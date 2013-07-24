@@ -1,10 +1,6 @@
 Fairness Time & Attendance
 ==========================
 
-Fairness is a Fork of the TimeTrex Workforce Management by Mike Benoit which he kindly licensed under the
-GNU AFFERO GENERAL PUBLIC LICENSE VERSION 3.
-See LICENSE file for the full license text.
-
 INSTALLATION INSTRUCTIONS
 -------------------------
 

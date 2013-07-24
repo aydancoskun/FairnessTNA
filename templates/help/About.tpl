@@ -28,25 +28,15 @@
 						<br>
 						{t}This version may contain tax table updates necessary for accurate payroll calculation, we recommend that you upgrade as soon as possible.{/t}
 						<br>
-						{t escape="no"}The latest version can be downloaded from:{/t} <a href="http://{$ORGANIZATION_URL}/?upgrade=1" target="_blank"><b>{$ORGANIZATION_URL}</b></a>
+						{t escape="no"}The latest version can be downloaded from:{/t} <a href="https://github.com/Aydan/fairness" target="_blank"><b>https://github.com/Aydan/fairness</b></a>
 						<br>
 						<br>
 					</td>
 				</tr>
 				{/if}
-
 				<tr>
 					<td colspan="2" class="cellLeftEditTable">
 						<div align="center">{t}System Information{/t}</div>
-					</td>
-				</tr>
-
-				<tr onClick="showHelpEntry('version')">
-					<td class="cellLeftEditTable">
-						{t}Product Edition:{/t}
-					</td>
-					<td class="cellRightEditTable">
-						{$data.product_edition}
 					</td>
 				</tr>
 
@@ -80,17 +70,6 @@
 					</td>
 				</tr>
 
-				{if DEPLOYMENT_ON_DEMAND == FALSE}
-				<tr onClick="showHelpEntry('version')">
-					<td class="cellLeftEditTable">
-						{t}Registration Key:{/t}
-					</td>
-					<td class="cellRightEditTable">
-						{$data.registration_key|default:"N/A"}
-					</td>
-				</tr>
-				{/if}
-
 				<tr onClick="showHelpEntry('version')">
 					<td class="cellLeftEditTable">
 						{t}Maintenance Jobs Last Ran:{/t}
@@ -103,84 +82,6 @@
 						{/if}
 					</td>
 				</tr>
-
-				{if isset($data.license_data)}
-					<tr>
-						<td colspan="2" class="cellLeftEditTable" {if isset($data.license_data.message) AND $data.license_data.message != ''}style="font-weight: bold; background-color: red"{/if}>
-							<div align="center">
-								{t}License Information{/t}
-								{if isset($data.license_data.message) AND $data.license_data.message != ''}
-									<br>
-									{t}WARNING:{/t} {$data.license_data.message}!
-								{/if}
-							</div>
-						</td>
-					</tr>
-					<tr onClick="showHelpEntry('license_upload')">
-						<td class="cellLeftEditTable">
-							{t}Upload License:{/t} <a href="javascript:Upload('license','');"><img style="vertical-align: middle" src="{$IMAGES_URL}/nav_popup.gif"></a>
-						</td>
-						<td class="cellRightEditTable">
-							<b>{t}Click the "..." icon to upload a license file.{/t}</b>
-						</td>
-					</tr>
-					{if isset($data.license_data) AND $data.license_data.organization_name != ''}
-						<tr onClick="showHelpEntry('license_product_name')">
-							<td class="cellLeftEditTable">
-								{t}Product:{/t}
-							</td>
-							<td class="cellRightEditTable">
-								{$data.license_data.product_name}
-							</td>
-						</tr>
-
-						<tr onClick="showHelpEntry('license_organization_name')">
-							<td class="cellLeftEditTable">
-								{t}Company:{/t}
-							</td>
-							<td class="cellRightEditTable">
-								{$data.license_data.organization_name}
-							</td>
-						</tr>
-
-						<tr onClick="showHelpEntry('license_version')">
-							<td class="cellLeftEditTable">
-								{t}Version:{/t}
-							</td>
-							<td class="cellRightEditTable">
-								{$data.license_data.major_version}.{$data.license_data.minor_version}.X
-							</td>
-						</tr>
-
-						<tr onClick="showHelpEntry('license_active_employee_licenses')">
-							<td class="cellLeftEditTable">
-								{t}Active Employee Licenses:{/t}
-							</td>
-							<td class="cellRightEditTable">
-								{$data.license_data.active_employee_licenses}
-							</td>
-						</tr>
-
-						<tr onClick="showHelpEntry('license_issue_date')">
-							<td class="cellLeftEditTable">
-								{t}Issue Date:{/t}
-							</td>
-							<td class="cellRightEditTable">
-								{$data.license_data.issue_date}
-							</td>
-						</tr>
-
-						<tr onClick="showHelpEntry('license_expire_date')">
-							<td class="cellLeftEditTable">
-								{t}Expire Date:{/t}
-							</td>
-							<td class="cellRightEditTable">
-								{$data.license_data.expire_date_display}
-							</td>
-						</tr>
-					{/if}
-				{/if}
-
 				<tr>
 					<td colspan="2" class="cellLeftEditTable">
 						<div align="center">{t}Schema Version{/t}</div>
@@ -237,6 +138,44 @@
 					</tr>
 				{/foreach}
 				{/if}
+				<tr>
+					<td colspan="2" class="cellLeftEditTable">
+						<div align="center">{t}License{/t}</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td class="cellLeftEditTable">
+						{t}Attribution:{/t}
+					</td>
+					<td class="cellRightEditTable">						
+						Credit is given and thanks is extended to Timetrex for the original codebase of this project.<br><br>
+						
+						Their software is called "TimeTrex Workforce Management" and is available at <a href="http://timetrex.com" target="_blank">timetrex.com</a><br><br>
+						
+						Their software is licensed under the GNU Affero General Public License version 3, as is this one.<br><br>
+					</td>
+				</tr>
+
+
+				<tr>
+					<td class="cellLeftEditTable">
+						{t}Source Code:{/t}
+					</td>
+					<td class="cellRightEditTable">
+						The source code of Fairness is publicly hosted on <a href="https://github.com/Aydan/fairness" target="_blank"><strong>Github</strong></a>.
+						<br>
+						<br>
+					</td>
+				</tr>
+				<tr>
+					<td class="cellLeftEditTable">
+						{t}License:{/t}
+					</td>
+					<td class="cellRightEditTable">
+						{$data.license}
+					</td>
+				</tr>
 
 				<tr>
 					<td class="tblPagingLeft" colspan="7" align="right">

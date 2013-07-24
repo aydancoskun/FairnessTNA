@@ -205,7 +205,7 @@ switch ($action) {
 		}
 }
 
-//var_dump($data);
+$data['license'] = str_replace("\n", "<br>", file_get_contents(Environment::getBasePath() ."LICENSE"));
 $smarty->assign_by_ref('data', $data);
 
 $smarty->display('help/About.tpl');
