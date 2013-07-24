@@ -93,7 +93,7 @@ installer_enabled = TRUE
 primary_company_id = 0
 hostname = localhost
 
-default_interface = flex
+;default_interface = flex
 
 ;WARNING: DO NOT CHANGE THIS AFTER YOU HAVE INSTALLED TIMETREX.
 ;If you do it will cause all your passwords to become invalid,
