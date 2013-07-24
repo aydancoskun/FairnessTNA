@@ -26,9 +26,9 @@ web server. Common locations include:
 
 3. Copy the all the files of fairness in that directory.
 
-4. Rename timetrex.ini.php-example_(linux|windows) to timetrex.ini.php
+4. Rename fairness.ini.php-example_(linux|windows) to fairness.ini.php
 
-5. Edit timetrex.ini.php and confirm that all paths are correct.
+5. Edit fairness.ini.php and confirm that all paths are correct.
 	The installer will create and configure the database
 	for you, as well as modify other non-path settings for you.
 
@@ -45,14 +45,14 @@ UPGRADE INSTRUCTIONS
 1. *IMPORTANT* Create a backup of your current installation, including your Fairness database.
 
 2. *VERY IMPORTANT* No really, create a backup of all your TimeTrex data including your
-   timetrex.ini.php file, as it contains a cryptographic salt that if you lose you will
+   fairness.ini.php file, as it contains a cryptographic salt that if you lose you will
    not be able to login to TimeTrex or access encrypted data ever again.
    
-   **BE SURE TO BACKUP YOUR TimeTrex DATABASE AND YOUR timetrex.ini.php FILE!**
+   **BE SURE TO BACKUP YOUR TimeTrex DATABASE AND YOUR fairness.ini.php FILE!**
 
 3. Copy the current version of Fairness over the top of your current installation.
 
-4. Edit timetrex.ini.php in your new Fairness directory and set:
+4. Edit fairness.ini.php in your new Fairness directory and set:
 	installer_enabled = TRUE
 
 5. Point your web browser to:

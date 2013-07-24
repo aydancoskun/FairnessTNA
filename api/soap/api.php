@@ -40,7 +40,7 @@
  */
 define('TIMETREX_SOAP_API', TRUE );
 
-//Add timetrex.ini.php setting to enable/disable the API. Make an entire [API] section.
+//Add fairness.ini.php setting to enable/disable the API. Make an entire [API] section.
 require_once('../../includes/global.inc.php');
 require_once('../../includes/API.inc.php');
 
@@ -109,7 +109,7 @@ if ( isset($_GET['SessionID']) AND $_GET['SessionID'] != '' ) {
 		}
 	} else {
 		TTi18n::chooseBestLocale(); //Make sure we set the locale as best we can when not logged in
-	
+
 		Debug::text('User not authenticated! Session likely timed out.', __FILE__, __LINE__, __METHOD__, 10);
 		//$soap_server->fault( 9900, 'Session timed out, please login again.');
 		$soap_server->setClass('APIAuthentication'); //Allow checking isLoggedIn() and logging in again here.

@@ -71,7 +71,7 @@ else _d.write("<scr"+"ipt language=JavaScript src={$BASE_URL}menu/mmenudom.js><\
 	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 maintenance jobs have not run in the last 48hours. Please contact your %1 administrator immediately.{/t}</div>
 	{/if}
 	{if $INSTALLER_ENABLED == 1}
-	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 is currently in INSTALL MODE. Please go to your timetrex.ini.php file and set "installer_enabled" to "FALSE".{/t}</div>
+	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 is currently in INSTALL MODE. Please go to your fairness.ini.php file and set "installer_enabled" to "FALSE".{/t}</div>
 	{/if}
 	{if $VALID_INSTALL_REQUIREMENTS == 1}
 	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 system requirement check has failed! Please contact your %1 administrator immediately to re-run the %1 installer to correct the issue.{/t}</div>

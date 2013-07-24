@@ -501,7 +501,7 @@ class TTi18n {
 		if ( $success == FALSE ) {
 			global $config_vars;
 
-			//Use system locale if its set from timetrex.ini.php
+			//Use system locale if its set from fairness.ini.php
 			if ( isset($config_vars['other']['system_locale']) AND $config_vars['other']['system_locale'] != '' ) {
 				Debug::text('Using system locale from .ini: ' . $config_vars['other']['system_locale'],  __FILE__, __LINE__, __METHOD__,10);
 				$success = self::setLocale( $config_vars['other']['system_locale'], $category );

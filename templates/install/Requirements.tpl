@@ -291,7 +291,7 @@
 
 							<tr>
 								<td class="cellLeftEditTable">
-									{t escape="no" 1=$APPLICATION_NAME}Writable %1 Configuration File (timetrex.ini.php):{/t}
+									{t escape="no" 1=$APPLICATION_NAME}Writable %1 Configuration File (fairness.ini.php):{/t}
 								</td>
 								<td class="cellRightEditTable">
 									{if $install_obj->checkWritableConfigFile() == 0}
@@ -406,7 +406,7 @@
 				<tr>
 					<td class="tblDataWhiteNH" colspan="2">
 						<ul>
-						<li>{t escape="no" 1=$APPLICATION_NAME 2=$install_obj->getConfigFile()}Your %1 configuration file (timetrex.ini.php) is located at:<br> <b>%2</b>{/t}</li>
+						<li>{t escape="no" 1=$APPLICATION_NAME 2=$install_obj->getConfigFile()}Your %1 configuration file (fairness.ini.php) is located at:<br> <b>%2</b>{/t}</li>
 						<br>
 						<li>{t escape="no" 1=$install_obj->getPHPConfigFile() 2=$install_obj->getPHPIncludePath()}Your PHP configuration file (php.ini) is located at:<br> <b>%1</b>, the include path is: "<b>%2</b>"{/t}</li>
 						<br>

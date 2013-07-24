@@ -69,12 +69,12 @@ if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') { define('OPERATING_SYSTEM', 'WIN
 /*
 	Config file inside webroot.
 */
-define('CONFIG_FILE', dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'timetrex.ini.php');
+define('CONFIG_FILE', dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'fairness.ini.php');
 
 /*
 	Config file outside webroot.
 */
-//define('CONFIG_FILE', '/etc/timetrex.ini.php');
+//define('CONFIG_FILE', '/etc/fairness.ini.php');
 
 if ( file_exists(CONFIG_FILE) ) {
 	$config_vars = parse_ini_file( CONFIG_FILE, TRUE);

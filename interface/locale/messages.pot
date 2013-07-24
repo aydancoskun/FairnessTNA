@@ -14420,7 +14420,7 @@ msgstr ""
 msgid "Thailand"
 msgstr ""
 
-msgid "The installer has already been run, as a safety measure it has been disabled from running again. If you are absolutely sure you want to run it again, or upgrade your system, please go to your timetrex.ini.php file and set \"installer_enabled\" to \"TRUE\". The line should look like:"
+msgid "The installer has already been run, as a safety measure it has been disabled from running again. If you are absolutely sure you want to run it again, or upgrade your system, please go to your fairness.ini.php file and set \"installer_enabled\" to \"TRUE\". The line should look like:"
 msgstr ""
 
 msgid "The latest version can be downloaded from:"
@@ -15798,7 +15798,7 @@ msgstr ""
 msgid "WARNING: %1 application version does not match database version. Please re-run the TimeTrex installer to complete the upgrade process."
 msgstr ""
 
-msgid "WARNING: %1 is currently in INSTALL MODE. Please go to your timetrex.ini.php file and set \"installer_enabled\" to \"FALSE\"."
+msgid "WARNING: %1 is currently in INSTALL MODE. Please go to your fairness.ini.php file and set \"installer_enabled\" to \"FALSE\"."
 msgstr ""
 
 msgid "WARNING: %1 maintenance jobs have not run in the last 48hours. Please contact your %1 administrator immediately."
@@ -16325,7 +16325,7 @@ msgstr ""
 msgid "Wrexham"
 msgstr ""
 
-msgid "Writable %1 Configuration File (timetrex.ini.php):"
+msgid "Writable %1 Configuration File (fairness.ini.php):"
 msgstr ""
 
 msgid "Writable Cache Directory:"
@@ -16444,7 +16444,7 @@ msgid ""
 "\t\t\t\tor to close the window press the X in the upper right of this window, or press the ESC key."
 msgstr ""
 
-msgid "Your %1 configuration file (timetrex.ini.php) is located at:<br> <b>%2</b>"
+msgid "Your %1 configuration file (fairness.ini.php) is located at:<br> <b>%2</b>"
 msgstr ""
 
 msgid "Your PHP configuration file (php.ini) is located at:<br> <b>%1</b>, the include path is: \"<b>%2</b>\""

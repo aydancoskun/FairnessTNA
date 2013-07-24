@@ -42,7 +42,7 @@
 				{else}
 				<tr>
 					<td class="tblDataWhiteNH" colspan="7" align="right">
-						{t}The installer has already been run, as a safety measure it has been disabled from running again. If you are absolutely sure you want to run it again, or upgrade your system, please go to your timetrex.ini.php file and set "installer_enabled" to "TRUE". The line should look like:{/t}
+						{t}The installer has already been run, as a safety measure it has been disabled from running again. If you are absolutely sure you want to run it again, or upgrade your system, please go to your fairness.ini.php file and set "installer_enabled" to "TRUE". The line should look like:{/t}
 						<br>
 						<br>
 						"<b>{t}installer_enabled = TRUE{/t}</b>"

@@ -68,7 +68,7 @@ if ( $argc < 1 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 	$install_obj = new Install();
 	$install_obj->cleanCacheDirectory();
 	if ( $install_obj->isInstallMode() == FALSE ) {
-		echo "ERROR: Install mode is not enabled in the timetrex.ini.php file!\n";
+		echo "ERROR: Install mode is not enabled in the fairness.ini.php file!\n";
 		exit(1);
 	} else {
 		$check_all_requirements = $install_obj->checkAllRequirements( TRUE );

@@ -125,7 +125,7 @@ class APINotification extends APIFactory {
 										  );
 				}
 
-				//Only display message to the primary company. 
+				//Only display message to the primary company.
 				if ( ( (time()-(int)APPLICATION_VERSION_DATE) > (86400*475) )
 						AND ( $this->getCurrentCompanyObject()->getId() == 1 OR ( isset($config_vars['other']['primary_company_id']) AND $this->getCurrentCompanyObject()->getId() == $config_vars['other']['primary_company_id'] ) ) ) { //~1yr and 3mths
 					$retarr[] = array(
@@ -179,7 +179,7 @@ class APINotification extends APIFactory {
 					$retarr[] = array(
 										  'delay' => -1,
 										  'bg_color' => '#FF0000', //Red
-										  'message' => TTi18n::getText('WARNING: %1 is currently in INSTALL MODE. Please go to your timetrex.ini.php file and set "installer_enabled" to "FALSE".', APPLICATION_NAME ),
+										  'message' => TTi18n::getText('WARNING: %1 is currently in INSTALL MODE. Please go to your fairness.ini.php file and set "installer_enabled" to "FALSE".', APPLICATION_NAME ),
 										  'destination' => NULL,
 										  );
 				}
