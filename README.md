@@ -160,16 +160,22 @@ We are planning of ripping all that out but we are not there yet by a long shot.
 List of removals:
 ----------------
 For the record we are keeping a list of files that we found that have other "further restrictions" imposed which we removed:
+
 **About.tpl**
 
 	{* REMOVING OR CHANGING THIS LOGO IS IN STRICT VIOLATION OF THE LICENSE AGREEMENT *}
 	<a href="http://{$ORGANIZATION_URL}"><img src="{$BASE_URL}/send_file.php?object_type=copyright" 	alt="Time and Attendance"></a>
 
 **CompanyFactory.class.php**
+
 **PunchFactory.class.php**
+
 **ScheduleFactory.class.php**
+
 **UserContactFactory.class.php**
+
 **UserFactory.class.php**
+
 **UserList.class.php**
 
 	$obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function =
@@ -181,11 +187,11 @@ For the record we are keeping a list of files that we found that have other "fur
 **We found this tabbed over by more than 80 characters (so that you won't see this code when you scroll though the file unless you have linewrap turned on) all on one line obfuscated code in the six files above.**
 Again, I think we just rip it out, making sure we don't loose functionality.
 
-**global.inc.php""
+**global.inc.php**
 
-// **REMOVING OR CHANGING THIS APPLICATION NAME AND ORGANIZATION URL IS IN STRICT VIOLATION OF THE LICENSE AND COPYRIGHT AGREEMENT**
-( isset($config_vars['branding']['application_name']) AND $config_vars['branding']['application_name'] != '' ) ? define('APPLICATION_NAME', $config_vars['branding']['application_name']) : define('APPLICATION_NAME', (PRODUCTION == FALSE) ? 'TimeTrex-Debug' : 'TimeTrex');
-( isset($config_vars['branding']['organization_name']) AND $config_vars['branding']['organization_name'] != '' ) ? define('ORGANIZATION_NAME', $config_vars['branding']['organization_name']) : define('ORGANIZATION_NAME', 'TimeTrex');
-( isset($config_vars['branding']['organization_url']) AND $config_vars['branding']['organization_url'] != '' ) ? define('ORGANIZATION_URL', $config_vars['branding']['organization_url']) : define('ORGANIZATION_URL', 'www.TimeTrex.com');
+	// **REMOVING OR CHANGING THIS APPLICATION NAME AND ORGANIZATION URL IS IN STRICT VIOLATION OF THE LICENSE AND COPYRIGHT AGREEMENT**
+	( isset($config_vars['branding']['application_name']) AND $config_vars['branding']['application_name'] != '' ) ? define('APPLICATION_NAME', $config_vars['branding']['application_name']) : define('APPLICATION_NAME', (PRODUCTION == FALSE) ? 'TimeTrex-Debug' : 'TimeTrex');
+	( isset($config_vars['branding']['organization_name']) AND $config_vars['branding']['organization_name'] != '' ) ? define('ORGANIZATION_NAME', $config_vars['branding']['organization_name']) : define('ORGANIZATION_NAME', 'TimeTrex');
+	( isset($config_vars['branding']['organization_url']) AND $config_vars['branding']['organization_url'] != '' ) ? define('ORGANIZATION_URL', $config_vars['branding']['organization_url']) : define('ORGANIZATION_URL', 'www.TimeTrex.com');
 
 
