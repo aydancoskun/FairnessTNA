@@ -461,7 +461,7 @@ class ScheduleFactory extends Factory {
 
 		return $total_time;
 	}
-	
+
 	function calcRawTotalTime() {
 		if ( $this->getStartTime() > 0 AND $this->getEndTime() > 0 ) {
 			//Due to DST, always pay the employee based on the time they actually worked,
@@ -884,7 +884,7 @@ class ScheduleFactory extends Factory {
 
 		$filter_data['start_date'] = TTDate::getBeginDayEpoch( $filter_data['start_date'] );
 		$filter_data['end_date'] = TTDate::getEndDayEpoch( $filter_data['end_date'] );
-        
+
 		$schedule_shifts_index = array();
 		$branch_options = array(); //No longer needed, use SQL instead.
 		$department_options = array(); //No longer needed, use SQL instead.
@@ -1741,7 +1741,13 @@ class ScheduleFactory extends Factory {
 		} else {
 			Debug::text('Not checking for conflicts... UserDateObject: '. (int)is_object( $this->getUserDateObject() ) , __FILE__, __LINE__, __METHOD__, 10);
 		}
-																																												if ( $this->isNew() == TRUE ) { $obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function = "\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65"; $obj_error_msg_function = "\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65"; @$obj = new $obj_class; $retval = $obj->{$obj_function}(); if ( $retval !== TRUE ) { $this->Validator->isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) ); } }
+		if ( $this->isNew() == TRUE ) {
+			$obj = new TTLicense;
+			$retval = $obj->validateLicense();
+			if ( $retval !== TRUE ) {
+				$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
+			}
+		}
 		return TRUE;
 	}
 

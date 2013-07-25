@@ -67,9 +67,9 @@ We will try to comment on **two points**.
 In paragraph 2 Timetrex is saying is that they modified their "Disclaimer of Warranty"
 
 Section 7A states:
-	
+
 	"a) Disclaiming warranty or limiting liability differently from the terms of sections 15 and 16 of this License;"
-	
+
 Section 15 states:
 
 	15. Disclaimer of Warranty.
@@ -85,21 +85,21 @@ Section 15 states:
 The changed it to:
 
 	FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
-  
+
 **It appears that Timetrex is trying to cover themselves in case of there is any infringements against the copyright of third parties (i.e. libaries they are using). We speculate that this is possibly because they are using a commercial javascript menu which is licensed to them with a serial code.**
 
-**Our aim is to replace this library with a free JQuery menu. But until then if you want to be sure get your own license for that menu if you use this software. Or better help us fix it.** 
+**Our aim is to replace this library with a free JQuery menu. But until then if you want to be sure get your own license for that menu if you use this software. Or better help us fix it.**
 
 ###Point 2
 
 In he last two paragraphs it sounds like that what Timetrex is tying to do is making sure that any future fork or derivitive work will diplay the "Powered by TimeTrex" Logo or say "Powered by TimeTrex." on every page of the user interface.
-				
+
 However section 7 of the license, and we urge you to read it for yourself, states that there are 2 types of "Additional Terms".
-		
-######Type 1: 
+
+######Type 1:
 There are "Additional permissions" which you can remove. Quote: "***When you convey a copy of a covered work, you may at your option remove any additional permissions from that copy, or from any part of it.***" (A permission is something extra you are allowed to do)
-		
-######Type 2: 
+
+######Type 2:
 Then there are "further restrictions". Quote: "***All other non-permissive additional terms are considered "further restrictions" within the meaning of section 10. If the Program as you received it, or any part of it, contains a notice stating that it is governed by this License along with a term that is a further restriction, you may remove that term.***"
 
 From our standpoint we are forking this software and its now called "Fairness". Obviously putting "Powered by Timetrex" onto every page is nonsense for an open source product. But there is the point of attribution.
@@ -116,13 +116,13 @@ There are two quotes relevant to this:
 	work under this License, and how to view a copy of this License. If
 	the interface presents a list of user commands or options, such as a
 	menu, a prominent item in the list meets this criterion.
-	
+
 **Article 7b):**
 
 	b) Requiring preservation of specified reasonable legal notices or
 	author attributions in that material or in the Appropriate Legal
 	Notices displayed by works containing it;
-	
+
 Article 0 is very clear as to what is meant by "Appropriate Legal Notices". The "About" menu is quite sufficient. Therefore we are giving full attribution to Timetrex in the about menu because we are thankful for what they have created.
 
 ###Another Point
@@ -166,14 +166,19 @@ For the record we are keeping a list of files that we found that have other "fur
 	<a href="http://{$ORGANIZATION_URL}"><img src="{$BASE_URL}/send_file.php?object_type=copyright" 	alt="Time and Attendance"></a>
 
 **CompanyFactory.class.php**
+**PunchFactory.class.php**
+**ScheduleFactory.class.php**
+**UserContactFactory.class.php**
+**UserFactory.class.php**
+**UserList.class.php**
 
-	$obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function = 
-	"\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65"; $obj_error_msg_function = 
-	"\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65"; @$obj = new 
+	$obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function =
+	"\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65"; $obj_error_msg_function =
+	"\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65"; @$obj = new
 	$obj_class; $retval = $obj->{$obj_function}(); if ( $retval !== TRUE ) { $this->Validator-
 	>isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) ); }
-								
-**We found this tabbed over by more than 80 characters (so that you won't see this code when you scroll though the file unless you have linewrap turned on) all on one line obfuscated code.**
+
+**We found this tabbed over by more than 80 characters (so that you won't see this code when you scroll though the file unless you have linewrap turned on) all on one line obfuscated code in the six files above.**
 Again, I think we just rip it out, making sure we don't loose functionality.
 
 

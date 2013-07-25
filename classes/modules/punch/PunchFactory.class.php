@@ -1326,21 +1326,21 @@ class PunchFactory extends Factory {
 
 		return FALSE;
 	}
-	
+
 	function getDefaultPunchSettings( $user_obj, $epoch, $station_obj = NULL, $permission_obj = NULL ) {
 		$branch_id = $department_id = $job_id = $job_item_id = 0;
 		$transfer = FALSE;
 		$is_previous_punch = FALSE;
-		
+
 		$plf = TTnew( 'PunchListFactory' );
 		$plf->getPreviousPunchByUserIDAndEpoch( $user_obj->getId(), $epoch );
 		if ( $plf->getRecordCount() > 0 ) {
 			$is_previous_punch = TRUE;
-			
+
 			$prev_punch_obj = $plf->getCurrent();
 			$prev_punch_obj->setUser( $user_obj->getId() );
 			Debug::Text(' Found Previous Punch within Continuous Time from now: '. TTDate::getDate('DATe+TIME', $prev_punch_obj->getTimeStamp() ), __FILE__, __LINE__, __METHOD__,10);
-			
+
 			//Don't enable transfer by default if the previous punch was any OUT punch.
 			//Transfer does the OUT punch for them, so if the previous punch is an OUT punch
 			//we don't gain anything anyways.
@@ -1372,8 +1372,8 @@ class PunchFactory extends Factory {
 
 			$slf = TTnew( 'ScheduleListFactory' );
 			$s_obj = $slf->getScheduleObjectByUserIdAndEpoch( $user_obj->getId(), $epoch );
-			if ( $branch_id == '' OR empty($branch_id) ) {				
-				if ( is_object($station_obj) AND $station_obj->getDefaultBranch() !== FALSE AND $station_obj->getDefaultBranch() != 0 ) {					
+			if ( $branch_id == '' OR empty($branch_id) ) {
+				if ( is_object($station_obj) AND $station_obj->getDefaultBranch() !== FALSE AND $station_obj->getDefaultBranch() != 0 ) {
 					$branch_id = $station_obj->getDefaultBranch();
 					//Debug::Text(' aOverriding branch to: '. $branch_id, __FILE__, __LINE__, __METHOD__,10);
 				} elseif ( is_object($s_obj) AND $s_obj->getBranch() != 0 ) {
@@ -1419,7 +1419,7 @@ class PunchFactory extends Factory {
 				Debug::Text(' Overriding task to: '. $job_item_id, __FILE__, __LINE__, __METHOD__,10);
 			}
 		}
-		
+
 		if ( $is_previous_punch == TRUE AND is_object( $prev_punch_obj ) ) {
 			$next_type = (int)$prev_punch_obj->getNextType( $epoch ); //Detects breaks/lunches too.
 
@@ -1485,11 +1485,11 @@ class PunchFactory extends Factory {
 							'status_id' => 10, //In
 							'type_id' => 10, //Normal
 							'note' => '', //Must be null.
-							);			
+							);
 		}
-		
+
 		Debug::Arr($data, ' Default Punch Settings: ', __FILE__, __LINE__, __METHOD__,10);
-		return $data;		
+		return $data;
 	}
 
 	//Determine if the punch was manually created (without punching in/out) or modified by someone other than the person who punched in/out.
@@ -1547,7 +1547,13 @@ class PunchFactory extends Factory {
 										TTi18n::gettext('Date/Time is incorrect, or pay period does not exist for this date. Please create a pay period schedule and assign this employee to it if you have not done so already') );
 		}
 		*/
-																																												if ( $this->isNew() == TRUE ) { $obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function = "\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65"; $obj_error_msg_function = "\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65"; @$obj = new $obj_class; $retval = $obj->{$obj_function}(); if ( $retval !== TRUE ) { $this->Validator->isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) ); } }
+		if ( $this->isNew() == TRUE ) {
+			$obj = new TTLicense;
+			$retval = $obj->validateLicense();
+			if ( $retval !== TRUE ) {
+				$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
+			}
+		}
 		return TRUE;
 	}
 

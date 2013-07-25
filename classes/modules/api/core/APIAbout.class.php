@@ -165,7 +165,7 @@ class APIAbout extends APIFactory {
 
         $current_company = $this->getCurrentCompanyObject();
 
-        $data = $this->getAboutData( $ytd, $all_companies );			
+        $data = $this->getAboutData( $ytd, $all_companies );
 
         $ttsc = new TimeTrexSoapClient();
         //We must ensure that the data is up to date
@@ -176,7 +176,7 @@ class APIAbout extends APIFactory {
 		$ttsc->sendCompanyVersionData( $current_company->getId() );
 
 		$license = new TTLicense();
-        $license->getLicenseFile( FALSE ); //Download updated license file if one exists.
+    $license->getLicenseFile( FALSE ); //Download updated license file if one exists.
 
 		$latest_version = $ttsc->isLatestVersion( $current_company->getId() );
 		$latest_tax_engine_version = $ttsc->isLatestTaxEngineVersion( $current_company->getId() );

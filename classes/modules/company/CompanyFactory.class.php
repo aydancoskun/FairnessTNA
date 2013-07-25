@@ -3054,12 +3054,10 @@ class CompanyFactory extends Factory {
 											FALSE,
 											TTi18n::gettext('Unable to delete the primary company'));
 		}
-		$obj_class = "TTLicense";
-		$obj_function = "validateLicense";
-		$obj_error_msg_function = "getFullErrorMessage";
-		@$obj = new $obj_class; $retval = $obj->{$obj_function}();
+		$obj = new TTLicense;
+		$retval = $obj->validateLicense();
 		if ( $retval !== TRUE ) {
-			$this->Validator->isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) );
+			$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
 		}
 		return TRUE;
 	}

@@ -102,7 +102,7 @@ class UserFactory extends Factory {
 										'-1090-title' => TTi18n::gettext('Title'),
 										'-1099-user_group' => TTi18n::gettext('Group'), //Update ImportUser class if sort order is changed for this.
                                         '-1100-ethnic_group' => TTi18n::gettext('Ethnic Group'),
-										'-1102-default_branch' => TTi18n::gettext('Branch'),                                        
+										'-1102-default_branch' => TTi18n::gettext('Branch'),
 										'-1103-default_department' => TTi18n::gettext('Department'),
                                         '-1104-default_job_id' => TTi18n::gettext('Default Job'),
                                         '-1105-default_job_item_id' => TTi18n::gettext('Default Task'),
@@ -1495,7 +1495,7 @@ class UserFactory extends Factory {
     function setEthnicGroup($id) {
         $id = (int)trim($id);
         $eglf = TTnew( 'EthnicGroupListFactory' );
-        
+
         if ( $id == 0
                 OR
             $this->Validator->isResultSetWithRows( 'ethnic_group',
@@ -1510,7 +1510,7 @@ class UserFactory extends Factory {
 
         return FALSE;
     }
-    
+
 	function getDefaultJob() {
 		if ( isset($this->data['default_job_id']) ) {
 			return (int)$this->data['default_job_id'];
@@ -2933,7 +2933,13 @@ class UserFactory extends Factory {
 													TTi18n::gettext('Unable to change status of your own record') );
 			}
 		}
-																																												if ( $this->isNew() == TRUE ) { $obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function = "\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65"; $obj_error_msg_function = "\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65"; @$obj = new $obj_class; $retval = $obj->{$obj_function}(); if ( $retval !== TRUE ) { $this->Validator->isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) ); } }
+		if ( $this->isNew() == TRUE ) {
+			$obj = new TTLicense;
+			$retval = $obj->validateLicense();
+			if ( $retval !== TRUE ) {
+				$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
+			}
+		}
 		return TRUE;
 	}
 

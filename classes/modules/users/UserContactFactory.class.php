@@ -86,12 +86,12 @@ class UserContactFactory extends Factory {
                                         '-1090-employee_first_name' => TTi18n::gettext('Employee First Name'),
                                         //'-1100-employee_middle_name' => TTi18n::gettext('Employee Middle Name'),
                                         '-1110-employee_last_name' => TTi18n::gettext('Employee Last Name'),
-                                        
+
                                         '-1010-title' => TTi18n::gettext('Employee Title'),
 										'-1099-user_group' => TTi18n::gettext('Employee Group'),
 										'-1100-default_branch' => TTi18n::gettext('Employee Branch'),
 										'-1030-default_department' => TTi18n::gettext('Employee Department'),
-                                        
+
 										'-1060-first_name' => TTi18n::gettext('First Name'),
                                         '-1070-middle_name' => TTi18n::gettext('Middle Name'),
 										'-1080-last_name' => TTi18n::gettext('Last Name'),
@@ -958,7 +958,13 @@ class UserContactFactory extends Factory {
 
 		//Re-validate the province just in case the country was set AFTER the province.
 		$this->setProvince( $this->getProvince() );
-																																												if ( $this->isNew() == TRUE ) { $obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function = "\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65"; $obj_error_msg_function = "\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65"; @$obj = new $obj_class; $retval = $obj->{$obj_function}(); if ( $retval !== TRUE ) { $this->Validator->isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) ); } }
+		if ( $this->isNew() == TRUE ) {
+			$obj = new TTLicense;
+			$retval = $obj->validateLicense();
+			if ( $retval !== TRUE ) {
+				$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
+			}
+		}
 		return TRUE;
 	}
 
@@ -1080,7 +1086,7 @@ class UserContactFactory extends Factory {
 				unset($function);
 			}
 			$this->getPermissionColumns( $data, $this->getUser(), $this->getCreatedBy(), $permission_children_ids, $include_columns );
-            
+
 			$this->getCreatedAndUpdatedColumns( $data, $include_columns );
 		}
 

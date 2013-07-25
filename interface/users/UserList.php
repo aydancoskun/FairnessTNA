@@ -300,7 +300,7 @@ switch ($action) {
 									'termination_date' => TTDate::getDate('DATE', $u_obj->getTerminationDate() ),
 
 									'map_url' => $u_obj->getMapURL(),
-									
+
 									'is_owner' => $permission->isOwner( $u_obj->getCreatedBy(), $u_obj->getId() ),
 									'is_child' => $permission->isChild( $u_obj->getId(), $permission_children_ids ),
 									'deleted' => $u_obj->getDeleted(),
@@ -350,7 +350,9 @@ switch ($action) {
 			$filter_columns[Misc::trimSortPrefix($column_key)] = $columns[$column_key];
 		}
 		unset($column_key);
-																																			$obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65";$obj_function = "\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65";$obj_error_msg_function = "\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65";@$obj = new $obj_class;$notice_data['retval'] = $obj->{$obj_function}();$notice_data['message'] = $obj->{$obj_error_msg_function}($notice_data['retval']);
+		$obj = new TTLicense;
+		$notice_data['retval'] = $obj->validateLicense();
+		$notice_data['message'] = $obj->getFullErrorMessage($notice_data['retval']);
 
 		$smarty->assign_by_ref('users', $users);
 		$smarty->assign_by_ref('notice_data', $notice_data);
