@@ -62,10 +62,6 @@ if ( $install_obj->isInstallMode() == FALSE ) {
 	exit;
 }
 
-//Check for updated license file.
-$license = new TTLicense();
-$license->getLicenseFile( TRUE ); //Download updated license file if one exists.
-
 $action = Misc::findSubmitButton();
 switch ($action) {
 	case 'back':

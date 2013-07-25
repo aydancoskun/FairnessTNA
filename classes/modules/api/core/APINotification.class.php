@@ -72,39 +72,6 @@ class APINotification extends APIFactory {
 				}
 				unset($sslf);
 
-				//Check license validity
-				if ( ( ( DEPLOYMENT_ON_DEMAND == FALSE AND $this->getCurrentCompanyObject()->getId() == 1 ) OR ( isset($config_vars['other']['primary_company_id']) AND $this->getCurrentCompanyObject()->getId() == $config_vars['other']['primary_company_id'] ) ) AND getTTProductEdition() > 10 ) {
-					if ( !isset($system_settings['license']) ) {
-						$system_settings['license'] = NULL;
-					}
-
-					$license = new TTLicense();
-					$license_validate = $license->validateLicense( $system_settings['license'] );
-					$license_message = $license->getFullErrorMessage( $license_validate , TRUE );
-					if ( $license_message != '' ) {
-						$destination_url = 'http://www.timetrex.com/r.php?id=899';
-
-						if ( $license_validate === TRUE ) {
-							//License likely expires soon.
-							$retarr[] = array(
-												  'delay' => 0, //0= Show until clicked, -1 = Show until next getNotifications call.
-												  'bg_color' => '#FFFF00', //Yellow
-												  'message' => TTi18n::getText('WARNING: %1', $license_message ),
-												  'destination' => $destination_url,
-												  );
-						} else {
-							//License error.
-							$retarr[] = array(
-												  'delay' => -1, //0= Show until clicked, -1 = Show until next getNotifications call.
-												  'bg_color' => '#FF0000', //Red
-												  'message' => TTi18n::getText('WARNING: %1', $license_message ),
-												  'destination' => $destination_url,
-												  );
-						}
-					}
-					unset($license, $license_validate, $license_message, $destination);
-				}
-
 				//System Requirements not being met.
 				if ( isset($system_settings['valid_install_requirements']) AND DEPLOYMENT_ON_DEMAND == FALSE AND (int)$system_settings['valid_install_requirements'] == 0 ) {
 					$retarr[] = array(

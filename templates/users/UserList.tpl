@@ -25,11 +25,6 @@ function showProvince() {
 }
 {/literal}
 </script>
-
-{if isset($notice_data.message) AND $notice_data.message != '' AND ( DEPLOYMENT_ON_DEMAND == FALSE OR ( DEPLOYMENT_ON_DEMAND == TRUE AND isset($config_vars.other.primary_company_id) AND $config_vars.other.primary_company_id == $current_company->getId() ) )}
-	<div id="rowError" align="center">{t}WARNING{/t}: {$notice_data.message}.</div>
-{/if}
-
 <div id="rowContent">
 	<div id="titleTab"><div class="textTitle"><span class="textTitleSub">{$title}</span></div>
 </div>

@@ -221,12 +221,6 @@ switch ($object_type) {
 
 				$file_data_arr = $upload->get_file();
 				$license_data = trim( file_get_contents( $dir.'/'.$upload_result ) );
-
-				$license = new TTLicense();
-				$retval = $license->getLicenseFile( TRUE, $license_data ); //Download updated license file if one exists.
-				if ( $retval === FALSE ) {
-					$error = TTi18n::gettext('Invalid License File');
-				}
 			}
 		} else {
 			Debug::Text('Permission denied for upload!', __FILE__, __LINE__, __METHOD__,10);

@@ -350,12 +350,7 @@ switch ($action) {
 			$filter_columns[Misc::trimSortPrefix($column_key)] = $columns[$column_key];
 		}
 		unset($column_key);
-		$obj = new TTLicense;
-		$notice_data['retval'] = $obj->validateLicense();
-		$notice_data['message'] = $obj->getFullErrorMessage($notice_data['retval']);
-
 		$smarty->assign_by_ref('users', $users);
-		$smarty->assign_by_ref('notice_data', $notice_data);
 		$smarty->assign_by_ref('filter_data', $filter_data);
 		$smarty->assign_by_ref('columns', $filter_columns );
 		$smarty->assign('total_columns', count($filter_columns)+3 );

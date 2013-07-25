@@ -71,9 +71,6 @@ if ( $ttsc->isUpdateNotifyEnabled() == TRUE ) {
 				if ( !isset($system_settings['license']) ) {
 					$system_settings['license'] = NULL;
 				}
-
-				$license = new TTLicense();
-				$license->checkLicenseFile( $system_settings['license'] );
 			}
 
 			//Only need to call this on the last company

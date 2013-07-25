@@ -1547,13 +1547,6 @@ class PunchFactory extends Factory {
 										TTi18n::gettext('Date/Time is incorrect, or pay period does not exist for this date. Please create a pay period schedule and assign this employee to it if you have not done so already') );
 		}
 		*/
-		if ( $this->isNew() == TRUE ) {
-			$obj = new TTLicense;
-			$retval = $obj->validateLicense();
-			if ( $retval !== TRUE ) {
-				$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
-			}
-		}
 		return TRUE;
 	}
 

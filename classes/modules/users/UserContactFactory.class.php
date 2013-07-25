@@ -958,13 +958,6 @@ class UserContactFactory extends Factory {
 
 		//Re-validate the province just in case the country was set AFTER the province.
 		$this->setProvince( $this->getProvince() );
-		if ( $this->isNew() == TRUE ) {
-			$obj = new TTLicense;
-			$retval = $obj->validateLicense();
-			if ( $retval !== TRUE ) {
-				$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
-			}
-		}
 		return TRUE;
 	}
 

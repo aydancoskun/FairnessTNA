@@ -1741,13 +1741,6 @@ class ScheduleFactory extends Factory {
 		} else {
 			Debug::text('Not checking for conflicts... UserDateObject: '. (int)is_object( $this->getUserDateObject() ) , __FILE__, __LINE__, __METHOD__, 10);
 		}
-		if ( $this->isNew() == TRUE ) {
-			$obj = new TTLicense;
-			$retval = $obj->validateLicense();
-			if ( $retval !== TRUE ) {
-				$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
-			}
-		}
 		return TRUE;
 	}
 

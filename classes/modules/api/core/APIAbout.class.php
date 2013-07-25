@@ -102,22 +102,6 @@ class APIAbout extends APIFactory {
 		}
 		Debug::Text('Company User Count Rows: '. $cuclf->getRecordCount(), __FILE__, __LINE__, __METHOD__,10);
 
-		if ( $cuclf->getRecordCount() > 0 ) {
-			foreach( $cuclf as $cuc_obj ) {
-				$data['user_counts'][] = array(
-																//'label' => $month_of_year_arr[TTDate::getMonth( $begin_month_epoch )] .' '. TTDate::getYear($begin_month_epoch),
-																'label' => $month_of_year_arr[TTDate::getMonth( TTDate::strtotime( $cuc_obj->getColumn('date_stamp') ) )] .' '. TTDate::getYear( TTDate::strtotime( $cuc_obj->getColumn('date_stamp') ) ),
-																'max_active_users' => $cuc_obj->getColumn('max_active_users'),
-																'max_inactive_users' => $cuc_obj->getColumn('max_inactive_users'),
-																'max_deleted_users' => $cuc_obj->getColumn('max_deleted_users'),
-																);
-			}
-		}
-
-        if ( isset($data['user_counts']) == FALSE ) {
-            $data['user_counts'] = array();
-        }
-
 		$cjlf = TTnew( 'CronJobListFactory' );
 		$cjlf->getMostRecentlyRun();
 		if ( $cjlf->getRecordCount() > 0 ) {
@@ -125,35 +109,6 @@ class APIAbout extends APIFactory {
 			$data['cron'] = array(
 								'last_run_date' => ( $cj_obj->getLastRunDate() == FALSE ) ? TTi18n::getText('Never') : TTDate::getDate('DATE+TIME', $cj_obj->getLastRunDate() ),
 								);
-		}
-        $data['show_license_data'] = FALSE;
-		if ( ( ( DEPLOYMENT_ON_DEMAND == FALSE AND $current_company->getId() == 1 ) OR ( isset($config_vars['other']['primary_company_id']) AND $current_company->getId() == $config_vars['other']['primary_company_id'] ) ) AND getTTProductEdition() > 10 ) {
-
-            if ( !isset($system_settings['license']) ) {
-				$system_settings['license'] = NULL;
-			}
-            $data['show_license_data'] = TRUE;
-			//Set this so the license upload area at least shows up regardles of edition.
-            $data['license_data'] = array();
-
-			$license = new TTLicense();
-			$retval = $license->validateLicense( $system_settings['license'] );
-
-			if ( $retval == TRUE ) {
-				$data['license_data'] = array(
-										'organization_name' => $license->getOrganizationName(),
-										'major_version' => $license->getMajorVersion(),
-										'minor_version' => $license->getMinorVersion(),
-										'product_name' => $license->getProductName(),
-										'active_employee_licenses' => $license->getActiveEmployeeLicenses(),
-										'issue_date' => TTDate::getDate('DATE', $license->getIssueDate() ),
-										'expire_date' => $license->getExpireDate(),
-										'expire_date_display' => TTDate::getDate('DATE', $license->getExpireDate() ),
-										'registration_key' => $license->getRegistrationKey(),
-										'message' => $license->getFullErrorMessage( $retval ),
-										'retval' => $retval,
-										);
-			}
 		}
 
 		//Debug::Arr($data, 'Data: ', __FILE__, __LINE__, __METHOD__,10);
@@ -174,9 +129,6 @@ class APIAbout extends APIFactory {
 		$ttsc->sendCompanyUserLocationData( $current_company->getId() );
 		$ttsc->sendCompanyUserCountData( $current_company->getId() );
 		$ttsc->sendCompanyVersionData( $current_company->getId() );
-
-		$license = new TTLicense();
-    $license->getLicenseFile( FALSE ); //Download updated license file if one exists.
 
 		$latest_version = $ttsc->isLatestVersion( $current_company->getId() );
 		$latest_tax_engine_version = $ttsc->isLatestTaxEngineVersion( $current_company->getId() );

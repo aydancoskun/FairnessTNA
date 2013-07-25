@@ -2933,13 +2933,6 @@ class UserFactory extends Factory {
 													TTi18n::gettext('Unable to change status of your own record') );
 			}
 		}
-		if ( $this->isNew() == TRUE ) {
-			$obj = new TTLicense;
-			$retval = $obj->validateLicense();
-			if ( $retval !== TRUE ) {
-				$this->Validator->isTrue( 'lic_obj', FALSE, $obj->getFullErrorMessage($retval) );
-			}
-		}
 		return TRUE;
 	}
 

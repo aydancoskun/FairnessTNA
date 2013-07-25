@@ -107,9 +107,6 @@ switch ($action) {
 		$ttsc->sendCompanyUserCountData( $current_company->getId() );
 		$ttsc->sendCompanyVersionData( $current_company->getId() );
 
-		$license = new TTLicense();
-        $license->getLicenseFile( FALSE ); //Download updated license file if one exists.
-
 		$latest_version = $ttsc->isLatestVersion( $current_company->getId() );
 		$latest_tax_engine_version = $ttsc->isLatestTaxEngineVersion( $current_company->getId() );
 		$latest_tax_data_version = $ttsc->isLatestTaxDataVersion( $current_company->getId() );
@@ -175,33 +172,6 @@ switch ($action) {
 			$data['cron'] = array(
 								'last_run_date' => $cj_obj->getLastRunDate()
 								);
-		}
-
-		if ( ( ( DEPLOYMENT_ON_DEMAND == FALSE AND $current_company->getId() == 1 ) OR ( isset($config_vars['other']['primary_company_id']) AND $current_company->getId() == $config_vars['other']['primary_company_id'] ) ) AND getTTProductEdition() > 10 ) {
-			if ( !isset($system_settings['license']) ) {
-				$system_settings['license'] = NULL;
-			}
-
-			//Set this so the license upload area at least shows up regardles of edition.
-			$data['license_data'] = array();
-
-			$license = new TTLicense();
-			$retval = $license->validateLicense( $system_settings['license'] );
-			if ( $retval == TRUE ) {
-				$data['license_data'] = array(
-										'organization_name' => $license->getOrganizationName(),
-										'major_version' => $license->getMajorVersion(),
-										'minor_version' => $license->getMinorVersion(),
-										'product_name' => $license->getProductName(),
-										'active_employee_licenses' => $license->getActiveEmployeeLicenses(),
-										'issue_date' => TTDate::getDate('DATE', $license->getIssueDate() ),
-										'expire_date' => $license->getExpireDate(),
-										'expire_date_display' => TTDate::getDate('DATE', $license->getExpireDate() ),
-										'registration_key' => $license->getRegistrationKey(),
-										'message' => $license->getFullErrorMessage( $retval ),
-										'retval' => $retval,
-										);
-			}
 		}
 }
 

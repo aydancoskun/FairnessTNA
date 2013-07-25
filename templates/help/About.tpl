@@ -121,23 +121,6 @@
 				</tr>
 				{/if}
 
-				{if count($data.user_counts) > 0}
-				<tr>
-					<td colspan="2" class="cellLeftEditTable">
-						<div align="center">{t}Employees (Active / InActive){/t}</div>
-					</td>
-				</tr>
-				{foreach from=$data.user_counts item=user_counts}
-					<tr>
-						<td class="cellLeftEditTable">
-							{$user_counts.label}:
-						</td>
-						<td class="cellRightEditTable">
-							{$user_counts.max_active_users} / {$user_counts.max_inactive_users}
-						</td>
-					</tr>
-				{/foreach}
-				{/if}
 				<tr>
 					<td colspan="2" class="cellLeftEditTable">
 						<div align="center">{t}License{/t}</div>
