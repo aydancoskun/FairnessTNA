@@ -1,38 +1,25 @@
 <?php
 /*********************************************************************************
- * TimeTrex is a Payroll and Time Management program developed by
- * TimeTrex Software Inc. Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * This file is part of "Fairness", a Payroll and Time Management program.
+ * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission
- * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE
- * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ * Fairness is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation, either version 3 of the License, or (at you option )
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
  *
  * You should have received a copy of the GNU Affero General Public License along
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- *
- * You can contact TimeTrex headquarters at Unit 22 - 2475 Dobbin Rd. Suite
- * #292 Westbank, BC V4T 2E9, Canada or at email address info@timetrex.com.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License version 3.
- *
- * In accordance with Section 7(b) of the GNU Affero General Public License
- * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by TimeTrex" logo. If the display of the logo is not reasonably
- * feasible for technical reasons, the Appropriate Legal Notices must display
- * the words "Powered by TimeTrex".
- ********************************************************************************/
+  ********************************************************************************/
 /*
  * $Revision: 9743 $
  * $Id: About.php 9743 2013-05-02 21:22:23Z ipso $
@@ -64,34 +51,7 @@ switch ($action) {
 		//Debug::setVerbosity( 11 );
 		Debug::Text('Redirect to Online University!', __FILE__, __LINE__, __METHOD__,10);
 
-		//Generate encoded data as well.
-		$encoded_data = NULL;
-		if ( is_object( $current_company ) AND is_object( $current_user ) ) {
-			//If for some reason the registration key isn't set, generate a random one now.
-			if ( isset($system_settings) AND ( !isset($system_settings['registration_key']) OR $system_settings['registration_key'] == '') ) {
-				$sslf->setName('registration_key');
-				$sslf->setValue( md5( uniqid() ) );
-				if ( $sslf->isValid() == TRUE ) {
-					$sslf->Save();
-				}
-			}
-
-			//Get permissions of current user so we can show them the proper courses.
-			$pf = TTnew( 'PermissionFactory' );
-			$permission_sections = $pf->getOptions('section');
-			foreach( $permission_sections as $section => $name ) {
-				$permission_arr[$section] = $permission->Check( $section, 'enabled');
-			}
-			$encoded_data = array( 'company_name' => $current_company->getName(), 'product_edition' => $current_company->getProductEdition(), 'version' => $system_settings['system_version'], 'registration_key' => $system_settings['registration_key'], 'first_name' => $current_user->getFirstName(), 'last_name' => $current_user->getLastName(), 'work_email' => $current_user->getWorkEmail(), 'permissions' => $permission_arr );
-
-			if ( function_exists('gzdeflate') ) {
-				$encoded_data = urlencode( base64_encode( gzdeflate( serialize( $encoded_data ) ) ) );
-			} else {
-				$encoded_data = urlencode( base64_encode( serialize( $encoded_data )  ) );
-			}
-			//Debug::Text(' Encoded Data ('.strlen($encoded_data).'): '. $encoded_data, __FILE__, __LINE__, __METHOD__,10);
-		}
-		Redirect::Page( URLBuilder::getURL( array('data' => $encoded_data ), 'https://www.timetrex.com/university.php') );
+		Redirect::Page( URLBuilder::getURL( array(), 'https://www.timetrex.com/university.php') );
 		exit;
 
 		break;

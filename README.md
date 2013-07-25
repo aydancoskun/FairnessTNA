@@ -1,7 +1,7 @@
 Fairness Time & Attendance
 ==========================
 
-Fairness is a Fork of the TimeTrex Workforce Management by Mike Benoit which he kindly licensed under the
+Fairness is a Fork of the "TimeTrex Workforce Management" software by Mike Benoit which is kindly licensed under the
 GNU AFFERO GENERAL PUBLIC LICENSE VERSION 3. See LICENSE file for the full license text.
 
 Acknowledgement and thank you!
@@ -19,7 +19,7 @@ We are not planning to supporting Windows as a platform. Not for any other reaso
 
 Little word on licensing:
 -------------------------
-We had to take a good look at the way the license for Timetrex is implemented and what it actually means because it has a few gotchas. this is probably the reason no one else has ever forked TimeTrex. We will list out what we found. Just upfront: This is in no way meant as a slight against Timetrex and especially Mike, in any way. We believe that part of the licensing choices that were made are either a clear oversight, misunderstanding or have their roots in the history of the Timetrex licensing model.
+We had to take a good look at the way the license for Timetrex is implemented and what it actually means because it has a few gotchas. This is probably the reason no one else has ever forked TimeTrex. We will list out what we found. Just to be clear upfront: This is in no way a slight against Timetrex and especially Mike, in any way. We believe that part of the licensing choices that were made are either a clear oversight, misunderstanding or have their roots in the history of the Timetrex licensing model.
 
 Timetrex licensed their software as Open Source using the GNU AFFERO GENERAL PUBLIC LICENSE Version 3.
 
@@ -86,9 +86,9 @@ The changed it to:
 
 	FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 
-**It appears that Timetrex is trying to cover themselves in case of there is any infringements against the copyright of third parties (i.e. libaries they are using). We speculate that this is possibly because they are using a commercial javascript menu which is licensed to them with a serial code.**
+It appears that Timetrex is trying to cover themselves in case of there is any infringements against the copyright of third parties (i.e. libaries they are using). We speculate that this is possibly because they are using a commercial javascript menu which is licensed to them with a serial code.
 
-**Our aim is to replace this library with a free JQuery menu. But until then if you want to be sure get your own license for that menu if you use this software. Or better help us fix it.**
+Our aim is to replace this library with a free JQuery menu. But until then if you want to use this software, get your own license for that menu. Or better even, just help us fix it.
 
 ###Point 2
 
@@ -180,5 +180,12 @@ For the record we are keeping a list of files that we found that have other "fur
 
 **We found this tabbed over by more than 80 characters (so that you won't see this code when you scroll though the file unless you have linewrap turned on) all on one line obfuscated code in the six files above.**
 Again, I think we just rip it out, making sure we don't loose functionality.
+
+**global.inc.php""
+
+// **REMOVING OR CHANGING THIS APPLICATION NAME AND ORGANIZATION URL IS IN STRICT VIOLATION OF THE LICENSE AND COPYRIGHT AGREEMENT**
+( isset($config_vars['branding']['application_name']) AND $config_vars['branding']['application_name'] != '' ) ? define('APPLICATION_NAME', $config_vars['branding']['application_name']) : define('APPLICATION_NAME', (PRODUCTION == FALSE) ? 'TimeTrex-Debug' : 'TimeTrex');
+( isset($config_vars['branding']['organization_name']) AND $config_vars['branding']['organization_name'] != '' ) ? define('ORGANIZATION_NAME', $config_vars['branding']['organization_name']) : define('ORGANIZATION_NAME', 'TimeTrex');
+( isset($config_vars['branding']['organization_url']) AND $config_vars['branding']['organization_url'] != '' ) ? define('ORGANIZATION_URL', $config_vars['branding']['organization_url']) : define('ORGANIZATION_URL', 'www.TimeTrex.com');
 
 

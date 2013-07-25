@@ -1,38 +1,25 @@
 <?php
 /*********************************************************************************
- * TimeTrex is a Payroll and Time Management program developed by
- * TimeTrex Software Inc. Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * This file is part of "Fairness", a Payroll and Time Management program.
+ * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission
- * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE
- * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ * Fairness is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation, either version 3 of the License, or (at you option )
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
  *
  * You should have received a copy of the GNU Affero General Public License along
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- *
- * You can contact TimeTrex headquarters at Unit 22 - 2475 Dobbin Rd. Suite
- * #292 Westbank, BC V4T 2E9, Canada or at email address info@timetrex.com.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License version 3.
- *
- * In accordance with Section 7(b) of the GNU Affero General Public License
- * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by TimeTrex" logo. If the display of the logo is not reasonably
- * feasible for technical reasons, the Appropriate Legal Notices must display
- * the words "Powered by TimeTrex".
- ********************************************************************************/
+  ********************************************************************************/
 /*
  * $Revision: 10254 $
  * $Id: global.inc.php 10254 2013-06-20 23:42:44Z ipso $
@@ -87,35 +74,14 @@ if ( file_exists(CONFIG_FILE) ) {
 	exit;
 }
 
-if ( isset($config_vars['debug']['production']) AND $config_vars['debug']['production'] == 1 ) {
-	define('PRODUCTION', TRUE);
-} else {
-	define('PRODUCTION', FALSE);
-}
-
-// **REMOVING OR CHANGING THIS APPLICATION NAME AND ORGANIZATION URL IS IN STRICT VIOLATION OF THE LICENSE AND COPYRIGHT AGREEMENT**
-( isset($config_vars['branding']['application_name']) AND $config_vars['branding']['application_name'] != '' ) ? define('APPLICATION_NAME', $config_vars['branding']['application_name']) : define('APPLICATION_NAME', (PRODUCTION == FALSE) ? 'TimeTrex-Debug' : 'TimeTrex');
-( isset($config_vars['branding']['organization_name']) AND $config_vars['branding']['organization_name'] != '' ) ? define('ORGANIZATION_NAME', $config_vars['branding']['organization_name']) : define('ORGANIZATION_NAME', 'TimeTrex');
-( isset($config_vars['branding']['organization_url']) AND $config_vars['branding']['organization_url'] != '' ) ? define('ORGANIZATION_URL', $config_vars['branding']['organization_url']) : define('ORGANIZATION_URL', 'www.TimeTrex.com');
-
-if ( isset($config_vars['other']['demo_mode']) AND $config_vars['other']['demo_mode'] == 1 ) {
-	define('DEMO_MODE', TRUE);
-} else {
-	define('DEMO_MODE', FALSE);
-}
-
-if ( isset($config_vars['other']['deployment_on_demand']) AND $config_vars['other']['deployment_on_demand'] == 1 ) {
-	define('DEPLOYMENT_ON_DEMAND', TRUE);
-} else {
-	define('DEPLOYMENT_ON_DEMAND', FALSE);
-}
-
-if ( isset($config_vars['other']['primary_company_id']) AND $config_vars['other']['primary_company_id'] > 0 ) {
-	define('PRIMARY_COMPANY_ID', (int)$config_vars['other']['primary_company_id']);
-} else {
-	define('PRIMARY_COMPANY_ID', FALSE);
-}
-
+( isset($config_vars['debug']['production']) AND $config_vars['debug']['production'] == 1 ) ? define('PRODUCTION', TRUE) : define('PRODUCTION', FALSE);
+( isset($config_vars['branding']['application_name']) AND $config_vars['branding']['application_name'] != '' ) ? define('APPLICATION_NAME', $config_vars['branding']['application_name']) : define('APPLICATION_NAME', (PRODUCTION == FALSE) ? 'APPLICATION_NAME-DEBUG' : 'APPLICATION_NAME');
+( isset($config_vars['branding']['organization_name']) AND $config_vars['branding']['organization_name'] != '' ) ? define('ORGANIZATION_NAME', $config_vars['branding']['organization_name']) : define('ORGANIZATION_NAME', 'ORGANISATION_NAME');
+( isset($config_vars['branding']['organization_url']) AND $config_vars['branding']['organization_url'] != '' ) ? define('ORGANIZATION_URL', $config_vars['branding']['organization_url']) : define('ORGANIZATION_URL', 'ORGANIZATION_URL');
+( isset($config_vars['branding']['product_edition']) AND $config_vars['branding']['product_edition'] != '' ) ? define('PRODUCT_EDITION', $config_vars['branding']['product_edition']) : define('PRODUCT_EDITION', '10');
+( isset($config_vars['other']['demo_mode']) AND $config_vars['other']['demo_mode'] == 1 ) ? define('DEMO_MODE', TRUE) : define('DEMO_MODE', FALSE);
+( isset($config_vars['branding']['deployment_on_demand']) AND $config_vars['branding']['deployment_on_demand'] == 1 ) ? define('DEPLOYMENT_ON_DEMAND', TRUE) : 	define('DEPLOYMENT_ON_DEMAND', FALSE);
+( isset($config_vars['other']['primary_company_id']) AND $config_vars['other']['primary_company_id'] > 0 ) ? define('PRIMARY_COMPANY_ID', (int)$config_vars['other']['primary_company_id']) : define('PRIMARY_COMPANY_ID', FALSE);
 //Try to dynamically load required PHP extensions if they aren't already.
 //This saves people from having to modify php.ini if possible.
 //v5.3 of PHP deprecates DL().
@@ -332,8 +298,22 @@ function forceCacheHeaders( $file_name = NULL, $mtime = NULL, $etag = NULL ) {
 	return TRUE;
 }
 
-define('TT_PRODUCT_COMMUNITY', 10 ); define('TT_PRODUCT_PROFESSIONAL', 15 ); define('TT_PRODUCT_CORPORATE', 20 ); define('TT_PRODUCT_ENTERPRISE', 25 );
-function getTTProductEdition() { if ( file_exists( Environment::getBasePath() .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR .'expense'. DIRECTORY_SEPARATOR .'UserExpenseFactory.class.php') ) { return TT_PRODUCT_ENTERPRISE; } elseif ( file_exists( Environment::getBasePath() .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR .'job'. DIRECTORY_SEPARATOR .'JobFactory.class.php') ) { return TT_PRODUCT_CORPORATE; } elseif ( file_exists( Environment::getBasePath() .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR .'time_clock'. DIRECTORY_SEPARATOR .'TimeClock.class.php') ) { return TT_PRODUCT_PROFESSIONAL; } return TT_PRODUCT_COMMUNITY; }
+define('TT_PRODUCT_COMMUNITY', 10 );
+define('TT_PRODUCT_PROFESSIONAL', 15 );
+define('TT_PRODUCT_CORPORATE', 20 );
+define('TT_PRODUCT_ENTERPRISE', 25 );
+function getTTProductEdition() {
+	 return PRODUCT_EDITION;
+
+	$chkpath = Environment::getBasePath() .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR;
+	if ( file_exists( $chkpath . 'expense'. DIRECTORY_SEPARATOR .'UserExpenseFactory.class.php') ) {
+		return TT_PRODUCT_ENTERPRISE;
+	} elseif ( file_exists( $chkpath .'job'. DIRECTORY_SEPARATOR .'JobFactory.class.php') ) {
+		return TT_PRODUCT_CORPORATE;
+	} elseif ( file_exists( $chkpath .'time_clock'. DIRECTORY_SEPARATOR .'TimeClock.class.php') ) {
+		return TT_PRODUCT_PROFESSIONAL;
+	} return TT_PRODUCT_COMMUNITY;
+}
 function getTTProductEditionName() {
 	switch( getTTProductEdition() ) {
 		case 15:
