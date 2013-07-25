@@ -14,6 +14,8 @@ A look into the future:
 -----------------------
 Timetrex is fantastic software and we are exited forking it! We are looking forward to making it a truely free platform without gotchas but truely open source. We are looking forward to including many more countries tax codes and calcultion tables and to add a JQuery and mobile friendly user interface. Our aim is to keep this fork in sync with Timetrex as much as that is feasable and feeding our changes back to the community.
 
+We are not planning to supporting Windows as a platform. Not for any other reason that we don't use windows. If someone wants to step up and be the windows part maintainer, speak up.
+
 
 Little word on licensing:
 -------------------------
@@ -162,5 +164,16 @@ For the record we are keeping a list of files that we found that have other "fur
 
 	{* REMOVING OR CHANGING THIS LOGO IS IN STRICT VIOLATION OF THE LICENSE AGREEMENT *}
 	<a href="http://{$ORGANIZATION_URL}"><img src="{$BASE_URL}/send_file.php?object_type=copyright" 	alt="Time and Attendance"></a>
+
+**CompanyFactory.class.php**
+
+	$obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function = 
+	"\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65"; $obj_error_msg_function = 
+	"\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65"; @$obj = new 
+	$obj_class; $retval = $obj->{$obj_function}(); if ( $retval !== TRUE ) { $this->Validator-
+	>isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) ); }
+								
+**We found this tabbed over by more than 80 characters (so that you won't see this code when you scroll though the file unless you have linewrap turned on) all on one line obfuscated code.**
+Again, I think we just rip it out, making sure we don't loose functionality.
 
 

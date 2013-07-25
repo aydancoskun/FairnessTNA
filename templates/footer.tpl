@@ -34,6 +34,6 @@
 	{/php}
 </div>
 </div>
-{if $config_vars.debug.production == 1 AND $config_vars.branding.google_analytics_acct != ""}<script src="http{if $smarty.server.HTTPS == TRUE}s://ssl{else}://www{/if}.google-analytics.com/urchin.js" type="text/javascript"></script><script type="text/javascript">_uacct="$config_vars.other.google_analytics_acct"; __utmSetVar('Company: {if is_object($primary_company)}{$primary_company->getName()|escape}{else}N/A{/if}'); __utmSetVar('Host: {$smarty.server.HTTP_HOST}'); __utmSetVar('Version: {$APPLICATION_VERSION}'); urchinTracker();</script><img src="{$IMAGES_URL}spacer.gif">{/if}
+{if $config_vars.debug.production == 1 AND $config_vars.other.google_analytics_acct != ""}<script src="http{if $smarty.server.HTTPS == TRUE}s://ssl{else}://www{/if}.google-analytics.com/urchin.js" type="text/javascript"></script><script type="text/javascript">_uacct="$config_vars.other.google_analytics_acct"; __utmSetVar('Company: {if is_object($primary_company)}{$primary_company->getName()|escape}{else}N/A{/if}'); __utmSetVar('Host: {$smarty.server.HTTP_HOST}'); __utmSetVar('Version: {$APPLICATION_VERSION}'); urchinTracker();</script><img src="{$IMAGES_URL}spacer.gif">{/if}
 </body>
 </html>

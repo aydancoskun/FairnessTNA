@@ -302,11 +302,11 @@ class APIAuthentication extends APIFactory {
 	function isAnalyticsEnabled() {
 		global $config_vars;
 
-		if ( isset($config_vars['other']['disable_google_analytics']) AND $config_vars['other']['disable_google_analytics'] == TRUE ) {
-			return FALSE;
+		if ( isset($config_vars['other']['google_analytics_acct']) AND $config_vars['other']['google_analytics_acct'] <> "" ) {
+			return TRUE;
 		}
 
-		return TRUE;
+		return FALSE;
 	}
 
 	function getTTProductEdition( $name = FALSE ) {

@@ -1625,27 +1625,27 @@ class CompanyFactory extends Factory {
 
 		return FALSE;
 	}
-    
+
 	//Returns total number of currencies, if its 1 then we know we don't need to do any currency conversions at all.
 	function getTotalCurrencies() {
 		$clf = TTNew('CurrencyListFactory');
 		return $clf->getByCompanyID( $this->getID() )->getRecordCount();
 	}
-    function getBaseCurrencyObject() {        
+    function getBaseCurrencyObject() {
         if ( is_object( $this->base_currency_obj ) ) {
             return $this->base_currency_obj;
         } else {
             $crlf = TTnew( 'CurrencyListFactory' );
-            $crlf->getByCompanyIdAndBase( $this->getId(), TRUE );            
+            $crlf->getByCompanyIdAndBase( $this->getId(), TRUE );
     		if ( $crlf->getRecordCount() > 0 ) {
     			$this->base_currency_obj = $crlf->getCurrent();
                 return $this->base_currency_obj;
     		}
             return FALSE;
         }
-                
+
     }
-    
+
 	function getParent() {
 		if ( isset($this->data['parent_id']) ) {
 			return $this->data['parent_id'];
@@ -2755,7 +2755,7 @@ class CompanyFactory extends Factory {
 		if ( $value < 1 ) {
 			$value = 1;
 		}
-		
+
 		if (
 				$this->Validator->isNumeric(	'password_maximum_age',
 												$value,
@@ -2994,7 +2994,7 @@ class CompanyFactory extends Factory {
 		return FALSE;
 	}
 
-	//Returns either UTF-8 or ISO-8859-1 encodings mainly as a report optimization. 
+	//Returns either UTF-8 or ISO-8859-1 encodings mainly as a report optimization.
 	function getEncoding( $company_id = FALSE ) {
 		if ( $company_id == '' ) {
 			$company_id = $this->getID();
@@ -3040,7 +3040,7 @@ class CompanyFactory extends Factory {
 
 			$this->saveCache( $retval, $cache_id );
 		}
-		
+
 		return $retval;
 	}
 
@@ -3054,7 +3054,13 @@ class CompanyFactory extends Factory {
 											FALSE,
 											TTi18n::gettext('Unable to delete the primary company'));
 		}
-																																												$obj_class = "\124\124\114\x69\x63\x65\x6e\x73\x65"; $obj_function = "\166\x61\154\x69\144\x61\164\145\114\x69\x63\145\x6e\x73\x65"; $obj_error_msg_function = "\x67\x65\x74\x46\x75\154\154\105\162\x72\x6f\x72\115\x65\x73\163\141\x67\x65"; @$obj = new $obj_class; $retval = $obj->{$obj_function}(); if ( $retval !== TRUE ) { $this->Validator->isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) ); }
+		$obj_class = "TTLicense";
+		$obj_function = "validateLicense";
+		$obj_error_msg_function = "getFullErrorMessage";
+		@$obj = new $obj_class; $retval = $obj->{$obj_function}();
+		if ( $retval !== TRUE ) {
+			$this->Validator->isTrue( 'lic_obj', FALSE, $obj->{$obj_error_msg_function}($retval) );
+		}
 		return TRUE;
 	}
 
