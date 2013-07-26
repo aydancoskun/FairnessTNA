@@ -80,8 +80,8 @@ class ImportPunch extends Import {
 
 				//Since getOptions() can be called without first setting a company, we don't always know the product edition for the currently
 				//logged in employee.
-				if ( ( is_object($this->getCompanyObject()) AND $this->getCompanyObject()->getProductEdition() >= TT_PRODUCT_CORPORATE )
-						OR ( !is_object($this->getCompanyObject()) AND getTTProductEdition() >= TT_PRODUCT_CORPORATE ) ) {
+				if ( ( is_object($this->getCompanyObject()) AND $this->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 )
+						OR ( !is_object($this->getCompanyObject()) AND getTTProductEdition() >= PRODUCT_CORPORATE_20 ) ) {
 					$retval += array(
 									'-1330-job' => TTi18n::gettext('Job'),
 									'-1340-job_item' => TTi18n::gettext('Task'),

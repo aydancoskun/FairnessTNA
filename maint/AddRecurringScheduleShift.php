@@ -312,7 +312,7 @@ if ( $clf->getRecordCount() > 0 ) {
 															$pcf->setDepartment( $recurring_schedule_shift['department_id'] );
 														}
 
-														if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+														if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 															if ( isset($recurring_schedule_shift['job_id']) ) {
 																$pcf->setJob( $recurring_schedule_shift['job_id'] );
 															}

@@ -6061,7 +6061,7 @@ class DemoData {
 			$policy_ids['overtime'][] = $this->createOverTimePolicy( $company_id, 10 );
 			$policy_ids['overtime'][] = $this->createOverTimePolicy( $company_id, 20, $policy_ids['accrual'][0] );
 
-			if ( getTTProductEdition() >= TT_PRODUCT_ENTERPRISE ) {
+			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$policy_ids['expense'][] = $this->createExpensePolicy( $company_id, 100 ); // Tax(Percent) - HST
 				$policy_ids['expense'][] = $this->createExpensePolicy( $company_id, 110 ); // Tax(Percent) - VAT
 				$policy_ids['expense'][] = $this->createExpensePolicy( $company_id, 120 ); // Tax(Flat Amount) - Improvement Fee
@@ -6121,7 +6121,7 @@ class DemoData {
 										NULL,
 										$policy_ids['expense'] );
 
-			if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+			if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				//Client Groups
 				$client_group_ids[] = $this->createClientGroup( $company_id, 10, 0 );
 				$client_group_ids[] = $this->createClientGroup( $company_id, 20, $client_group_ids[0] );
@@ -6208,7 +6208,7 @@ class DemoData {
 				$invoice_ids[] = 0;
 			}
 
-            if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+            if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				//Task Groups
 				$task_group_ids[] = $this->createTaskGroup( $company_id, 10, 0 );
 				$task_group_ids[] = $this->createTaskGroup( $company_id, 20, $task_group_ids[0] );
@@ -6259,7 +6259,7 @@ class DemoData {
 				$job_ids[] = 0;
 			}
 
-			if ( getTTProductEdition() >= TT_PRODUCT_ENTERPRISE ) {
+			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$user_expense_ids[] = $this->createUserExpense( $user_ids[0], $policy_ids['expense'][3], $branch_ids[0],$department_ids[1], $currency_ids[0], $job_ids[1],$task_ids[1] );
 				$user_expense_ids[] = $this->createUserExpense( $user_ids[3], $policy_ids['expense'][3], $branch_ids[0],$department_ids[2], $currency_ids[1], $job_ids[1],$task_ids[0] );
 				$user_expense_ids[] = $this->createUserExpense( $user_ids[4], $policy_ids['expense'][3], $branch_ids[0],$department_ids[0], $currency_ids[0], $job_ids[1],$task_ids[2] );
@@ -6413,7 +6413,7 @@ class DemoData {
             }
 
 
-			if ( getTTProductEdition() >= TT_PRODUCT_ENTERPRISE ) {
+			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$x = 1;
 				while( $x <= 9 ) {
 					$interviewer_random_user_ids = array_rand( $user_ids, 3 );
@@ -6682,7 +6682,7 @@ class DemoData {
             $this->createReportCustomColumn( $company_id, 'TimesheetDetailReport', 200 );
 
 
-			if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+			if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				// Attach  document to employee
 				foreach( $user_ids as $user_id ) {
 					$x = 1;

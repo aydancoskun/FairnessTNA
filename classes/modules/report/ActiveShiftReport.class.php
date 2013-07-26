@@ -84,7 +84,7 @@ class ActiveShiftReport extends Report {
 										'-5030-sort' => TTi18n::gettext('Sort By'),
 							   );
 
-				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$professional_edition_setup_fields = array(
 										'-2510-job_status_id' => TTi18n::gettext('Job Status'),
 										'-2520-job_group_id' => TTi18n::gettext('Job Group'),
@@ -120,7 +120,7 @@ class ActiveShiftReport extends Report {
 				}
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -131,13 +131,13 @@ class ActiveShiftReport extends Report {
 				}
                 break; 
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'ActiveShiftReport', 'custom_column' );
 				}
                 break;
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'ActiveShiftReport', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
@@ -146,7 +146,7 @@ class ActiveShiftReport extends Report {
 				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'ActiveShiftReport', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {
@@ -219,7 +219,7 @@ class ActiveShiftReport extends Report {
 										'-2010-note' => TTi18n::gettext('Note'),
 							   );
 
-				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$professional_edition_static_columns = array(
 											//Static Columns - Aggregate functions can't be used on these.
 											'-1825-job' => TTi18n::gettext('Job'),
@@ -285,7 +285,7 @@ class ActiveShiftReport extends Report {
 
 										//'-1230-by_branch+total_user' => TTi18n::gettext('Total Employees By Branch'),
 							   );
-				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$professional_edition_setup_fields = array(
 										'-1112-by_job_by_job_item_by_employee' => TTi18n::gettext('Punches By Job/Task'),
 										);

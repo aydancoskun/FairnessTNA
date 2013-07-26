@@ -2864,7 +2864,7 @@ class Report {
 	}
 
     function setCustomColumnConfig( $columns ) {
-		if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$rcclf = TTnew('ReportCustomColumnListFactory');
 			$rcclf->getByCompanyId( $this->getUserObject()->getCompany() );
 			$columns_data = array();
@@ -2912,7 +2912,7 @@ class Report {
     }
 
     function calculateCustomColumns() {
-		if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$this->profiler->startTimer( 'calculateCustomColumns' );
 			ReportCustomColumnFactory::calculateCustomColumns( $this );
 			$this->profiler->stopTimer( 'calculateCustomColumns' );
@@ -2921,7 +2921,7 @@ class Report {
         return TRUE;
     }
     function calculateCustomColumnFilters( $type_id ) {
-        if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+        if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$this->profiler->startTimer( 'calculateCustomColumnFilters' );
 			ReportCustomColumnFactory::calculateCustomColumnFilters( $this, $type_id );
 			$this->profiler->stopTimer( 'calculateCustomColumnFilters' );

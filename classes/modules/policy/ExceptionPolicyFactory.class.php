@@ -678,7 +678,7 @@ class ExceptionPolicyFactory extends Factory {
 	function getTypeOptions( $product_edition = 10 ) {
 		$options = $this->getOptions('type');
 
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE OR $product_edition < 20 ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 OR $product_edition < 20 ) {
 			$corporate_exceptions = array('J1','J2','J3','J4');
 			foreach( $corporate_exceptions as $corporate_exception ) {
 				unset($options[$corporate_exception]);
@@ -2400,7 +2400,7 @@ class ExceptionPolicyFactory extends Factory {
 						}
 						break;
 					case 'j1': //Not Allowed on Job
-						if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE AND $plf->getRecordCount() > 0 ) {
+						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
 									if ( is_object( $p_obj->getPunchControlObject() ) AND $p_obj->getPunchControlObject()->getJob() > 0 ) {
@@ -2433,7 +2433,7 @@ class ExceptionPolicyFactory extends Factory {
 						}
 						break;
 					case 'j2': //Not Allowed on Task
-						if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE AND $plf->getRecordCount() > 0 ) {
+						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
 									if ( is_object( $p_obj->getPunchControlObject() ) AND $p_obj->getPunchControlObject()->getJob() > 0 AND $p_obj->getPunchControlObject()->getJobItem() > 0 ) {
@@ -2467,7 +2467,7 @@ class ExceptionPolicyFactory extends Factory {
 						}
 						break;
 					case 'j3': //Job already completed
-						if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE AND $plf->getRecordCount() > 0 ) {
+						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
 									if ( is_object( $p_obj->getPunchControlObject() ) AND $p_obj->getPunchControlObject()->getJob() > 0 ) {
@@ -2503,7 +2503,7 @@ class ExceptionPolicyFactory extends Factory {
 						break;
 					case 'j4': //No Job or Task
 						$add_exception = FALSE;
-						if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE AND $plf->getRecordCount() > 0 ) {
+						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								//In punches only
 								if ( $p_obj->getStatus() == 10 AND is_object( $p_obj->getPunchControlObject() ) ) {

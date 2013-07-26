@@ -393,7 +393,7 @@ class PunchControlFactory extends Factory {
 			$id = 0;
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
 
@@ -425,7 +425,7 @@ class PunchControlFactory extends Factory {
 			$id = 0;
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
 
@@ -1155,7 +1155,7 @@ class PunchControlFactory extends Factory {
 			}
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE AND $this->getEnableStrictJobValidation() == TRUE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $this->getEnableStrictJobValidation() == TRUE ) {
 			if ( $this->getJob() > 0 ) {
 				$jlf = TTnew( 'JobListFactory' );
 				$jlf->getById( $this->getJob() );

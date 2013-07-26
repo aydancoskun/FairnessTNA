@@ -2598,7 +2598,7 @@ class CompanyFactory extends Factory {
 	//This shouldn't be called unless the user requests auto update notification.
 	function remoteSave() {
 		$ttsc = new TimeTrexSoapClient();
-		if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE AND ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL OR $ttsc->isUpdateNotifyEnabled() == TRUE ) ) {
+		if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE AND ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 OR $ttsc->isUpdateNotifyEnabled() == TRUE ) ) {
 			$ttsc->sendCompanyData( $this->getId() );
 			$ttsc->sendCompanyVersionData( $this->getId() );
 

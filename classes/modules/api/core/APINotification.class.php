@@ -104,7 +104,7 @@ class APINotification extends APIFactory {
 											  'delay' => -1,
 											  'bg_color' => '#FFFF00', //Yellow
 											  'message' => TTi18n::getText('NOTICE: A new version of %1 available, it is highly recommended that you upgrade as soon as possible. Click here to download the latest version.', array( APPLICATION_NAME ) ),
-											  'destination' => ( getTTProductEdition() == TT_PRODUCT_COMMUNITY ) ? 'http://www.timetrex.com/r.php?id=19' : 'http://www.timetrex.com/r.php?id=9',
+											  'destination' => ( getTTProductEdition() == PRODUCT_COMMUNITY_10 ) ? 'http://www.timetrex.com/r.php?id=19' : 'http://www.timetrex.com/r.php?id=9',
 											  );
 					}
 					unset($new_version_available_notification);

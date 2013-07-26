@@ -1325,7 +1325,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobGroup() {
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
 
@@ -1342,7 +1342,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobGroup($ids) {
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
 
@@ -1423,7 +1423,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJob() {
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
 
@@ -1440,7 +1440,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJob($ids) {
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
 
@@ -1521,7 +1521,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobItemGroup() {
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
 
@@ -1538,7 +1538,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobItemGroup($ids) {
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
 
@@ -1619,7 +1619,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobItem() {
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
 
@@ -1636,7 +1636,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobItem($ids) {
-		if ( getTTProductEdition() < TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
 

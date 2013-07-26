@@ -90,7 +90,7 @@ class GeneralLedgerSummaryReport extends Report {
 				$retval = TTDate::getReportDateOptions( 'transaction', TTi18n::getText('Transaction Date'), 13, TRUE );
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -101,13 +101,13 @@ class GeneralLedgerSummaryReport extends Report {
 				}
                 break; 
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'GeneralLedgerSummaryReport', 'custom_column' );
 				}
                 break;
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'GeneralLedgerSummaryReport', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
@@ -116,7 +116,7 @@ class GeneralLedgerSummaryReport extends Report {
 				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'GeneralLedgerSummaryReport', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {
@@ -658,7 +658,7 @@ class GeneralLedgerSummaryReport extends Report {
 		$utlf = TTnew( 'UserTitleListFactory' );
 		$title_options = $utlf->getByCompanyIdArray( $this->getUserObject()->getCompany() );
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$job_options = $jlf->getByCompanyIdArray( $this->getUserObject()->getCompany() );
 			//Get Job ID to Job Code mapping

@@ -284,7 +284,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					unset($dlf);
 				}
 
-				if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE AND !isset($job_options) ) {
+				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND !isset($job_options) ) {
 					//Get jobs
 					$jlf = new JobListFactory();
 					$jlf->getByCompanyId( $u_obj->getCompany() );
@@ -292,7 +292,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					unset($jlf);
 				}
 
-				if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE AND !isset($job_item_options) ) {
+				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND !isset($job_item_options) ) {
 					//Get tasks
 					$jilf = new JobItemListFactory();
 					$jilf->getByCompanyId( $u_obj->getCompany() );
@@ -529,7 +529,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					$pcf->setDepartment( Misc::importCallInputParseFunction( 'department_id', $mapped_row['department_id'], $filtered_import_map['department_id']['default_value'], $filtered_import_map['department_id']['parse_hint'] ) );
 				}
 
-				if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					if ( isset($mapped_row['job_id']) AND $mapped_row['job_id'] != '' ) {
 						$pcf->setJob( Misc::importCallInputParseFunction( 'job_id', $mapped_row['job_id'], $filtered_import_map['job_id']['default_value'], $filtered_import_map['job_id']['parse_hint'] ) );
 					}

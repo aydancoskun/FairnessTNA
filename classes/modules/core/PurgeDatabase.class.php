@@ -659,7 +659,7 @@ class PurgeDatabase {
 								'ethnic_group' => 45,
 							  );
 
-		if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$purge_professional_tables = array(
 								'report_schedule' => 45,
 								'report_custom_column' => 45,
@@ -668,7 +668,7 @@ class PurgeDatabase {
 			$purge_tables = array_merge( $purge_tables, $purge_professional_tables );
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$purge_corporate_tables = array(
 								'client' => 45,
 								'client_contact' => 45,
@@ -717,7 +717,7 @@ class PurgeDatabase {
 			$purge_tables = array_merge( $purge_tables, $purge_corporate_tables );
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_ENTERPRISE ) {
+		if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 			$purge_enterprise_tables = array(
 								'job_vacancy' => 45,
 								'job_applicant_location' => 45,

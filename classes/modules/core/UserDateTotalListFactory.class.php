@@ -3796,7 +3796,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 		$apf = new AbsencePolicyFactory();
 		$ppf = new PremiumPolicyFactory();
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
@@ -3836,7 +3836,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 
 					LEFT JOIN '. $ppf_b->getTable() .' as ppf ON b.pay_period_id = ppf.id ';
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '
 					LEFT JOIN '. $jf->getTable() .' as jf ON a.job_id = jf.id
 					LEFT JOIN '. $jif->getTable() .' as jif ON a.job_item_id = jif.id ';
@@ -3977,7 +3977,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 		$mpf = new MealPolicyFactory();
 		$bpf = new BreakPolicyFactory();
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
@@ -4042,7 +4042,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 							z.id as user_wage_id,
 							z.effective_date as user_wage_effective_date ';
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job,
 						x.name as job_name,
@@ -4081,7 +4081,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 																			and z.deleted = 0
 																			order by z.effective_date desc LiMiT 1)
 					';
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON a.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON a.job_item_id = y.id';
 		}

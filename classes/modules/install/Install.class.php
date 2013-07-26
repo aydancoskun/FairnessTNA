@@ -132,11 +132,11 @@ class Install {
 	function getFullApplicationVersion() {
 		$retval = APPLICATION_VERSION;
 
-		if ( getTTProductEdition() == TT_PRODUCT_ENTERPRISE ) {
+		if ( getTTProductEdition() == PRODUCT_ENTERPRISE_25 ) {
 			$retval .= 'E';
-		} elseif ( getTTProductEdition() == TT_PRODUCT_CORPORATE ) {
+		} elseif ( getTTProductEdition() == PRODUCT_CORPORATE_20 ) {
 			$retval .= 'C';
-		} elseif ( getTTProductEdition() == TT_PRODUCT_PROFESSIONAL ) {
+		} elseif ( getTTProductEdition() == PRODUCT_PROFESSIONAL_15 ) {
 			$retval .= 'P';
 		} else {
 			$retval .= 'S';
@@ -1284,7 +1284,7 @@ class Install {
 		$retarr[$this->checkPHPMemoryLimit()]++;
 		$retarr[$this->checkPHPMagicQuotesGPC()]++;
 
-		if ( $this->getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( $this->getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$retarr[$this->checkMCRYPT()]++;
 		}
 
@@ -1388,7 +1388,7 @@ class Install {
 			$retarr[] = 'PHPMagicQuotesGPC';
 		}
 
-		if ( $fail_all == TRUE OR $this->getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( $fail_all == TRUE OR $this->getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			if ( $fail_all == TRUE OR $this->checkPEARValidate() != 0 ) {
 				$retarr[] = 'PEARVal';
 			}

@@ -350,7 +350,7 @@ class PunchControlListFactory extends PunchControlFactory implements IteratorAgg
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
@@ -403,7 +403,7 @@ class PunchControlListFactory extends PunchControlFactory implements IteratorAgg
 							z.id as user_wage_id,
 							z.effective_date as user_wage_effective_date ';
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job_name,
 						x.status_id as job_status_id,
@@ -433,7 +433,7 @@ class PunchControlListFactory extends PunchControlFactory implements IteratorAgg
 																			and z.deleted = 0
 																			order by z.effective_date desc LiMiT 1)
 					';
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON b.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON b.job_item_id = y.id';
 		}

@@ -298,21 +298,21 @@ function forceCacheHeaders( $file_name = NULL, $mtime = NULL, $etag = NULL ) {
 	return TRUE;
 }
 
-define('TT_PRODUCT_COMMUNITY', 10 );
-define('TT_PRODUCT_PROFESSIONAL', 15 );
-define('TT_PRODUCT_CORPORATE', 20 );
-define('TT_PRODUCT_ENTERPRISE', 25 );
+define('PRODUCT_COMMUNITY_10', 10 );
+define('PRODUCT_PROFESSIONAL_15', 15 );
+define('PRODUCT_CORPORATE_20', 20 );
+define('PRODUCT_ENTERPRISE_25', 25 );
 function getTTProductEdition() {
 	 return PRODUCT_EDITION;
 
 	$chkpath = Environment::getBasePath() .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR;
 	if ( file_exists( $chkpath . 'expense'. DIRECTORY_SEPARATOR .'UserExpenseFactory.class.php') ) {
-		return TT_PRODUCT_ENTERPRISE;
+		return PRODUCT_ENTERPRISE_25;
 	} elseif ( file_exists( $chkpath .'job'. DIRECTORY_SEPARATOR .'JobFactory.class.php') ) {
-		return TT_PRODUCT_CORPORATE;
+		return PRODUCT_CORPORATE_20;
 	} elseif ( file_exists( $chkpath .'time_clock'. DIRECTORY_SEPARATOR .'TimeClock.class.php') ) {
-		return TT_PRODUCT_PROFESSIONAL;
-	} return TT_PRODUCT_COMMUNITY;
+		return PRODUCT_PROFESSIONAL_15;
+	} return PRODUCT_COMMUNITY_10;
 }
 function getTTProductEditionName() {
 	switch( getTTProductEdition() ) {

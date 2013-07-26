@@ -616,7 +616,7 @@ class APICompany extends APIFactory {
 			$retarr['department'] = TRUE;
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$jlf->getByCompanyId( $this->getCurrentCompanyObject()->getId(), 1 );
 			if ( $jlf->getRecordCount() >= 1 ) {

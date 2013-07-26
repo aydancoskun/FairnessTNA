@@ -71,20 +71,20 @@ class PermissionFactory extends Factory {
 				}
 				break;
 			case 'preset_flags':
-				if ( getTTProductEdition() >= TT_PRODUCT_COMMUNITY ) {
+				if ( getTTProductEdition() >= PRODUCT_COMMUNITY_10 ) {
 					$retval[10] = TTi18n::gettext('Scheduling');
 					$retval[20] = TTi18n::gettext('Time & Attendance');
 					$retval[30] = TTi18n::gettext('Payroll');
 					$retval[70] = TTi18n::gettext('Human Resources');
 				}
 
-				if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[40] = TTi18n::gettext('Job Costing');
 					$retval[50] = TTi18n::gettext('Document Management');
 					$retval[60] = TTi18n::gettext('Invoicing');
 				}
 
-				if ( getTTProductEdition() >= TT_PRODUCT_ENTERPRISE ) {
+				if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 					$retval[75] = TTi18n::gettext('Recruitment');
 					$retval[80] = TTi18n::gettext('Expense Tracking');
 				}
@@ -125,11 +125,11 @@ class PermissionFactory extends Factory {
 				} else {
 					$product_edition = getTTProductEdition();
 				}
-				
-				if ( $product_edition == TT_PRODUCT_ENTERPRISE ) { //Enterprise
-				} elseif ( $product_edition == TT_PRODUCT_CORPORATE ) { //Corporate
+
+				if ( $product_edition == PRODUCT_ENTERPRISE_25 ) { //Enterprise
+				} elseif ( $product_edition == PRODUCT_CORPORATE_20 ) { //Corporate
 					unset( $retval['recruitment'] );
-				} elseif ( $product_edition == TT_PRODUCT_COMMUNITY OR $product_edition == TT_PRODUCT_PROFESSIONAL ) { //Community or Professional
+				} elseif ( $product_edition == PRODUCT_COMMUNITY_10 OR $product_edition == PRODUCT_PROFESSIONAL_15 ) { //Community or Professional
 					unset( $retval['job'], $retval['invoice'], $retval['recruitment'] );
 				}
 
@@ -250,11 +250,11 @@ class PermissionFactory extends Factory {
 					$product_edition = getTTProductEdition();
 				}
 
-				if ( $product_edition == TT_PRODUCT_ENTERPRISE ) { //Enterprise
-				} elseif ( $product_edition == TT_PRODUCT_CORPORATE ) { //Corporate
+				if ( $product_edition == PRODUCT_ENTERPRISE_25 ) { //Enterprise
+				} elseif ( $product_edition == PRODUCT_CORPORATE_20 ) { //Corporate
 					unset( $retval['recruitment'] );
 					unset( $retval['payroll'][array_search( 'user_expense', $retval['payroll'])], $retval['policy'][array_search( 'expense_policy', $retval['policy'])] );
-				} elseif ( $product_edition == TT_PRODUCT_COMMUNITY OR $product_edition == TT_PRODUCT_PROFESSIONAL ) { //Community or Professional
+				} elseif ( $product_edition == PRODUCT_COMMUNITY_10 OR $product_edition == PRODUCT_PROFESSIONAL_15 ) { //Community or Professional
 					unset( $retval['recruitment'], $retval['invoice'], $retval['job'] );
 					unset( $retval['payroll'][array_search( 'user_expense', $retval['payroll'])], $retval['policy'][array_search( 'expense_policy', $retval['policy'])] );
 				}
@@ -2551,7 +2551,7 @@ class PermissionFactory extends Factory {
 
 		//Delete all previous permissions for this user.
 		$this->deletePermissions( $this->getCompany(), $permission_control_id );
-		
+
 		foreach($preset_permissions as $section => $permissions) {
 			foreach($permissions as $name => $value) {
 				if ( $pf->isIgnore( $section, $name, $product_edition ) == FALSE ) {
@@ -2617,12 +2617,12 @@ class PermissionFactory extends Factory {
 		}
 
 		//Debug::Text(' Product Edition: '. $product_edition .' Primary Company ID: '. PRIMARY_COMPANY_ID, __FILE__, __LINE__, __METHOD__,10);
-		if ( $product_edition == TT_PRODUCT_ENTERPRISE ) { //Enterprise
+		if ( $product_edition == PRODUCT_ENTERPRISE_25 ) { //Enterprise
 			//Company ignore permissions must be enabled always, and unset below if this is the primary company
 			$ignore_permissions = array('help' => 'ALL',
 										'company' => array('add','delete','delete_own','undelete','view','edit','login_other_user'),
 										);
-		} elseif ( $product_edition == TT_PRODUCT_CORPORATE ) { //Corporate
+		} elseif ( $product_edition == PRODUCT_CORPORATE_20 ) { //Corporate
 			//Company ignore permissions must be enabled always, and unset below if this is the primary company
 			$ignore_permissions = array('help' => 'ALL',
 										'company' => array('add','delete','delete_own','undelete','view','edit','login_other_user'),
@@ -2634,7 +2634,7 @@ class PermissionFactory extends Factory {
                                         'report' => array('view_expense'),
                                         'recruitment_report' => 'ALL',
 										);
-		} elseif ( $product_edition == TT_PRODUCT_COMMUNITY OR $product_edition == TT_PRODUCT_PROFESSIONAL ) { //Community or Professional
+		} elseif ( $product_edition == PRODUCT_COMMUNITY_10 OR $product_edition == PRODUCT_PROFESSIONAL_15 ) { //Community or Professional
 			//Company ignore permissions must be enabled always, and unset below if this is the primary company
 			$ignore_permissions = array('help' => 'ALL',
 										'company' => array('add','delete','delete_own','undelete','view','edit','login_other_user'),
@@ -2666,7 +2666,7 @@ class PermissionFactory extends Factory {
 		}
 
 		//If they are currently logged in as the primary company ID, allow multiple company permissions.
-		if ( isset($current_company) AND $current_company->getProductEdition() > TT_PRODUCT_COMMUNITY AND $current_company->getId() == PRIMARY_COMPANY_ID ) {
+		if ( isset($current_company) AND $current_company->getProductEdition() > PRODUCT_COMMUNITY_10 AND $current_company->getId() == PRIMARY_COMPANY_ID ) {
 			unset($ignore_permissions['company']);
 		}
 

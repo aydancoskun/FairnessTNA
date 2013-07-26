@@ -333,7 +333,7 @@ class LogDetailFactory extends Factory {
                     break;
 				case 'ClientPaymentFactory':
 				case 'ClientPaymentListFactory':
-					if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+					if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 						//Only log secure values.
 						if ( isset($diff_arr['cc_number']) ) {
 							$old_data['cc_number'] = ( isset($old_data['cc_number']) ) ? $object->getSecureCreditCardNumber( Misc::decrypt( $old_data['cc_number'] ) ) : '';

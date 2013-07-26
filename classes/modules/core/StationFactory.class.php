@@ -172,7 +172,7 @@ class StationFactory extends Factory {
 
 										1073741824 => TTi18n::gettext('Enable: Diagnostic Logs'),
 									);
-				if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[128]  = TTi18n::gettext('Enable: Job');
 					$retval[256]  = TTi18n::gettext('Enable: Task');
 					$retval[512]  = TTi18n::gettext('Enable: Quantity');
@@ -551,7 +551,7 @@ class StationFactory extends Factory {
 		}
 
 		Debug::Text('Job ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
 
@@ -586,7 +586,7 @@ class StationFactory extends Factory {
 		}
 
 		Debug::Text('Job Item ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
 

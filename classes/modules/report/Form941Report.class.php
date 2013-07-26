@@ -109,7 +109,7 @@ class Form941Report extends Report {
 				$retval = TTDate::getReportDateOptions( NULL, TTi18n::getText('Date'), 13, TRUE );
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -120,13 +120,13 @@ class Form941Report extends Report {
 				}
                 break; 
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'Form941Report', 'custom_column' );
 				}
                 break;
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'Form941Report', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
@@ -135,7 +135,7 @@ class Form941Report extends Report {
 				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'Form941Report', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {

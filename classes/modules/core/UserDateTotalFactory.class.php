@@ -584,7 +584,7 @@ class UserDateTotalFactory extends Factory {
 			$id = 0;
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
 
@@ -616,7 +616,7 @@ class UserDateTotalFactory extends Factory {
 			$id = 0;
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
 

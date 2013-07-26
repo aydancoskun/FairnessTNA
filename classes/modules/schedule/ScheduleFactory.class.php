@@ -89,7 +89,7 @@ class ScheduleFactory extends Factory {
 										'-2030-updated_date' => TTi18n::gettext('Updated Date'),
 							);
 
-				if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval['-1180-job'] = TTi18n::gettext('Job');
 					$retval['-1190-job_item'] = TTi18n::gettext('Task');
 				}
@@ -126,7 +126,7 @@ class ScheduleFactory extends Factory {
 								'department',
 								);
 
-				if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[] = 'job';
 					$retval[] = 'job_item';
 
@@ -242,7 +242,7 @@ class ScheduleFactory extends Factory {
 		$ulf = TTnew( 'UserListFactory' );
 
 		//Allow "blank" user for OPEN shifts.
-		if ( ( $id == 0 AND getTTProductEdition() > TT_PRODUCT_COMMUNITY )
+		if ( ( $id == 0 AND getTTProductEdition() > PRODUCT_COMMUNITY_10 )
 				OR
 				$this->Validator->isResultSetWithRows(	'user_id',
 															$ulf->getByID($id),
@@ -655,7 +655,7 @@ class ScheduleFactory extends Factory {
 			$id = 0;
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
 
@@ -687,7 +687,7 @@ class ScheduleFactory extends Factory {
 			$id = 0;
 		}
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
 

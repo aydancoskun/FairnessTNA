@@ -1513,7 +1513,7 @@ class UserFactory extends Factory {
 		}
 
 		Debug::Text('Default Job ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
 
@@ -1548,7 +1548,7 @@ class UserFactory extends Factory {
 		}
 
 		Debug::Text('Default Job Item ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
 

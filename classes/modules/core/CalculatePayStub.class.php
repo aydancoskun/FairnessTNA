@@ -483,7 +483,7 @@ class CalculatePayStub extends PayStubFactory {
 		$udlf->getByCompanyIdAndUserId( $this->getUserObject()->getCompany(), $this->getUserObject()->getId() );
 
 
-		if ( getTTProductEdition() >= TT_PRODUCT_ENTERPRISE ) {
+		if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 			$uelf = TTnew( 'UserExpenseListFactory' );
 			$uelf->getByUserIdAndAuthorizedAndStartDateAndEndDate( $this->getUser(), TRUE, $this->getPayPeriodObject()->getStartDate(), $this->getPayPeriodObject()->getEndDate() );
 			Debug::text('Total User Expenses: '. $uelf->getRecordCount(), __FILE__, __LINE__, __METHOD__,10);

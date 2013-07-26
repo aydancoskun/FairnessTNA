@@ -1038,7 +1038,7 @@ class PayStubFactory extends Factory {
 	}
 
 	function handleUserExpenseStatuses() {
-		if ( getTTProductEdition() < TT_PRODUCT_ENTERPRISE ) {
+		if ( getTTProductEdition() < PRODUCT_ENTERPRISE_25 ) {
 			return TRUE;
 		}
 

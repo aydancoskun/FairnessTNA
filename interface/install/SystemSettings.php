@@ -95,7 +95,7 @@ switch ($action) {
 		}
 
 		$obj->setName( 'anonymous_update_notify' );
-		if ( getTTProductEdition() == TT_PRODUCT_COMMUNITY AND isset($data['anonymous_update_notify']) AND $data['anonymous_update_notify'] == 1 ) {
+		if ( getTTProductEdition() == PRODUCT_COMMUNITY_10 AND isset($data['anonymous_update_notify']) AND $data['anonymous_update_notify'] == 1 ) {
 			$obj->setValue( 1 );
 		} else {
 			$obj->setValue( 0 );

@@ -1585,7 +1585,7 @@ class Misc {
 		//FIXME: Add GET parameter override to prevent any redirection from happening.
 		//Set mobile=1
 		extract( FormVariables::GetVariables( array('desktop') ) );
-		if ( getTTProductEdition() != TT_PRODUCT_COMMUNITY AND $desktop != 1 ) {
+		if ( getTTProductEdition() != PRODUCT_COMMUNITY_10 AND $desktop != 1 ) {
 			$browser = self::detectMobileBrowser();
 			if ( $browser == 'ios' ) {
 				Redirect::Page( URLBuilder::getURL( NULL, Environment::getBaseURL().'/iphone/punch/punch.php' ) );

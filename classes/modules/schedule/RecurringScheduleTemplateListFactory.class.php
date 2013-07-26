@@ -209,7 +209,7 @@ class RecurringScheduleTemplateListFactory extends RecurringScheduleTemplateFact
 		$utf = new UserTitleFactory();
 		$apf = new AbsencePolicyFactory();
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
@@ -256,7 +256,7 @@ class RecurringScheduleTemplateListFactory extends RecurringScheduleTemplateFact
 
 							c.created_by as recurring_schedule_control_created_by
 							';
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job,
 						x.status_id as job_status_id,
@@ -299,7 +299,7 @@ class RecurringScheduleTemplateListFactory extends RecurringScheduleTemplateFact
 
 						';
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON a.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON a.job_item_id = y.id';
 		}

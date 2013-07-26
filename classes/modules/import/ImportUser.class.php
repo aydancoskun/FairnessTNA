@@ -69,8 +69,8 @@ class ImportUser extends Import {
 
 				//Since getOptions() can be called without first setting a company, we don't always know the product edition for the currently
 				//logged in employee.
-				if ( ( is_object($this->getCompanyObject()) AND $this->getCompanyObject()->getProductEdition() < TT_PRODUCT_CORPORATE )
-						OR ( !is_object($this->getCompanyObject()) AND getTTProductEdition() < TT_PRODUCT_CORPORATE ) ) {
+				if ( ( is_object($this->getCompanyObject()) AND $this->getCompanyObject()->getProductEdition() < PRODUCT_CORPORATE_20 )
+						OR ( !is_object($this->getCompanyObject()) AND getTTProductEdition() < PRODUCT_CORPORATE_20 ) ) {
 					unset($retval['-1104-default_job_id'],$retval['-1105-default_job_item_id']);
 				}
 

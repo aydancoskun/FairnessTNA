@@ -237,7 +237,7 @@ class PayrollExportReport extends TimesheetSummaryReport {
 								);
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -250,13 +250,13 @@ class PayrollExportReport extends TimesheetSummaryReport {
 				}
                 break; 
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = Misc::prependArray( $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'PayrollExportReport', 'custom_column' ), parent::_getOptions( $name, $params ) );
 				}
                 break;                
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'PayrollExportReport', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
@@ -267,7 +267,7 @@ class PayrollExportReport extends TimesheetSummaryReport {
 				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'PayrollExportReport', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {

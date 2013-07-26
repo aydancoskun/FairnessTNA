@@ -667,7 +667,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
@@ -724,7 +724,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							uwf.hourly_rate as user_wage_hourly_rate,
 							uwf.effective_date as user_wage_effective_date ';
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job,
 						x.status_id as job_status_id,
@@ -756,7 +756,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and z.deleted = 0
 																			order by z.effective_date desc limit 1)
 					';
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON a.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON a.job_item_id = y.id';
 		}
@@ -1188,7 +1188,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$udf = new UserDateFactory();
 		$uwf = new UserWageFactory();
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
@@ -1248,7 +1248,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							z.middle_name as updated_by_middle_name,
 							z.last_name as updated_by_last_name';
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						w.name as job,
 						w.status_id as job_status_id,
@@ -1284,7 +1284,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and m.deleted = 0
 																			order by m.effective_date desc limit 1)
 					';
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as w ON a.job_id = w.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as x ON a.job_item_id = x.id';
 		}
@@ -1491,7 +1491,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$ppf = new PayPeriodFactory();
 		$uwf = new UserWageFactory();
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
@@ -1558,7 +1558,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							z.middle_name as updated_by_middle_name,
 							z.last_name as updated_by_last_name';
 
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						w.name as job_name,
 						w.status_id as job_status_id,
@@ -1591,7 +1591,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and m.deleted = 0
 																			order by m.effective_date desc limit 1)
 					';
-		if ( getTTProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as w ON a.job_id = w.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as x ON a.job_item_id = x.id';
 		}

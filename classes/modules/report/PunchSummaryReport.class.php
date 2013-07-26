@@ -86,7 +86,7 @@ class PunchSummaryReport extends Report {
 										'-5030-sort' => TTi18n::gettext('Sort By'),
 							   );
 
-				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$corporate_edition_setup_fields = array(
 										'-2510-job_status_id' => TTi18n::gettext('Job Status'),
 										'-2520-job_group_id' => TTi18n::gettext('Job Group'),
@@ -117,7 +117,7 @@ class PunchSummaryReport extends Report {
 				}
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -128,13 +128,13 @@ class PunchSummaryReport extends Report {
 				}
                 break; 
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'PunchSummaryReport', 'custom_column' );
 				}
                 break;
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'PunchSummaryReport', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
@@ -143,7 +143,7 @@ class PunchSummaryReport extends Report {
 				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= TT_PRODUCT_PROFESSIONAL ) {
+				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'PunchSummaryReport', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {
@@ -218,7 +218,7 @@ class PunchSummaryReport extends Report {
 										'-1951-tainted_status' => TTi18n::gettext('Tainted Status'),
 							   );
 
-				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$corporate_edition_static_columns = array(
 											//Static Columns - Aggregate functions can't be used on these.
 											'-1810-job' => TTi18n::gettext('Job'),
@@ -322,7 +322,7 @@ class PunchSummaryReport extends Report {
 										'-1120-by_employee+verified_time_sheet' => TTi18n::gettext('TimeSheet Verification Tainted'),
 							   );
 
-				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= TT_PRODUCT_CORPORATE ) {
+				if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$professional_edition_templates = array(
 										'-2010-by_job+punch_summary+total_time' => TTi18n::gettext('Punch Summary by Job'),
 										'-2020-by_job_item+punch_summary+total_time' => TTi18n::gettext('Punch Summary by Task'),
@@ -728,7 +728,7 @@ class PunchSummaryReport extends Report {
 		$slf = TTnew( 'StationListFactory' );
 		$station_type_options = $slf->getOptions('type');
 
-		if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= TT_PRODUCT_CORPORATE ) {
+		if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$job_status_options = $jlf->getOptions('status');
 		} else {
