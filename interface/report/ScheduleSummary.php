@@ -105,10 +105,12 @@ $professional_edition_static_columns = array(
 									'-1190-job_item' => TTi18n::gettext('Task'),
 									);
 
+/* Aydan
 if ( $current_company->getProductEdition() >= 20 ) {
 	$static_columns = Misc::prependArray( $static_columns, $professional_edition_static_columns);
 	ksort($static_columns);
 }
+*/
 
 //Get custom user fields
 $oflf = TTnew( 'OtherFieldListFactory' );
@@ -229,6 +231,7 @@ switch ($action) {
 			}
 
 			$slf = TTnew( 'ScheduleListFactory' );
+			/* Aydan
 			if ( $current_company->getProductEdition() >= 20 ) {
 				if ( !isset($filter_data['job_item_ids']) ) {
 					$filter_data['job_item_ids'] = array();
@@ -255,6 +258,10 @@ switch ($action) {
 				$filter_data['job_ids'] = array( -1 );
 				$filter_data['job_item_ids'] = array( -1 );
 			}
+			*/
+			// DELETE BELOW
+				$filter_data['job_ids'] = array( -1 );
+				$filter_data['job_item_ids'] = array( -1 );
 
 			$aplf = TTnew( 'AbsencePolicyListFactory' );
 			$aplf->getByCompanyId( $current_company->getId() );
@@ -294,7 +301,7 @@ switch ($action) {
 
 			$dlf = TTnew( 'DepartmentListFactory' );
 			$department_options = $dlf->getByCompanyIdArray( $current_company->getId() );
-
+/* Aydan
 			if ( $current_company->getProductEdition() >= 20 ) {
 				$jlf = TTnew( 'JobListFactory' );
 				$job_options = $jlf->getByCompanyIdArray( $current_company->getId() );
@@ -312,6 +319,12 @@ switch ($action) {
 				$job_item_options = array();
 				$job_group_options = array();
 			}
+			*/
+			// DELETE BELOW
+				$job_options = array();
+				$job_status_options = array();
+				$job_item_options = array();
+				$job_group_options = array();
 
 			$aplf = TTnew( 'AbsencePolicyListFactory' );
 			$absence_policy_options = $aplf->getByCompanyIdArray( $current_company->getId() );
@@ -324,7 +337,7 @@ switch ($action) {
 				echo TTi18n::getText('Please try again later...');
 				exit;
 			}
-			
+
 			if ( isset($tmp_rows) ) {
 				$x=0;
 				foreach($tmp_rows as $pay_period_id => $data_a ) {
@@ -610,6 +623,7 @@ switch ($action) {
 		$filter_data['src_user_title_options'] = Misc::arrayDiffByKey( (array)$filter_data['user_title_ids'], $user_title_options );
 		$filter_data['selected_user_title_options'] = Misc::arrayIntersectByKey( (array)$filter_data['user_title_ids'], $user_title_options );
 
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 
@@ -640,7 +654,7 @@ switch ($action) {
 			$filter_data['src_job_item_options'] = Misc::arrayDiffByKey( (array)$filter_data['job_item_ids'], $job_item_options );
 			$filter_data['selected_job_item_options'] = Misc::arrayIntersectByKey( (array)$filter_data['job_item_ids'], $job_item_options );
 		}
-
+*/
 		//Get pay periods
 		$pplf = TTnew( 'PayPeriodListFactory' );
 		$pplf->getByCompanyId( $current_company->getId() );

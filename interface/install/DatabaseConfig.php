@@ -175,8 +175,6 @@ switch ($action) {
 if ( !isset($data['priv_user']) ) {
 	$data['priv_user'] = NULL;
 }
-$handle = @fopen('http://www.timetrex.com/'.URLBuilder::getURL( array('v' => $install_obj->getFullApplicationVersion(), 'page' => 'database_config', 'priv_user' => $data['priv_user']), 'pre_install.php'), "r");
-@fclose($handle);
 
 $smarty->assign_by_ref('install_obj', $install_obj);
 $smarty->assign_by_ref('external_installer', $external_installer);

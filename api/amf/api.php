@@ -1,5 +1,5 @@
 <?php
-define('TIMETREX_AMF_API', TRUE );
+define('AMF_API', TRUE );
 
 //Add fairness.ini.php setting to enable/disable the API. Make an entire [API] section.
 require_once('../../includes/global.inc.php');

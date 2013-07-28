@@ -223,14 +223,14 @@ foreach($ulf as $user ) {
 		if ( PRODUCTION === TRUE ) {
 			$to_email = $user->getWorkEmail();
 		} else {
-			$to_email = 'mikeb@timetrex.com';
+			$to_email = 'nobody@example.com';
 		}
 
 		if ( $total_count > 0 ) {
 			Debug::Text('Emailing Report to: '. $user->getFullName() .' Email: '. $to_email , __FILE__, __LINE__, __METHOD__,10);
 			Debug::Arr($body, 'Email Report', __FILE__, __LINE__, __METHOD__,10);
 			//echo "<pre>$body</pre><br>\n";
-			mail($to_email,'TimeTrex - Pending Authorizations ('. $total_count .')' , $body, "From: \"TimeTrex - Notify\"<noreply@timetrex.com>\nBcc: ipso@snappymail.ca\n");
+			mail($to_email,'Pending Authorizations ('. $total_count .')' , $body, "From: \"Notify\"<$config_vars[urls][noreply_email]>\nBcc: $config_vars[urls][email_bcc]\n");
 		} else {
 			Debug::Text('NOT Emailing Report to: '. $user->getFullName() .' Email: '. $user->getWorkEmail() , __FILE__, __LINE__, __METHOD__,10);
 		}

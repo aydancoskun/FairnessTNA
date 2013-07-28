@@ -4,7 +4,7 @@ require_once('../../classes/modules/api/client/TimeTrexClientAPI.class.php');
 /*
  Global variables
 */
-$TIMETREX_URL = 'https://demo.timetrex.com/api/soap/api.php';
+$TIMETREX_URL = $config_vars['urls']['soap_api'];
 $TIMETREX_USERNAME = 'demoadmin';
 $TIMETREX_PASSWORD = 'demo283920';
 

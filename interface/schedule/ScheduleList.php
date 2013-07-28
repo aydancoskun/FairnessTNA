@@ -78,11 +78,13 @@ $professional_edition_columns = array(
 */
 									);
 
+// Aydan
+/*
 if ( $current_company->getProductEdition() >= 20 ) {
 	$columns = Misc::prependArray( $columns, $professional_edition_columns);
 	ksort($columns);
 }
-
+*/
 if ( $saved_search_id == '' AND !isset($filter_data['columns']) ) {
 	//Default columns.
 	$filter_data['columns'] = array(

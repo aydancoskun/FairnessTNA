@@ -22,10 +22,7 @@
 
 				{if $install_obj->checkAllRequirements() != 0}
 				<tr>
-					<td class="tblDataWhiteNH" colspan="7" align="right">
-						<div id="rowWarning">
-						{t escape="no" 1='<a href="http://forums.timetrex.com" target="_blank">' 2='</a>' 3='<a href="http://www.timetrex.com/setup_support.php" target="_blank">' 4='</a>'}For installation support, please join our community %1forums%2 or contact a TimeTrex support expert for %3Implementation Support Services%4.{/t}
-						</div>
+					<td class="tblDataWhiteNH" colspan="7" align="right">$nbsp;
 					</td>
 				</tr>
 				{/if}
@@ -42,8 +39,8 @@
 						{elseif $check_timetrex_version == 1}
 							<span class="tblDataWarning">{t}Unable to Check Latest Version{/t}
 						{elseif $check_timetrex_version == 2}
-							<span class="tblDataWarning">A Newer Version of TimeTrex is Available.
-							<a href="http://www.timetrex.com/download.php">{t escape="no" 1=$install_obj->getLatestTimeTrexVersion()}Download v%1 Now{/t}</a>
+							<span class="tblDataWarning">A Newer Version of Fairness is Available.
+							<a href="https://github.com/Aydan/fairness">{t escape="no" 1=$install_obj->getLatestTimeTrexVersion()}Download v%1 Now{/t}</a>
 						{/if}
 						</span>
 					</td>
@@ -180,7 +177,7 @@
 								</td>
 							</tr>
 
-							{if $install_obj->getTTProductEdition() >= 20}
+							<!-- Aydan if $install_obj->getTTProductEdition() >= 20 -->
 							<tr>
 								<td class="cellLeftEditTable">
 									{t}MCRYPT Enabled:{/t}
@@ -194,7 +191,7 @@
 									</span>
 								</td>
 							</tr>
-							{/if}
+							<!--/if -->
 
 							<tr>
 								<td class="cellLeftEditTable">

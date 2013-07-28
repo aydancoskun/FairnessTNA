@@ -312,6 +312,7 @@ if ( $clf->getRecordCount() > 0 ) {
 															$pcf->setDepartment( $recurring_schedule_shift['department_id'] );
 														}
 
+/* Aydan
 														if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 															if ( isset($recurring_schedule_shift['job_id']) ) {
 																$pcf->setJob( $recurring_schedule_shift['job_id'] );
@@ -321,7 +322,7 @@ if ( $clf->getRecordCount() > 0 ) {
 																$pcf->setJobItem( $recurring_schedule_shift['job_item_id'] );
 															}
 														}
-
+*/
 														$pcf->setEnableStrictJobValidation( TRUE );
 														$pcf->setEnableCalcUserDateID( TRUE );
 														$pcf->setEnableCalcTotalTime( TRUE );

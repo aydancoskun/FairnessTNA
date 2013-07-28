@@ -269,7 +269,7 @@ class Misc {
 
 		$retval = FALSE;
 		if ( isset($rows[0]) ) {
-			$retval = @call_user_func_array( 'array_intersect_assoc', $rows ); 
+			$retval = @call_user_func_array( 'array_intersect_assoc', $rows );
             // The '@' cannot be removed, Some of the array_* functions that compare elements in multiple arrays do so by (string)$elem1 === (string)$elem2
             // If $elem1 or $elem2 is an array, then the array to string notice is thrown, $rows is an array and its every element is also an array, but its element may have one element is still an array, if so, the array to string notice will be produced.
             // this case may be like this:
@@ -278,9 +278,9 @@ class Misc {
             //      array(
             //          array('a'),
             //      ),
-            //  ); 
-            // Put a "@" in front to prevent the error, otherwise, the Flex will not work properly.            
-            
+            //  );
+            // Put a "@" in front to prevent the error, otherwise, the Flex will not work properly.
+
 			Debug::Arr($retval, 'Intersected/Common Data', __FILE__, __LINE__, __METHOD__, 10);
 		}
 
@@ -1417,9 +1417,9 @@ class Misc {
 			return FALSE;
 		}
 
-		//Only send errors to TimeTrex support, not the customer.
+		//Only send errors to support, not the customer.
 		$cc = NULL;
-		$to = 'errors@timetrex.com';
+		$to = $config_vars['urls']['error_reports_email'];
 		$from = APPLICATION_NAME.'@'.Misc::getHostName( FALSE );
 
 		$headers = array(
@@ -1585,7 +1585,9 @@ class Misc {
 		//FIXME: Add GET parameter override to prevent any redirection from happening.
 		//Set mobile=1
 		extract( FormVariables::GetVariables( array('desktop') ) );
-		if ( getTTProductEdition() != PRODUCT_COMMUNITY_10 AND $desktop != 1 ) {
+//		if ( getTTProductEdition() != PRODUCT_COMMUNITY_10 AND $desktop != 1 ) {
+// Aydan
+		if ( $desktop != 1 ) {
 			$browser = self::detectMobileBrowser();
 			if ( $browser == 'ios' ) {
 				Redirect::Page( URLBuilder::getURL( NULL, Environment::getBaseURL().'/iphone/punch/punch.php' ) );

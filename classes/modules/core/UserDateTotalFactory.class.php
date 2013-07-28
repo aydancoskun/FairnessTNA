@@ -583,11 +583,11 @@ class UserDateTotalFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
-
+*/
 		if (  $id == 0
 				OR
 				$this->Validator->isResultSetWithRows(	'job_id',
@@ -616,10 +616,11 @@ class UserDateTotalFactory extends Factory {
 			$id = 0;
 		}
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
-
+*/
 		if (  $id == 0
 				OR
 				$this->Validator->isResultSetWithRows(	'job_item_id',
@@ -3121,7 +3122,7 @@ class UserDateTotalFactory extends Factory {
 
 	function calcBreakPolicyTotalTime( $break_policy_ids = NULL ) {
 		//Debug::Arr($break_policy_ids, 'Break Policy IDs: ', __FILE__, __LINE__, __METHOD__, 10);
-		
+
 		//Get total worked time for the day.
 		$udtlf = TTnew( 'UserDateTotalListFactory' );
 		$daily_total_time = $udtlf->getWorkedTimeSumByUserDateID( $this->getUserDateID() );

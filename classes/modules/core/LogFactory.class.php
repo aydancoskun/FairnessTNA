@@ -643,7 +643,9 @@ class LogFactory extends Factory {
 	}
 
 	function getDetails() {
-		if ( getTTProductEdition() > 10 AND $this->isNew() == FALSE AND is_object( $this->getUserObject() ) ) {
+// Aydan
+//		if ( getTTProductEdition() > 10 AND $this->isNew() == FALSE AND is_object( $this->getUserObject() ) ) {
+		if ( $this->isNew() == FALSE AND is_object( $this->getUserObject() ) ) {
 			//Get class for this table
 			Debug::Text( 'Table: '. $this->getTableName(), __FILE__, __LINE__, __METHOD__,10);
 			require_once( Environment::getBasePath() . DIRECTORY_SEPARATOR . 'includes'. DIRECTORY_SEPARATOR .'TableMap.inc.php');

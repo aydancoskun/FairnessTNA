@@ -57,13 +57,13 @@ if ( version_compare( PHP_VERSION, 5, '<') == 1 ) {
 	$redir = FALSE;
 }
 if ( version_compare( PHP_VERSION, '5.4.99', '>') == 1 ) {
-	echo "You are currenting using PHP v<b>". PHP_VERSION ."</b> TimeTrex requires PHP <b>v5.4.x</b> or earlier!<br><br>\n";
+	echo "You are currenting using PHP v<b>". PHP_VERSION ."</b> Fairness requires PHP <b>v5.4.x</b> or earlier!<br><br>\n";
 	$redir = FALSE;
 }
 
 echo " 5...";
 if ( !is_writeable($templates_c_dir) ) {
-	echo "<b>". $templates_c_dir ."</b> is NOT writable by your web server! For help on this topic click <a href='http://forums.timetrex.com/viewtopic.php?t=66'>here</a>.<br><br>\n";
+	echo "<b>". $templates_c_dir ."</b> is NOT writable by your web server! please give your webserver write permissions to this directory.<br><br>\n";
 	$redir = FALSE;
 }
 
@@ -76,7 +76,7 @@ if ( extension_loaded( 'gettext' ) == FALSE ) {
 echo " 7...";
 $test_template_c_sub_dir = $templates_c_dir . DIRECTORY_SEPARATOR . uniqid();
 if ( @mkdir( $test_template_c_sub_dir ) !== TRUE ) {
-	echo "Your web server is unable to create directories inside of: <b>". $templates_c_dir ."</b>, please give your webserver write permissions to this directory. For help on this topic click <a href='http://forums.timetrex.com/viewtopic.php?t=66'>here</a>.<br><br>\n";
+	echo "Your web server is unable to create directories inside of: <b>". $templates_c_dir ."</b>, please give your webserver write permissions to this directory.<br><br>\n";
 	$redir = FALSE;
 }
 echo " 8...";
@@ -84,20 +84,16 @@ echo " 8...";
 unset($test_template_c_sub_dir);
 
 echo " 9...";
-$handle = @fopen('http://www.timetrex.com/pre_install.php?os='. PHP_OS .'&php_version='. PHP_VERSION .'&redir='. (int)$redir .'&web_server='. urlencode( substr( $_SERVER['SERVER_SOFTWARE'], 0, 20 ) ) .'&external_installer='. $external_installer .'&url='. urlencode($_SERVER['HTTP_HOST'].':'.$_SERVER['SERVER_PORT'].$_SERVER['REQUEST_URI']), "r");
-@fclose($handle);
 
 echo " 10...";
 if ( $redir == TRUE ) {
 	echo " PASSED!<br><br>\n";
 	echo "Please wait while we automatically redirect you to the <a href='License.php?external_installer=". $external_installer ."'>installer</a>.";
 	echo "<meta http-equiv='refresh' content='0;url=License.php?external_installer=". $external_installer ."'>";
-	//header("Location: License.php?external_installer=". $external_installer ."\n\n");
+
 } else {
 	echo " FAILED!<br><br>\n";
-	echo "For installation support, please join our community <a href=\"http://forums.timetrex.com\" target=\"_blank\">forums</a> or
-		contact a TimeTrex support expert for <a href=\"http://www.timetrex.com/setup_support.php\" target=\"_blank\">Implementation Support Services</a>.
-		<br>\n";
+	echo $config_vars['urls']['installation_support'];
 }
 echo "</body></html>";
 ?>

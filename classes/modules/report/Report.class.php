@@ -491,7 +491,7 @@ class Report {
 			$formatted_data = $data;
 		}
 		$this->config['columns'] = Misc::trimSortPrefix($formatted_data);
-        
+
 		return TRUE;
 	}
 	function getColumnConfig() {
@@ -500,8 +500,8 @@ class Report {
 		}
 
 		return FALSE;
-	}    
-    
+	}
+
     function setColumnDataConfig( $data ) {
         if ( is_array( $data ) ) {
 			//getColumnConfig() can return FALSE, make sure we don't merge an array where 0 => FALSE, as that will prevent us from including *all* columns in the report.
@@ -509,17 +509,17 @@ class Report {
             $data = array_merge( (array)$data, ( is_array( $this->getColumnConfig() ) ) ? $this->getColumnConfig() : array() );
             $this->config['columns_data'] = $data;
         }
-        
+
         return TRUE;
     }
-    
+
     function getColumnDataConfig() {
         if ( isset($this->config['columns_data']) ) {
             return $this->config['columns_data'];
         } else {
             return $this->getColumnConfig();
-        }        
-        
+        }
+
         return FALSE;
     }
 
@@ -702,7 +702,7 @@ class Report {
 			}
 			//Debug::Arr($columns, 'Remaining Column Config: ', __FILE__, __LINE__, __METHOD__,10);
 		}
-        
+
 		if ( $num !== FALSE ) {
 			$column_keys = array_keys( (array)$columns );
 			if ( isset($column_keys[$num]) ) {
@@ -1158,7 +1158,7 @@ class Report {
 			} else {
 				Debug::Text('Skipping Grand Total label...', __FILE__, __LINE__, __METHOD__,10);
 			}
-			
+
 			$total[0]['_total'] = TRUE;
 			$this->total_row = $total[0];
 			//Debug::Arr($this->total_row, ' Total Row: ', __FILE__, __LINE__, __METHOD__,10);
@@ -1243,7 +1243,7 @@ class Report {
 								'page_height' => 279,
 								);
 			$rc->setDocumentProperties( $properties );
-			
+
 			$this->chart_images = $rc->Output();
 		} else {
 			Debug::Text(' Charting not enabled...', __FILE__, __LINE__, __METHOD__,10);
@@ -1352,7 +1352,7 @@ class Report {
                         $column = ( strpos( $column, 'custom_column' ) === FALSE ) ? $column : $column.'-'.'date_stamp';
 						$retval = TTDate::getReportDates( $column, $value, TRUE, $this->getUserObject() );
 						break;
-					case 'currency':                                               
+					case 'currency':
 						if ( is_object( $this->getCurrencyObject() ) ) {
 							//Set MIN decimals to 2 and max to the currency rounding.
 							$retval = $this->getCurrencyObject()->getSymbol() . TTi18n::formatNumber( $value, TRUE, 2, $this->getCurrencyObject()->getRoundDecimalPlaces() );
@@ -1408,7 +1408,7 @@ class Report {
 		} else {
 			Debug::Text('No Report Date columns...', __FILE__, __LINE__, __METHOD__,10);
 		}
-        
+
 		return $format_options;
 	}
 
@@ -1417,22 +1417,22 @@ class Report {
         $report_format_options = $this->getOptions('column_format_map');
         if ( is_array($custom_columns) ) {
             foreach( $custom_columns as $custom_column ) {
-                $format_options[$custom_column['variable_name']] = $report_format_options[$custom_column['format']];               
+                $format_options[$custom_column['variable_name']] = $report_format_options[$custom_column['format']];
             }
         } else {
             Debug::Text('No Custom Columns...', __FILE__, __LINE__, __METHOD__, 10);
         }
-        
+
         return $format_options;
     }
-    
+
     function currencyConvertToBase() {
 		$this->profiler->startTimer( 'currencyConvertToBase' );
 
-        $currency_format_columns = array_keys( array_merge( (array)Misc::trimSortPrefix( $this->getOptions('column_format') ), $this->getCustomColumnFormatOptions() ), 'currency'  );        
+        $currency_format_columns = array_keys( array_merge( (array)Misc::trimSortPrefix( $this->getOptions('column_format') ), $this->getCustomColumnFormatOptions() ), 'currency'  );
         $currency_convert_to_base = $this->getCurrencyConvertToBase();
 		$base_currency_obj = $this->getBaseCurrencyObject();
-        
+
         if ( empty( $currency_format_columns ) ) {
             return TRUE;
         }
@@ -1445,7 +1445,7 @@ class Report {
         if ( is_array( $this->data ) == FALSE ) {
             return TRUE;
         }
-        
+
         // Loop over the all currency columns to match with the report data to convert the currency columns in data to base currency in company if they do exist.
         foreach( $this->data as $key => $row ) {
             foreach( $currency_format_columns as $currency_column ) {
@@ -1456,16 +1456,16 @@ class Report {
                 }
             }
         }
-        
+
 		Debug::Text(' Memory Usage: Current: '. memory_get_usage() .' Peak: '. memory_get_peak_usage(), __FILE__, __LINE__, __METHOD__,10);
 
 		$this->profiler->stopTimer( 'currencyConvertToBase' );
 
-        return TRUE;      
-        
+        return TRUE;
+
     }
 
-	function getColumnFormatConfig() {        
+	function getColumnFormatConfig() {
 		return $this->getTimePeriodFormatOptions( array_merge( (array)Misc::trimSortPrefix( $this->getOptions('column_format') ), $this->getCustomColumnFormatOptions() ) );
 	}
 
@@ -1551,7 +1551,7 @@ class Report {
 		if ( $description != '' ) {
 			$body .= TTi18n::getText('Sort').': ' . $description."\n";
 		}
-        
+
         //Custom Filter:
         $description = $this->getDescription('custom_filter');
         if ( $description != '' ) {
@@ -1672,8 +1672,8 @@ class Report {
 						break;
                     case 'custom_filter':
                         //$config = (array)$this->getCustomFilterConfig();
-                        $filter_columns = (array)$this->getCustomFilterConfig();                       
-						$columns = Misc::trimSortPrefix( $this->getOptions('report_custom_filters') );     
+                        $filter_columns = (array)$this->getCustomFilterConfig();
+						$columns = Misc::trimSortPrefix( $this->getOptions('report_custom_filters') );
 						break;
 				}
 				//Debug::Arr($config, ' Config: ', __FILE__, __LINE__, __METHOD__,10);
@@ -1757,16 +1757,16 @@ class Report {
 			return FALSE;
 		}
 
-		$this->preProcess( $format );  
-        
+		$this->preProcess( $format );
+
         $this->currencyConvertToBase();
 
-        $this->calculateCustomColumns();        
+        $this->calculateCustomColumns();
         $this->calculateCustomColumnFilters( 30 ); //Pre-Group
 		$this->group();
         $this->calculateCustomColumnFilters( 31 ); //Post-Group //Put after grouping is handled, otherwise the user might get unexpected results based on the data they actually see.
-             
-        
+
+
 		$this->sort(); //Sort needs to come before subTotal, as subTotal will need to re-sort the data in order to fit the sub-totals in.
 		//if ( $format != 'csv' AND $format != 'xml' ) { //Exclude total/sub-totals for CSV/XML format
 		if ( $format == 'pdf' OR $format == 'raw' OR stripos( $format, 'pdf_' ) !== FALSE ) {  //Only total/subtotal for PDF/RAW formats.
@@ -1785,10 +1785,10 @@ class Report {
 			//But we need to size the PDF *after* postProcess runs.
 			$this->chart();
 		}
-        
+
 		$this->postProcess( $format );
 		$this->_pdf_Initialize(); //Size page after postProcess() is done. This will resize the page if its already been initialized for charting purposes.
-        
+
 		//Check after data is postProcessed to make sure we are still below our load threshold.
 		if ( $this->isSystemLoadValid() == FALSE ) {
 			return FALSE;
@@ -1881,7 +1881,7 @@ class Report {
 		Debug::text('Total Rows: '. $total_rows .' Form Rows: '. $total_form_rows .' Result: '. (int)$retval, __FILE__, __LINE__, __METHOD__, 10);
 		return $retval;
 	}
-	
+
 	function email( $output, $report_schedule_obj = NULL ) {
 		Debug::Text('Emailing report...', __FILE__, __LINE__, __METHOD__,10);
 
@@ -2311,7 +2311,7 @@ class Report {
 				$this->pdf->Cell($this->_pdf_scaleSize(100), $this->_pdf_fontSize(3), $description, 0, 0, 'L', 0, '', 0);
 				$this->pdf->Ln();
 			}
-            
+
             //Custom Filter:
             $description = $this->getDescription('custom_filter');
 			if ( $description != '' ) {
@@ -2864,7 +2864,8 @@ class Report {
 	}
 
     function setCustomColumnConfig( $columns ) {
-		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$rcclf = TTnew('ReportCustomColumnListFactory');
 			$rcclf->getByCompanyId( $this->getUserObject()->getCompany() );
 			$columns_data = array();
@@ -2895,8 +2896,8 @@ class Report {
 					}
 				}
 			}
-		}
-        
+//		}
+
         $this->setColumnDataConfig( $columns_data );
 
         return TRUE;
@@ -2912,21 +2913,23 @@ class Report {
     }
 
     function calculateCustomColumns() {
-		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$this->profiler->startTimer( 'calculateCustomColumns' );
 			ReportCustomColumnFactory::calculateCustomColumns( $this );
 			$this->profiler->stopTimer( 'calculateCustomColumns' );
-		}
+//		}
 
         return TRUE;
     }
     function calculateCustomColumnFilters( $type_id ) {
-        if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//        if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$this->profiler->startTimer( 'calculateCustomColumnFilters' );
 			ReportCustomColumnFactory::calculateCustomColumnFilters( $this, $type_id );
 			$this->profiler->stopTimer( 'calculateCustomColumnFilters' );
-		}
-		
+//		}
+
         return TRUE;
     }
 }
@@ -2945,7 +2948,7 @@ class ReportPDF extends Report {
 
 class ReportCell {
 	public $report_obj = NULL;
-	
+
 	public $value = NULL;
 
 	function __toString() {
@@ -2963,7 +2966,7 @@ class ReportCell {
 
 class ReportCellBarcode extends ReportCell {
 	public $style = NULL;
-	
+
 	function __construct( $report_obj, $value, $style = FALSE ) {
 		$this->report_obj = $report_obj;
 		$this->value = $value;
@@ -2996,7 +2999,7 @@ class ReportCellBarcode extends ReportCell {
 				//'fontsize' => 8,
 				//'stretchtext' => 4
 			);
-			
+
 			$this->report_obj->pdf->write1DBarcode( $this->value, 'C128A', $this->report_obj->pdf->getX(), '', $max_width, $max_height, '', $style, 'T');
 		}
 	}

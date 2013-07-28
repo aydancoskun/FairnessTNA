@@ -80,6 +80,8 @@ class ImportPunch extends Import {
 
 				//Since getOptions() can be called without first setting a company, we don't always know the product edition for the currently
 				//logged in employee.
+
+/* Aydan
 				if ( ( is_object($this->getCompanyObject()) AND $this->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 )
 						OR ( !is_object($this->getCompanyObject()) AND getTTProductEdition() >= PRODUCT_CORPORATE_20 ) ) {
 					$retval += array(
@@ -89,6 +91,7 @@ class ImportPunch extends Import {
 									'-1360-bad_quantity' => TTi18n::gettext('Bad Quantity'),
 								);
 				}
+				*/
 
 				$retval = Misc::addSortPrefix( Misc::prependArray( $this->getUserIdentificationColumns(), Misc::trimSortPrefix($retval) ) );
 				ksort($retval);
@@ -367,7 +370,7 @@ class ImportPunch extends Import {
 		} else {
 			$retval = $this->findClosestMatch( $input, $this->branch_options );
 		}
-		
+
 		if ( $retval === FALSE ) {
 			$retval = -1; //Make sure this fails.
 		}

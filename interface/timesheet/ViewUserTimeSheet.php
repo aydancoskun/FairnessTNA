@@ -840,6 +840,7 @@ switch ($action) {
 
 		$job_options = array();
 		$job_item_options = array();
+		/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$job_options = $jlf->getByCompanyIdArray( $current_company->getId(), FALSE );
@@ -847,7 +848,7 @@ switch ($action) {
 			$jilf = TTnew( 'JobItemListFactory' );
 			$job_item_options = $jilf->getByCompanyIdArray( $current_company->getId(), FALSE );
 		}
-
+		*/
 		$udtlf = TTnew( 'UserDateTotalListFactory' );
 		//Get only worked/paid absence totals.
 		$udtlf->getPaidTimeByCompanyIDAndUserIdAndStatusAndStartDateAndEndDate( $current_company->getId(), $user_id, array(10,30) , $start_date, $end_date);

@@ -333,6 +333,7 @@ class LogDetailFactory extends Factory {
                     break;
 				case 'ClientPaymentFactory':
 				case 'ClientPaymentListFactory':
+/* Aydan
 					if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 						//Only log secure values.
 						if ( isset($diff_arr['cc_number']) ) {
@@ -350,6 +351,7 @@ class LogDetailFactory extends Factory {
 							$new_data['cc_check'] = ( isset($old_data['cc_check']) ) ? $object->getSecureCreditCardCheck( $new_data['cc_check'] ) : '';
 						}
 					}
+*/
 					break;
                 case 'JobApplicantFactory':
                 case 'JobApplicantListFactory':

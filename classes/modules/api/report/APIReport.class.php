@@ -115,7 +115,7 @@ class APIReport extends APIFactory {
 			$output_arr = $this->getReportObject()->getOutput( $format );
 			if ( isset($output_arr['file_name']) AND isset($output_arr['mime_type']) AND isset($output_arr['data']) ) {
 				//If using the SOAP API, return data base64 encoded so it can be decoded on the client side.
-				if ( defined('TIMETREX_SOAP_API') AND TIMETREX_SOAP_API == TRUE ) {
+				if ( defined('SOAP_API') AND SOAP_API == TRUE ) {
 					$output_arr['data'] = base64_encode( $output_arr['data'] );
 					return $this->returnHandler( $output_arr );
 				} else {

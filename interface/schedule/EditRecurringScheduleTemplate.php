@@ -423,6 +423,7 @@ switch ($action) {
 		$data['department_options'] = Misc::prependArray( $prepend_array_option,  $dlf->getArrayByListFactory( $dlf, FALSE, TRUE ) );
 		//$data['department_options'] = $dlf->getByCompanyIdArray( $current_company->getId() );
 
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$data['job_options'] = $jlf->getByCompanyIdAndStatusArray( $current_company->getId(), array(10,20,30,40), TRUE );
@@ -430,7 +431,7 @@ switch ($action) {
 			$jilf = TTnew( 'JobItemListFactory' );
 			$data['job_item_options'] = $jilf->getByCompanyIdArray( $current_company->getId(), TRUE );
 		}
-
+*/
 		$data['status_options'] = $rstlf->getOptions('status');
 		$data['absence_policy_options'] = Misc::prependArray( array( '- '. TTi18n::getText('Select Policy') .' -'), $absence_policy_options );
 

@@ -67,6 +67,7 @@ class APIImport extends APIFactory {
 					 );
 
 		//Get company data so we know if its professional edition or not.
+		/* Aydan
 		if ( $this->getCurrentCompanyObject()->getProductEdition() == 20 ) {
 			$retarr += array(
 							'-1500-client' => TTi18n::getText('Clients'),
@@ -75,7 +76,7 @@ class APIImport extends APIFactory {
 					);
 
 		}
-
+*/
 		return $this->returnHandler( $retarr );
 	}
 

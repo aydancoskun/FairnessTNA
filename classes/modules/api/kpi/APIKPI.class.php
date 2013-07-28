@@ -1,38 +1,25 @@
 <?php
 /*********************************************************************************
- * TimeTrex is a Payroll and Time Management program developed by
- * TimeTrex Software Inc. Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * This file is part of "Fairness", a Payroll and Time Management program.
+ * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission
- * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE
- * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ * Fairness is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation, either version 3 of the License, or (at you option )
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
  *
  * You should have received a copy of the GNU Affero General Public License along
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- *
- * You can contact TimeTrex headquarters at Unit 22 - 2475 Dobbin Rd. Suite
- * #292 Westbank, BC V4T 2E9, Canada or at email address info@timetrex.com.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License version 3.
- *
- * In accordance with Section 7(b) of the GNU Affero General Public License
- * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by TimeTrex" logo. If the display of the logo is not reasonably
- * feasible for technical reasons, the Appropriate Legal Notices must display
- * the words "Powered by TimeTrex".
- ********************************************************************************/
+  ********************************************************************************/
 /*
  * $Revision: 2196 $
  * $Id: APIKPI.class.php 2196 2008-10-14 16:08:54Z ipso $
@@ -59,7 +46,7 @@ class APIKPI extends APIFactory {
 	 */
 	function getOptions( $name, $parent = NULL ) {
 		if ( $name == 'columns'
-				AND ( !$this->getPermissionObject()->Check('kpi','enabled') 
+				AND ( !$this->getPermissionObject()->Check('kpi','enabled')
 					OR !( $this->getPermissionObject()->Check('kpi','view') OR $this->getPermissionObject()->Check('kpi','view_own') OR $this->getPermissionObject()->Check('kpi','view_child') ) ) ) {
 			$name = 'list_columns';
 		}
@@ -98,7 +85,7 @@ class APIKPI extends APIFactory {
 		}
 		$data = $this->initializeFilterAndPager( $data, $disable_paging );
 		$data['filter_data']['permission_children_ids'] = $this->getPermissionObject()->getPermissionChildren( 'kpi', 'view' );
-        
+
 		$klf = TTnew( 'KPIListFactory' );
 		$klf->getAPISearchByCompanyIdAndArrayCriteria( $this->getCurrentCompanyObject()->getId(), $data['filter_data'], $data['filter_items_per_page'], $data['filter_page'], NULL, $data['filter_sort'] );
         Debug::Text('Record Count: '. $klf->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
@@ -106,7 +93,7 @@ class APIKPI extends APIFactory {
 			$this->setPagerObject( $klf );
             Debug::Arr($data,'Searching Data: ',__FILE__, __LINE__, __METHOD__, 10);
 			foreach( $klf as $kpi_obj ) {
-				$retarr[] = $kpi_obj->getObjectAsArray( $data['filter_columns'], $data['filter_data']['permission_children_ids']  ); 
+				$retarr[] = $kpi_obj->getObjectAsArray( $data['filter_columns'], $data['filter_data']['permission_children_ids']  );
 			}
             Debug::Arr($retarr, 'Getting Data: ',__FILE__, __LINE__, __METHOD__,10);
 			return $this->returnHandler( $retarr );
@@ -183,7 +170,7 @@ class APIKPI extends APIFactory {
 								    OR ( $this->getPermissionObject()->Check('kpi','edit_child') AND $this->getPermissionObject()->isChild( $lf->getCurrent()->getCreatedBy(), $permission_children_ids ) === TRUE )
                                 ) ) {
 							Debug::Text('Row Exists, getting current data: ', $row['id'], __FILE__, __LINE__, __METHOD__, 10);
-							$lf = $lf->getCurrent(); 
+							$lf = $lf->getCurrent();
 							$row = array_merge( $lf->getObjectAsArray(), $row );
 						} else {
 							$primary_validator->isTrue( 'kpi', FALSE, TTi18n::gettext('Edit permission denied') );
@@ -209,7 +196,7 @@ class APIKPI extends APIFactory {
                     //Force Company ID to current company.
                     $row['company_id'] = $this->getCurrentCompanyObject()->getId();
 					$lf->setObjectFromArray( $row );
-						  
+
 					$is_valid = $lf->isValid();
 					if ( $is_valid == TRUE ) {
 						Debug::Text('Saving data...', __FILE__, __LINE__, __METHOD__, 10);
@@ -271,12 +258,12 @@ class APIKPI extends APIFactory {
 				OR !( $this->getPermissionObject()->Check('kpi','delete') OR $this->getPermissionObject()->Check('kpi','delete_own') OR $this->getPermissionObject()->Check('kpi','delete_child') ) ) {
 			return  $this->getPermissionObject()->PermissionDenied();
 		}
-        
+
         $permission_children_ids = $this->getPermissionChildren();
 
 		Debug::Text('Received data for: '. count($data) .' KPIs', __FILE__, __LINE__, __METHOD__, 10);
 		Debug::Arr($data, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
-        
+
 		$total_records = count($data);
         $validator_stats = array('total_records' => $total_records, 'valid_records' => 0 );
 		if ( is_array($data) ) {
@@ -294,7 +281,7 @@ class APIKPI extends APIFactory {
 								OR ( $this->getPermissionObject()->Check('kpi','delete_own') AND $this->getPermissionObject()->isOwner( $lf->getCurrent()->getCreatedBy() ) === TRUE )
                                 OR ( $this->getPermissionObject()->Check('kpi','delete_child') AND $this->getPermissionObject()->isChild( $lf->getCurrent()->getCreatedBy(), $permission_children_ids ) === TRUE )
                             ) {
-                                
+
                             Debug::Text('Record Exists, deleting record: ', $id, __FILE__, __LINE__, __METHOD__, 10);
 							$lf = $lf->getCurrent();
 						} else {
@@ -317,7 +304,7 @@ class APIKPI extends APIFactory {
 
 					$is_valid = $lf->isValid();
 					if ( $is_valid == TRUE ) {
-						Debug::Text('Record Deleted...', __FILE__, __LINE__, __METHOD__, 10);                        
+						Debug::Text('Record Deleted...', __FILE__, __LINE__, __METHOD__, 10);
 						$save_result[$key] = $lf->Save();
 						$validator_stats['valid_records']++;
 					}
@@ -372,7 +359,7 @@ class APIKPI extends APIFactory {
 		if ( is_array( $src_rows ) AND count($src_rows) > 0 ) {
 			Debug::Arr($src_rows, 'SRC Rows: ', __FILE__, __LINE__, __METHOD__, 10);
 			foreach( $src_rows as $key => $row ) {
-				unset($src_rows[$key]['id'],$src_rows[$key]['user']); //Clear fields that can't be copied               
+				unset($src_rows[$key]['id'],$src_rows[$key]['user']); //Clear fields that can't be copied
 				$src_rows[$key]['name'] = Misc::generateCopyName( $row['name'] ); //Generate unique name
 			}
 			//Debug::Arr($src_rows, 'bSRC Rows: ', __FILE__, __LINE__, __METHOD__, 10);

@@ -65,22 +65,34 @@ else _d.write("<scr"+"ipt language=JavaScript src={$BASE_URL}menu/mmenudom.js><\
 	*}
 	{displaybreadcrumbs}
 	{if $DB_TIME_ZONE_ERROR == 1}
-	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 was unable to set your time zone. Please contact your %1 administrator immediately.{/t} {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own')}<a href="http://forums.timetrex.com/viewtopic.php?t=40">{t}For more information please click here.{/t}</a>{/if}</div>
+	<div id="rowError">
+	{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 was unable to set your time zone. Please contact your %1 administrator immediately.{/t}
+	</div>
 	{/if}
 	{if $CRON_OUT_OF_DATE == 1}
-	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 maintenance jobs have not run in the last 48hours. Please contact your %1 administrator immediately.{/t}</div>
+	<div id="rowError">
+	{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 maintenance jobs have not run in the last 48hours. Please contact your %1 administrator immediately.{/t}
+	</div>
 	{/if}
 	{if $INSTALLER_ENABLED == 1}
-	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 is currently in INSTALL MODE. Please go to your fairness.ini.php file and set "installer_enabled" to "FALSE".{/t}</div>
+	<div id="rowError">
+	{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 is currently in INSTALL MODE. Please go to your fairness.ini.php file and set "installer_enabled" to "FALSE".{/t}
+	</div>
 	{/if}
 	{if $VALID_INSTALL_REQUIREMENTS == 1}
-	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 system requirement check has failed! Please contact your %1 administrator immediately to re-run the %1 installer to correct the issue.{/t}</div>
+	<div id="rowError">
+	{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 system requirement check has failed! Please contact your %1 administrator immediately to re-run the %1 installer to correct the issue.{/t}
+	</div>
 	{/if}
 	{if $VERSION_MISMATCH == 1}
-	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 application version does not match database version. Please re-run the TimeTrex installer to complete the upgrade process.{/t}</div>
+	<div id="rowError">
+	{t escape="no" 1=$APPLICATION_NAME}WARNING: %1 application version does not match database version. Please re-run the TimeTrex installer to complete the upgrade process.{/t}
+	</div>
 	{/if}
 	{if $VERSION_OUT_OF_DATE == 1}
-	<div id="rowError">{t escape="no" 1=$APPLICATION_NAME 2=$APPLICATION_VERSION}WARNING: This %1 version (v%2) is severely out of date and may no longer be supported. Please upgrade to the latest version as soon as possible as invalid calculations may already be occurring.{/t}</div>
+	<div id="rowError">
+	{t escape="no" 1=$APPLICATION_NAME 2=$APPLICATION_VERSION}WARNING: This %1 version (v%2) is severely out of date and may no longer be supported. Please upgrade to the latest version as soon as possible as invalid calculations may already be occurring.{/t}
+	</div>
 	{/if}
 </div>
 <a name="top"></a>

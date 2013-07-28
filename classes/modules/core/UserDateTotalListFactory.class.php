@@ -1522,9 +1522,9 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 			$total = 0;
 		}
 		Debug::text('Total: '. $total, __FILE__, __LINE__, __METHOD__, 10);
-		return $total;		
+		return $total;
 		*/
-		
+
 		return $this->db->getCol( $query, $ph );
 	}
 
@@ -3796,11 +3796,12 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 		$apf = new AbsencePolicyFactory();
 		$ppf = new PremiumPolicyFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array( 'company_id' => $company_id );
 
 		//Make it so employees with 0 hours still show up!! Very important!
@@ -3836,12 +3837,13 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 
 					LEFT JOIN '. $ppf_b->getTable() .' as ppf ON b.pay_period_id = ppf.id ';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '
 					LEFT JOIN '. $jf->getTable() .' as jf ON a.job_id = jf.id
 					LEFT JOIN '. $jif->getTable() .' as jif ON a.job_item_id = jif.id ';
 		}
-
+*/
 		$query .= '	LEFT JOIN '. $otpf->getTable() .' as m ON (a.over_time_policy_id = m.id AND m.deleted = 0)
 					LEFT JOIN '. $apf->getTable() .' as o ON (a.absence_policy_id = o.id AND o.deleted = 0)
 					LEFT JOIN '. $ppf->getTable() .' as q ON (a.premium_policy_id = q.id AND q.deleted = 0)
@@ -3977,11 +3979,12 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 		$mpf = new MealPolicyFactory();
 		$bpf = new BreakPolicyFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'company_id' => $company_id,
 					);
@@ -4042,6 +4045,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 							z.id as user_wage_id,
 							z.effective_date as user_wage_effective_date ';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job,
@@ -4053,7 +4057,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 						x.group_id as job_group_id,
 						y.name as job_item';
 		}
-
+*/
 		$query .= '
 					from 	'. $this->getTable() .' as a
 							LEFT JOIN '. $udf->getTable() .' as c ON a.user_date_id = c.id
@@ -4081,11 +4085,12 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 																			and z.deleted = 0
 																			order by z.effective_date desc LiMiT 1)
 					';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON a.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON a.job_item_id = y.id';
 		}
-
+*/
 		$query .= '	WHERE d.company_id = ?';
 
 		$query .= ( isset($filter_data['permission_children_ids']) ) ? $this->getWhereClauseSQL( 'd.id', $filter_data['permission_children_ids'], 'numeric_list', $ph ) : NULL;
@@ -4211,7 +4216,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 					';
 		$query .= $this->getWhereSQL( $where );
 		$query .= $this->getSortSQL( $order, $strict, $additional_order_fields );
-        
+
 		$this->ExecuteSQL( $query, $ph, $limit, $page );
 
 		//Debug::Arr($ph, 'Query: '. $query, __FILE__, __LINE__, __METHOD__,10);

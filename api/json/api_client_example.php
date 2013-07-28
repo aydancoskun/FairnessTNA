@@ -2,12 +2,12 @@
 /*
  Global variables
 */
-$TIMETREX_URL = 'https://demo.timetrex.com/api/json/api.php';
+$TIMETREX_URL = $config_vars['urls']['json_api'];
 $TIMETREX_USERNAME = 'demoadmin';
 $TIMETREX_PASSWORD = 'demo283920';
 
 //Build URL given a Class and Method to call.
-//Format is: http://demo.timetrex.com/api/json/api.php?Class=<CLASS>&Method=<METHOD>&SessionID=<SessionID>
+//Format is: http://localhost/api/json/api.php?Class=<CLASS>&Method=<METHOD>&SessionID=<SessionID>
 function buildURL( $class, $method, $session_id = FALSE ) {
 	global $TIMETREX_URL, $TIMETREX_SESSION_ID;
 	$url = $TIMETREX_URL.'?Class='.$class.'&Method='.$method;

@@ -89,10 +89,12 @@ class ScheduleFactory extends Factory {
 										'-2030-updated_date' => TTi18n::gettext('Updated Date'),
 							);
 
+/* Aydan
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval['-1180-job'] = TTi18n::gettext('Job');
 					$retval['-1190-job_item'] = TTi18n::gettext('Task');
 				}
+*/
 				break;
 			case 'list_columns':
 				$retval = Misc::arrayIntersectByKey( $this->getOptions('default_display_columns'), Misc::trimSortPrefix( $this->getOptions('columns') ) );
@@ -126,11 +128,13 @@ class ScheduleFactory extends Factory {
 								'department',
 								);
 
+/* Aydan
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[] = 'job';
 					$retval[] = 'job_item';
 
 				}
+*/
 				break;
 		}
 
@@ -242,7 +246,8 @@ class ScheduleFactory extends Factory {
 		$ulf = TTnew( 'UserListFactory' );
 
 		//Allow "blank" user for OPEN shifts.
-		if ( ( $id == 0 AND getTTProductEdition() > PRODUCT_COMMUNITY_10 )
+// Aydan		if ( ( $id == 0 AND getTTProductEdition() > PRODUCT_COMMUNITY_10 )
+		if ( ( $id == 0 )
 				OR
 				$this->Validator->isResultSetWithRows(	'user_id',
 															$ulf->getByID($id),
@@ -654,11 +659,11 @@ class ScheduleFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
-
+*/
 		if (  $id == 0
 				OR
 				$this->Validator->isResultSetWithRows(	'job',
@@ -687,10 +692,11 @@ class ScheduleFactory extends Factory {
 			$id = 0;
 		}
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
-
+*/
 		if (  $id == 0
 				OR
 				$this->Validator->isResultSetWithRows(	'job_item',

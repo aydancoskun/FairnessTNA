@@ -1,38 +1,25 @@
 <?php
 /*********************************************************************************
- * TimeTrex is a Payroll and Time Management program developed by
- * TimeTrex Software Inc. Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * This file is part of "Fairness", a Payroll and Time Management program.
+ * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission
- * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE
- * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ * Fairness is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation, either version 3 of the License, or (at you option )
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
  *
  * You should have received a copy of the GNU Affero General Public License along
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- *
- * You can contact TimeTrex headquarters at Unit 22 - 2475 Dobbin Rd. Suite
- * #292 Westbank, BC V4T 2E9, Canada or at email address info@timetrex.com.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License version 3.
- *
- * In accordance with Section 7(b) of the GNU Affero General Public License
- * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by TimeTrex" logo. If the display of the logo is not reasonably
- * feasible for technical reasons, the Appropriate Legal Notices must display
- * the words "Powered by TimeTrex".
- ********************************************************************************/
+  ********************************************************************************/
 /*
  * $Revision: 7166 $
  * $Id: SystemSettingFactory.class.php 7166 2012-06-26 22:32:24Z ipso $
@@ -45,7 +32,7 @@
 class CompanySettingFactory extends Factory {
 	protected $table = 'company_setting';
 	protected $pk_sequence_name = 'company_setting_id_seq'; //PK Sequence name
-    
+
     function _getFactoryOptions( $name ) {
 
 		$retval = NULL;
@@ -53,7 +40,7 @@ class CompanySettingFactory extends Factory {
 			case 'type':
 				$retval = array(
 								10 => TTi18n::gettext('Public'),
-								20 => TTi18n::gettext('Private'),		
+								20 => TTi18n::gettext('Private'),
 									);
 				break;
 		}
@@ -73,7 +60,7 @@ class CompanySettingFactory extends Factory {
 										);
 		return $variable_function_map;
 	}
-    
+
 	function isUniqueName($name) {
 		Debug::Arr($this->getCompany(),'Company: ', __FILE__, __LINE__, __METHOD__,10);
 		if ( $this->getCompany() == FALSE ) {
@@ -107,7 +94,7 @@ class CompanySettingFactory extends Factory {
 
 		return FALSE;
 	}
-    
+
     function getCompany() {
 		if ( isset($this->data['company_id']) ) {
 			return (int)$this->data['company_id'];
@@ -159,7 +146,7 @@ class CompanySettingFactory extends Factory {
 
 		return FALSE;
 	}
-    
+
 	function getName() {
 		if ( isset($this->data['name']) ) {
 			return $this->data['name'];
@@ -211,7 +198,7 @@ class CompanySettingFactory extends Factory {
 
 		return FALSE;
 	}
-    	
+
 
 	function preSave() {
 		return TRUE;
@@ -221,7 +208,7 @@ class CompanySettingFactory extends Factory {
 		$this->removeCache( $this->getCompany().$this->getName() );
 		return TRUE;
 	}
-    
+
     function setObjectFromArray( $data ) {
 		if ( is_array( $data ) ) {
 			$variable_function_map = $this->getVariableToFunctionMap();
@@ -275,11 +262,11 @@ class CompanySettingFactory extends Factory {
 
 		return $data;
 	}
-    
+
 	function addLog( $log_action ) {
 		return TTLog::addEntry( $this->getId(), $log_action,  TTi18n::getText('Company Setting - Name').': '. $this->getName() .' '. TTi18n::getText('Value').': '. $this->getValue(), NULL, $this->getTable() );
 	}
-    
+
     static function getCompanySetting( $company_id, $name ) {
         $cslf = new CompanySettingListFactory();
         $cslf->getByCompanyIdAndName( $company_id, $name );
@@ -288,10 +275,10 @@ class CompanySettingFactory extends Factory {
             $retarr = $cs_obj->getObjectAsArray();
             return $retarr;
         }
-        
+
         return FALSE;
     }
-    
+
     static function setCompanySetting( $company_id, $name, $value, $type_id = 10 ) {
         $row = array(
             'company_id' => $company_id,
@@ -307,17 +294,17 @@ class CompanySettingFactory extends Factory {
         } else {
             $csf = new CompanySettingFactory();
         }
-        
-        Debug::Arr($row, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);        
+
+        Debug::Arr($row, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
         $csf->setObjectFromArray( $row );
         if ( $csf->isValid() ) {
             $csf->Save();
         }
-        
+
         return FALSE;
 
     }
-    
+
     static function deleteCompanySetting( $company_id, $name ) {
         $cslf = new CompanySettingListFactory();
         $cslf->getByCompanyIdAndName( $company_id, $name );
@@ -328,7 +315,7 @@ class CompanySettingFactory extends Factory {
                 $csf->Save();
             }
         }
-        
+
         return FALSE;
     }
 }

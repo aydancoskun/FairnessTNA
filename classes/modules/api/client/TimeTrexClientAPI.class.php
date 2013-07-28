@@ -30,7 +30,7 @@
  * @package API\TimeTrexClientAPI
  */
 class TimeTrexClientAPI {
-	protected $url = 'http://demo.timetrex.com/api/soap/api.php';
+	protected $url = $config_vars['urls']['soap_api'];
 	protected $session_id = NULL;
 	protected $session_hash = NULL; //Used to determine if we need to login again because the URL or Session changed.
 	protected $class_factory = NULL;

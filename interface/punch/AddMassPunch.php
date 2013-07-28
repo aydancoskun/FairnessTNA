@@ -51,7 +51,7 @@ extract	(FormVariables::GetVariables(
 												'action',
 												'id',
 												'pc_data',
-												'filter_user_id'												
+												'filter_user_id'
 												) ) );
 
 $punch_full_time_stamp = NULL;
@@ -77,7 +77,7 @@ if ( isset($pc_data) ) {
 	if ( $pc_data['end_date_stamp'] != '') {
 		$pc_data['end_date_stamp'] = TTDate::parseDateTime($pc_data['end_date_stamp']);
 	}
-	
+
 }
 
 //Get Permission Hierarchy Children first, as this can be used for viewing, or editing.
@@ -121,7 +121,7 @@ switch ($action) {
 		if ( $action != 'submit' AND !is_array($pc_data) ) {
 			Debug::Text(' ID was NOT passed: '. $id, __FILE__, __LINE__, __METHOD__,10);
 			$time_stamp = $date_stamp = TTDate::getBeginDayEpoch( TTDate::getTime() ) + (3600*12); //Noon
-			
+
 			$pc_data = array(
 							//'user_id' => $user_obj->getId(),
 							//'user_full_name' => $user_obj->getFullName(),
@@ -147,7 +147,7 @@ switch ($action) {
 
 		$user_options = Misc::arrayDiffByKey( (array)$filter_user_id, $src_user_options );
 		$filter_user_options = Misc::arrayIntersectByKey( (array)$filter_user_id, $src_user_options );
-		
+
 		$prepend_array_option = array( 0 => '--', -1 => TTi18n::gettext('-- Default --') );
 
 		$blf = TTnew( 'BranchListFactory' );
@@ -157,6 +157,8 @@ switch ($action) {
 		$dlf = TTnew( 'DepartmentListFactory' );
 		$dlf->getByCompanyId( $current_company->getId() );
 		$department_options = Misc::prependArray( $prepend_array_option,  $dlf->getArrayByListFactory( $dlf, FALSE, TRUE ) );
+
+/* Aydan
 
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
@@ -170,11 +172,11 @@ switch ($action) {
 			$pc_data['job_item_options'] = $jilf->getArrayByListFactory( $jilf, TRUE );
 			$pc_data['job_item_manual_id_options'] = $jilf->getManualIdArrayByListFactory( $jilf, TRUE );
 		}
-
+*/
 		//Select box options;
-		$smarty->assign_by_ref('user_options', $user_options);		
+		$smarty->assign_by_ref('user_options', $user_options);
 		$smarty->assign_by_ref('filter_user_options', $filter_user_options);
-		
+
 		$pc_data['status_options'] = $pf->getOptions('status');
 		$pc_data['type_options'] = $pf->getOptions('type');
 		$pc_data['branch_options'] = $branch_options;

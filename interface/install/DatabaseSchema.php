@@ -202,8 +202,6 @@ switch ($action) {
 		exit;
 		break;
 	default:
-		$handle = @fopen('http://www.timetrex.com/'.URLBuilder::getURL( array('v' => $install_obj->getFullApplicationVersion(), 'page' => 'database_schema'), 'pre_install.php'), "r");
-		@fclose($handle);
 
 		$smarty->assign_by_ref('install_obj', $install_obj);
 		$smarty->assign_by_ref('external_installer', $external_installer);

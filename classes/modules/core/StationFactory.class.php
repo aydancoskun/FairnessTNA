@@ -51,7 +51,8 @@ class StationFactory extends Factory {
 											10 	=> TTi18n::gettext('PC'),
 									);
 
-				if ( getTTProductEdition() >= 15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= 15 ) {
 					$retval[20]	= TTi18n::gettext('PHONE');
 					$retval[25]	= TTi18n::gettext('WirelessWeb (WAP)');
 					$retval[26]	= TTi18n::gettext('Mobile Web Browser'); //Controls mobile device web browser from quick punch.
@@ -63,7 +64,7 @@ class StationFactory extends Factory {
 					//$retval[120] = TTi18n::gettext('TimeClock: TT-S300');
 					$retval[150] = TTi18n::gettext('TimeClock: TT-US100');
 					//$retval[200] = TTi18n::gettext('TimeClock: ACTAtek');
-				}
+//				}
 
 				if ( PRODUCTION == FALSE ) {
 					$retval[60] = TTi18n::gettext('PC - Client Station');
@@ -172,13 +173,14 @@ class StationFactory extends Factory {
 
 										1073741824 => TTi18n::gettext('Enable: Diagnostic Logs'),
 									);
+/* Aydan
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[128]  = TTi18n::gettext('Enable: Job');
 					$retval[256]  = TTi18n::gettext('Enable: Task');
 					$retval[512]  = TTi18n::gettext('Enable: Quantity');
 					$retval[1024] = TTi18n::gettext('Enable: Bad Quantity');
 				}
-
+*/
 				ksort($retval);
 				break;
 			case 'columns':
@@ -551,10 +553,11 @@ class StationFactory extends Factory {
 		}
 
 		Debug::Text('Job ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
-
+*/
 		if (
 				$id == 0
 				OR
@@ -586,10 +589,11 @@ class StationFactory extends Factory {
 		}
 
 		Debug::Text('Job Item ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
+/*
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
-
+*/
 		if (
 				$id == 0
 				OR
@@ -1972,12 +1976,13 @@ class StationFactory extends Factory {
 	}
 
 	function Validate() {
-		if ( is_object($this->getCompanyObject() ) AND $this->getCompanyObject()->getProductEdition() == 10 AND $this->getType() > 10 ) {
+// Aydan
+/*		if ( is_object($this->getCompanyObject() ) AND $this->getCompanyObject()->getProductEdition() == 10 AND $this->getType() > 10 ) {
 			$this->Validator->isTrue(		'type_id',
 											FALSE,
 											TTi18n::gettext('Type is not available in %1 Community Edition, please contact our sales department for more information', APPLICATION_NAME ));
 		}
-
+*/
 		if ( $this->getDescription() == '' ) {
 			$this->Validator->isTrue(		'description',
 											FALSE,

@@ -51,7 +51,7 @@ class Services_ExchangeRates_Currencies_UN extends Services_ExchangeRates_Common
     * URL of XML feed
     * @var string
     */
-   var $feedUrl = 'http://www.timetrex.com/CurrencyCodeList.xml';
+   var $feedUrl = $config_vars['urls']['currency_codes'];
     //var $feedUrl = 'http://www.unece.org/etrades/unedocs/repository/codelists/xml/CurrencyCodeList.xml';
 
 

@@ -104,7 +104,7 @@ class APINotification extends APIFactory {
 											  'delay' => -1,
 											  'bg_color' => '#FFFF00', //Yellow
 											  'message' => TTi18n::getText('NOTICE: A new version of %1 available, it is highly recommended that you upgrade as soon as possible. Click here to download the latest version.', array( APPLICATION_NAME ) ),
-											  'destination' => ( getTTProductEdition() == PRODUCT_COMMUNITY_10 ) ? 'http://www.timetrex.com/r.php?id=19' : 'http://www.timetrex.com/r.php?id=9',
+											  'destination' => 'https://github.com/Aydan/fairness',
 											  );
 					}
 					unset($new_version_available_notification);
@@ -123,7 +123,7 @@ class APINotification extends APIFactory {
 										  'delay' => -1,
 										  'bg_color' => '#FFFF00', //Yellow
 										  'message' => TTi18n::getText('NOTICE: Your instance of %1 has been upgraded to v%2, click here to see whats new.', array( APPLICATION_NAME, APPLICATION_VERSION ) ),
-										  'destination' => 'http://www.timetrex.com/r.php?id=300',
+										  'destination' => $config_vars['urls']['whats_new'],
 										  );
 				}
 				unset($new_version_notification);
@@ -237,9 +237,9 @@ class APINotification extends APIFactory {
 		$current_user_prefs = $this->getCurrentUserObject()->getUserPreferenceObject();
 		if ( $current_user_prefs->setDateTimePreferences() == FALSE ) {
 			//Setting timezone failed, alert user to this fact.
-			//WARNING: %1 was unable to set your time zone. Please contact your %1 administrator immediately.{/t} {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own')}<a href="http://forums.timetrex.com/viewtopic.php?t=40">{t}For more information please click here.{/t}</a>{/if}
+			//WARNING: %1 was unable to set your time zone. Please contact your %1 administrator immediately.{/t} {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own')}<a href="">{t}For more information please click here.{/t}</a>{/if}
 			if ( $this->getPermissionObject()->Check('company','enabled') AND $this->getPermissionObject()->Check('company','edit_own') ) {
-				$destination_url = 'http://www.timetrex.com/r.php?id=1010';
+				$destination_url = $config_vars['urls']['timezone_error']
 				$sub_message = TTi18n::getText('For more information please click here.');
 			} else {
 				$destination_url = NULL;

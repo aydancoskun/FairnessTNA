@@ -491,11 +491,11 @@ class RecurringScheduleTemplateFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
-
+*/
 		if (  $id == NULL
 				OR
 				$this->Validator->isResultSetWithRows(	'job',
@@ -523,11 +523,11 @@ class RecurringScheduleTemplateFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
-
+*/
 		if (  $id == NULL
 				OR
 				$this->Validator->isResultSetWithRows(	'job_item',

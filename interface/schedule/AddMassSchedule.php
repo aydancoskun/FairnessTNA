@@ -189,6 +189,7 @@ switch ($action) {
 		$dlf->getByCompanyId( $current_company->getId() );
 		$department_options = Misc::prependArray( $prepend_array_option,  $dlf->getArrayByListFactory( $dlf, FALSE, TRUE ) );
 
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$jlf->getByStatusIdAndCompanyId( array(10,20,30,40), $current_company->getId() );
@@ -201,6 +202,7 @@ switch ($action) {
 			$data['job_item_options'] = $jilf->getArrayByListFactory( $jilf, TRUE );
 			$data['job_item_manual_id_options'] = $jilf->getManualIdArrayByListFactory( $jilf, TRUE );
 		}
+*/
 
 		//Select box options;
 		$smarty->assign_by_ref('user_options', $user_options);

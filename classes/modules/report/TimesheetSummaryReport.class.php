@@ -117,7 +117,8 @@ class TimesheetSummaryReport extends Report {
 				}
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -125,35 +126,38 @@ class TimesheetSummaryReport extends Report {
 					if ( is_array($custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $custom_column_labels, 9500 );
 					}
-				}
-                break; 
+//				}
+                break;
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'TimesheetSummaryReport', 'custom_column' );
-				}
+//				}
                 break;
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'TimesheetSummaryReport', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_dynamic_custom_column_labels, 9700 );
 					}
-				}
+//				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'TimesheetSummaryReport', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_static_custom_column_labels, 9700 );
 					}
-				}
+//				}
                 break;
             case 'formula_columns':
                 $retval = TTMath::formatFormulaColumns( array_merge( array_diff( $this->getOptions('static_columns'), (array)$this->getOptions('report_static_custom_column') ), $this->getOptions('dynamic_columns') ) );
-                break; 
+                break;
             case 'filter_columns':
                 $retval = TTMath::formatFormulaColumns( array_merge( $this->getOptions('static_columns'), $this->getOptions('dynamic_columns'), (array)$this->getOptions('report_dynamic_custom_column') ) );
                 break;
@@ -284,7 +288,7 @@ class TimesheetSummaryReport extends Report {
 				}
 				break;
 			case 'columns':
-				$retval = array_merge( $this->getOptions('static_columns'), $this->getOptions('dynamic_columns'), (array)$this->getOptions('report_dynamic_custom_column') );                
+				$retval = array_merge( $this->getOptions('static_columns'), $this->getOptions('dynamic_columns'), (array)$this->getOptions('report_dynamic_custom_column') );
 				break;
 			case 'column_format':
 				//Define formatting function for each column.
@@ -298,7 +302,7 @@ class TimesheetSummaryReport extends Report {
 						}
 					}
 				}
-				$retval['verified_time_sheet_date'] = 'time_stamp';                
+				$retval['verified_time_sheet_date'] = 'time_stamp';
 				break;
 			case 'aggregates':
 				$retval = array();
@@ -764,17 +768,17 @@ class TimesheetSummaryReport extends Report {
 	//Get raw data for report
 	function _getData( $format = NULL ) {
 		$this->tmp_data = array('user_date_total' => array(), 'schedule' => array(), 'worked_days' => array(), 'user' => array(), 'default_branch' => array(), 'default_department' => array(), 'branch' => array(), 'department' => array(), 'verified_timesheet' => array() );
-        
-		$columns = $this->getColumnDataConfig();    
-           
+
+		$columns = $this->getColumnDataConfig();
+
 		$filter_data = $this->getFilterConfig();
 		$policy_hourly_rates = $this->getPolicyHourlyRates();
-        
+
         $currency_convert_to_base = $this->getCurrencyConvertToBase();
 		$base_currency_obj = $this->getBaseCurrencyObject();
 		$this->handleReportCurrency( $currency_convert_to_base, $base_currency_obj, $filter_data );
 		$currency_options = $this->getOptions('currency');
-        
+
 		if ( $this->getPermissionObject()->Check('punch','view') == FALSE OR $this->getPermissionObject()->Check('wage','view') == FALSE ) {
 			$hlf = TTnew( 'HierarchyListFactory' );
 			$permission_children_ids = $wage_permission_children_ids = $hlf->getHierarchyChildrenByCompanyIdAndUserIdAndObjectTypeID( $this->getUserObject()->getCompany(), $this->getUserObject()->getID() );
@@ -951,19 +955,19 @@ class TimesheetSummaryReport extends Report {
 		$this->getProgressBarObject()->start( $this->getAMFMessageID(), $ulf->getRecordCount(), NULL, TTi18n::getText('Retrieving Data...') );
 		foreach ( $ulf as $key => $u_obj ) {
 			$this->tmp_data['user'][$u_obj->getId()] = (array)$u_obj->getObjectAsArray( array_merge( (array)$this->getColumnDataConfig(), array('other_id1' => TRUE, 'other_id2' => TRUE, 'other_id3' => TRUE, 'other_id4' => TRUE, 'other_id5' => TRUE) ) );
-			
+
             if ( $currency_convert_to_base == TRUE AND is_object( $base_currency_obj ) ) {
 				$this->tmp_data['user'][$u_obj->getId()]['current_currency'] = Option::getByKey( $base_currency_obj->getId(), $currency_options );
 				$this->tmp_data['user'][$u_obj->getId()]['currency_rate'] = $u_obj->getColumn('currency_rate');
 			} else {
 			    $this->tmp_data['user'][$u_obj->getId()]['current_currency'] =  $u_obj->getColumn('currency');
 			}
-            
+
             $this->getProgressBarObject()->set( $this->getAMFMessageID(), $key );
 		}
-        
+
         //Debug::Arr($this->tmp_data['user'], 'User Raw Data: ', __FILE__, __LINE__, __METHOD__,10);
-		
+
 		$blf = TTnew( 'BranchListFactory' );
 		$blf->getAPISearchByCompanyIdAndArrayCriteria( $this->getUserObject()->getCompany(), array() ); //Dont send filter data as permission_children_ids intended for users corrupts the filter
 		Debug::Text(' Branch Total Rows: '. $blf->getRecordCount(), __FILE__, __LINE__, __METHOD__,10);
@@ -1001,19 +1005,19 @@ class TimesheetSummaryReport extends Report {
 				}
 			}
 		}
-		//Debug::Arr($this->tmp_data, 'TMP Data: ', __FILE__, __LINE__, __METHOD__,10);          
-        
+		//Debug::Arr($this->tmp_data, 'TMP Data: ', __FILE__, __LINE__, __METHOD__,10);
+
 		return TRUE;
 	}
 
 	//PreProcess data such as calculating additional columns from raw data etc...
 	function _preProcess() {
 		$this->getProgressBarObject()->start( $this->getAMFMessageID(), count($this->tmp_data['user_date_total']), NULL, TTi18n::getText('Pre-Processing Data...') );
-        
+
 		//Merge time data with user data
 		$key=0;
-        
-		if ( isset($this->tmp_data['user_date_total']) ) {		  
+
+		if ( isset($this->tmp_data['user_date_total']) ) {
 			foreach( $this->tmp_data['user_date_total'] as $user_id => $level_1 ) {
 				if ( isset($this->tmp_data['user'][$user_id]) ) {
 					foreach( $level_1 as $date_stamp => $level_2 ) {
@@ -1074,10 +1078,10 @@ class TimesheetSummaryReport extends Report {
 								} else {
 									$tmp_department = array();
 								}
-                                
-                                $this->data[] = array_merge( $this->tmp_data['user'][$user_id], $tmp_default_branch, $tmp_default_department, $tmp_branch, $tmp_department, $row, $date_columns, $processed_data );                            
-                                
-                                
+
+                                $this->data[] = array_merge( $this->tmp_data['user'][$user_id], $tmp_default_branch, $tmp_default_department, $tmp_branch, $tmp_department, $row, $date_columns, $processed_data );
+
+
 								$this->getProgressBarObject()->set( $this->getAMFMessageID(), $key );
 								$key++;
 							}

@@ -257,6 +257,7 @@ switch ($action) {
 		$dlf = TTnew( 'DepartmentListFactory' );
 		$department_options = $dlf->getByCompanyIdArray( $current_company->getId() );
 
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$jlf->getByCompanyIdAndUserIdAndStatus( $current_company->getId(), $user_id, array(10,20,30,40) );
@@ -268,7 +269,7 @@ switch ($action) {
 			$udt_data['job_item_options'] = $jilf->getArrayByListFactory( $jilf, TRUE, TRUE );
 			$udt_data['job_item_manual_id_options'] = $jilf->getManualIdArrayByListFactory( $jilf, TRUE );
 		}
-
+*/
 		//Select box options;
 		//$udt_data['status_options'] = $udtf->getOptions('status');
 		//$udt_data['type_options'] = $udtf->getOptions('type');

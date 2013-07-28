@@ -142,7 +142,9 @@ if ( TTProductEdition >= 20 ) {
 					</td>
 				</tr>
 
-				{if $current_company->getProductEdition() >= 20}
+				{if $current_company->getProductEdition() >= 50}
+									<!-- Aydan see above was >=20 -->
+
 					{if count($data.job_options) > 1}
 					<tr onClick="showHelpEntry('job_id')">
 						<td class="{isvalid object="sf" label="job_id" value="cellLeftEditTable"}">

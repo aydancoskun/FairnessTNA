@@ -72,8 +72,6 @@ switch ($action) {
 		break;
 }
 
-$handle = @fopen('http://www.timetrex.com/'.URLBuilder::getURL( array('v' => $install_obj->getFullApplicationVersion(), 'page' => 'maintenance'), 'pre_install.php'), "r");
-@fclose($handle);
 
 $smarty->assign_by_ref('uf', $uf);
 $cron_file = Environment::getBasePath().'maint'. DIRECTORY_SEPARATOR .'cron.php';

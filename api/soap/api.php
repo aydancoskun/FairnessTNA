@@ -25,7 +25,7 @@
  * $Id: server.php 8160 2006-05-31 23:33:54Z root $
  * $Date: 2006-05-31 16:33:54 -0700 (Wed, 31 May 2006) $
  */
-define('TIMETREX_SOAP_API', TRUE );
+define('SOAP_API', TRUE );
 
 //Add fairness.ini.php setting to enable/disable the API. Make an entire [API] section.
 require_once('../../includes/global.inc.php');

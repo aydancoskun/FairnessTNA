@@ -10,8 +10,16 @@
 					{t}Server response time:{/t} {php}echo sprintf('%01.3f',microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']);{/php} {t}seconds.{/t} {t}All Rights Reserved.{/t}
 						{if stristr( $smarty.server.SCRIPT_NAME, 'login') == FALSE}
 						<br>
-						<a href="http://www.timetrex.com/r.php?id=451" target="_blank"><img src="{$IMAGES_URL}/facebook_button.jpg" border="0"></a>
-						<a href="http://www.timetrex.com/r.php?id=455" target="_blank"><img src="{$IMAGES_URL}/twitter_button.jpg" border="0"></a>
+							{if isset($config_vars.urls.facebook)}
+								<a href="$config_vars.urls.facebook" target="_blank">
+									<img src="{$IMAGES_URL}/facebook_button.jpg" border="0">
+								</a>
+							{/if}
+							{if isset($config_vars.urls.twitter)}
+								<a href="$config_vars.urls.twitter" target="_blank">
+									<img src="{$IMAGES_URL}/twitter_button.jpg" border="0">
+								</a>
+							{/if}
 						{/if}
 						<br>
 				</td>

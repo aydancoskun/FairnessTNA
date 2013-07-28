@@ -667,11 +667,12 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'company_id' => $company_id,
 					'company_id2' => $company_id,
@@ -724,6 +725,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							uwf.hourly_rate as user_wage_hourly_rate,
 							uwf.effective_date as user_wage_effective_date ';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job,
@@ -737,7 +739,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 						y.manual_id as job_item_manual_id,
 						y.group_id as job_item_group_id';
 		}
-
+*/
 		$query .= '
 					from 	'. $this->getTable() .' as a
 							LEFT JOIN '. $udf->getTable() .' as udf ON a.user_date_id = udf.id
@@ -756,11 +758,12 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and z.deleted = 0
 																			order by z.effective_date desc limit 1)
 					';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON a.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON a.job_item_id = y.id';
 		}
-
+*/
 		$query .= '	WHERE ( uf.company_id = ? OR a.company_id = ? )';
 
 		if ( isset($filter_data['permission_children_ids']) AND isset($filter_data['permission_children_ids'][0]) AND !in_array(-1, (array)$filter_data['permission_children_ids']) ) {
@@ -1188,11 +1191,12 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$udf = new UserDateFactory();
 		$uwf = new UserWageFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'company_id' => $company_id,
 					'company_id2' => $company_id,
@@ -1248,6 +1252,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							z.middle_name as updated_by_middle_name,
 							z.last_name as updated_by_last_name';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						w.name as job,
@@ -1262,7 +1267,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 						x.group_id as job_item_group_id
 						';
 		}
-
+*/
 		$query .= '
 					from 	'. $this->getTable() .' as a
 							LEFT JOIN '. $spf->getTable() .' as i ON a.schedule_policy_id = i.id
@@ -1284,11 +1289,12 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and m.deleted = 0
 																			order by m.effective_date desc limit 1)
 					';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as w ON a.job_id = w.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as x ON a.job_item_id = x.id';
 		}
-
+*/
 		$query .= '
 						LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
 						LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
@@ -1491,11 +1497,12 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$ppf = new PayPeriodFactory();
 		$uwf = new UserWageFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'company_id' => $company_id,
 					);
@@ -1558,6 +1565,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							z.middle_name as updated_by_middle_name,
 							z.last_name as updated_by_last_name';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						w.name as job_name,
@@ -1567,7 +1575,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 						w.department_id as job_department_id,
 						w.group_id as job_group_id';
 		}
-
+*/
 		$query .= '
 					from 	'. $this->getTable() .' as a
 							LEFT JOIN '. $spf->getTable() .' as i ON ( a.schedule_policy_id = i.id AND i.deleted = 0)
@@ -1591,11 +1599,12 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and m.deleted = 0
 																			order by m.effective_date desc limit 1)
 					';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as w ON a.job_id = w.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as x ON a.job_item_id = x.id';
 		}
-
+*/
 		$query .= '
 						LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
 						LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
@@ -1645,9 +1654,9 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		}
 
 		$query .= ( isset($filter_data['created_by']) ) ? $this->getWhereClauseSQL( array('a.created_by','y.first_name','y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph ) : NULL;
-        
+
         $query .= ( isset($filter_data['updated_by']) ) ? $this->getWhereClauseSQL( array('a.updated_by','z.first_name','z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph ) : NULL;
-        
+
 		$query .= 	'
 						AND (a.deleted = 0 AND c.deleted = 0 AND d.deleted = 0)
 					';

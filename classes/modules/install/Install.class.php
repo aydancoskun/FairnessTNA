@@ -1284,9 +1284,10 @@ class Install {
 		$retarr[$this->checkPHPMemoryLimit()]++;
 		$retarr[$this->checkPHPMagicQuotesGPC()]++;
 
-		if ( $this->getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
+// Aydan
+//		if ( $this->getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$retarr[$this->checkMCRYPT()]++;
-		}
+//		}
 
 		//Debug::Arr($retarr, 'RetArr: ', __FILE__, __LINE__, __METHOD__,9);
 
@@ -1387,16 +1388,15 @@ class Install {
 		if ( $fail_all == TRUE OR $this->checkPHPMagicQuotesGPC() != 0 ) {
 			$retarr[] = 'PHPMagicQuotesGPC';
 		}
-
-		if ( $fail_all == TRUE OR $this->getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
+// Aydan
+//		if ( $fail_all == TRUE OR $this->getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			if ( $fail_all == TRUE OR $this->checkPEARValidate() != 0 ) {
 				$retarr[] = 'PEARVal';
 			}
-
 			if ( $fail_all == TRUE OR $this->checkMCRYPT() != 0 ) {
 				$retarr[] = 'MCRYPT';
 			}
-		}
+		//}
 
 		if ( isset($retarr) ) {
 			return $retarr;
@@ -1405,4 +1405,4 @@ class Install {
 		return FALSE;
 	}
 }
-?>
+

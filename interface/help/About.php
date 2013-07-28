@@ -51,7 +51,7 @@ switch ($action) {
 		//Debug::setVerbosity( 11 );
 		Debug::Text('Redirect to Online University!', __FILE__, __LINE__, __METHOD__,10);
 
-		Redirect::Page( URLBuilder::getURL( array(), 'https://www.timetrex.com/university.php') );
+		Redirect::Page( URLBuilder::getURL( array(), $config_vars['urls']['university']) );
 		exit;
 
 		break;

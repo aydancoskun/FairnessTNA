@@ -3,7 +3,7 @@
 require_once('../../includes/global.inc.php');
 require_once('../../includes/API.inc.php');
 
-define('TIMETREX_JSON_API', TRUE );
+define('JSON_API', TRUE );
 
 //header('Access-Control-Allow-Origin: '. ( isset($_SERVER['HTTP_ORIGIN']) ) ? $_SERVER['HTTP_ORIGIN'] : '*' );
 header('Access-Control-Allow-Origin: *' );

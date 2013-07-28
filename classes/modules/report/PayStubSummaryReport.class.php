@@ -109,7 +109,8 @@ class PayStubSummaryReport extends Report {
 				}
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -117,35 +118,38 @@ class PayStubSummaryReport extends Report {
 					if ( is_array($custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $custom_column_labels, 9500 );
 					}
-				}
-                break; 
+//				}
+                break;
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'PayStubSummaryReport', 'custom_column' );
-				}
+//				}
                 break;
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'PayStubSummaryReport', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_dynamic_custom_column_labels, 9700 );
 					}
-				}
+//				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'PayStubSummaryReport', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_static_custom_column_labels, 9700 );
 					}
-				}
+//				}
                 break;
             case 'formula_columns':
                 $retval = TTMath::formatFormulaColumns( array_merge( array_diff( $this->getOptions('static_columns'), (array)$this->getOptions('report_static_custom_column') ), $this->getOptions('dynamic_columns') ) );
-                break; 
+                break;
             case 'filter_columns':
                 $retval = TTMath::formatFormulaColumns( array_merge( $this->getOptions('static_columns'), $this->getOptions('dynamic_columns'), (array)$this->getOptions('report_dynamic_custom_column') ) );
                 break;
@@ -594,16 +598,16 @@ class PayStubSummaryReport extends Report {
 
 	//Get raw data for report
 	function _getData( $format = NULL ) {
-		$this->tmp_data = array('pay_stub_entry' => array(), 'user' => array() );		
-		
+		$this->tmp_data = array('pay_stub_entry' => array(), 'user' => array() );
+
 		$columns = $this->getColumnDataConfig();
 		$filter_data = $this->getFilterConfig();
-                
+
 		$currency_convert_to_base = $this->getCurrencyConvertToBase();
 		$base_currency_obj = $this->getBaseCurrencyObject();
 		$this->handleReportCurrency( $currency_convert_to_base, $base_currency_obj, $filter_data );
 		$currency_options = $this->getOptions('currency');
-        
+
 		//Don't need to process data unless we're preparing the report.
 		$psf = TTnew( 'PayStubFactory' );
 		$export_type_options = Misc::trimSortPrefix( $psf->getOptions('export_type') );
@@ -611,7 +615,7 @@ class PayStubSummaryReport extends Report {
 			Debug::Text('Skipping data retrieval for format: '. $format, __FILE__, __LINE__, __METHOD__,10);
 			return TRUE;
 		}
-		
+
 		if ( $this->getPermissionObject()->Check('pay_stub','view') == FALSE OR $this->getPermissionObject()->Check('wage','view') == FALSE ) {
 			$hlf = TTnew( 'HierarchyListFactory' );
 			$permission_children_ids = $wage_permission_children_ids = $hlf->getHierarchyChildrenByCompanyIdAndUserIdAndObjectTypeID( $this->getUserObject()->getCompany(), $this->getUserObject()->getID() );
@@ -659,7 +663,7 @@ class PayStubSummaryReport extends Report {
 				$department = $pse_obj->getColumn('default_department');
 				$pay_stub_entry_name_id = $pse_obj->getPayStubEntryNameId();
                 $currency_rate = $pse_obj->getColumn('currency_rate');
-                $currency_id = $pse_obj->getColumn('currency_id');                
+                $currency_id = $pse_obj->getColumn('currency_id');
 
 				if ( !isset($this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]) ) {
 					$this->tmp_data['pay_stub_entry'][$user_id][$date_stamp] = array(
@@ -674,9 +678,9 @@ class PayStubSummaryReport extends Report {
 															);
 				}
                 $this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]['currency_rate'] = $currency_rate;
-                
+
                 $this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]['currency'] = $this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]['current_currency'] = Option::getByKey( $currency_id, $currency_options );
-                
+
                 if ( isset($this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]['PA'.$pay_stub_entry_name_id]) ) {
 					$this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]['PA'.$pay_stub_entry_name_id] = bcadd( $this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]['PA'.$pay_stub_entry_name_id], $pse_obj->getColumn('amount') );
 				} else {
@@ -700,7 +704,7 @@ class PayStubSummaryReport extends Report {
 				} else {
 					$this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]['PY'.$pay_stub_entry_name_id] = $pse_obj->getColumn('ytd_amount');
 				}
-                
+
                 if ( $currency_convert_to_base == TRUE AND is_object( $base_currency_obj ) ) {
 					$this->tmp_data['pay_stub_entry'][$user_id][$date_stamp]['current_currency'] = Option::getByKey( $base_currency_obj->getId(), $currency_options );
 				}
@@ -778,7 +782,7 @@ class PayStubSummaryReport extends Report {
 				//Must be false, because if it isn't checked it won't be set.
 				$filter_data['hide_employer_rows'] = FALSE;
 			}
-			
+
 			$this->form_data = range( 0, $pslf->getRecordCount() ); //Set this so hasData() thinks there is data to report.
 			$output = $pslf->getPayStub( $pslf, (bool)$filter_data['hide_employer_rows'] );
 

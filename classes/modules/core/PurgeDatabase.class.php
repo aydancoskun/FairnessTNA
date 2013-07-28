@@ -243,7 +243,7 @@ class PurgeDatabase {
 										'job_application' => array(
 														'job_applicant',
 														'job_vacancy',
-														),										
+														),
 										'job_applicant_location' => array(
 														'job_applicant',
 														),
@@ -658,7 +658,7 @@ class PurgeDatabase {
 								'user_contact' => 45,
 								'ethnic_group' => 45,
 							  );
-
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$purge_professional_tables = array(
 								'report_schedule' => 45,
@@ -716,7 +716,6 @@ class PurgeDatabase {
 
 			$purge_tables = array_merge( $purge_tables, $purge_corporate_tables );
 		}
-
 		if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 			$purge_enterprise_tables = array(
 								'job_vacancy' => 45,
@@ -736,6 +735,7 @@ class PurgeDatabase {
 
 			$purge_tables = array_merge( $purge_tables, $purge_enterprise_tables );
 		}
+*/
 
 		$current_tables = $db->MetaTables();
 

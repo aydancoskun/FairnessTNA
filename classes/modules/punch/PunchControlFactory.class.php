@@ -392,11 +392,11 @@ class PunchControlFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-
+					/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
-
+*/
 		if (  $id == 0
 				OR
 				$this->Validator->isResultSetWithRows(	'job',
@@ -424,11 +424,11 @@ class PunchControlFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
-
+*/
 		if (  $id == 0
 				OR
 				$this->Validator->isResultSetWithRows(	'job_item',
@@ -1154,6 +1154,7 @@ class PunchControlFactory extends Factory {
 				}
 			}
 		}
+					/* Aydan
 
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $this->getEnableStrictJobValidation() == TRUE ) {
 			if ( $this->getJob() > 0 ) {
@@ -1176,7 +1177,7 @@ class PunchControlFactory extends Factory {
 				}
 			}
 		}
-
+*/
 		return TRUE;
 	}
 

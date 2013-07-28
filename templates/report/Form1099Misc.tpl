@@ -32,7 +32,7 @@ var report_criteria_elements = new Array(
 
 				<tr class="tblDataError">
 					<td colspan="3">
-						<br><b>WARNING: THIS REPORT IS OUT OF DATE. UP-TO-DATE TAX REPORTS ARE NOW ONLY AVAILABLE IN THE NEW <a href="{if $smarty.server.HTTP_HOST == 'www.timetrex.com' OR $smarty.server.HTTP_HOST == 'timetrex.com'}http{if $smarty.server.HTTPS == TRUE}s{/if}://{$config_vars.other.hostname}/interface/{/if}../BetaTest.php">v5.0 INTERFACE</a></span></b>.</b><br><br>
+						<br><b>WARNING: THIS REPORT IS OUT OF DATE. UP-TO-DATE TAX REPORTS ARE AVAILABLE IN THE NEW <a href="http{if $smarty.server.HTTPS == TRUE}s{/if}://{$config_vars.other.hostname}/interface/flex"> INTERFACE</a></span></b>.</b><br><br>
 					</td>
 				</tr>
 
@@ -112,7 +112,7 @@ var report_criteria_elements = new Array(
 						  <tr align="center">
 							<td>
 							  <select id="columns" name="setup_data[6_psea_ids][]" size="{select_size array=$filter_data.pay_stub_entry_account_options}" multiple>
-								  {html_options options=$filter_data.pay_stub_entry_account_options selected=$setup_data.6_psea_ids}
+								{html_options options=$filter_data.pay_stub_entry_account_options selected=$setup_data.6_psea_ids}
 							  </select>
 							</td>
 							<td>
@@ -121,7 +121,7 @@ var report_criteria_elements = new Array(
 							  </select>
 							</td>
 						  </tr>
-						</table
+						</table>
 					</td>
 				</tr>
 

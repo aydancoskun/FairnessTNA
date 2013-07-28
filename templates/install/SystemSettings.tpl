@@ -56,7 +56,7 @@
 					</td>
 				</tr>
 
-				{if $install_obj->getTTProductEdition() == 10}
+				<!-- if $install_obj->getTTProductEdition() == 10 -->
 				<tr>
 					<td class="cellLeftEditTable">
 						{t escape="no" 1=$APPLICATION_NAME}Enable %1 Update Notifications:{/t}
@@ -84,7 +84,7 @@
 						<input type="checkbox" class="checkbox" name="data[anonymous_update_notify]" value="1">
 					</td>
 				</tr>
-				{/if}
+				<!-- /if -->
 
 				<tr>
 					<td class="tblPagingLeft" colspan="7" align="right">

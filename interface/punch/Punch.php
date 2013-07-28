@@ -184,7 +184,7 @@ switch ($action) {
 			$data = $plf->getDefaultPunchSettings( $current_user, $epoch, $current_station, $permission );
 			$data['time_stamp'] = $data['date_stamp'] = $epoch;
 			$data['user_full_name'] = $current_user->getFullName();
-			
+
 			/*
 			$plf->getPreviousPunchByUserIDAndEpoch( $current_user->getId(), $epoch );
 			if ($plf->getRecordCount() > 0 ) {
@@ -362,7 +362,8 @@ switch ($action) {
 		$department_options = $dlf->getArrayByListFactory( $dlf, TRUE, FALSE);
 		//$department_options = $dlf->getByCompanyIdArray( $current_company->getId() );
 
-		if ( $current_company->getProductEdition() >= 20 ) {
+		/* Aydan
+			if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$jlf->getByCompanyIdAndUserIdAndStatus( $current_company->getId(), $current_user->getId(), array(10) );
 			$data['job_options'] = $jlf->getArrayByListFactory( $jlf, TRUE, TRUE );
@@ -373,7 +374,7 @@ switch ($action) {
 			$data['job_item_options'] = $jilf->getArrayByListFactory( $jilf, TRUE, FALSE );
 			$data['job_item_manual_id_options'] = $jilf->getManualIdArrayByListFactory( $jilf, FALSE );
 		}
-
+		*/
 		//Select box options;
 		$data['status_options'] = $pf->getOptions('status');
 		$data['type_options'] = $pf->getOptions('type');

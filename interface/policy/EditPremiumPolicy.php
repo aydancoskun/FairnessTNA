@@ -248,7 +248,7 @@ switch ($action) {
 		} else {
 			$ppf->setExcludeDefaultDepartment( FALSE );
 		}
-
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$ppf->setJobGroupSelectionType( $data['job_group_selection_type_id'] );
 			$ppf->setJobSelectionType( $data['job_selection_type_id'] );
@@ -263,6 +263,17 @@ switch ($action) {
 			$ppf->setJobItemGroupSelectionType( 10 );
 			$ppf->setJobItemSelectionType( 10 );
 		}
+		*/
+// DELETE BELOW
+			//Set selection types to "All" so speed up checks in calcPremiumPolicy
+			$ppf->setJobGroupSelectionType( 10 );
+			$ppf->setJobSelectionType( 10 );
+
+			$ppf->setJobItemGroupSelectionType( 10 );
+			$ppf->setJobItemSelectionType( 10 );
+
+
+
 
 		if ( $ppf->isValid() ) {
 			$ppf->Save(FALSE);
@@ -278,7 +289,7 @@ switch ($action) {
 			} else {
 				$ppf->setDepartment( array() );
 			}
-
+/* Aydan
 			if ( $current_company->getProductEdition() >= 20 ) {
 				if ( isset($data['job_group_ids']) ){
 					$ppf->setJobGroup( $data['job_group_ids'] );
@@ -302,6 +313,7 @@ switch ($action) {
 					$ppf->setJobItem( array() );
 				}
 			}
+*/
 
 			if ( $ppf->isValid() ) {
 				$ppf->Save(TRUE);
@@ -453,6 +465,7 @@ switch ($action) {
 		$data['src_department_options'] = Misc::arrayDiffByKey( (array)$data['department_ids'], $department_options );
 		$data['selected_department_options'] = Misc::arrayIntersectByKey( (array)$data['department_ids'], $department_options );
 
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			//Get Job Groups
 			$jglf = TTnew( 'JobGroupListFactory' );
@@ -482,7 +495,7 @@ switch ($action) {
 			$data['src_job_item_options'] = Misc::arrayDiffByKey( (array)$data['job_item_ids'], $job_item_options );
 			$data['selected_job_item_options'] = Misc::arrayIntersectByKey( (array)$data['job_item_ids'], $job_item_options );
 		}
-
+*/
 		//Select box options;
 		$wglf = TTnew( 'WageGroupListFactory' );
 		$data['wage_group_options'] = $wglf->getArrayByListFactory( $wglf->getByCompanyId( $current_company->getId() ), TRUE );

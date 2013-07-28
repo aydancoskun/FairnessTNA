@@ -562,6 +562,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$ppbf = new PremiumPolicyBranchFactory();
 		$ppdf = new PremiumPolicyDepartmentFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -571,7 +572,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 			$ppjigf = new PremiumPolicyJobItemGroupFactory();
 			$ppjif = new PremiumPolicyJobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'user_id' => $user_id,
 					'start_date_stamp' => $this->db->BindDate( $start_time_stamp ),
@@ -592,11 +593,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							from 	'. $this->getTable() .' as x
 							LEFT JOIN '. $pcf->getTable() .' as pcf ON x.punch_control_id = pcf.id
 							LEFT JOIN '. $udf->getTable() .' as z ON pcf.user_date_id = z.id ';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ' LEFT JOIN '. $jf->getTable() .' as jf ON (pcf.job_id = jf.id AND jf.deleted = 0 )';
 			$query .= ' LEFT JOIN '. $jif->getTable() .' as jif ON (pcf.job_item_id = jif.id AND jf.deleted = 0 )';
 		}
-
+*/
 		$query .= '
 							where z.user_id = ?
 								AND z.date_stamp >= ?
@@ -623,6 +625,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		} elseif ( isset($filter_data['department_selection_type_id']) AND $filter_data['department_selection_type_id'] == 30 AND isset($filter_data['premium_policy_id']) ) {
 			$query .= ' AND pcf.department_id not in ( select zz.department_id from '. $ppdf->getTable() .' as zz WHERE zz.premium_policy_id = '. (int)$filter_data['premium_policy_id'] .' ) ';
 		}
+/* Aydan
 
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			//Job Group Criteria
@@ -651,7 +654,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 				$query .= ' AND pcf.job_item_id not in ( select zz.job_item_id from '. $ppjif->getTable() .' as zz WHERE zz.premium_policy_id = '. (int)$filter_data['premium_policy_id'] .' ) ';
 			}
 		}
-
+*/
 		$query .= '
 								AND ( x.deleted = 0 AND pcf.deleted=0 AND z.deleted=0 )
 						) as z ON a.punch_control_id = z.punch_control_id
@@ -1183,10 +1186,11 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$ulf = new UserListFactory();
 		$udf = new UserDateFactory();
 		$pcf = new PunchControlFactory();
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 		}
-
+*/
 		$ph = array();
 
 		$query = '
@@ -1221,10 +1225,11 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							LEFT JOIN '. $pcf->getTable() .' as b ON a.punch_control_id = b.id
 							LEFT JOIN '. $udf->getTable() .' as c ON a.user_date_id = c.id
 					';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as d ON b.job_id = d.id';
 		}
-
+*/
 		$query .= '
 					where c.user_id in ('. $this->getListSQL($user_ids, $ph) .')
 					';
@@ -1295,11 +1300,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$udf = new UserDateFactory();
 		$pcf = new PunchControlFactory();
 		$uwf = new UserWageFactory();
+/* Aydan
 
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 		}
-
+*/
 		$ph = array(
 					'start_date' => $this->db->BindDate($start_date),
 					'end_date' => $this->db->BindDate($end_date),
@@ -1347,10 +1353,11 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 																			and z.deleted = 0
 																			order by z.effective_date desc limit 1)
 					';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as d ON b.job_id = d.id';
 		}
-
+*/
 		$query .= '
 					where c.date_stamp >= ?
 						AND c.date_stamp <= ?
@@ -1457,10 +1464,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$uwf = new UserWageFactory();
 		$sf = new StationFactory();
 
+		/*
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
+		*/
 
 		$ph = array(
 					'company_id' => $company_id,
@@ -1504,6 +1513,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							z.id as user_wage_id,
 							z.effective_date as user_wage_effective_date ';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job_name,
@@ -1514,7 +1524,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 						x.department_id as job_department_id,
 						x.group_id as job_group_id';
 		}
-
+*/
 		$query .= '
 					from 	'. $this->getTable() .' as a
 							LEFT JOIN '. $pcf->getTable() .' as b ON a.punch_control_id = b.id
@@ -1528,11 +1538,11 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 																			and z.deleted = 0
 																			order by z.effective_date desc LiMiT 1)
 					';
-		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
+/*		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON b.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON b.job_item_id = y.id';
 		}
-
+*/
 		$query .= '	WHERE d.company_id = ?';
 
 		if ( isset($filter_data['permission_children_ids']) AND isset($filter_data['permission_children_ids'][0]) AND !in_array(-1, (array)$filter_data['permission_children_ids']) ) {
@@ -1659,13 +1669,13 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$pf = new PunchFactory();
 		$sf = new StationFactory();
 
-		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
+/*		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jgf = new JobGroupFactory();
 			$jif = new JobItemFactory();
 			$jigf = new JobItemGroupFactory();
 		}
-
+*/
 		$ph = array( 'company_id' => $company_id );
 
 		//Make it so employees with 0 hours still show up!! Very important!
@@ -1731,6 +1741,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							sf.source as station_source,
 							sf.description as station_description';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						jf.name as job,
@@ -1755,7 +1766,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 						jigf.name as job_item_group
 						';
 		}
-
+*/
 		$query .= ' from	'. $this->getTable() .' as a
 					LEFT JOIN '. $pcf->getTable() .' as pcf ON a.punch_control_id = pcf.id
 					LEFT JOIN '. $udf->getTable() .' as b ON pcf.user_date_id = b.id
@@ -1778,6 +1789,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 																			and z.deleted = 0
 																			order by z.effective_date desc limit 1) ';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as jf ON pcf.job_id = jf.id
 						LEFT JOIN '. $jif->getTable() .' as jif ON pcf.job_item_id = jif.id
@@ -1787,7 +1799,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 						LEFT JOIN '. $jigf->getTable() .' as jigf ON jif.group_id = jigf.id
 						';
 		}
-
+*/
 		$query .= ' where 	uf.company_id = ? ';
 
 		$query .= ( isset($filter_data['permission_children_ids']) ) ? $this->getWhereClauseSQL( 'uf.id', $filter_data['permission_children_ids'], 'numeric_list', $ph ) : NULL;
@@ -1964,11 +1976,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'company_id' => $company_id,
 					);
@@ -2040,6 +2053,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							z.last_name as updated_by_last_name
 							';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						r.name as job,
@@ -2051,7 +2065,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 						r.group_id as job_group_id,
 						s.name as job_item';
 		}
-
+*/
 		$query .= '
 					from 	(
 								select tmp2_d.id, max(tmp2_a.id) as punch_id, max(tmp2_a.time_stamp) as max_punch_time_stamp
@@ -2100,11 +2114,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
 							LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
 					';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as r ON b.job_id = r.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as s ON b.job_item_id = s.id';
 		}
-
+*/
 		$ph[] = $company_id;
 		$query .= '	WHERE d.company_id = ?';
 
@@ -2184,11 +2199,11 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 			$ph[] = $this->db->BindDate($filter_data['end_date']);
 			$query  .=	' AND c.date_stamp <= ?';
 		}
-        
+
         $query .= ( isset($filter_data['created_by']) ) ? $this->getWhereClauseSQL( array('a.created_by','y.first_name','y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph ) : NULL;
-        
+
         $query .= ( isset($filter_data['updated_by']) ) ? $this->getWhereClauseSQL( array('a.updated_by','z.first_name','z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph ) : NULL;
-        
+
 
 		$query .= 	'
 						AND (a.deleted = 0 AND b.deleted = 0 AND c.deleted = 0 AND d.deleted = 0)
@@ -2308,11 +2323,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'company_id' => $company_id,
 					);
@@ -2390,6 +2406,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							z.last_name as updated_by_last_name
 							';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						r.name as job,
@@ -2401,7 +2418,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 						r.group_id as job_group_id,
 						s.name as job_item';
 		}
-
+*/
 		$query .= '
 					from 	'. $this->getTable() .' as a
 							LEFT JOIN '. $pcf->getTable() .' as b ON a.punch_control_id = b.id
@@ -2428,11 +2445,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
 							LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
 					';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as r ON b.job_id = r.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as s ON b.job_item_id = s.id';
 		}
-
+*/
 		$query .= '	WHERE d.company_id = ?';
 
 		$query .= ( isset($filter_data['permission_children_ids']) ) ? $this->getWhereClauseSQL( 'd.id', $filter_data['permission_children_ids'], 'numeric_list', $ph ) : NULL;
@@ -2630,11 +2648,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$pcf = new PunchControlFactory();
 		$sf = new StationFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'company_id' => $company_id,
 					);
@@ -2693,11 +2712,12 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 
 					';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON b.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON b.job_item_id = y.id';
 		}
-
+*/
 		$ph[] = $company_id;
 		$query .= '	WHERE tmp2.id IS NOT NULL AND d.company_id = ?';
 

@@ -51,7 +51,7 @@
 						{t escape="no"}After this change has been made, you can click the "Start" button below to begin your installation. <b>After the installation is complete, you will want to change "installer_enabled" to "FALSE".</b>{/t}
 						<br>
 						<br>
-						{t}For help, please visit{/t} <a href="http://www.timetrex.com">www.timetrex.com</a>
+						{t}For help, please see the INSTALL.md file in the root of the installations.</a>
 					</td>
 				</tr>
 				<tr>

@@ -161,7 +161,8 @@ switch ($action) {
 		}
 		$sf->FailTransaction();
 	case 'time_clock_command':
-		if ( getTTProductEdition() >= 15 AND $action != 'submit' ) {
+//		if ( getTTProductEdition() >= 15 AND $action != 'submit' ) {
+		if ( $action != 'submit' ) {
 			//Debug::setVerbosity(11);
 			Debug::Text('Time Clock Command: '. $data['time_clock_command'], __FILE__, __LINE__, __METHOD__,10);
 
@@ -359,6 +360,7 @@ switch ($action) {
 		$data['time_clock_command_options'] = $sf->getOptions('time_clock_command');
 		$data['mode_flag_options'] = $sf->getOptions('mode_flag');
 
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$jlf->getByCompanyId( $current_company->getId() );
@@ -368,7 +370,7 @@ switch ($action) {
 			$jilf->getByCompanyIdAndStatus( $current_company->getId(), 10 );
 			$data['job_item_options'] = Misc::prependArray( array(0 => '-- None --'), $jilf->getArrayByListFactory( $jilf, TRUE, FALSE ) );
 		}
-
+*/
 		//Get branches
 		$blf = TTnew( 'BranchListFactory' );
 		$blf->getByCompanyId( $current_company->getId() );

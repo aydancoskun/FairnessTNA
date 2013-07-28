@@ -784,7 +784,9 @@ class UserFactory extends Factory {
 
 			//When changing the password, we need to check if a Password Policy is defined.
 			$c_obj = $this->getCompanyObject();
-			if ( is_object( $c_obj ) AND $c_obj->getPasswordPolicyType() == 1 AND $this->getPermissionLevel() >= $c_obj->getPasswordMinimumPermissionLevel() AND $c_obj->getProductEdition() > 10 ) {
+// Aydan
+//			if ( is_object( $c_obj ) AND $c_obj->getPasswordPolicyType() == 1 AND $this->getPermissionLevel() >= $c_obj->getPasswordMinimumPermissionLevel() AND $c_obj->getProductEdition() > 10 ) {
+			if ( is_object( $c_obj ) AND $c_obj->getPasswordPolicyType() == 1 AND $this->getPermissionLevel() >= $c_obj->getPasswordMinimumPermissionLevel() ) {
 				Debug::Text('Password Policy: Minimum Length: '. $c_obj->getPasswordMinimumLength() .' Min. Strength: '. $c_obj->getPasswordMinimumStrength() .' ('.  Misc::getPasswordStrength( $password ) .') Age: '. $c_obj->getPasswordMinimumAge(), __FILE__, __LINE__, __METHOD__,10);
 
 				if ( strlen( $password ) < $c_obj->getPasswordMinimumLength() ) {
@@ -838,7 +840,9 @@ class UserFactory extends Factory {
 		$c_obj = $this->getCompanyObject();
 		//Always add 1 to the PasswordMaximumAge so if its set to 0 by mistake it will still allow the user to login after changing their password.
 		Debug::Text('Password Policy: Type: '. $c_obj->getPasswordPolicyType() .'('.$c_obj->getProductEdition().') Current Age: '. TTDate::getDays( (time()-$this->getPasswordUpdatedDate()) ) .'('.$this->getPasswordUpdatedDate().') Maximum Age: '. $c_obj->getPasswordMaximumAge() .' days', __FILE__, __LINE__, __METHOD__,10);
-		if ( PRODUCTION == TRUE AND is_object( $c_obj ) AND $c_obj->getPasswordPolicyType() == 1 AND (int)$this->getPasswordUpdatedDate() < ( time()-(($c_obj->getPasswordMaximumAge()+1)*86400) ) AND $c_obj->getProductEdition() > 10 ) {
+// Aydan
+//		if ( PRODUCTION == TRUE AND is_object( $c_obj ) AND $c_obj->getPasswordPolicyType() == 1 AND (int)$this->getPasswordUpdatedDate() < ( time()-(($c_obj->getPasswordMaximumAge()+1)*86400) ) AND $c_obj->getProductEdition() > 10 ) {
+		if ( PRODUCTION == TRUE AND is_object( $c_obj ) AND $c_obj->getPasswordPolicyType() == 1 AND (int)$this->getPasswordUpdatedDate() < ( time()-($c_obj->getPasswordMaximumAge()+1)*86400) ) {
 			Debug::Text('Password Policy: Password exceeds maximum age, denying access...', __FILE__, __LINE__, __METHOD__,10);
 			return FALSE;
 		}
@@ -1513,10 +1517,12 @@ class UserFactory extends Factory {
 		}
 
 		Debug::Text('Default Job ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
+		/* Aydan
+
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
-
+*/
 		if (
 				$id == 0
 				OR
@@ -1548,10 +1554,11 @@ class UserFactory extends Factory {
 		}
 
 		Debug::Text('Default Job Item ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
-
+*/
 		if (
 				$id == 0
 				OR

@@ -19,9 +19,6 @@ function confirm(form) {
 </script>
 </head>
 
-<iframe src="http://www.timetrex.com/embedded/viewlets/intro_v5/index.php" width="100%" height="600" scrolling="no" frameborder="0" marginheight="0">
-  <p>{t}Unfortunately your browser does not support frames, please upgrade your browser.{/t}</p>
-</iframe>
 <table align="center" width="910" cellpadding="0" cellspacing="0">
 	<tr>
 		<td colspan="4" bgcolor="#779BBE" align="center">

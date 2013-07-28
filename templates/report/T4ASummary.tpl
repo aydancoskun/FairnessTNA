@@ -32,7 +32,7 @@ var report_criteria_elements = new Array(
 
 				<tr class="tblDataError">
 					<td colspan="3">
-						<br><b>WARNING: THIS REPORT IS OUT OF DATE. UP-TO-DATE TAX REPORTS ARE NOW ONLY AVAILABLE IN THE NEW <a href="{if $smarty.server.HTTP_HOST == 'www.timetrex.com' OR $smarty.server.HTTP_HOST == 'timetrex.com'}http{if $smarty.server.HTTPS == TRUE}s{/if}://{$config_vars.other.hostname}/interface/{/if}../BetaTest.php">v5.0 INTERFACE</a></span></b>.</b><br><br>
+						<br><b>WARNING: THIS REPORT IS OUT OF DATE. UP-TO-DATE TAX REPORTS ARE AVAILABLE IN THE NEW <a href="http{if $smarty.server.HTTPS == TRUE}s{/if}://{$config_vars.other.hostname}/interface/flex"> INTERFACE</a></span></b>.</b><br><br>
 					</td>
 				</tr>
 

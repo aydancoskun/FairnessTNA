@@ -852,10 +852,10 @@ class DemoData {
 	}
 
 	function createPayStubAccount( $company_id ) {
-		//$retval = PayStubEntryAccountFactory::addPresets( $company_id );		
+		//$retval = PayStubEntryAccountFactory::addPresets( $company_id );
 		$sp = TTNew('SetupPresets');
 		$sp->setCompany( $company_id );
-		
+
 		$retval = $sp->PayStubAccounts();
 		$retval = $sp->PayStubAccounts( 'us' );
 		$retval = $sp->PayStubAccounts( 'us', 'ny' );
@@ -906,10 +906,10 @@ class DemoData {
 		//$retval = CompanyDeductionFactory::addPresets( $company_id );
 		$sp = TTNew('SetupPresets');
 		$sp->setCompany( $company_id );
-		
-		$retval = $sp->CompanyDeductions();		
-		$retval = $sp->CompanyDeductions( 'us' );		
-		$retval = $sp->CompanyDeductions( 'us', 'ny' );		
+
+		$retval = $sp->CompanyDeductions();
+		$retval = $sp->CompanyDeductions( 'us' );
+		$retval = $sp->CompanyDeductions( 'us', 'ny' );
 		if ( $retval == TRUE ) {
 			Debug::Text('Created Company Deductions!', __FILE__, __LINE__, __METHOD__,10);
 			return TRUE;
@@ -1214,7 +1214,7 @@ class DemoData {
         $cf = TTnew( 'CompanyFactory' );
 
         $apf->setCompany( $company_id );
-        
+
         switch( $type ) {
             case 10:
                 $apf->setName( 'Area Policy - CA' );
@@ -1222,7 +1222,7 @@ class DemoData {
                     $insert_id = $apf->Save( FALSE );
                     $apf->setCountry( array( 'CA' ) );
                     $apf->setProvince( array( 'AB', 'ON' ) );
-                    $apf->setDistrict( $invoice_district_ids );                    
+                    $apf->setDistrict( $invoice_district_ids );
                 }
                 break;
             case 20:
@@ -1231,11 +1231,11 @@ class DemoData {
                     $insert_id = $apf->Save( FALSE );
                     $apf->setCountry( array( 'US' ) );
                     $apf->setProvince( array( 'WA', 'NY' ) );
-                    $apf->setDistrict( $invoice_district_ids );                    
+                    $apf->setDistrict( $invoice_district_ids );
                 }
                 break;
         }
-        
+
         if ( $apf->isValid() ) {
 			$apf->Save();
 
@@ -1243,7 +1243,7 @@ class DemoData {
 
             return $insert_id;
         }
-        
+
 		Debug::Text('Failed Creating Area Policy!', __FILE__, __LINE__, __METHOD__,10);
 
 		return FALSE;
@@ -3380,7 +3380,7 @@ class DemoData {
 				break;
 			case 100: //Administrator
 				$hire_date = strtotime('01-Jan-2001'); //Force consistent hire date for the administrator, so other unit tests can rely on it.
-				
+
 				$uf->setUserName( 'demoadmin'. $this->getUserNamePostfix() );
 				$uf->setPassword( 'demo' );
 
@@ -3416,7 +3416,7 @@ class DemoData {
 				$uf->setGroup( $user_group_id );
 				$uf->setTitle( $user_title_id );
 				break;
-			case 999: //Random user                
+			case 999: //Random user
 				$first_name = $this->getRandomFirstName();
 				$last_name = $this->getRandomLastName();
 				if ( $first_name != '' AND $last_name != '' ) {
@@ -3470,7 +3470,7 @@ class DemoData {
 				//$this->createUserPermission( array( $insert_id ), 40, $preset_flags );
 				$this->createUserPermission( $insert_id, 40 );
 			} elseif ( $type == 10 OR $type == 11 OR $type == 999 ) {
-			    $this->createUserPermission( $insert_id, 18 ); 
+			    $this->createUserPermission( $insert_id, 18 );
 			} else {
 				//$this->createUserPermission( array( $insert_id ), 10, $preset_flags );
 				$this->createUserPermission( $insert_id, 10 );
@@ -3612,7 +3612,7 @@ class DemoData {
         $jae->setWage('');
         $jae->setStartDate( time() - 86400*rand(365, 730) );
         $jae->setEndDate( time() - 86400*rand(1, 365) );
-        
+
         $jae->setContactFirstName( $this->getRandomFirstName() );
         $jae->setContactLastName( $this->getRandomLastName() );
         $jae->setContactTitle('Engineer');
@@ -3623,18 +3623,18 @@ class DemoData {
         $jae->setLeaveReason('');
 
         if ( $jae->isValid() ) {
-			$insert_id = $jae->Save(FALSE);            
-            
+			$insert_id = $jae->Save(FALSE);
+
             $jae->setIsCurrentEmployer(TRUE);
             if ( $jae->isValid() ) {
-                 $jae->Save(); 
-                
+                 $jae->Save();
+
                  Debug::Text('Job Applicant Employment ID: '. $insert_id, __FILE__, __LINE__, __METHOD__,10);
 
 			     return $insert_id;
             }
-                    
-			
+
+
 		}
 
 		Debug::Text('Failed Creating Job Applicant Employment!', __FILE__, __LINE__, __METHOD__,10);
@@ -3885,7 +3885,7 @@ class DemoData {
 			$pclf->getById( $this->permission_presets[$preset_id] );
 			if ( $pclf->getRecordCount() > 0 ) {
 				$pc_obj = $pclf->getCurrent();
-                
+
 				$puf = TTnew( 'PermissionUserFactory' );
 				$puf->setPermissionControl( $pc_obj->getId() );
 				$puf->setUser( $user_id );
@@ -5975,7 +5975,7 @@ class DemoData {
 
 			//Company Deductions
 			$this->createCompanyDeduction( $company_id );
-		
+
 			//Wage Groups
 			$wage_group_ids[] = $this->createUserWageGroups( $company_id );
 
@@ -6060,6 +6060,7 @@ class DemoData {
 
 			$policy_ids['overtime'][] = $this->createOverTimePolicy( $company_id, 10 );
 			$policy_ids['overtime'][] = $this->createOverTimePolicy( $company_id, 20, $policy_ids['accrual'][0] );
+/* Aydan
 
 			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$policy_ids['expense'][] = $this->createExpensePolicy( $company_id, 100 ); // Tax(Percent) - HST
@@ -6071,7 +6072,7 @@ class DemoData {
 				$policy_ids['expense'][] = $this->createExpensePolicy( $company_id, 30 ); // Per Unit - No Tax
 				$policy_ids['expense'][] = $this->createExpensePolicy( $company_id, 40, array( $policy_ids['expense'][0], $policy_ids['expense'][2] ) ); // Flat Amount
 			}
-
+*/
 			$policy_ids['premium'][] = $this->createPremiumPolicy( $company_id, 10 );
 
 			$policy_ids['absence'][] = $this->createAbsencePolicy( $company_id, 10, $policy_ids['accrual'][1] );
@@ -6085,12 +6086,12 @@ class DemoData {
 			$policy_ids['exception_1'] = $this->createExceptionPolicy( $company_id );
 
 			$hierarchy_user_ids = $user_ids;
-            
+
 			$root_user_id = array_pop( $hierarchy_user_ids );
-            
+
 			unset($hierarchy_user_ids[0], $hierarchy_user_ids[1] );
 
-			//Create authorization hierarchy            
+			//Create authorization hierarchy
 			$hierarchy_control_id = $this->createAuthorizationHierarchyControl( $company_id, $hierarchy_user_ids );
 
 			if ( $root_user_id == FALSE ) {
@@ -6098,11 +6099,11 @@ class DemoData {
 				return FALSE;
 			}
 
-			//Admin user at the top            
+			//Admin user at the top
 			$this->createAuthorizationHierarchyLevel( $company_id, $hierarchy_control_id, $root_user_id, 1 );
             $this->createAuthorizationHierarchyLevel( $company_id, $hierarchy_control_id, $user_ids[0], 2 );
 			$this->createAuthorizationHierarchyLevel( $company_id, $hierarchy_control_id, $user_ids[1], 3 );
-                       
+
 			unset($hierarchy_user_ids, $root_user_id);
 
 			//Pay Period Schedule
@@ -6121,6 +6122,7 @@ class DemoData {
 										NULL,
 										$policy_ids['expense'] );
 
+/* Aydan
 			if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				//Client Groups
 				$client_group_ids[] = $this->createClientGroup( $company_id, 10, 0 );
@@ -6191,7 +6193,9 @@ class DemoData {
 					$invoice_ids[] = $this->createInvoice( $company_id, $client_id, $currency_ids[0], array( $product_ids[10][0], $product_ids[10][4], $product_ids[20][0] ), 100, array(), $user_ids, $shipping_policy_ids );
 					$invoice_ids[] = $this->createInvoice( $company_id, $client_id, $currency_ids[0], array( $product_ids[10][3], $product_ids[10][4] ), 100, array(), $user_ids, $shipping_policy_ids );
 				}
-			} else {
+			} else
+*/
+			{
 				$client_group_ids[] = 0;
 				$product_group_ids[] = 0;
 				$client_ids[] = 0;
@@ -6207,6 +6211,7 @@ class DemoData {
 				$shipping_policy_ids[] = 0;
 				$invoice_ids[] = 0;
 			}
+/* Aydan
 
             if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				//Task Groups
@@ -6254,10 +6259,13 @@ class DemoData {
 				$job_ids[] = $this->createJob( $company_id, 24, $default_task_id, $job_group_ids[5], $branch_ids[1], $department_ids[1] );
 				$job_ids[] = $this->createJob( $company_id, 25, $default_task_id, $job_group_ids[5], $branch_ids[1], $department_ids[1] );
 
-			} else {
+			} else
+			*/
+			{
 				$task_ids[] = 0;
 				$job_ids[] = 0;
 			}
+/* Aydan
 
 			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$user_expense_ids[] = $this->createUserExpense( $user_ids[0], $policy_ids['expense'][3], $branch_ids[0],$department_ids[1], $currency_ids[0], $job_ids[1],$task_ids[1] );
@@ -6279,7 +6287,9 @@ class DemoData {
 				$user_expense_ids[] = $this->createUserExpense( $user_ids[18], $policy_ids['expense'][4], $branch_ids[1],$department_ids[3], $currency_ids[0], $job_ids[10],$task_ids[3], NULL, 50 );
 				$user_expense_ids[] = $this->createUserExpense( $user_ids[19], $policy_ids['expense'][4], $branch_ids[1],$department_ids[3], $currency_ids[0], $job_ids[0],$task_ids[3], NULL, 50 );
 				$user_expense_ids[] = $this->createUserExpense( $user_ids[20], $policy_ids['expense'][4], $branch_ids[1],$department_ids[3], $currency_ids[0], $job_ids[0],$task_ids[3], NULL, 50 );
-			} else {
+			} else
+			*/
+			{
 				$user_expense_ids[] = 0;
 			}
 
@@ -6412,6 +6422,7 @@ class DemoData {
 				}
             }
 
+/* Aydan
 
 			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$x = 1;
@@ -6444,7 +6455,7 @@ class DemoData {
 					$x++;
 				}
 			}
-
+*/
 
 			//Create recurring schedule templates
 			$recurring_schedule_ids[] = $this->createRecurringScheduleTemplate( $company_id, 10, $policy_ids['schedule_1'] ); //Morning shift
@@ -6682,6 +6693,7 @@ class DemoData {
             $this->createReportCustomColumn( $company_id, 'TimesheetDetailReport', 200 );
 
 
+/* Aydan
 			if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				// Attach  document to employee
 				foreach( $user_ids as $user_id ) {
@@ -6762,6 +6774,7 @@ class DemoData {
 					}
 				}
 			}
+			*/
 		}
 
 		//$cf->FailTransaction();

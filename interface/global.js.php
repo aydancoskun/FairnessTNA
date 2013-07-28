@@ -43,7 +43,12 @@ forceCacheHeaders( NULL, $authentication->getCreatedDate() );
 $pplf = TTnew( 'PayPeriodListFactory' );
 $js_calendar_pay_period_dates = $pplf->getJSCalendarPayPeriodArray()
 ?>
-var TTProductEdition = <?php if ( isset($current_company) AND is_object($current_company) AND getTTProductEdition() >= $current_company->getProductEdition() ) { echo (int)$current_company->getProductEdition(); } else { echo (int)getTTProductEdition(); } ?>;
+var TTProductEdition = <?php
+if ( isset($current_company) AND is_object($current_company) AND getTTProductEdition() >= $current_company->getProductEdition() ) {
+	echo (int)$current_company->getProductEdition();
+} else {
+	echo (int)getTTProductEdition();
+} ?>;
 
 var JSCalendarPayPeriodEndDates = <?php echo Misc::getJSArray( $js_calendar_pay_period_dates['end_date'] )."\n"; ?>
 var JSCalendarPayPeriodTransactionDates = <?php echo Misc::getJSArray( $js_calendar_pay_period_dates['transaction_date'] )."\n"; ?>

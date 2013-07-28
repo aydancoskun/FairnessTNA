@@ -104,7 +104,8 @@ class UserSummaryReport extends Report {
 				}
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -112,35 +113,38 @@ class UserSummaryReport extends Report {
 					if ( is_array($custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $custom_column_labels, 9500 );
 					}
-				}
-                break; 
+//				}
+                break;
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'UserSummaryReport', 'custom_column' );
-				}
+//				}
                 break;
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'UserSummaryReport', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_dynamic_custom_column_labels, 9700 );
 					}
-				}
+//				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'UserSummaryReport', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_static_custom_column_labels, 9700 );
 					}
-				}
+//				}
                 break;
             case 'formula_columns':
                 $retval = TTMath::formatFormulaColumns( array_merge( array_diff( $this->getOptions('static_columns'), (array)$this->getOptions('report_static_custom_column') ), $this->getOptions('dynamic_columns') ) );
-                break; 
+                break;
             case 'filter_columns':
                 $retval = TTMath::formatFormulaColumns( array_merge( $this->getOptions('static_columns'), $this->getOptions('dynamic_columns'), (array)$this->getOptions('report_dynamic_custom_column') ) );
                 break;
@@ -235,7 +239,7 @@ class UserSummaryReport extends Report {
 
 				break;
 			case 'columns':
-				$retval = array_merge( $this->getOptions('static_columns'), $this->getOptions('dynamic_columns'), (array)$this->getOptions('report_dynamic_custom_column') );                
+				$retval = array_merge( $this->getOptions('static_columns'), $this->getOptions('dynamic_columns'), (array)$this->getOptions('report_dynamic_custom_column') );
 				break;
 			case 'column_format':
 				//Define formatting function for each column.
@@ -752,7 +756,7 @@ class UserSummaryReport extends Report {
 	function _getData( $format = NULL ) {
 		$this->tmp_data = array('user' => array(), 'user_preference' => array(), 'user_wage' => array(),  'user_bank' => array(), 'user_deduction' => array(), 'total_user' => array() );
 
-		$columns = $this->getColumnDataConfig();  
+		$columns = $this->getColumnDataConfig();
 		$filter_data = $this->getFilterConfig();
 
         $currency_convert_to_base = $this->getCurrencyConvertToBase();
@@ -796,7 +800,7 @@ class UserSummaryReport extends Report {
 
 		//Always include date columns, because 'hire-date_stamp' is not recognized by the UserFactory. This greatly slows down the report though.
 		$columns['effective_date'] = $columns['hire_date'] = $columns['termination_date'] = $columns['birth_date'] = $columns['created_date'] = $columns['updated_date'] = TRUE;
-        
+
 		//Get user data for joining.
 		$ulf = TTnew( 'UserListFactory' );
 		$ulf->getAPISearchByCompanyIdAndArrayCriteria( $this->getUserObject()->getCompany(), $filter_data );
@@ -809,14 +813,14 @@ class UserSummaryReport extends Report {
 			if ( $currency_convert_to_base == TRUE AND is_object( $base_currency_obj ) ) {
 				$this->tmp_data['user'][$u_obj->getId()]['currency_rate'] = $u_obj->getColumn('currency_rate');
 			}
-			
+
             $this->tmp_data['user'][$u_obj->getId()]['employee_number'] = isset($columns['employee_number']) ? $this->tmp_data['user'][$u_obj->getId()]['employee_number']: $u_obj->getEmployeeNumber();
             if ( isset($columns['employee_number_barcode']) ) {
 				$this->tmp_data['user'][$u_obj->getId()]['employee_number_barcode'] = new ReportCellBarcode( $this, 'U'.$this->tmp_data['user'][$u_obj->getId()]['employee_number'] );
 			}
 			if ( isset($columns['employee_number_qrcode']) ) {
 				$this->tmp_data['user'][$u_obj->getId()]['employee_number_qrcode'] = new ReportCellQRcode( $this, 'U'.$this->tmp_data['user'][$u_obj->getId()]['employee_number'] );
-			}            			
+			}
 
 			$this->tmp_data['user_preference'][$u_obj->getId()] = array();
 			$this->tmp_data['user_wage'][$u_obj->getId()] = array();
@@ -835,7 +839,7 @@ class UserSummaryReport extends Report {
 			$this->tmp_data['user_preference'][$up_obj->getUser()] = (array)$up_obj->getObjectAsArray( $columns );
 			$this->getProgressBarObject()->set( $this->getAMFMessageID(), $key );
 		}
-        
+
 		//Get user wage data for joining.
 		$filter_data['wage_group_id'] = 0; //Use default wage groups only.
 		$uwlf = TTnew( 'UserWageListFactory' );
@@ -868,7 +872,7 @@ class UserSummaryReport extends Report {
 			$this->tmp_data['user_bank'][$ba_obj->getUser()] = (array)$ba_obj->getObjectAsArray( $columns );
 			$this->getProgressBarObject()->set( $this->getAMFMessageID(), $key );
 		}
-		
+
         //Debug::Arr($this->tmp_data['user_preference'], 'TMP Data: ', __FILE__, __LINE__, __METHOD__,10);
 		return TRUE;
 	}
@@ -920,7 +924,7 @@ class UserSummaryReport extends Report {
 				}
 
 				$this->data[] = array_merge( $row, $hire_date_columns, $termination_date_columns, $birth_date_columns, $created_date_columns, $updated_date_columns, $processed_data );
-                
+
 				$this->getProgressBarObject()->set( $this->getAMFMessageID(), $key );
 				$key++;
 			}

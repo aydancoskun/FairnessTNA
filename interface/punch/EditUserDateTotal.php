@@ -203,6 +203,8 @@ switch ($action) {
 		$mplf = TTnew( 'MealPolicyListFactory' );
 		$meal_policy_options = $mplf->getByCompanyIDArray( $current_company->getId(), TRUE );
 
+/* Aydan
+
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$udt_data['job_options'] = $jlf->getByCompanyIdAndUserIdAndStatusArray( $current_company->getId(),  $udt_data['user_id'], array(10,20,30,40), TRUE );
@@ -210,7 +212,7 @@ switch ($action) {
 			$jilf = TTnew( 'JobItemListFactory' );
 			$udt_data['job_item_options'] = $jilf->getByCompanyIdArray( $current_company->getId(), TRUE );
 		}
-
+*/
 		//Select box options;
 		$udt_data['status_options'] = $udtf->getOptions('status');
 		$udt_data['type_options'] = $udtf->getOptions('type');

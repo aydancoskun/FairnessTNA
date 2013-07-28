@@ -77,7 +77,7 @@ class PermissionFactory extends Factory {
 					$retval[30] = TTi18n::gettext('Payroll');
 					$retval[70] = TTi18n::gettext('Human Resources');
 				}
-
+/* Aydan
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[40] = TTi18n::gettext('Job Costing');
 					$retval[50] = TTi18n::gettext('Document Management');
@@ -88,6 +88,7 @@ class PermissionFactory extends Factory {
 					$retval[75] = TTi18n::gettext('Recruitment');
 					$retval[80] = TTi18n::gettext('Expense Tracking');
 				}
+*/
 				ksort($retval);
 				break;
 			case 'preset_level':
@@ -114,7 +115,7 @@ class PermissionFactory extends Factory {
 											'payroll' => TTi18n::gettext('Payroll'),
 											'policy' => TTi18n::gettext('Policies'),
 											'report' => TTi18n::gettext('Reports'),
-                                            'hr' => TTi18n::gettext('Human Resources (HR)'),
+                      'hr' => TTi18n::gettext('Human Resources (HR)'),
 											'recruitment' => TTi18n::gettext('Recruitment'),
 											);
 
@@ -126,12 +127,17 @@ class PermissionFactory extends Factory {
 					$product_edition = getTTProductEdition();
 				}
 
+/* Aydan
 				if ( $product_edition == PRODUCT_ENTERPRISE_25 ) { //Enterprise
 				} elseif ( $product_edition == PRODUCT_CORPORATE_20 ) { //Corporate
 					unset( $retval['recruitment'] );
 				} elseif ( $product_edition == PRODUCT_COMMUNITY_10 OR $product_edition == PRODUCT_PROFESSIONAL_15 ) { //Community or Professional
 					unset( $retval['job'], $retval['invoice'], $retval['recruitment'] );
 				}
+*/
+// DELETE BELOW
+				unset( $retval['job'], $retval['invoice'], $retval['recruitment'] );
+
 
 				if ( defined('TIMETREX_API') == TRUE AND TIMETREX_API == TRUE ) {
 					unset($retval[0]);
@@ -249,7 +255,7 @@ class PermissionFactory extends Factory {
 				} else {
 					$product_edition = getTTProductEdition();
 				}
-
+/*
 				if ( $product_edition == PRODUCT_ENTERPRISE_25 ) { //Enterprise
 				} elseif ( $product_edition == PRODUCT_CORPORATE_20 ) { //Corporate
 					unset( $retval['recruitment'] );
@@ -258,8 +264,12 @@ class PermissionFactory extends Factory {
 					unset( $retval['recruitment'], $retval['invoice'], $retval['job'] );
 					unset( $retval['payroll'][array_search( 'user_expense', $retval['payroll'])], $retval['policy'][array_search( 'expense_policy', $retval['policy'])] );
 				}
+*/
+// DELETE BELOW
+				unset( $retval['recruitment'], $retval['invoice'], $retval['job'] );
+				unset( $retval['payroll'][array_search( 'user_expense', $retval['payroll'])], $retval['policy'][array_search( 'expense_policy', $retval['policy'])] );
 
-				break;
+			break;
 			case 'section':
 				$retval = array(
 										'system' => TTi18n::gettext('System'),

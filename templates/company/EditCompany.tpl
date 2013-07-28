@@ -129,10 +129,8 @@ function showProvince() {
 						{t}Full Name:{/t}
 					</td>
 					<td class="cellRightEditTable">
-						<input type="text" size="40" name="company_data[name]" value="{$company_data.name}" {if $config_vars.other.primary_company_id == $company_data.id AND getTTProductEdition() > 10}disabled{/if}>
-						{if $config_vars.other.primary_company_id == $company_data.id AND getTTProductEdition() > 10}
-							<input type="hidden" name="company_data[name]" value="{$company_data.name}">
-						{/if}
+						<input type="text" size="40" name="company_data[name]" value="{$company_data.name}" >
+						<input type="hidden" name="company_data[name]" value="{$company_data.name}" >
 					</td>
 				</tr>
 

@@ -136,7 +136,8 @@ function getRecurringScheduleTotalTime(this_week_row) {
 									{t}Job{/t} / {t}Task{/t}
 								</td>
 								{/if}
-								{if $current_company->getProductEdition() > 10}
+								{if 1 > 0}
+								<!-- Aydan see above was if $current_company->getProductEdition() > 10 -->
 								<td>
 									{t}Open Shift Multiplier{/t}
 								</td>
@@ -269,7 +270,8 @@ function getRecurringScheduleTotalTime(this_week_row) {
 										</table>
 									</td>
 									{/if}
-									{if $current_company->getProductEdition() > 10}
+									{if 1 > 0}
+					<!-- Aydan see above was if $current_company->getProductEdition() > 10 -->
 									<td>
 										<input type="text" size="2" id="open_shift_multiplier-{$week_row.id}" name="week_rows[{$week_row.id}][open_shift_multiplier]" value="{$week_row.open_shift_multiplier}">
 									</td>

@@ -483,6 +483,8 @@ class CalculatePayStub extends PayStubFactory {
 		$udlf->getByCompanyIdAndUserId( $this->getUserObject()->getCompany(), $this->getUserObject()->getId() );
 
 
+// Aydan
+/*
 		if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 			$uelf = TTnew( 'UserExpenseListFactory' );
 			$uelf->getByUserIdAndAuthorizedAndStartDateAndEndDate( $this->getUser(), TRUE, $this->getPayPeriodObject()->getStartDate(), $this->getPayPeriodObject()->getEndDate() );
@@ -490,6 +492,9 @@ class CalculatePayStub extends PayStubFactory {
 		} else {
 			$uelf = FALSE;
 		}
+*/
+// delete below
+			$uelf = FALSE;
 
 		$deduction_order_arr = $this->getOrderedDeductionAndPSAmendment( $udlf, $psalf, $uelf );
 		if ( is_array($deduction_order_arr) AND count($deduction_order_arr) > 0 ) {

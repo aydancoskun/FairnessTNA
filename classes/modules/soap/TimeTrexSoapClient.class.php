@@ -40,8 +40,8 @@ class TimeTrexSoapClient {
 
 	function getSoapObject() {
 		if ( $this->soap_client_obj == NULL ) {
-			$location = 'http://www.timetrex.com/ext_soap/server.php';
-			//$location = 'http://192.168.1.9/timetrex-head-master/website/ext_soap/server.php';
+			$location = $config_vars['urls']['soap_external'];
+			//$location = '/website/ext_soap/server.php';
 
 			$this->soap_client_obj = new SoapClient(NULL, array(
 											'location' => $location,
@@ -73,17 +73,16 @@ class TimeTrexSoapClient {
 			return FALSE; //Disabled with On-Demand service.
 		}
 
-		if ( getTTProductEdition() == 10 ) {
+// Aydan		if ( getTTProductEdition() == 10 ) {
 			$sslf = TTnew( 'SystemSettingListFactory' );
 			$sslf->getByName('update_notify');
 			if ( $sslf->getRecordCount() == 1 ) {
 				$value = $sslf->getCurrent()->getValue();
-
 				if ( $value == 0 ) {
 					return FALSE;
 				}
 			}
-		}
+//		}
 
 		return TRUE;
 	}
@@ -364,7 +363,8 @@ class TimeTrexSoapClient {
 
 		//Check for anonymous update notifications
 		$anonymous_update_notify = 0;
-		if ( $force == FALSE OR getTTProductEdition() == 10 ) {
+//		if ( $force == FALSE OR getTTProductEdition() == 10 ) {
+		if ( $force == FALSE ) {
 			$sslf = TTnew( 'SystemSettingListFactory' );
 			$sslf->getByName('anonymous_update_notify');
 			if ( $sslf->getRecordCount() == 1 ) {
@@ -450,11 +450,7 @@ class TimeTrexSoapClient {
 	// Currency Data Feed functions
 	//
 	function getCurrencyExchangeRates( $company_id, $currency_arr, $base_currency ) {
-		/*
 
-			Contact info@timetrex.com to request adding custom currency data feeds.
-
-		*/
 		if ( $company_id == '' ) {
 			return FALSE;
 		}

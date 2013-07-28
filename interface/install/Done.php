@@ -103,8 +103,6 @@ switch ($action) {
 
 $cache->clean(); //Clear all cache.
 
-$handle = @fopen('http://www.timetrex.com/'.URLBuilder::getURL( array('v' => $install_obj->getFullApplicationVersion(), 'page' => 'done'), 'pre_install.php'), "r");
-@fclose($handle);
 
 $smarty->assign_by_ref('upgrade', $upgrade);
 $smarty->assign_by_ref('install_obj', $install_obj);

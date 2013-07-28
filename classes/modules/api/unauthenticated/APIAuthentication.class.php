@@ -79,7 +79,8 @@ class APIAuthentication extends APIFactory {
 					}
 				} elseif ( $c_obj->getStatus() == 30 ) {
 					$error_message = TTi18n::gettext('Sorry, your company\'s account has been CANCELLED, please contact customer support if you believe this is an error');
-				} elseif ( $c_obj->getPasswordPolicyType() == 1 AND $c_obj->getProductEdition() > 10 ) {
+//				} elseif ( $c_obj->getPasswordPolicyType() == 1 AND $c_obj->getProductEdition() > 10 ) {
+				} elseif ( $c_obj->getPasswordPolicyType() == 1) {
 					//Password policy is enabled, confirm users password has not exceeded maximum age.
 					$ulf = TTnew( 'UserListFactory' );
 					$ulf->getByUserName( $user_name );
@@ -312,12 +313,12 @@ class APIAuthentication extends APIFactory {
 	}
 
 	function getRegistrationKey() {
-//		$sslf = new SystemSettingListFactory();
-//		$sslf->getByName( 'registration_key' );
-//		if ( $sslf->getRecordCount() == 1 ) {
-//			$key = $sslf->getCurrent()->getValue();
-//			return $key;
-//		}
+		$sslf = new SystemSettingListFactory();
+		$sslf->getByName( 'registration_key' );
+		if ( $sslf->getRecordCount() == 1 ) {
+			$key = $sslf->getCurrent()->getValue();
+			return $key;
+		}
 
 		return FALSE;
 	}

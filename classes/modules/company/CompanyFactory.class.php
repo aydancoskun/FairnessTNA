@@ -1736,7 +1736,9 @@ class CompanyFactory extends Factory {
 												100) ) {
 
 			global $config_vars;
-			if ( $force == FALSE AND $this->isNew() == FALSE AND isset($config_vars['other']['primary_company_id']) AND $config_vars['other']['primary_company_id'] == $this->getId() AND getTTProductEdition() > 10 ) {
+// Aydan
+//			if ( $force == FALSE AND $this->isNew() == FALSE AND isset($config_vars['other']['primary_company_id']) AND $config_vars['other']['primary_company_id'] == $this->getId() AND getTTProductEdition() > 10 ) {
+			if ( $force == FALSE AND $this->isNew() == FALSE AND isset($config_vars['other']['primary_company_id']) AND $config_vars['other']['primary_company_id'] == $this->getId() ) {
 				//Don't change company name
 			} else {
 				$this->data['name'] = $name;
@@ -2598,8 +2600,9 @@ class CompanyFactory extends Factory {
 	//This shouldn't be called unless the user requests auto update notification.
 	function remoteSave() {
 		$ttsc = new TimeTrexSoapClient();
-		if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE AND ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 OR $ttsc->isUpdateNotifyEnabled() == TRUE ) ) {
-			$ttsc->sendCompanyData( $this->getId() );
+//		if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE AND ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 OR $ttsc->isUpdateNotifyEnabled() == TRUE ) ) {
+		if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE AND $ttsc->isUpdateNotifyEnabled() == TRUE ) {
+				$ttsc->sendCompanyData( $this->getId() );
 			$ttsc->sendCompanyVersionData( $this->getId() );
 
 			return TRUE;
@@ -3156,7 +3159,9 @@ class CompanyFactory extends Factory {
 					$sf->Save();
 				}
 
-				if ( $this->getProductEdition() >= 15 ) {
+// Aydan
+//				if ( $this->getProductEdition() >= 15 ) {
+
 					$sf = TTnew( 'StationFactory' );
 					$sf->setCompany( $this->getId() );
 					$sf->setStatus( 20 );
@@ -3198,7 +3203,8 @@ class CompanyFactory extends Factory {
 					if ( $sf->isValid() ) {
 						$sf->Save();
 					}
-				}
+
+				//}
 			}
 
 			if ( $this->getEnableAddPayStubEntryAccountPreset() == TRUE

@@ -1,38 +1,25 @@
 <?php
 /*********************************************************************************
- * TimeTrex is a Payroll and Time Management program developed by
- * TimeTrex Software Inc. Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * This file is part of "Fairness", a Payroll and Time Management program.
+ * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
+ * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission
- * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE
- * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ * Fairness is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation, either version 3 of the License, or (at you option )
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
  *
  * You should have received a copy of the GNU Affero General Public License along
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- *
- * You can contact TimeTrex headquarters at Unit 22 - 2475 Dobbin Rd. Suite
- * #292 Westbank, BC V4T 2E9, Canada or at email address info@timetrex.com.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License version 3.
- *
- * In accordance with Section 7(b) of the GNU Affero General Public License
- * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by TimeTrex" logo. If the display of the logo is not reasonably
- * feasible for technical reasons, the Appropriate Legal Notices must display
- * the words "Powered by TimeTrex".
- ********************************************************************************/
+  ********************************************************************************/
 /*
  * $Revision: 5335 $
  * $Id: KPIListFactory.class.php 5335 2011-10-18 00:32:47Z ipso $
@@ -271,22 +258,22 @@ class KPIListFactory extends KPIFactory implements IteratorAggregate {
 				$query  .=	' AND '. $date_filter;
 			}
 			unset($date_filter);
-		}        
-        
+		}
+
         $query .= ( isset($filter_data['created_by']) ) ? $this->getWhereClauseSQL( array('a.created_by','y.first_name','y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph ) : NULL;
-        
+
         $query .= ( isset($filter_data['updated_by']) ) ? $this->getWhereClauseSQL( array('a.updated_by','z.first_name','z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph ) : NULL;
-        
-        
+
+
 		$query .= 	'
 						AND a.deleted = 0
 					';
 
 		$query .= $this->getWhereSQL( $where );
 		$query .= $this->getSortSQL( $order, $strict, $additional_order_fields );
-        
+
         Debug::Arr( $ph, 'Query: '.$query, __FILE__, __LINE__, __METHOD__, 10 );
-        
+
 		$this->ExecuteSQL($query,$ph,$limit,$page);
 		return $this;
 	}

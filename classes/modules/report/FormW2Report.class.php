@@ -50,7 +50,7 @@ class FormW2Report extends Report {
 
 		return FALSE;
 	}
-    
+
     protected function _validateConfig() {
 		$config = $this->getConfig();
 
@@ -111,7 +111,8 @@ class FormW2Report extends Report {
 				$retval = array();
 				break;
             case 'report_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
@@ -119,35 +120,38 @@ class FormW2Report extends Report {
 					if ( is_array($custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $custom_column_labels, 9500 );
 					}
-				}
-                break; 
+//				}
+                break;
             case 'report_custom_filters':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'FormW2Report', 'custom_column' );
-				}
+//				}
                 break;
             case 'report_dynamic_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'FormW2Report', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_dynamic_custom_column_labels, 9700 );
 					}
-				}
+//				}
                 break;
             case 'report_static_custom_column':
-				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
+// Aydan
+//				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'FormW2Report', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_static_custom_column_labels, 9700 );
 					}
-				}
+//				}
                 break;
             case 'formula_columns':
                 $retval = TTMath::formatFormulaColumns( array_merge( array_diff( $this->getOptions('static_columns'), (array)$this->getOptions('report_static_custom_column') ), $this->getOptions('dynamic_columns') ) );
-                break; 
+                break;
             case 'filter_columns':
                 $retval = TTMath::formatFormulaColumns( array_merge( $this->getOptions('static_columns'), $this->getOptions('dynamic_columns'), (array)$this->getOptions('report_dynamic_custom_column') ) );
                 break;
@@ -446,7 +450,7 @@ class FormW2Report extends Report {
 			require_once( Environment::getBasePath() .'/classes/GovernmentForms/GovernmentForms.class.php');
 
 			$gf = new GovernmentForms();
-            
+
 			$this->form_obj['gf'] = $gf;
 			return $this->form_obj['gf'];
 		}
@@ -478,7 +482,7 @@ class FormW2Report extends Report {
 
 		return $this->form_obj['return1040'];
 	}
-    
+
 
 	function formatFormConfig() {
 		$default_include_exclude_arr = array( 'include_pay_stub_entry_account' => array(), 'exclude_pay_stub_entry_account' => array() );
@@ -522,9 +526,9 @@ class FormW2Report extends Report {
 		$this->tmp_data = array( 'pay_stub_entry' => array() );
 
 		$columns = $this->getColumnDataConfig();
-        
+
 		$filter_data = $this->getFilterConfig();
-        
+
 		$form_data = $this->formatFormConfig();
 
 		//
@@ -581,7 +585,7 @@ class FormW2Report extends Report {
 					$this->tmp_data['pay_stub_entry'][$user_id]['psen_ids'][$pay_stub_entry_name_id] = $pse_obj->getColumn('amount');
 				}
 			}
-            
+
 			if ( isset($this->tmp_data['pay_stub_entry']) AND is_array($this->tmp_data['pay_stub_entry']) ) {
 				foreach($this->tmp_data['pay_stub_entry'] as $user_id => $data_b) {
 					$this->tmp_data['pay_stub_entry'][$user_id]['l1'] 		= Misc::calculateMultipleColumns( $data_b['psen_ids'], $form_data['l1']['include_pay_stub_entry_account'], 					$form_data['l1']['exclude_pay_stub_entry_account'] );
@@ -603,15 +607,15 @@ class FormW2Report extends Report {
 					$this->tmp_data['pay_stub_entry'][$user_id]['l14b'] 	= Misc::calculateMultipleColumns( $data_b['psen_ids'], $form_data['l14b']['include_pay_stub_entry_account'], 					$form_data['l14b']['exclude_pay_stub_entry_account'] );
 					$this->tmp_data['pay_stub_entry'][$user_id]['l14c'] 	= Misc::calculateMultipleColumns( $data_b['psen_ids'], $form_data['l14c']['include_pay_stub_entry_account'], 					$form_data['l14c']['exclude_pay_stub_entry_account'] );
 					$this->tmp_data['pay_stub_entry'][$user_id]['l14d'] 	= Misc::calculateMultipleColumns( $data_b['psen_ids'], $form_data['l14d']['include_pay_stub_entry_account'], 					$form_data['l14d']['exclude_pay_stub_entry_account'] );
-                    
+
 					if ( is_array($data_b['psen_ids']) ) {
 						foreach( $data_b['psen_ids'] as $psen_id => $psen_amount ) {
 						  if ( isset($tax_deduction_pay_stub_account_id_map[$psen_id]) ) {
 								//$tax_deduction_arr = $tax_deductions[$tax_deduction_pay_stub_account_id_map[$psen_id]];
-                                
+
 								//Support multiple tax/deductions that deposit to the same pay stub account.
 								foreach( $tax_deduction_pay_stub_account_id_map[$psen_id] as $tax_deduction_id ) {
-									$tax_deduction_arr = $tax_deductions[$tax_deduction_id];                                    
+									$tax_deduction_arr = $tax_deductions[$tax_deduction_id];
 									//determine how many district/states currently exist for this employee.
 									foreach( range('a','z') as $z ) {
 										if ( !isset($this->tmp_data['pay_stub_entry'][$user_id]['l16'.$z]) ) {
@@ -619,7 +623,7 @@ class FormW2Report extends Report {
 											break;
 										}
 									}
-                                    
+
 									foreach( range('a','z') as $z ) {
 										if ( !isset($this->tmp_data['pay_stub_entry'][$user_id]['l18'.$z]) ) {
 											$district_id = $z;
@@ -655,7 +659,7 @@ class FormW2Report extends Report {
 				}
 			}
 		}
-        
+
 		$this->user_ids = array_unique( $this->user_ids ); //Used to get the total number of employees.
 
 		//Debug::Arr($this->tmp_data['user'], 'User Raw Data: ', __FILE__, __LINE__, __METHOD__,10);
@@ -671,7 +675,7 @@ class FormW2Report extends Report {
 			$this->tmp_data['user'][$u_obj->getId()] = (array)$u_obj->getObjectAsArray( $this->getColumnDataConfig() );
 			$this->getProgressBarObject()->set( $this->getAMFMessageID(), $key );
 		}
-        
+
 		return TRUE;
 	}
 
@@ -700,12 +704,12 @@ class FormW2Report extends Report {
 		//Debug::Arr($this->data, 'preProcess Data: ', __FILE__, __LINE__, __METHOD__,10);
 
 		$this->form_data = $this->data; //Copy data to Form Data so group/sort doesn't affect it.
-        
+
 		return TRUE;
 	}
 
 	function _outputPDFForm( $format = NULL ) {
-	    
+
 		$show_background = TRUE;
 		if ( $format == 'pdf_form_print' OR $format == 'pdf_form_print_government' OR $format == 'efile' ) {
 			$show_background = FALSE;
@@ -715,7 +719,7 @@ class FormW2Report extends Report {
 		$setup_data = $this->getFormConfig();
 		$filter_data = $this->getFilterConfig();
 		//Debug::Arr($filter_data, 'Filter Data: ', __FILE__, __LINE__, __METHOD__,10);
-        
+
 		$current_company = $this->getUserObject()->getCompanyObject();
 		if ( !is_object($current_company) ) {
 			Debug::Text('Invalid company object...', __FILE__, __LINE__, __METHOD__,10);
@@ -727,7 +731,7 @@ class FormW2Report extends Report {
 			Debug::Text('Invalid user object...', __FILE__, __LINE__, __METHOD__,10);
 			return FALSE;
 		}
-        
+
         if ( $format == 'efile_xml' ) {
 			$return1040 = $this->getRETURN1040Object();
 			// Ceate the all needed data for Return1040.xsd at here.
@@ -735,26 +739,26 @@ class FormW2Report extends Report {
             $return1040->year = TTDate::getYear( $filter_data['end_date'] );
             $return1040->tax_period_begin_date =  TTDate::getDate('Y-m-d', TTDate::getBeginDayEpoch( $filter_data['start_date'] ));
             $return1040->tax_period_end__date = TTDate::getDate('Y-m-d', TTDate::getEndDayEpoch( $filter_data['end_date'] ));
-            $return1040->software_id = ''; 
+            $return1040->software_id = '';
             $return1040->originator_efin = '';
             $return1040->originator_type_code = '';
             $return1040->pin_type_code = '';
             $return1040->jurat_disclosure_code = '';
-            $return1040->pin_entered_by = ''; 
+            $return1040->pin_entered_by = '';
             $return1040->signature_date = TTDate::getDate('Y-m-d', TTDate::getTime());
             $return1040->return_type = '';
             $return1040->ssn = '';
             $return1040->name = ( isset($setup_data['company_name']) AND $setup_data['company_name'] != '' ) ? $setup_data['company_name'] : $current_company->getName();
             $return1040->name_control = '';
-            $return1040->address1 = ( isset($setup_data['address1']) AND $setup_data['address1'] != '' ) ? $setup_data['address1'] : $current_company->getAddress1() .' '. $current_company->getAddress2(); 
+            $return1040->address1 = ( isset($setup_data['address1']) AND $setup_data['address1'] != '' ) ? $setup_data['address1'] : $current_company->getAddress1() .' '. $current_company->getAddress2();
             $return1040->city = ( isset($setup_data['city']) AND $setup_data['city'] != '' ) ? $setup_data['city'] : $current_company->getCity();
             $return1040->state = ( isset($setup_data['province']) AND ( $setup_data['province'] != '' AND $setup_data['province'] != 0 ) ) ? $setup_data['province'] : $current_company->getProvince();
             $return1040->zip_code = ( isset($setup_data['postal_code']) AND $setup_data['postal_code'] != '' ) ? $setup_data['postal_code'] : $current_company->getPostalCode();
             $return1040->ip_address = '';
             $return1040->ip_date = TTDate::getDate('Y-m-d', TTDate::getTime());
-            $return1040->ip_time = TTDate::getDate('H:i:s', TTDate::getTime());    
+            $return1040->ip_time = TTDate::getDate('H:i:s', TTDate::getTime());
             $return1040->timezone = TTDate::getTimeZone();
-            
+
 			$this->getFormObject()->addForm( $return1040 );
 		}
 
@@ -781,7 +785,7 @@ class FormW2Report extends Report {
 		$fw2->ein = ( isset($setup_data['ein']) AND $setup_data['ein'] != '' ) ? $setup_data['ein'] : $current_company->getBusinessNumber();
 		$fw2->name = ( isset($setup_data['name']) AND $setup_data['name'] != '' ) ? $setup_data['name'] : $this->getUserObject()->getFullName();
 		$fw2->trade_name = ( isset($setup_data['company_name']) AND $setup_data['company_name'] != '' ) ? $setup_data['company_name'] : $current_company->getName();
-        $fw2->company_address1 = ( isset($setup_data['address1']) AND $setup_data['address1'] != '' ) ? $setup_data['address1'] : $current_company->getAddress1() .' '. $current_company->getAddress2();     
+        $fw2->company_address1 = ( isset($setup_data['address1']) AND $setup_data['address1'] != '' ) ? $setup_data['address1'] : $current_company->getAddress1() .' '. $current_company->getAddress2();
         $fw2->company_city = ( isset($setup_data['city']) AND $setup_data['city'] != '' ) ? $setup_data['city'] : $current_company->getCity();
 		$fw2->company_state = ( isset($setup_data['province']) AND ( $setup_data['province'] != '' AND $setup_data['province'] != 0 ) ) ? $setup_data['province'] : $current_company->getProvince();
 		$fw2->company_zip_code = ( isset($setup_data['postal_code']) AND $setup_data['postal_code'] != '' ) ? $setup_data['postal_code'] : $current_company->getPostalCode();
@@ -792,7 +796,7 @@ class FormW2Report extends Report {
 		$fw2->contact_phone = $current_user->getWorkPhone();
 		$fw2->contact_phone_ext = $current_user->getWorkPhoneExt();
 		$fw2->contact_email = $current_user->getWorkEmail();
-		
+
 		if ( isset($this->form_data) AND count($this->form_data) > 0 ) {
 			$i=0;
 			$n=1;

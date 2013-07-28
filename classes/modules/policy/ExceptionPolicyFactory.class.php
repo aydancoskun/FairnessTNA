@@ -677,13 +677,14 @@ class ExceptionPolicyFactory extends Factory {
 
 	function getTypeOptions( $product_edition = 10 ) {
 		$options = $this->getOptions('type');
+// Aydan
 
-		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 OR $product_edition < 20 ) {
+//		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 OR $product_edition < 20 ) {
 			$corporate_exceptions = array('J1','J2','J3','J4');
 			foreach( $corporate_exceptions as $corporate_exception ) {
 				unset($options[$corporate_exception]);
 			}
-		}
+//		}
 
 		return $options;
 	}
@@ -2400,6 +2401,7 @@ class ExceptionPolicyFactory extends Factory {
 						}
 						break;
 					case 'j1': //Not Allowed on Job
+						/* Aydan
 						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
@@ -2431,8 +2433,10 @@ class ExceptionPolicyFactory extends Factory {
 							}
 							unset($j_obj);
 						}
+						*/
 						break;
 					case 'j2': //Not Allowed on Task
+					/* Aydan
 						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
@@ -2465,8 +2469,10 @@ class ExceptionPolicyFactory extends Factory {
 
 							unset($j_obj);
 						}
+					*/
 						break;
 					case 'j3': //Job already completed
+						/* Aydan
 						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
@@ -2500,9 +2506,12 @@ class ExceptionPolicyFactory extends Factory {
 							}
 							unset($j_obj);
 						}
+						*/
 						break;
 					case 'j4': //No Job or Task
 						$add_exception = FALSE;
+						/* Aydan
+
 						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								//In punches only
@@ -2538,6 +2547,7 @@ class ExceptionPolicyFactory extends Factory {
 								}
 							}
 						}
+*/
 						break;
 					default:
 						Debug::text('BAD, should never get here: ', __FILE__, __LINE__, __METHOD__,10);

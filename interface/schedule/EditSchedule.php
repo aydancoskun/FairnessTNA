@@ -317,6 +317,7 @@ switch ($action) {
 		$dlf = TTnew( 'DepartmentListFactory' );
 		$department_options = $dlf->getByCompanyIdArray( $current_company->getId() );
 
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$jlf->getByCompanyIdAndUserIdAndStatus( $current_company->getId(),  $current_user->getId(), array(10) );
@@ -328,13 +329,15 @@ switch ($action) {
 			$data['job_item_options'] = $jilf->getArrayByListFactory( $jilf, TRUE );
 			$data['job_item_manual_id_options'] = $jilf->getManualIdArrayByListFactory( $jilf, TRUE );
 		}
+*/
 
 		$ulf = TTnew( 'UserListFactory' );
 		$ulf->getSearchByCompanyIdAndArrayCriteria( $current_company->getId(), $filter_data );
 		$data['user_options'] = UserListFactory::getArrayByListFactory( $ulf, TRUE, TRUE );
-		if ( $current_company->getProductEdition() > 10 ) {
+// Aydan
+//		if ( $current_company->getProductEdition() > 10 ) {
 			$data['user_options'] = Misc::prependArray( array( 0 => '- '. TTi18n::getText('OPEN') .' -' ), $data['user_options'] );
-		}
+//		}
 
 		//Select box options;
 		$data['status_options'] = $sf->getOptions('status');

@@ -83,10 +83,12 @@ $professional_edition_static_columns = array(
 									'-1190-job_item' => TTi18n::gettext('Task'),
 									);
 
+/* Aydan
 if ( $current_company->getProductEdition() >= 20 ) {
 	$static_columns = Misc::prependArray( $static_columns, $professional_edition_static_columns);
 	ksort($static_columns);
 }
+*/
 
 $columns = $static_columns;
 
@@ -135,6 +137,8 @@ switch ($action) {
 			}
 
 			$plf = TTnew( 'PunchListFactory' );
+			/* Aydan
+
 			if ( $current_company->getProductEdition() >= 20 ) {
 				if ( !isset($filter_data['job_item_ids']) ) {
 					$filter_data['job_item_ids'] = array();
@@ -161,6 +165,12 @@ switch ($action) {
 				$filter_data['job_ids'] = array( -1 );
 				$filter_data['job_item_ids'] = array( -1 );
 			}
+*/
+// DELETE BELOW 2 IF ACTIVE ABOVE
+				$filter_data['job_ids'] = array( -1 );
+				$filter_data['job_item_ids'] = array( -1 );
+
+
 
 			$epoch = TTDate::getTime();
 			$filter_data['start_date'] = ($epoch-86400);
@@ -184,6 +194,7 @@ switch ($action) {
 			$slf = TTnew( 'StationListFactory' );
 			$station_type_options = $slf->getOptions('type');
 
+/* Aydan
 			if ( $current_company->getProductEdition() >= 20 ) {
 				$jlf = TTnew( 'JobListFactory' );
 				$job_options = $jlf->getByCompanyIdArray( $current_company->getId() );
@@ -194,6 +205,12 @@ switch ($action) {
 				$job_options = array();
 				$job_item_options = array();
 			}
+*/
+// DELETE 2 BELOW
+				$job_options = array();
+				$job_item_options = array();
+
+
 
 			$punch_type_options = $plf->getOptions('type');
 
@@ -259,7 +276,7 @@ switch ($action) {
 				echo TTi18n::getText('Please try again later...');
 				exit;
 			}
-			
+
 			if ( isset($rows) ) {
 				foreach($rows as $row) {
 					$tmp_rows[] = $row;
@@ -432,6 +449,7 @@ switch ($action) {
 		$filter_data['src_user_title_options'] = Misc::arrayDiffByKey( (array)$filter_data['user_title_ids'], $user_title_options );
 		$filter_data['selected_user_title_options'] = Misc::arrayIntersectByKey( (array)$filter_data['user_title_ids'], $user_title_options );
 
+/* Aydan
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 
@@ -462,6 +480,7 @@ switch ($action) {
 			$filter_data['src_job_item_options'] = Misc::arrayDiffByKey( (array)$filter_data['job_item_ids'], $job_item_options );
 			$filter_data['selected_job_item_options'] = Misc::arrayIntersectByKey( (array)$filter_data['job_item_ids'], $job_item_options );
 		}
+*/
 
 		//Get column list
 		$filter_data['src_column_options'] = Misc::arrayDiffByKey( (array)$filter_data['column_ids'], $columns );

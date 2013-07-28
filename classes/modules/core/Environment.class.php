@@ -61,11 +61,11 @@ class Environment {
 		$base_url = str_replace( array('/interface','/api'), '', $config_vars['path']['base_url']);
 
 		if ( $api == '' ) {
-			if ( defined('TIMETREX_AMF_API') AND TIMETREX_AMF_API == TRUE ) {
+			if ( defined('AMF_API') AND AMF_API == TRUE ) {
 				$api = 'amf';
-			} elseif ( defined('TIMETREX_SOAP_API') AND TIMETREX_SOAP_API == TRUE )  {
+			} elseif ( defined('SOAP_API') AND SOAP_API == TRUE )  {
 				$api = 'soap';
-			} elseif ( defined('TIMETREX_JSON_API') AND TIMETREX_JSON_API == TRUE )  {
+			} elseif ( defined('JSON_API') AND JSON_API == TRUE )  {
 				$api = 'json';
 			}
 		}

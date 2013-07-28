@@ -283,7 +283,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					$department_options = $dlf->getArrayByListFactory( $dlf, FALSE, TRUE );
 					unset($dlf);
 				}
-
+/* Aydan
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND !isset($job_options) ) {
 					//Get jobs
 					$jlf = new JobListFactory();
@@ -291,7 +291,6 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					$job_options = $jlf->getArrayByListFactory( $jlf, FALSE, TRUE );
 					unset($jlf);
 				}
-
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND !isset($job_item_options) ) {
 					//Get tasks
 					$jilf = new JobItemListFactory();
@@ -299,6 +298,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					$job_item_options = $jilf->getArrayByListFactory( $jilf, FALSE, TRUE );
 					unset($jilf);
 				}
+*/
 
 				if ( isset($mapped_row['time_stamp']) AND $mapped_row['time_stamp'] != '' ) {
 					$time_stamp_epoch = Misc::importCallInputParseFunction( 'time_stamp', $mapped_row['time_stamp'], $filtered_import_map['time_stamp']['default_value'], $filtered_import_map['time_stamp']['parse_hint'] );
@@ -529,6 +529,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					$pcf->setDepartment( Misc::importCallInputParseFunction( 'department_id', $mapped_row['department_id'], $filtered_import_map['department_id']['default_value'], $filtered_import_map['department_id']['parse_hint'] ) );
 				}
 
+/* Aydan
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					if ( isset($mapped_row['job_id']) AND $mapped_row['job_id'] != '' ) {
 						$pcf->setJob( Misc::importCallInputParseFunction( 'job_id', $mapped_row['job_id'], $filtered_import_map['job_id']['default_value'], $filtered_import_map['job_id']['parse_hint'] ) );
@@ -545,7 +546,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 						$pcf->setBadQuantity( $mapped_row['bad_quantity'] );
 					}
 				}
-
+*/
 				$pcf->setEnableStrictJobValidation( TRUE );
 				$pcf->setEnableCalcUserDateID( TRUE );
 				$pcf->setEnableCalcTotalTime( TRUE );

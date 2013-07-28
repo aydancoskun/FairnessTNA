@@ -1038,6 +1038,9 @@ class PayStubFactory extends Factory {
 	}
 
 	function handleUserExpenseStatuses() {
+//	Aydan
+return true;
+
 		if ( getTTProductEdition() < PRODUCT_ENTERPRISE_25 ) {
 			return TRUE;
 		}
@@ -1222,7 +1225,7 @@ class PayStubFactory extends Factory {
 							//FIXME: I think we need to change this so YTD adjustment PS amendments are just "magically" included in the YTD Amount on pay stubs
 							//       at anytime, then add a flag to have reports such as Tax reports include YTD adjustments or not. (enabled by default)
 							//       This should cut down on clutter/confusion with any pay stubs that currently have YTD amounts, as well as offer flexibility
-							//       to add these amounts in at anytime without having to regenerate pay stubs, so corrections can be made at the end of the year. 
+							//       to add these amounts in at anytime without having to regenerate pay stubs, so corrections can be made at the end of the year.
 							$retarr['ytd_amount'] = bcadd( $retarr['ytd_amount'], $entry_arr['amount'] );
 							$retarr['ytd_units'] = bcadd( $retarr['ytd_units'], $entry_arr['units'] );
 						} else {

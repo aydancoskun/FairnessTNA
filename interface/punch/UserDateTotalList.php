@@ -173,6 +173,8 @@ switch ($action) {
 
 			$job_options = array();
 			$job_item_options = array();
+			/* Aydan
+
 			if ( $current_company->getProductEdition() >= 20 ) {
 				$jlf = TTnew( 'JobListFactory' );
 				$job_options = $jlf->getByCompanyIdArray( $current_company->getId(), FALSE );
@@ -180,7 +182,7 @@ switch ($action) {
 				$jilf = TTnew( 'JobItemListFactory' );
 				$job_item_options = $jilf->getByCompanyIdArray( $current_company->getId(), TRUE );
 			}
-
+*/
 			$day_total_time = array(
 								'total_time' => 0,
 								'worked_time' => 0,

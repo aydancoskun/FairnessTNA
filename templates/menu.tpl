@@ -303,7 +303,8 @@ style=menuStyle;
 {if $permission->Check('authorization','enabled') AND ( $permission->Check('authorization','view') )}
 	aI("text={t}Authorization{/t};url={$BASE_URL}authorization/AuthorizationList.php;");
 {/if}
-{if $current_company->getProductEdition() > 10 AND $permission->Check('company','enabled') AND $permission->Check('company','view')}
+{if $permission->Check('company','enabled') AND $permission->Check('company','view')}
+<!-- Aydan see above if $current_company->getProductEdition() > 10 AND $permission->Check('company','enabled') AND $permission->Check('company','view')-->
 	aI("text={t}Company Administration{/t};url={$BASE_URL}company/CompanyList.php;");
 {/if}
 {if $permission->Check('help','enabled') AND $permission->Check('help','edit')}
@@ -639,15 +640,18 @@ style=menuStyle;
 with(milonic=new menuname("help")){
 style=menuStyle;
 {/literal}
-{if DEMO_MODE == FALSE}
-	aI("text={t}Online University{/t};target=new;url={$BASE_URL}help/About.php?action:university=1;");
+{if isset($config_vars.urls.university)}
+aI("text={t}Online University{/t};target=new;url={$config_vars.urls.university;");
 {/if}
-aI("text={t}Administrator Guide{/t};target=new;url=http://www.timetrex.com/wiki/index.php/TimeTrex_{php}echo getTTProductEditionName(){/php}_Edition_Administrator_Guide_v3;");
-aI("text={t}FAQ{/t};target=new;url=http://www.timetrex.com/wiki/index.php/TimeTrex_{php}echo getTTProductEditionName(){/php}_Edition_FAQ_v3;");
-{if $current_company->getProductEdition() == 10}
-aI("text={t}Support Forums{/t};target=new;url=http://forums.timetrex.com;");
+{if isset($config_vars.urls.guide)}
+aI("text={t}Administrator Guide{/t};target=new;url=$config_vars.urls.guide;");
 {/if}
-aI("text={t}What's New{/t};target=new;url=http://www.timetrex.com/wiki/index.php/TimeTrex_{php}echo getTTProductEditionName(){/php}_Edition_ChangeLog_v{$system_settings.system_version};");
+{if isset($config_vars.urls.wiki)}
+aI("text={t}Wiki{/t};target=new;url=$config_vars.urls.wiki;");
+{/if}
+{if isset($config_vars.urls.whatsnew)}
+aI("text={t}What's New{/t};target=new;url=$config_vars.urls.whatsnew;");
+{/if}
 aI("text={t}About{/t};url={$BASE_URL}help/About.php;{if $system_settings.new_version == 1}image={$IMAGES_URL}red_flag.gif{/if}");
 {literal}
 }

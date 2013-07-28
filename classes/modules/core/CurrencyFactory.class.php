@@ -289,7 +289,7 @@ class CurrencyFactory extends Factory {
 										'ZM' => 'ZMW',
 										'ZW' => 'ZWD',
 									);
-				break;            
+				break;
             case 'round_decimal_places':
                 $retval = array(
                                         0 => 0,
@@ -298,7 +298,7 @@ class CurrencyFactory extends Factory {
                                         3 => 3,
                                         4 => 4,
                             );
-                break;            
+                break;
 			case 'columns':
 				$retval = array(
 										'-1000-status' => TTi18n::gettext('Status'),
@@ -716,12 +716,12 @@ class CurrencyFactory extends Factory {
 
 	function getRoundDecimalPlaces() {
 	    if ( isset($this->data['round_decimal_places']) ) {
-            return $this->data['round_decimal_places']; 
+            return $this->data['round_decimal_places'];
 		}
 
 		return 2;
 	}
-	function setRoundDecimalPlaces( $value ) {    
+	function setRoundDecimalPlaces( $value ) {
         if ( version_compare( APPLICATION_VERSION, 5.5, '>' ) ) {
 			$value = trim($value);
 
@@ -736,9 +736,9 @@ class CurrencyFactory extends Factory {
 				return TRUE;
 			}
 		}
-		
+
 		return FALSE;
-        
+
 	}
 
 	function round( $value ) {
@@ -806,11 +806,7 @@ class CurrencyFactory extends Factory {
 	}
 
 	static function updateCurrencyRates( $company_id ) {
-		/*
 
-			Contact info@timetrex.com to request adding custom currency data feeds.
-
-		*/
 		$base_currency = FALSE;
 
 		$clf = TTnew( 'CurrencyListFactory' );
@@ -924,9 +920,9 @@ class CurrencyFactory extends Factory {
 	function setObjectFromArray( $data ) {
 		if ( is_array( $data ) ) {
 			$variable_function_map = $this->getVariableToFunctionMap();
-            
+
 			foreach( $variable_function_map as $key => $function ) {
-                
+
 				if ( isset($data[$key]) ) {
 
 					$function = 'set'.$function;
@@ -939,7 +935,7 @@ class CurrencyFactory extends Factory {
 					}
 				}
 			}
-            
+
 			$this->setCreatedAndUpdatedColumns( $data );
 
 			return TRUE;

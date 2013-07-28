@@ -83,7 +83,8 @@ var report_criteria_elements = new Array(
 				{capture assign=report_display_plural_name}{t}Employees{/t}{/capture}
 				{htmlreportfilter filter_data=$filter_data label='exclude_user' display_name=$report_display_name display_plural_name=$report_display_plural_name}
 
-				{if $current_company->getProductEdition() >= 20}
+				{if $current_company->getProductEdition() >= 50}
+				<!-- Aydan see above was >=20 -->
 				{capture assign=report_display_name}{t}Job Group{/t}{/capture}
 				{capture assign=report_display_plural_name}{t}Groups{/t}{/capture}
 				{htmlreportfilter filter_data=$filter_data label='job_group' display_name=$report_display_name display_plural_name=$report_display_plural_name}

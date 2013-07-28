@@ -39,7 +39,7 @@ class ImportUser extends Import {
 	public $branch_manual_id_options = FALSE;
 	public $department_options = FALSE;
 	public $department_manual_id_options = FALSE;
-	
+
 	public $job_options = FALSE;
 	public $job_manual_id_options = FALSE;
 	public $job_item_options = FALSE;
@@ -69,10 +69,15 @@ class ImportUser extends Import {
 
 				//Since getOptions() can be called without first setting a company, we don't always know the product edition for the currently
 				//logged in employee.
+/* Aydan
 				if ( ( is_object($this->getCompanyObject()) AND $this->getCompanyObject()->getProductEdition() < PRODUCT_CORPORATE_20 )
 						OR ( !is_object($this->getCompanyObject()) AND getTTProductEdition() < PRODUCT_CORPORATE_20 ) ) {
 					unset($retval['-1104-default_job_id'],$retval['-1105-default_job_item_id']);
 				}
+*/
+// DELETE BELOW
+					unset($retval['-1104-default_job_id'],$retval['-1105-default_job_item_id']);
+
 
 				Debug::Arr($retval, 'ImportUserColumns: ', __FILE__, __LINE__, __METHOD__,10);
 
@@ -409,7 +414,7 @@ class ImportUser extends Import {
 		} else {
 			$retval = $this->findClosestMatch( $input, $this->branch_options );
 		}
-		
+
 		if ( $retval === FALSE ) {
 			$retval = -1; //Make sure this fails.
 		}

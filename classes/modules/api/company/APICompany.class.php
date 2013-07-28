@@ -616,6 +616,7 @@ class APICompany extends APIFactory {
 			$retarr['department'] = TRUE;
 		}
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$jlf->getByCompanyId( $this->getCurrentCompanyObject()->getId(), 1 );
@@ -629,9 +630,8 @@ class APICompany extends APIFactory {
 				$retarr['job_item'] = TRUE;
 			}
 		}
-
+*/
 		return $retarr;
 	}
 
 }
-?>

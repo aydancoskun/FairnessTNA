@@ -20,7 +20,8 @@
 						<br>
 						<br>
 						{*
-						{t escape="no"}We recommend that you visit our Online University or read our{/t} <a href="http://www.timetrex.com/help/help.php?product=admin&edition={php}echo getTTProductEdition(){/php}&version={$APPLICATION_VERSION}&language=en">{t}Administrator Guide{/t}</a> {t escape="no" 1=$APPLICATION_NAME}to help you get started with %1.{/t}<br>
+						{t escape="no"}We recommend that you visit our Online University or read our{/t}
+						{t}Administrator Guide{/t} {t escape="no" 1=$APPLICATION_NAME}to help you get started with %1.{/t}<br>
 						{t}At anytime you can access either from the navigation menu, as shown below.{/t}
 						<br>
 						<br>

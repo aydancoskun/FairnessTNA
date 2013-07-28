@@ -77,11 +77,12 @@ $professional_edition_columns = array(
 									'-1190-job_item' => TTi18n::gettext('Task'),
 */
 									);
-
+/* Aydan
 if ( $current_company->getProductEdition() >= 20 ) {
 	$columns = Misc::prependArray( $columns, $professional_edition_columns);
 	ksort($columns);
 }
+*/
 
 if ( $saved_search_id == '' AND !isset($filter_data['columns']) ) {
 	//Default columns.

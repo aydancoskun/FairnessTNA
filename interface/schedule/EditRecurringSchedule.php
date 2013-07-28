@@ -176,9 +176,10 @@ switch ($action) {
 		$ulf = TTnew( 'UserListFactory' );
 		$ulf->getSearchByCompanyIdAndArrayCriteria( $current_company->getId(), $filter_data );
 		$user_options = UserListFactory::getArrayByListFactory( $ulf, FALSE, TRUE );
-		if ( $current_company->getProductEdition() > 10 ) {
+// Aydan
+//		if ( $current_company->getProductEdition() > 10 ) {
 			$user_options = Misc::prependArray( array( 0 => '- '. TTi18n::getText('OPEN') .' -' ), $user_options );
-		}
+//		}
 
 		$rstclf = TTnew( 'RecurringScheduleTemplateControlListFactory' );
 		$template_options = $rstclf->getByCompanyIdArray( $current_company->getId() );

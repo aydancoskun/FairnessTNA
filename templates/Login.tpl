@@ -52,10 +52,6 @@ function bookmarkSite( title, url ) {
 
 <body onload="document.login.user_name.focus(); {if !isset($config_vars.branding)}document.getElementById('popUpDiv').className += ' visible';{/if}">
 
-{if !isset($config_vars.branding)}
-<div id="popUpDiv"><b><span style="font-size: small;">&nbsp;<a href="{if $smarty.server.HTTP_HOST == 'www.timetrex.com' OR $smarty.server.HTTP_HOST == 'timetrex.com'}http{if $smarty.server.HTTPS == TRUE}s{/if}://{$config_vars.other.hostname}/interface/{/if}BetaTest.php{if $user_name != '' AND $password != ''}?user_name={$user_name}&password={$password}{/if}">Try our new {$APPLICATION_NAME} interface!</a>&nbsp;</span></b></div>
-{/if}
-
 <div id="container">
 
 <div id="rowHeaderLogin"><a href="http://{$ORGANIZATION_URL}"><img src="{$BASE_URL}/send_file.php?object_type=primary_company_logo" style="width:auto; height:42px;" alt="Time And Attendance"></a></div>
@@ -64,7 +60,23 @@ function bookmarkSite( title, url ) {
   <form method="post" name="login" action="{$smarty.server.SCRIPT_NAME}">
   <div id="contentBox">
 
-    <div class="textTitle2"><img src="{$IMAGES_URL}lock.gif" width="28" height="26" alt="Secure Login" class="imgLock">{$title}{if getTTProductEdition() == 10}<span style="float: right"><a href="http://www.timetrex.com/r.php?id=451" target="_blank"><img src="{$IMAGES_URL}/facebook_button.jpg" border="0"></a>&nbsp;<a href="http://www.timetrex.com/r.php?id=455"  target="_blank"><img src="{$IMAGES_URL}/twitter_button.jpg" border="0"></a></span>{/if}<br></div>
+    <div class="textTitle2">
+    	<img src="{$IMAGES_URL}lock.gif" width="28" height="26" alt="Secure Login" class="imgLock">
+    	<span style="float: right">
+				{if isset($config_vars.urls.facebook)}
+					<a href="$config_vars.urls.facebook" target="_blank">
+  	  			<img src="{$IMAGES_URL}/facebook_button.jpg" border="0">
+	    		</a>
+				{/if}
+    		&nbsp;
+				{if isset($config_vars.urls.twitter)}
+	    		<a href="$config_vars.urls.twitter"  target="_blank">
+  	  			<img src="{$IMAGES_URL}/twitter_button.jpg" border="0">
+    			</a>
+				{/if}
+    	</span>
+    	<br>
+    </div>
 
     <div id="contentBoxOne"></div>
 
@@ -103,7 +115,7 @@ function bookmarkSite( title, url ) {
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
 		<tr>
 			<td width="33%" align="left"><a href="ForgotPassword.php">{t}Forgot Your Password?{/t}</a></td>
-			<td width="33%" align="center">{if getTTProductEdition() > 10}<a href="quick_punch/">{t}Quick Punch{/t}</a>{/if}</td>
+			<td width="33%" align="center"><a href="quick_punch/">{t}Quick Punch{/t}</a></td>
 			<td width="33%" align="right"><a href="javascript:bookmarkSite( '{$APPLICATION_NAME} - {t}Secure Login{/t}', location.href )">{t}Bookmark This Page!{/t}</a></td>
 		</tr>
 	</table>

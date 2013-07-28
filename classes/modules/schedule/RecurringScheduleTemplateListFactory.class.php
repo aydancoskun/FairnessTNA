@@ -209,11 +209,12 @@ class RecurringScheduleTemplateListFactory extends RecurringScheduleTemplateFact
 		$utf = new UserTitleFactory();
 		$apf = new AbsencePolicyFactory();
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
 		}
-
+*/
 		$ph = array(
 					'filter_end_date' => $this->db->BindDate( $filter_data['end_date'] ),
 					'company_id' => $company_id,
@@ -256,6 +257,7 @@ class RecurringScheduleTemplateListFactory extends RecurringScheduleTemplateFact
 
 							c.created_by as recurring_schedule_control_created_by
 							';
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job,
@@ -269,7 +271,7 @@ class RecurringScheduleTemplateListFactory extends RecurringScheduleTemplateFact
 						y.manual_id as job_item_manual_id,
 						y.group_id as job_item_group_id';
 		}
-
+*/
 		//Since when dealing with recurring schedules, we don't have a row for each specific date, so when determining wages
 		//we can only use the last wage entered that is earlier than the filter end date.
 		//Since in theory committed schedules will occur before todays date anyways, the accuracy won't be off too much unless
@@ -299,11 +301,12 @@ class RecurringScheduleTemplateListFactory extends RecurringScheduleTemplateFact
 
 						';
 
+/* Aydan
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON a.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON a.job_item_id = y.id';
 		}
-
+*/
 		$query .=' where 	b.company_id = ?
 					';
 
@@ -498,9 +501,9 @@ class RecurringScheduleTemplateListFactory extends RecurringScheduleTemplateFact
 		}
 
 		$query .= ( isset($filter_data['created_by']) ) ? $this->getWhereClauseSQL( array('a.created_by','y.first_name','y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph ) : NULL;
-        
+
         $query .= ( isset($filter_data['updated_by']) ) ? $this->getWhereClauseSQL( array('a.updated_by','z.first_name','z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph ) : NULL;
-        
+
 
 		$query .= 	'
 						AND a.deleted = 0

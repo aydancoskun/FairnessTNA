@@ -47,7 +47,7 @@ class Services_ExchangeRates_Countries_UN extends Services_ExchangeRates_Common 
     * URL of XML feed
     * @var string
     */
-   var $feedUrl = 'http://www.timetrex.com/CountryCodeList.xml';
+   var $feedUrl = $config_vars['urls']['country_codes'];
     //var $feedUrl = 'http://www.unece.org/etrades/unedocs/repository/codelists/xml/CountryCodeList.xml';
 
    /**

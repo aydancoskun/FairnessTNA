@@ -254,7 +254,7 @@ class SugarCRM {
         if ( $result->error->number == 0 ) {
             Debug::Text('Changed lead status success! ID: '. $id .' Status: '. $status, __FILE__, __LINE__, __METHOD__,10);
 
-            //Send out an email to sales@timetrex.com stating that the lead was converted?
+            //Send out an email stating that the lead was converted?
 
             return TRUE;
         } else {

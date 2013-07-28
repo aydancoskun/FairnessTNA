@@ -1325,6 +1325,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobGroup() {
+	return false; // Aydan
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1342,6 +1343,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobGroup($ids) {
+	return false; // Aydan
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1423,6 +1425,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJob() {
+	return false; // Aydan
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1440,6 +1443,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJob($ids) {
+	return false; // Aydan
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1521,6 +1525,8 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobItemGroup() {
+	return false; // Aydan
+
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1538,6 +1544,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobItemGroup($ids) {
+	return false; // Aydan
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1619,6 +1626,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobItem() {
+	return false; // Aydan
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1636,6 +1644,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobItem($ids) {
+	return false; // Aydan
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}

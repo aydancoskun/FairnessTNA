@@ -253,6 +253,7 @@ function TTnew( $class_name ) { //Unlimited arguments are supported.
 		return $reflection_class->newInstanceArgs($params);
     } else {
 		return new $class_name();
+
     }
 }
 
@@ -304,8 +305,8 @@ define('PRODUCT_CORPORATE_20', 20 );
 define('PRODUCT_ENTERPRISE_25', 25 );
 function getTTProductEdition() {
 	 return PRODUCT_EDITION;
-
 	$chkpath = Environment::getBasePath() .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR;
+
 	if ( file_exists( $chkpath . 'expense'. DIRECTORY_SEPARATOR .'UserExpenseFactory.class.php') ) {
 		return PRODUCT_ENTERPRISE_25;
 	} elseif ( file_exists( $chkpath .'job'. DIRECTORY_SEPARATOR .'JobFactory.class.php') ) {

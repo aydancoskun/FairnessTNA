@@ -73,9 +73,10 @@ switch ($action) {
 			$obj = TTnew( 'SystemSettingListFactory' );
 		}
 
+// Aydan
 		$obj->setName( 'update_notify' );
 		if ( ( isset($data['update_notify']) AND $data['update_notify'] == 1 )
-				OR getTTProductEdition() > 10
+//				OR getTTProductEdition() > 10
 				OR $external_installer == 1 ) {
 			$obj->setValue( 1 );
 		} else {
@@ -95,7 +96,8 @@ switch ($action) {
 		}
 
 		$obj->setName( 'anonymous_update_notify' );
-		if ( getTTProductEdition() == PRODUCT_COMMUNITY_10 AND isset($data['anonymous_update_notify']) AND $data['anonymous_update_notify'] == 1 ) {
+//		if ( getTTProductEdition() == PRODUCT_COMMUNITY_10 AND isset($data['anonymous_update_notify']) AND $data['anonymous_update_notify'] == 1 ) {
+		if ( isset($data['anonymous_update_notify']) AND $data['anonymous_update_notify'] == 1 ) {
 			$obj->setValue( 1 );
 		} else {
 			$obj->setValue( 0 );
@@ -107,8 +109,6 @@ switch ($action) {
 		$ttsc = new TimeTrexSoapClient();
 		$ttsc->saveRegistrationKey();
 
-		$handle = fopen('http://www.timetrex.com/'.URLBuilder::getURL( array('v' => $install_obj->getFullApplicationVersion(), 'page' => 'system_setting', 'update_notify' => (int)$data['update_notify'], 'anonymous_update_notify' => (int)$data['anonymous_update_notify']), 'pre_install.php'), "r");
-		fclose($handle);
 
 		Redirect::Page( URLBuilder::getURL( array('external_installer' => $external_installer), 'Company.php') );
 		break;
@@ -128,8 +128,6 @@ switch ($action) {
 		break;
 }
 
-$handle = @fopen('http://www.timetrex.com/'.URLBuilder::getURL( array('v' => $install_obj->getFullApplicationVersion(), 'page' => 'system_setting'), 'pre_install.php'), "r");
-@fclose($handle);
 
 $smarty->assign_by_ref('install_obj', $install_obj);
 $smarty->assign_by_ref('external_installer', $external_installer);

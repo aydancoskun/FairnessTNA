@@ -655,8 +655,10 @@ function showProvince() {
 	</div>
 </div>
 {if $user_data.id != ''
-	AND $current_company->getProductEdition() >= 20
+	AND $current_company->getProductEdition() >= 50
 	AND ( $permission->Check('document','view') OR $permission->Check('document','view_own') OR $permission->Check('document','view_private') ) }
+						<!-- Aydan see above was >=20 -->
+
 <br>
 <br>
 <div id="rowContent">
