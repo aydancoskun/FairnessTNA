@@ -220,4 +220,7 @@ Again, I think we just rip it out, making sure we don't loose functionality.
 		Type: Professional
 		Dated: Sunday January 11 2009
 
-		*/
+	*/
+
+I contacted Milonic to see if we can get a free license for the Open Source Project or what they suggest we do with this. This is really not compatible with the AGPL and will need to be addressed fast.
+
