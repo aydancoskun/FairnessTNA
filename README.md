@@ -4,21 +4,21 @@ Fairness Time & Attendance
 Fairness is a Fork of the "TimeTrex Workforce Management" software by Mike Benoit which is kindly licensed under the
 GNU AFFERO GENERAL PUBLIC LICENSE VERSION 3. See LICENSE file for the full license text.
 
-Acknowledgement and thank you!
-==============================
+Acknowledgement and thank you
+=============================
 
 First of all we want to thank Timetrex and Mike Benoit for their work and for licensing their work as open source.
 
 
-A look into the future:
------------------------
+A look into the future
+----------------------
 Timetrex is fantastic software and we are exited forking it! We are looking forward to making it a truely free platform without gotchas but truely open source. We are looking forward to including many more countries tax codes and calcultion tables and to add a JQuery and mobile friendly user interface. Our aim is to keep this fork in sync with Timetrex as much as that is feasable and feeding our changes back to the community.
 
 We are not planning to supporting Windows as a platform. Not for any other reason that we don't use windows. If someone wants to step up and be the windows part maintainer, speak up.
 
 
-Little word on licensing:
--------------------------
+A word on licensing
+-------------------
 We had to take a good look at the way the license for Timetrex is implemented and what it actually means because it has a few gotchas. This is probably the reason no one else has ever forked TimeTrex. We will list out what we found. Just to be clear upfront: This is in no way a slight against Timetrex and especially Mike, in any way. We believe that part of the licensing choices that were made are either a clear oversight, misunderstanding or have their roots in the history of the Timetrex licensing model.
 
 Timetrex licensed their software as Open Source using the GNU AFFERO GENERAL PUBLIC LICENSE Version 3.
@@ -159,6 +159,7 @@ We are planning of ripping all that out but we are not there yet by a long shot.
 
 List of removals:
 ----------------
+
 For the record we are keeping a list of files that we found that have other "further restrictions" imposed which we removed:
 
 **About.tpl**
