@@ -4,4 +4,7 @@ templates_c
 .buildpath
 .project
 .settings
-.gitignore
+interface/company/CompanyList.php
+templates/company/CompanyList.tpl
+interface/quick_punch
+templates/quick_punch
