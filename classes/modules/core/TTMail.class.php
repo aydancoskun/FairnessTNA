@@ -223,8 +223,11 @@ class TTMail {
 				$send_retval = $this->getMailObject()->send( $this->getTo(), $this->getMIMEHeaders(), $this->getBody() );
 				break;
 			case 'soap':
+				Debug::Text("Soap as mail transport diabled", __FILE__, __LINE__, __METHOD__,10);
+/*
 				$ttsc = new TimeTrexSoapClient();
 				$send_retval = $ttsc->sendEmail( $this->getTo(), $this->getMIMEHeaders(), $this->getBody() );
+*/
 				break;
 		}
 

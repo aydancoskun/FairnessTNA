@@ -56,8 +56,8 @@ switch ($action) {
 
 		break;
 	case 'check_for_updates':
-		Debug::Text('Check For Update!', __FILE__, __LINE__, __METHOD__,10);
-
+		Debug::Text('Check For update disabled', __FILE__, __LINE__, __METHOD__,10);
+/*
 		$ttsc = new TimeTrexSoapClient();
 
 		//We must ensure that the data is up to date
@@ -93,6 +93,7 @@ switch ($action) {
 		if ( $obj->isValid() ) {
 			$obj->Save();
 		}
+*/
 	default:
 		$data['product_edition'] = Option::getByKey( ( DEPLOYMENT_ON_DEMAND == TRUE ) ? $current_company->getProductEdition() : getTTProductEdition(), $current_company->getOptions('product_edition') );
 

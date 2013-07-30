@@ -106,8 +106,8 @@ switch ($action) {
 			$obj->Save();
 		}
 
-		$ttsc = new TimeTrexSoapClient();
-		$ttsc->saveRegistrationKey();
+//		$ttsc = new TimeTrexSoapClient();
+//		$ttsc->saveRegistrationKey();
 
 
 		Redirect::Page( URLBuilder::getURL( array('external_installer' => $external_installer), 'Company.php') );

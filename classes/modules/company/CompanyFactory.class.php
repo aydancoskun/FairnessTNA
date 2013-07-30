@@ -2599,6 +2599,7 @@ class CompanyFactory extends Factory {
 	//based on geographical region.
 	//This shouldn't be called unless the user requests auto update notification.
 	function remoteSave() {
+/*
 		$ttsc = new TimeTrexSoapClient();
 //		if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE AND ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 OR $ttsc->isUpdateNotifyEnabled() == TRUE ) ) {
 		if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE AND $ttsc->isUpdateNotifyEnabled() == TRUE ) {
@@ -2607,8 +2608,9 @@ class CompanyFactory extends Factory {
 
 			return TRUE;
 		}
-
-		return FALSE;
+*/
+//		return FALSE;
+		return TRUE;
 	}
 
 	/*

@@ -1216,11 +1216,12 @@ class Install {
 	}
 
 	function getLatestTimeTrexVersion() {
+/*
 		if ( $this->checkSOAP() == 0 ) {
 			$ttsc = new TimeTrexSoapClient();
 			return $ttsc->getSoapObject()->getInstallerLatestVersion();
 		}
-
+*/
 		return FALSE;
 	}
 

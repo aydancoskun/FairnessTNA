@@ -824,6 +824,7 @@ class CurrencyFactory extends Factory {
 		}
 		unset($clf, $c_obj);
 
+/*
 		if ( $base_currency != FALSE
 				AND isset($active_currencies)
 				AND is_array($active_currencies)
@@ -862,6 +863,9 @@ class CurrencyFactory extends Factory {
 		Debug::Text('Updating Currency Data Failed...', __FILE__, __LINE__, __METHOD__,10);
 
 		return FALSE;
+		*/
+		Debug::Text("Currency feed diabled", __FILE__, __LINE__, __METHOD__,10);
+		return TRUE;
 	}
 
 	function Validate() {

@@ -32,6 +32,7 @@
  * Template compiling class
  * @package Smarty
  */
+
 class Smarty_Compiler extends Smarty {
 
     // internal vars

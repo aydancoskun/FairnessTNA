@@ -39,6 +39,7 @@ class TimeTrexSoapClient {
 	}
 
 	function getSoapObject() {
+		global $config_vars;
 		if ( $this->soap_client_obj == NULL ) {
 			$location = $config_vars['urls']['soap_external'];
 			//$location = '/website/ext_soap/server.php';

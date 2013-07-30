@@ -32,6 +32,8 @@
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'global.inc.php');
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'CLI.inc.php');
 
+Debug::Text('Auto Update Notifications permanently disabled in file /main/CheckForUpdate.php', __FILE__, __LINE__, __METHOD__,10);
+/*
 $ttsc = new TimeTrexSoapClient();
 if ( $ttsc->isUpdateNotifyEnabled() == TRUE ) {
 	sleep( rand(0,60) ); //Further randomize when calls are made.
@@ -95,6 +97,6 @@ if ( $ttsc->isUpdateNotifyEnabled() == TRUE ) {
 } else {
 	Debug::Text('Auto Update Notifications are disabled!', __FILE__, __LINE__, __METHOD__,10);
 }
+*/
 Debug::writeToLog();
 Debug::Display();
-?>

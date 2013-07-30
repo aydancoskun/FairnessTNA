@@ -134,8 +134,6 @@
 					<td class="cellRightEditTable">
 						Credit is given and thanks is extended to Timetrex for the original codebase of this project.<br><br>
 
-						Their software is called "TimeTrex Workforce Management" and is available at <a href="http://timetrex.com" target="_blank">timetrex.com</a><br><br>
-
 						This software is licensed under the GNU Affero General Public License version 3, as is theirs.<br><br>
 					</td>
 				</tr>

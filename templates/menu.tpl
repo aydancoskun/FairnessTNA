@@ -640,8 +640,12 @@ style=menuStyle;
 with(milonic=new menuname("help")){
 style=menuStyle;
 {/literal}
-{if isset($config_vars.urls.university)}
-aI("text={t}Online University{/t};target=new;url={$config_vars.urls.university;");
+
+
+
+
+{if isset($config_vars.urls.university) AND $config_vars.urls.university <> ""}
+aI("text={t}Administrator Guide{/t};target=new;url=$config_vars.urls.university;");
 {/if}
 {if isset($config_vars.urls.guide)}
 aI("text={t}Administrator Guide{/t};target=new;url=$config_vars.urls.guide;");
