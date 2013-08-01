@@ -129,22 +129,6 @@ class Install {
 		return getTTProductEdition();
 	}
 
-	function getFullApplicationVersion() {
-		$retval = APPLICATION_VERSION;
-
-		if ( getTTProductEdition() == PRODUCT_ENTERPRISE_25 ) {
-			$retval .= 'E';
-		} elseif ( getTTProductEdition() == PRODUCT_CORPORATE_20 ) {
-			$retval .= 'C';
-		} elseif ( getTTProductEdition() == PRODUCT_PROFESSIONAL_15 ) {
-			$retval .= 'P';
-		} else {
-			$retval .= 'S';
-		}
-
-		return $retval;
-	}
-
 	function getLicenseText() {
 		$license_file = Environment::getBasePath(). DIRECTORY_SEPARATOR .'LICENSE';
 

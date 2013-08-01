@@ -347,7 +347,6 @@ switch ($action) {
 		$smarty->assign_by_ref('saved_search_id', $saved_search_id );
 
 		$smarty->assign_by_ref('paging_data', $pager->getPageVariables() );
-
 		break;
 }
 $smarty->display('users/UserList.tpl');
