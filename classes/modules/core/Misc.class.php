@@ -1417,6 +1417,7 @@ class Misc {
 			return FALSE;
 		}
 
+		global $config_vars;
 		//Only send errors to support, not the customer.
 		$cc = NULL;
 		$to = $config_vars['urls']['error_reports_email'];
