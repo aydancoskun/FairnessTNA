@@ -89,6 +89,9 @@ class TimeTrexSoapClient {
 	}
 
 	function isLatestVersion( $company_id ) {
+		// NOT CURRENTLY EVER CALLED UNLESS FROM FLEX
+		return TRUE;
+
 		$sslf = TTnew( 'SystemSettingListFactory' );
 		$sslf->getByName('system_version');
 		if ( $sslf->getRecordCount() == 1 ) {
@@ -104,6 +107,9 @@ class TimeTrexSoapClient {
 	}
 
 	function isLatestTaxEngineVersion( $company_id ) {
+		// NOT CURRENTLY EVER CALLED UNLESS FROM FLEX
+		return TRUE;
+
 		$sslf = TTnew( 'SystemSettingListFactory' );
 		$sslf->getByName('tax_engine_version');
 		if ( $sslf->getRecordCount() == 1 ) {
@@ -119,6 +125,9 @@ class TimeTrexSoapClient {
 	}
 
 	function isLatestTaxDataVersion( $company_id ) {
+		// NOT CURRENTLY EVER CALLED UNLESS FROM FLEX
+		return TRUE;
+
 		$sslf = TTnew( 'SystemSettingListFactory' );
 		$sslf->getByName('tax_data_version');
 		if ( $sslf->getRecordCount() == 1 ) {
@@ -134,6 +143,9 @@ class TimeTrexSoapClient {
 	}
 
 	function isValidRegistrationKey( $key ) {
+		// NOT CURRENTLY EVER CALLED UNLESS FROM FLEX
+		return TRUE;
+
 		$key = trim($key);
 		if ( strlen( $key ) == 32 OR strlen( $key ) == 40 ) {
 			return TRUE;
@@ -143,76 +155,27 @@ class TimeTrexSoapClient {
 	}
 
 	function getLocalRegistrationKey() {
-		$key = FALSE;
-
-		$sslf = TTnew( 'SystemSettingListFactory' );
-		$sslf->getByName('registration_key');
-		if ( $sslf->getRecordCount() == 1 ) {
-			$key = $sslf->getCurrent()->getValue();
-		}
-
-		//If key is invalid, attempt to obtain a new one.
-		if ( $this->isValidRegistrationKey( $key ) == FALSE ) {
-			$this->saveRegistrationKey();
-			return FALSE;
-		}
-
+		$key = "REGISTRATION_KEY_NOT_IN_USE";
 		return $key;
 	}
+
 	function getRegistrationKey() {
-		return $this->getSoapObject()->generateRegistrationKey();
+		$key = "REGISTRATION_KEY_NOT_IN_USE";
+		return $key;
 	}
 
 	function saveRegistrationKey() {
-		$sslf = TTnew( 'SystemSettingListFactory' );
-		$sslf->getByName('registration_key');
-
-		$get_new_key = FALSE;
-		if ( $sslf->getRecordCount() > 1 ) {
-			Debug::Text('Too many registration keys, removing them...', __FILE__, __LINE__, __METHOD__,10);
-			foreach( $sslf as $ss_obj ) {
-				$ss_obj->Delete();
-			}
-			$get_new_key = TRUE;
-		} elseif ( $sslf->getRecordCount() == 1 ) {
-			$key = $sslf->getCurrent()->getValue();
-			if ( $this->isValidRegistrationKey( $key ) == FALSE ) {
-				foreach( $sslf as $ss_obj ) {
-					$ss_obj->Delete();
-				}
-				$get_new_key = TRUE;
-			}
-		}
-
-		if ( $get_new_key == TRUE OR $sslf->getRecordCount() == 0 ) {
-			//Get registration key from TimeTrex server.
-			$key = trim( $this->getRegistrationKey() );
-			Debug::Text('Registration Key from server: '. $key, __FILE__, __LINE__, __METHOD__,10);
-
-			if ( $this->isValidRegistrationKey( $key ) == FALSE ) {
-				$key = md5( uniqid() );
-				Debug::Text('Failed getting registration key from server...', __FILE__, __LINE__, __METHOD__,10);
-			}
-
-			$sslf->setName('registration_key');
-			$sslf->setValue( $key );
-			if ( $sslf->isValid() == TRUE ) {
-				$sslf->Save();
-			}
-
-			return TRUE;
-		} else {
-			Debug::Text('Registration key is valid, skipping...', __FILE__, __LINE__, __METHOD__,10);
-		}
-
 		return TRUE;
 	}
 
 	function sendCompanyVersionData( $company_id ) {
+		// NOT CURRENTLY EVER CALLED UNLESS FROM FLEX
+		return TRUE;
+
 		Debug::Text('Sending Company Version Data...', __FILE__, __LINE__, __METHOD__,10);
 		$cf = TTnew( 'CompanyFactory' );
 
-		$tt_version_data['registration_key'] = $this->getLocalRegistrationKey();
+		$tt_version_data['registration_key'] = "REGISTRATION_KEY_NOT_IN_USE";
 		$tt_version_data['company_id'] = $company_id;
 
 		$sslf = TTnew( 'SystemSettingListFactory' );
@@ -288,6 +251,9 @@ class TimeTrexSoapClient {
 	}
 
 	function sendCompanyUserCountData( $company_id ) {
+		// NOT CURRENTLY EVER CALLED UNLESS FROM FLEX
+		return TRUE;
+
 		$cuclf = TTnew( 'CompanyUserCountListFactory' );
 		$cuclf->getActiveUsers();
 		if ( $cuclf->getRecordCount() > 0 ) {
@@ -311,7 +277,7 @@ class TimeTrexSoapClient {
 		}
 
 		if ( isset($user_counts[$company_id]) ) {
-			$user_counts[$company_id]['registration_key'] = $this->getLocalRegistrationKey();
+			$user_counts[$company_id]['registration_key'] = "REGISTRATION_KEY_NOT_IN_USE";
 			$user_counts[$company_id]['company_id'] = $company_id;
 
 			return $this->getSoapObject()->saveCompanyUserCountData( $user_counts[$company_id] );
@@ -321,6 +287,9 @@ class TimeTrexSoapClient {
 	}
 
 	function sendCompanyUserLocationData( $company_id ) {
+		// NOT CURRENTLY EVER CALLED UNLESS FROM FLEX
+		return TRUE;
+
 		if ( $company_id == '' ) {
 			return FALSE;
 		}
@@ -329,7 +298,7 @@ class TimeTrexSoapClient {
 		$clf->getById( $company_id );
 		if ( $clf->getRecordCount() > 0 ) {
 
-			$location_data['registration_key'] = $this->getLocalRegistrationKey();
+			$location_data['registration_key'] = "REGISTRATION_KEY_NOT_IN_USE";
 			$location_data['company_id'] = $company_id;
 
 			$ulf = TTnew( 'UserListFactory' );
@@ -357,6 +326,9 @@ class TimeTrexSoapClient {
 	}
 
 	function sendCompanyData( $company_id, $force = FALSE ) {
+		// NOT CURRENTLY EVER CALLED UNLESS FROM FLEX
+		return TRUE;
+
 		Debug::Text('Sending Company Data...', __FILE__, __LINE__, __METHOD__,10);
 		if ( $company_id == '' ) {
 			return FALSE;
@@ -379,7 +351,7 @@ class TimeTrexSoapClient {
 			foreach( $clf as $c_obj ) {
 
 				$company_data['id'] = $c_obj->getId();
-				$company_data['registration_key'] = $this->getLocalRegistrationKey();
+				$company_data['registration_key'] = "REGISTRATION_KEY_NOT_IN_USE";
 				$company_data['status_id'] = $c_obj->getStatus();
 				$company_data['product_edition_id'] = $c_obj->getProductEdition();
 				$company_data['is_professional_edition_available'] = getTTProductEdition();
@@ -491,7 +463,7 @@ class TimeTrexSoapClient {
 				foreach( $clf as $c_obj ) {
 					$company_data = array(
 											'system_version' => APPLICATION_VERSION,
-											'registration_key' => $this->getLocalRegistrationKey(),
+											'registration_key' => "REGISTRATION_KEY_NOT_IN_USE",
 											'product_edition_id' => $c_obj->getProductEdition(),
 											'product_edition_available' => getTTProductEdition(),
 											'name' => $c_obj->getName(),
@@ -535,7 +507,7 @@ class TimeTrexSoapClient {
 				foreach( $clf as $c_obj ) {
 					$company_data = array(
 											'system_version' => APPLICATION_VERSION,
-											'registration_key' => $this->getLocalRegistrationKey(),
+											'registration_key' => "REGISTRATION_KEY_NOT_IN_USE",
 											'product_edition_id' => $c_obj->getProductEdition(),
 											'product_edition_available' => getTTProductEdition(),
 											'name' => $c_obj->getName(),

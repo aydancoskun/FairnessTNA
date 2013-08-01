@@ -829,7 +829,7 @@ class CurrencyFactory extends Factory {
 				AND isset($active_currencies)
 				AND is_array($active_currencies)
 				AND count($active_currencies) > 0 ) {
-			$ttsc = new TimeTrexSoapClient();
+//			$ttsc = new TimeTrexSoapClient();
 			$currency_rates = $ttsc->getCurrencyExchangeRates( $company_id, $active_currencies, $base_currency );
 		} else {
 			Debug::Text('Invalid Currency Data, not getting rates...', __FILE__, __LINE__, __METHOD__,10);

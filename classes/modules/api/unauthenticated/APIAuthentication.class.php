@@ -313,14 +313,7 @@ class APIAuthentication extends APIFactory {
 	}
 
 	function getRegistrationKey() {
-		$sslf = new SystemSettingListFactory();
-		$sslf->getByName( 'registration_key' );
-		if ( $sslf->getRecordCount() == 1 ) {
-			$key = $sslf->getCurrent()->getValue();
-			return $key;
-		}
-
-		return FALSE;
+			return "REGISTRATION_KEY_NOT_IN_USE";
 	}
 
 	function getLocale( $language = NULL, $country = NULL ) {
@@ -381,7 +374,7 @@ class APIAuthentication extends APIFactory {
 				'deployment_on_demand' => $this->getDeploymentOnDemand(),
 				'web_session_expire' => ( isset($config_vars['other']['web_session_expire']) AND $config_vars['other']['web_session_expire'] != '' ) ? (bool)$config_vars['other']['web_session_expire'] : FALSE, //If TRUE then session expires when browser closes.
 				'analytics_enabled' => $this->isAnalyticsEnabled(),
-				'registration_key' => $this->getRegistrationKey(),
+				'registration_key' => "REGISTRATION_KEY_NOT_IN_USE",
 				'http_host' => $this->getHTTPHost(),
 				'application_version' => $this->getApplicationVersion(),
 				'is_logged_in' => $this->isLoggedIn(),
