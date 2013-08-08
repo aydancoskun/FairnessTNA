@@ -22,8 +22,8 @@
 
 				{if $install_obj->checkAllRequirements() != 0}
 				<tr>
-					<td class="tblDataWhiteNH" colspan="7" align="right">$nbsp;
-					</td>
+					<!--td class="tblDataWhiteNH" colspan="7" align="right">&nbsp;
+					</td-->
 				</tr>
 				{/if}
 
