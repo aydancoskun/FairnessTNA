@@ -8,3 +8,4 @@ interface/company/CompanyList.php
 templates/company/CompanyList.tpl
 interface/quick_punch
 templates/quick_punch
+.idea/
