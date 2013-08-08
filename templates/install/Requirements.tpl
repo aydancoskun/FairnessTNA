@@ -29,7 +29,7 @@
 
 				<tr>
 					<td class="cellLeftEditTable">
-						{t}TimeTrex Version:{/t}
+						{t}Fairness Version:{/t}
 					</td>
 					<td class="cellRightEditTable">
 						{assign var="check_timetrex_version" value=$install_obj->checkTimeTrexVersion()}
