@@ -25,6 +25,14 @@
  * $Id: global.inc.php 10254 2013-06-20 23:42:44Z ipso $
  * $Date: 2013-06-20 16:42:44 -0700 (Thu, 20 Jun 2013) $
  */
+
+//This should get rid of the timezone warnings
+if (ini_get('date.timezone')) {
+	date_default_timezone_set( ini_get('date.timezone') );
+} else {
+	date_default_timezone_set(date_default_timezone_get());
+}
+
 //PHP v5.1.0 introduced $_SERVER['REQUEST_TIME'], but it doesn't include microseconds until v5.4.0.
 if ( version_compare(PHP_VERSION, '5.4.0', '<') == TRUE ) {
 	$_SERVER['REQUEST_TIME_FLOAT'] = microtime( TRUE );
