@@ -17,6 +17,10 @@ web server. Common locations include:
 	/Library/Web server/Documents/ (MaxOS X/Apache)
 
 3. Copy the all the files of fairness in that directory.
+   An easy way to do this is just to make sure you have git installed and then:
+   From within your webroot directory do 'git init'
+   then 'git clone https://github.com/username/Spoon-Knife.git'.
+   If you want to get updated in the future just run 'git fetch https://github.com/Aydan/fairness.git'. But do follow the rest of the upgrade instructions below!
 
 4. Rename fairness.ini.php-example_(linux|windows) to fairness.ini.php
 
