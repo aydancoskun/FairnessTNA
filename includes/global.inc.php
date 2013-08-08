@@ -30,7 +30,7 @@
 if (ini_get('date.timezone')) {
 	date_default_timezone_set( ini_get('date.timezone') );
 } else {
-	date_default_timezone_set(date_default_timezone_get());
+	date_default_timezone_set("UTC");
 }
 
 //PHP v5.1.0 introduced $_SERVER['REQUEST_TIME'], but it doesn't include microseconds until v5.4.0.
