@@ -21,9 +21,9 @@
  * 02110-1301 USA.
   ********************************************************************************/
 /*
- * $Revision: 9815 $
- * $Id: Misc.class.php 9815 2013-05-08 21:20:45Z ipso $
- * $Date: 2013-05-08 14:20:45 -0700 (Wed, 08 May 2013) $
+ * $Revision: 10643 $
+ * $Id: Misc.class.php 10643 2013-08-02 19:06:09Z ipso $
+ * $Date: 2013-08-02 12:06:09 -0700 (Fri, 02 Aug 2013) $
  */
 
 /**
@@ -601,7 +601,11 @@ class Misc {
 
 	//Encode integer to a alphanumeric value that is reversible.
 	static function encodeInteger( $int ) {
-		return strtoupper( base_convert( strrev( str_pad( $int, 11, 0, STR_PAD_LEFT ) ), 10, 36) );
+		if ( $int != '' ) {
+			return strtoupper( base_convert( strrev( str_pad( $int, 11, 0, STR_PAD_LEFT ) ), 10, 36) );
+		}
+
+		return $int;
 	}
 	static function decodeInteger( $str, $max = 2147483646 ) {
 		$retval = (int)str_pad( strrev( base_convert( $str, 36, 10) ), 11, 0, STR_PAD_RIGHT );
@@ -1126,26 +1130,22 @@ class Misc {
 			$server_port = ':'.$_SERVER['SERVER_PORT'];
 		}
 
-		if ( defined('DEPLOYMENT_ON_DEMAND') AND DEPLOYMENT_ON_DEMAND == TRUE AND isset($config_vars['other']['hostname']) AND $config_vars['other']['hostname'] != '' ) {
+		//Try server hostname/servername first, than fallback on .ini hostname setting.
+		//If the admin sets the hostname in the .ini file, always use that, as the servers hostname from the CLI could be incorrect.
+		if ( isset($config_vars['other']['hostname']) AND $config_vars['other']['hostname'] != '' ) {
 			$server_domain = $config_vars['other']['hostname'];
-		} else {
-			//Try server hostname/servername first, than fallback on .ini hostname setting.
-			//If the admin sets the hostname in the .ini file, always use that, as the servers hostname from the CLI could be incorrect.
-			if ( isset($config_vars['other']['hostname']) AND $config_vars['other']['hostname'] != '' ) {
-				$server_domain = $config_vars['other']['hostname'];
-				if ( strpos( $server_domain, ':') === FALSE ) {
-					//Add port if its not already specified.
-					$server_domain .= $server_port;
-				}
-			} elseif ( isset( $_SERVER['HTTP_HOST'] ) ) { //Use HTTP_HOST instead of SERVER_NAME first so it includes any custom ports.
-				$server_domain = $_SERVER['HTTP_HOST'];
-			} elseif ( isset( $_SERVER['SERVER_NAME'] ) ) {
-				$server_domain = $_SERVER['SERVER_NAME'].$server_port;
-			} elseif ( isset( $_SERVER['HOSTNAME'] ) ) {
-				$server_domain = $_SERVER['HOSTNAME'].$server_port;
-			} else {
-				$server_domain = 'localhost'.$server_port;
+			if ( strpos( $server_domain, ':') === FALSE ) {
+				//Add port if its not already specified.
+				$server_domain .= $server_port;
 			}
+		} elseif ( isset( $_SERVER['HTTP_HOST'] ) ) { //Use HTTP_HOST instead of SERVER_NAME first so it includes any custom ports.
+			$server_domain = $_SERVER['HTTP_HOST'];
+		} elseif ( isset( $_SERVER['SERVER_NAME'] ) ) {
+			$server_domain = $_SERVER['SERVER_NAME'].$server_port;
+		} elseif ( isset( $_SERVER['HOSTNAME'] ) ) {
+			$server_domain = $_SERVER['HOSTNAME'].$server_port;
+		} else {
+			$server_domain = 'localhost'.$server_port;
 		}
 
 		if ( $include_port == FALSE ) {

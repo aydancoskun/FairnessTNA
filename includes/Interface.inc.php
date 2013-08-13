@@ -224,7 +224,7 @@ $smarty->assign('APPLICATION_NAME', APPLICATION_NAME );
 $smarty->assign('ORGANIZATION_NAME', ORGANIZATION_NAME );
 $smarty->assign('ORGANIZATION_URL', ORGANIZATION_URL );
 $smarty->assign('APPLICATION_VERSION', APPLICATION_VERSION );
-$smarty->assign('DEPLOYMENT_ON_DEMAND', DEPLOYMENT_ON_DEMAND );
+$smarty->assign('SOFTWARE_AS_SERVICE', SOFTWARE_AS_SERVICE );
 
 if ( isset($cron_out_of_date) ) {
 	$smarty->assign('CRON_OUT_OF_DATE', $cron_out_of_date );
@@ -238,11 +238,11 @@ if ( isset($config_vars['other']['installer_enabled']) ) {
 	$smarty->assign('INSTALLER_ENABLED', $config_vars['other']['installer_enabled'] );
 }
 
-if ( isset($system_settings['valid_install_requirements']) AND DEPLOYMENT_ON_DEMAND == FALSE AND (int)$system_settings['valid_install_requirements'] == 0 ) {
+if ( isset($system_settings['valid_install_requirements']) AND (int)$system_settings['valid_install_requirements'] == 0 ) {
 	$smarty->assign('VALID_INSTALL_REQUIREMENTS', TRUE );
 }
 
-if ( isset($system_settings['system_version']) AND DEPLOYMENT_ON_DEMAND == FALSE AND APPLICATION_VERSION != $system_settings['system_version'] ) {
+if ( isset($system_settings['system_version']) AND APPLICATION_VERSION != $system_settings['system_version'] ) {
 	$smarty->assign('VERSION_MISMATCH', TRUE );
 }
 

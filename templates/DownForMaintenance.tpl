@@ -20,22 +20,10 @@
 
     <div id="contentBoxTwo">
 		<div id="rowWarning" valign="center">
-		{if $DEPLOYMENT_ON_DEMAND == TRUE}
-			{if strtolower($exception) == 'dbtimeout'}
-				{$APPLICATION_NAME} {t}database query has timed-out, if you were trying to run a report it may be too large, please narrow your search criteria and try again.{/t}
-			{else}
-				{$APPLICATION_NAME} {t}is currently undergoing maintenance. We're sorry for any inconvenience this may cause. Please try back later.{/t}
-			{/if}
+		{if strtolower($exception) == 'dbtimeout'}
+			{$APPLICATION_NAME} {t}database query has timed-out, if you were trying to run a report it may be too large, please narrow your search criteria and try again.{/t}
 		{else}
-			{if strtolower($exception) == 'dberror'}
-				{$APPLICATION_NAME} {t}is unable to connect to its database, please make sure that the database service on your own local {$APPLICATION_NAME} server has been started and is running. If you are unsure, try rebooting your server.{/t}
-			{elseif strtolower($exception) == 'dbtimeout'}
-				{$APPLICATION_NAME} {t}database query has timed-out, if you were trying to run a report it may be too large, please narrow your search criteria and try again.{/t}
-			{elseif strtolower($exception) == 'dbinitialize'}
-				{$APPLICATION_NAME} {t}database has not been initialized yet, please run the installer again and follow the on screen instructions.{/t} <a href="{$BASE_URL}/install/install.php?external_installer=1">{t}Click here to run the installer now.{/t}</a>
-			{else}
-				{$APPLICATION_NAME} {t}experienced a general error, please contact technical support.{/t}
-			{/if}
+			{$APPLICATION_NAME} {t}is currently undergoing maintenance. We're sorry for any inconvenience this may cause. Please try back later.{/t}
 		{/if}
 		</div>
     </div>

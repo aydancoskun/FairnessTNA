@@ -35,7 +35,7 @@ require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR
 //
 //Check system requirements.
 //
-if ( PRODUCTION == TRUE AND DEPLOYMENT_ON_DEMAND == FALSE ) {
+if ( PRODUCTION == TRUE ) {
 	Debug::Text('Checking system requirements... '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__,10);
 	$install_obj = new Install();
 	$failed_requirment_requirements = $install_obj->getFailedRequirements( FALSE, array('clean_cache', 'file_checksums') );

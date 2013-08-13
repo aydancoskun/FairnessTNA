@@ -70,21 +70,15 @@ class TimeTrexSoapClient {
 	}
 
 	function isUpdateNotifyEnabled() {
-		if ( DEPLOYMENT_ON_DEMAND == TRUE ) {
-			return FALSE; //Disabled with On-Demand service.
-		}
 
-// Aydan		if ( getTTProductEdition() == 10 ) {
-			$sslf = TTnew( 'SystemSettingListFactory' );
-			$sslf->getByName('update_notify');
-			if ( $sslf->getRecordCount() == 1 ) {
-				$value = $sslf->getCurrent()->getValue();
-				if ( $value == 0 ) {
-					return FALSE;
-				}
+		$sslf = TTnew( 'SystemSettingListFactory' );
+		$sslf->getByName('update_notify');
+		if ( $sslf->getRecordCount() == 1 ) {
+			$value = $sslf->getCurrent()->getValue();
+			if ( $value == 0 ) {
+				return FALSE;
 			}
-//		}
-
+		}
 		return TRUE;
 	}
 

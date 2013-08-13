@@ -317,6 +317,13 @@ class LogDetailFactory extends Factory {
 							$diff_arr['user_date_total_id']
 							);
 					break;
+				case 'JobItemFactory':
+				case 'JobItemListFactory':
+					unset(
+							$diff_arr['type_id'],
+							$diff_arr['department_id']
+							);
+					break;
 				case 'ClientContactFactory':
 				case 'ClientContactListFactory':
 					unset(
@@ -360,9 +367,9 @@ class LogDetailFactory extends Factory {
 							$diff_arr['password_reset_key'],
 							$diff_arr['password_reset_date'],
 							$diff_arr['first_name_metaphone'],
-							$diff_arr['last_name_metaphone'],
-                            $diff_arr['longitude'],
-                            $diff_arr['latitude']
+							$diff_arr['last_name_metaphone']
+                            //$diff_arr['longitude'],
+                            //$diff_arr['latitude']
 							);
 					break;
 			}
@@ -375,6 +382,8 @@ class LogDetailFactory extends Factory {
 
 					//UserDateID controls which user things like schedules are assigned too, which is critical in the audit log.
 					$diff_arr['user_date_id'], //UserDateTotal, Schedule, PunchControl, etc...
+
+					$diff_arr['name_metaphone'],
 
 					//General fields to skip
 					$diff_arr['created_date'],

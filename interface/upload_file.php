@@ -48,6 +48,44 @@ Debug::Text('Object Type: '. $object_type .' ID: '. $object_id .' Parent ID: '. 
 
 $upload = new fileupload();
 switch ($object_type) {
+    case 'invoice_config':
+        if ( $permission->Check('invoice_config','add') OR $permission->Check('invoice_config','edit') OR $permission->Check('invoice_config','edit_child') OR $permission->Check('invoice_config','edit_own') ) {
+            $upload->set_max_filesize(1000000); //1mb or less
+            //$upload->set_acceptable_types( array('image/jpg', 'image/jpeg', 'image/pjpeg', 'image/png') ); // comma separated string, or array
+            //$upload->set_max_image_size(600, 600);
+            $upload->set_overwrite_mode(1);
+
+            $icf = TTnew( 'InvoiceConfigFactory' );
+            $icf->cleanStoragePath( $current_company->getId() );
+
+            $dir = $icf->getStoragePath( $current_company->getId() );
+            if ( isset($dir) ) {
+                @mkdir($dir, 0700, TRUE);
+
+                $upload_result = $upload->upload("filedata", $dir);
+                //var_dump($upload ); //file data
+                if ($upload_result) {
+                    $success = $upload_result .' '. TTi18n::gettext('Successfully Uploaded');
+                } else {
+                    $error = $upload->get_error();
+                }
+            }
+            Debug::Text('Post Upload Operation...', __FILE__, __LINE__, __METHOD__,10);
+            if ( isset($success) AND $success != '' ) {
+                Debug::Text('Rename', __FILE__, __LINE__, __METHOD__,10);
+                //Submit filename to db.
+                //Rename file to just "logo" so its always consistent.
+
+                $file_data_arr = $upload->get_file();
+                rename( $dir.'/'.$upload_result, $dir.'/logo'. $file_data_arr['extension'] );
+
+                //$post_js = 'window.opener.document.getElementById(\'logo\').src = \''. Environment::getBaseURL().'/send_file.php?object_type=invoice_config&rand='.time().'\'; window.opener.showLogo();';
+                //$post_js = 'window.opener.setLogo()';
+            } else {
+                Debug::Text('bUpload Failed!: '. $upload->get_error(), __FILE__, __LINE__, __METHOD__,10);
+            }
+        }
+        break;
 	case 'document_revision':
 		Debug::Text('Document...', __FILE__, __LINE__, __METHOD__,10);
 		if ( $permission->Check('document','add') OR $permission->Check('document','edit') OR $permission->Check('document','edit_child') OR $permission->Check('document','edit_own') ) {
@@ -184,35 +222,7 @@ switch ($object_type) {
 		}
 		break;
 	case 'license':
-// Aydan
-//		if ( ( ( DEPLOYMENT_ON_DEMAND == FALSE AND $current_company->getId() == 1 ) OR ( isset($config_vars['other']['primary_company_id']) AND $current_company->getId() == $config_vars['other']['primary_company_id'] ) ) AND getTTProductEdition() > 10
-		if ( ( ( DEPLOYMENT_ON_DEMAND == FALSE AND $current_company->getId() == 1 ) OR ( isset($config_vars['other']['primary_company_id']) AND $current_company->getId() == $config_vars['other']['primary_company_id'] ) )
-			AND ( $permission->Check('company','add') OR $permission->Check('company','edit') OR $permission->Check('company','edit_own') OR $permission->Check('company','edit_child') ) ) {
-			$upload->set_max_filesize(20000); //1mb or less
-			$upload->set_acceptable_types( array('text/plain','plain/text','application/octet-stream') ); // comma separated string, or array
-			$upload->set_overwrite_mode(1);
-
-			$dir = Environment::getStorageBasePath() . DIRECTORY_SEPARATOR .'license'. DIRECTORY_SEPARATOR . $current_company->getId();
-			if ( isset($dir) ) {
-				@mkdir($dir, 0700, TRUE);
-
-				$upload_result = $upload->upload("filedata", $dir);
-				//var_dump($upload ); //file data
-				if ($upload_result) {
-					$success = $upload_result .' '. TTi18n::gettext('Successfully Uploaded');
-				} else {
-					$error = $upload->get_error();
-				}
-			}
-			Debug::Text('Post Upload Operation...', __FILE__, __LINE__, __METHOD__,10);
-			if ( isset($success) AND $success != '' ) {
-				Debug::Text('Rename', __FILE__, __LINE__, __METHOD__,10);
-
-				$file_data_arr = $upload->get_file();
-				$license_data = trim( file_get_contents( $dir.'/'.$upload_result ) );
-			}
-		} else {
-			Debug::Text('Permission denied for upload!', __FILE__, __LINE__, __METHOD__,10);
+			Debug::Text('No such thing as a license upload!', __FILE__, __LINE__, __METHOD__,10);
 		}
 		break;
 	case 'import':

@@ -21,9 +21,9 @@
  * 02110-1301 USA.
   ********************************************************************************/
 /*
- * $Revision: 10092 $
- * $Id: CompanyFactory.class.php 10092 2013-06-03 15:30:09Z ipso $
- * $Date: 2013-06-03 08:30:09 -0700 (Mon, 03 Jun 2013) $
+ * $Revision: 10530 $
+ * $Id: CompanyFactory.class.php 10530 2013-07-23 17:41:24Z ipso $
+ * $Date: 2013-07-23 10:41:24 -0700 (Tue, 23 Jul 2013) $
  */
 
 /**
@@ -1518,6 +1518,7 @@ class CompanyFactory extends Factory {
 											'industry_id' => 'Industry',
 											'industry' => FALSE,
 											'name' => 'Name',
+											'name_metaphone' => 'NameMetaphone',
 											'business_number' => 'BusinessNumber',
 											'originator_id' => 'OriginatorID',
 											'data_center_id' => 'DataCenterID',
@@ -2093,7 +2094,7 @@ class CompanyFactory extends Factory {
 											$value,
 											TTi18n::gettext('Longitude is invalid')
 											) ) {
-			$this->data['longitude'] = $value;
+			$this->data['longitude'] = number_format( $value, 10 ); //Always use 10 decimal places, this also prevents audit logging 0 vs 0.000000000
 
 			return TRUE;
 		}
@@ -2117,7 +2118,7 @@ class CompanyFactory extends Factory {
 											$value,
 											TTi18n::gettext('Latitude is invalid')
 											) ) {
-			$this->data['latitude'] = $value;
+			$this->data['latitude'] = number_format( $value, 10 ); //Always use 10 decimal places, this also prevents audit logging 0 vs 0.000000000
 
 			return TRUE;
 		}
@@ -3346,6 +3347,8 @@ class CompanyFactory extends Factory {
 						case 'last_month_avg_active_users':
 						case 'last_month_max_active_users':
 							$data[$variable] = (int)$this->getColumn( $variable );
+							break;
+						case 'name_metaphone':
 							break;
 						default:
 							if ( method_exists( $this, $function ) ) {

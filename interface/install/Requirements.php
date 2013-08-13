@@ -46,9 +46,9 @@ extract	(FormVariables::GetVariables(
 												) ) );
 
 $install_obj = new Install();
-if ( DEPLOYMENT_ON_DEMAND == FALSE ) {
+
 	$install_obj->cleanCacheDirectory();
-}
+
 if ( $install_obj->isInstallMode() == FALSE ) {
 	Redirect::Page( URLBuilder::getURL(NULL, 'install.php') );
 }

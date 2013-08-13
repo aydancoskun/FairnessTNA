@@ -271,7 +271,7 @@ class APIAuthentication extends APIFactory {
 	function isApplicationBranded() {
 		global $config_vars;
 
-		if ( isset($config_vars['branding']['application_name']) ) {
+		if ( isset($config_vars['other']['application_name']) ) {
 			return TRUE;
 		}
 
@@ -280,7 +280,7 @@ class APIAuthentication extends APIFactory {
 	function isPoweredByLogoEnabled() {
 		global $config_vars;
 
-		if ( isset($config_vars['branding']['disable_powered_by_logo']) AND $config_vars['branding']['disable_powered_by_logo'] == TRUE ) {
+		if ( isset($config_vars['other']['disable_powered_by_logo']) AND $config_vars['other']['disable_powered_by_logo'] == TRUE ) {
 			return FALSE;
 		}
 
@@ -309,7 +309,7 @@ class APIAuthentication extends APIFactory {
 	}
 
 	function getDeploymentOnDemand() {
-		return DEPLOYMENT_ON_DEMAND;
+		return SOFTWARE_AS_SERVICE;
 	}
 
 	function getRegistrationKey() {

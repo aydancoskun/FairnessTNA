@@ -105,7 +105,7 @@
 									<li>Added support to add pay stub amendments for multiple employees in a single operation.</li>
 								</ul>
 							</li>
-							{if DEPLOYMENT_ON_DEMAND == FALSE}
+							{if SOFTWARE_AS_SERVICE == FALSE}
 							<br>
 							<li>Maintenance Jobs:
 								<ul>
@@ -113,8 +113,6 @@
 									<li>Added support to automatically backup the database each day and maintain a set number of backups.</li>
 								</ul>
 							</li>
-							{/if}
-							{if $current_company->getProductEdition() >= 20}
 							<br>
 							<li>Employees:
 								<ul>
@@ -205,7 +203,6 @@
 									<li>Updated several US tax reports.</li>
 								</ul>
 							</li>
-							{if $current_company->getProductEdition() >= 20}
 							<br>
 							<li>
 								Jobs:
@@ -214,7 +211,6 @@
 										<li>Added job selection by code where job drop down boxes are shown.</li>
 									</ul>
 							</li>
-							{/if}
 						</ul>
 					</td>
 				</tr>
@@ -272,9 +268,7 @@
 							<br>
 							<li>Exception Policy:
 								<ul>
-									{if $current_company->getProductEdition() >= 20}
 									<li>Added No Job/Task exception.</li>
-									{/if}
 									<li>Added Long/Short Lunch exceptions with grace time.</li>
 									<li>Added grace time to Over/Under Scheduled Time exceptions.</li>
 									<li>Exceptions are now shown beside each punch on Employee TimeSheets.</li>
@@ -285,13 +279,10 @@
 								<ul>
 									<li>Employee Information Report: iButton/Fingerprint enrolled status, Employee Note columns.<li>
 									<li>TimeSheet Summary Report: Employee Number, Worked Days columns.</li>
-									{if $current_company->getProductEdition() >= 20}
 									<li>Job Summary Report: Regular Time, Over Time, Premium Time columns.</li>
-									{/if}
 									<li>Added Pay Period Schedule names to drop down lists where multiple pay period schedules exist.</li>
 								</ul>
 							</li>
-							{if $current_company->getProductEdition() >= 20}
 							<br>
 							<li>
 								Jobs:
@@ -315,7 +306,6 @@
 										<li>Added Fixed, Bracket, Progressive price types to Products.</li>
 									</ul>
 							</li>
-							{/if}
 						</ul>
 					</td>
 				</tr>

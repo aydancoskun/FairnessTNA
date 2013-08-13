@@ -46,17 +46,17 @@ class APIAbout extends APIFactory {
 
         $clf = new CompanyListFactory();
         $sslf = new SystemSettingListFactory();
-		$system_settings = $sslf->getAllArray();
+				$system_settings = $sslf->getAllArray();
         $clf->getByID( PRIMARY_COMPANY_ID );
-		if ( $clf->getRecordCount() == 1 ) {
-			$primary_company = $clf->getCurrent();
-		}
+				if ( $clf->getRecordCount() == 1 ) {
+					$primary_company = $clf->getCurrent();
+				}
         $current_user = $this->getCurrentUserObject();
         if ( isset($primary_company) AND PRIMARY_COMPANY_ID == $current_user->getCompany() ) {
-			$current_company = $primary_company;
-		} else {
-			$current_company = $clf->getByID( $current_user->getCompany() )->getCurrent();
-		}
+					$current_company = $primary_company;
+				} else {
+					$current_company = $clf->getByID( $current_user->getCompany() )->getCurrent();
+				}
 
         //$current_user_prefs = $current_user->getUserPreferenceObject();
         $data = $system_settings;
@@ -67,7 +67,8 @@ class APIAbout extends APIFactory {
             $data['new_version'] = FALSE;
         }
 
-        $data['product_edition'] = Option::getByKey( ( DEPLOYMENT_ON_DEMAND == TRUE ) ? $current_company->getProductEdition() : getTTProductEdition(), $current_company->getOptions('product_edition') );
+// Aydan
+        $data['product_edition'] = Option::getByKey( ( SOFTWARE_AS_SERVICE == TRUE ) ? $current_company->getProductEdition() : getTTProductEdition(), $current_company->getOptions('product_edition') );
 
         $data['application_name'] = APPLICATION_NAME;
 
@@ -109,41 +110,39 @@ class APIAbout extends APIFactory {
 
         $data = $this->getAboutData( $ytd, $all_companies );
 				$data['new_version'] = FALSE;
-/*        $ttsc = new TimeTrexSoapClient();
-        //We must ensure that the data is up to date
-				//Otherwise version check will fail.
-				$ttsc->sendCompanyData( $current_company->getId(), TRUE );
-				$ttsc->sendCompanyUserLocationData( $current_company->getId() );
-				$ttsc->sendCompanyUserCountData( $current_company->getId() );
-				$ttsc->sendCompanyVersionData( $current_company->getId() );
-
-				$latest_version = $ttsc->isLatestVersion( $current_company->getId() );
-				$latest_tax_engine_version = $ttsc->isLatestTaxEngineVersion( $current_company->getId() );
-				$latest_tax_data_version = $ttsc->isLatestTaxDataVersion( $current_company->getId() );
+				$latest_version = false;
+				$handle = @fopen("https://raw.github.com/Aydan/fairness/master/VERSION", "r");
+				if ($handle) {
+		    	$latest_version = trim(fgets($handle, 4096));
+    			fclose($handle);
+					Debug::Text('Github says latest version is '.$latest_version, __FILE__, __LINE__, __METHOD__,10);
+				}
 
 				$sslf = TTnew( 'SystemSettingListFactory' );
 				$sslf->getByName('new_version');
 				if ( $sslf->getRecordCount() == 1 ) {
-						$obj = $sslf->getCurrent();
+					$obj = $sslf->getCurrent();
 				} else {
-						$obj = TTnew( 'SystemSettingListFactory' );
+					$obj = TTnew( 'SystemSettingListFactory' );
 				}
 
 				$obj->setName( 'new_version' );
 
-				if( $latest_version == FALSE
-				OR $latest_tax_engine_version == FALSE
-				OR $latest_tax_data_version == FALSE ) {
-						$obj->setValue( 1 );
-						$data['new_version'] = TRUE;
+
+				if ( $latest_version AND version_compare( APPLICATION_VERSION, $latest_version, '<') === TRUE ) {
+					Debug::Text('Checking For updates => new_version = TRUE', __FILE__, __LINE__, __METHOD__,10);
+					$obj->setValue( 1 );
+					$data['new_version'] = TRUE;
 				} else {
-						$obj->setValue( 0 );
+					Debug::Text('Checking For updates => FALSE', __FILE__, __LINE__, __METHOD__,10);
+					$obj->setValue( 0 );
 					$data['new_version'] = FALSE;
 				}
+
 				if ( $obj->isValid() ) {
 						$obj->Save();
 				}
-*/
+
         return $this->returnHandler( $data );
 
     }

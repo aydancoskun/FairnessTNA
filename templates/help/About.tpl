@@ -46,7 +46,7 @@
 					</td>
 					<td class="cellRightEditTable">
 						{$data.system_version}
-						{if DEPLOYMENT_ON_DEMAND == FALSE}
+						{if SOFTWARE_AS_SERVICE == FALSE}
 							<input type="submit" name="action:Check_For_Updates" value="{t}Check For Updates{/t}"/>
 						{/if}
 					</td>
@@ -129,32 +129,33 @@
 
 				<tr>
 					<td class="cellLeftEditTable">
+						{t}License:{/t}
+					</td>
+					<td class="cellRightEditTable">
+						{$data.license}
+						<br>
+					</td>
+				</tr>
+
+				<tr>
+					<td class="cellLeftEditTable">
 						{t}Attribution:{/t}
 					</td>
 					<td class="cellRightEditTable">
-						Credit is given and thanks is extended to Timetrex for the original codebase of this project.<br><br>
+						We would like to thank Timetrex for the original codebase of this project.<br><br>
 
 						This software is licensed under the GNU Affero General Public License version 3, as is theirs.<br><br>
 					</td>
 				</tr>
 
-
 				<tr>
 					<td class="cellLeftEditTable">
-						{t}Source Code:{/t}
+						{t}Download:{/t}
 					</td>
 					<td class="cellRightEditTable">
-						The source code of Fairness is publicly hosted on <a href="https://github.com/Aydan/fairness" target="_blank"><strong>Github</strong></a>.
+						This software can be downloaded from <a href="https://github.com/Aydan/fairness" target="_blank"><strong>Github</strong></a>.
 						<br>
 						<br>
-					</td>
-				</tr>
-				<tr>
-					<td class="cellLeftEditTable">
-						{t}License:{/t}
-					</td>
-					<td class="cellRightEditTable">
-						{$data.license}
 					</td>
 				</tr>
 

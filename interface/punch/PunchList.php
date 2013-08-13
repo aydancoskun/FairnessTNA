@@ -213,13 +213,13 @@ switch ($action) {
 		}
 
 		//This query can be really slow, make sure we put a time limit on it.
-		if ( DEPLOYMENT_ON_DEMAND == TRUE ) { $plf->setQueryStatementTimeout( 5000 ); }
+		$plf->setQueryStatementTimeout( 5000 );
 
 		//Order In punches before Out punches.
 		$sort_array = Misc::prependArray( $sort_array, array( 'c.pay_period_id' => 'asc', 'last_name' => 'asc', 'first_name' => 'asc', 'a.time_stamp' => 'asc', 'a.punch_control_id' => 'asc', 'a.status_id' => 'desc' ) );
 		$plf->getSearchByCompanyIdAndArrayCriteria( $current_company->getId(), $filter_data, $current_user_prefs->getItemsPerPage(), $page, NULL, $sort_array );
 
-		if ( DEPLOYMENT_ON_DEMAND == TRUE ) { $plf->setQueryStatementTimeout(); }
+		$plf->setQueryStatementTimeout();
 
 		$pager = new Pager($plf);
 

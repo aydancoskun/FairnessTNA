@@ -722,7 +722,6 @@ class CurrencyFactory extends Factory {
 		return 2;
 	}
 	function setRoundDecimalPlaces( $value ) {
-        if ( version_compare( APPLICATION_VERSION, 5.5, '>' ) ) {
 			$value = trim($value);
 
 			if (
@@ -735,7 +734,6 @@ class CurrencyFactory extends Factory {
 
 				return TRUE;
 			}
-		}
 
 		return FALSE;
 

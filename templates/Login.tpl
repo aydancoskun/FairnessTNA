@@ -50,7 +50,7 @@ function bookmarkSite( title, url ) {
 </script>
 </head>
 
-<body onload="document.login.user_name.focus(); {if !isset($config_vars.branding)}document.getElementById('popUpDiv').className += ' visible';{/if}">
+<body onload="document.login.user_name.focus(); {if !isset($config_vars.other)}document.getElementById('popUpDiv').className += ' visible';{/if}">
 
 <div id="container">
 

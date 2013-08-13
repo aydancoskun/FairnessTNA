@@ -757,10 +757,8 @@ class UserContactFactory extends Factory {
 	function setHomeEmail($home_email) {
 		$home_email = trim($home_email);
 
-		$error_threshold = 7; //No DNS checks.
-		if ( DEPLOYMENT_ON_DEMAND === TRUE ) {
-			$error_threshold = 0; //DNS checks on email address.
-		}
+		$error_threshold = 7; //No DNS checks. Set to 0 for DNS check
+
 		if 	(	$home_email == ''
 					OR $this->Validator->isEmailAdvanced(	'home_email',
 													$home_email,
@@ -785,10 +783,8 @@ class UserContactFactory extends Factory {
 	function setWorkEmail($work_email) {
 		$work_email = trim($work_email);
 
-		$error_threshold = 7; //No DNS checks.
-		if ( DEPLOYMENT_ON_DEMAND === TRUE ) {
-			$error_threshold = 0; //DNS checks on email address.
-		}
+		$error_threshold = 7; //No DNS checks. Set to 0 for DNS check
+
 		if 	(	$work_email == ''
 					OR	$this->Validator->isEmailAdvanced(	'work_email',
 													$work_email,

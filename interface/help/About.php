@@ -56,20 +56,14 @@ switch ($action) {
 
 		break;
 	case 'check_for_updates':
-		Debug::Text('Check For update disabled', __FILE__, __LINE__, __METHOD__,10);
-/*
-		$ttsc = new TimeTrexSoapClient();
-
-		//We must ensure that the data is up to date
-		//Otherwise version check will fail.
-		$ttsc->sendCompanyData( $current_company->getId(), TRUE );
-		$ttsc->sendCompanyUserLocationData( $current_company->getId() );
-		$ttsc->sendCompanyUserCountData( $current_company->getId() );
-		$ttsc->sendCompanyVersionData( $current_company->getId() );
-
-		$latest_version = $ttsc->isLatestVersion( $current_company->getId() );
-		$latest_tax_engine_version = $ttsc->isLatestTaxEngineVersion( $current_company->getId() );
-		$latest_tax_data_version = $ttsc->isLatestTaxDataVersion( $current_company->getId() );
+		Debug::Text('Checking For updates', __FILE__, __LINE__, __METHOD__,10);
+		$latest_version = false;
+		$handle = @fopen("https://raw.github.com/Aydan/fairness/master/VERSION", "r");
+		if ($handle) {
+    	$latest_version = trim(fgets($handle, 4096));
+ 			fclose($handle);
+			Debug::Text('Github says latest version is '.$latest_version, __FILE__, __LINE__, __METHOD__,10);
+		}
 
 		$sslf = TTnew( 'SystemSettingListFactory' );
 		$sslf->getByName('new_version');
@@ -80,12 +74,12 @@ switch ($action) {
 		}
 		$obj->setName( 'new_version' );
 
-		if( $latest_version == FALSE
-				OR $latest_tax_engine_version == FALSE
-				OR $latest_tax_data_version == FALSE ) {
+		if ( $latest_version AND version_compare( APPLICATION_VERSION, $latest_version, '<') === TRUE ) {
+			Debug::Text('Checking For updates => new_version = TRUE', __FILE__, __LINE__, __METHOD__,10);
 			$obj->setValue( 1 );
 			$data['new_version'] = 1;
 		} else {
+			Debug::Text('Checking For updates => FALSE', __FILE__, __LINE__, __METHOD__,10);
 			$obj->setValue( 0 );
 			$data['new_version'] = 0;
 		}
@@ -93,9 +87,7 @@ switch ($action) {
 		if ( $obj->isValid() ) {
 			$obj->Save();
 		}
-*/
 	default:
-		$data['product_edition'] = Option::getByKey( ( DEPLOYMENT_ON_DEMAND == TRUE ) ? $current_company->getProductEdition() : getTTProductEdition(), $current_company->getOptions('product_edition') );
 
 		//Get Employee counts for this month, and last month
 		$month_of_year_arr = TTDate::getMonthOfYearArray();
@@ -125,6 +117,7 @@ switch ($action) {
 																);
 			}
 		}
+
 
 		$cjlf = TTnew( 'CronJobListFactory' );
 		$cjlf->getMostRecentlyRun();

@@ -144,7 +144,7 @@ switch ($action) {
 	default:
 		Misc::redirectMobileBrowser(); //Redirect mobile browsers automatically. Don't do it if the submit button is pressed though.
 
-		if ( DEPLOYMENT_ON_DEMAND == FALSE AND isset($config_vars['other']['installer_enabled']) AND $config_vars['other']['installer_enabled'] == TRUE ) {
+		if ( isset($config_vars['other']['installer_enabled']) AND $config_vars['other']['installer_enabled'] == TRUE ) {
 			//Installer is enabled, check to see if any companies have been created, if not redirect to installer automatically, as they skipped it somehow.
 			//Check if Company table exists first, incase the installer hasn't run at all, this avoids a SQL error.
 			$install_obj = new Install();

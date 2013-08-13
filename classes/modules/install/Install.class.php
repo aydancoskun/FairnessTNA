@@ -451,37 +451,6 @@ class Install {
 				$ss_obj = $sslf->getCurrent();
 				$system_version = $ss_obj->getValue();
 				Debug::text('System Version: '. $system_version .' Application Version: '. APPLICATION_VERSION, __FILE__, __LINE__, __METHOD__,9);
-
-				//If the current version is greater than 7.0 and the system_version in the database is less than 7.0, we know we are upgrading from pre7.0 to post7.0.
-				if ( version_compare( APPLICATION_VERSION, '7.0', '>=' ) AND version_compare( $system_version, '7.0', '<' ) ) {
-					Debug::text('Upgrade schema groups...', __FILE__, __LINE__, __METHOD__,9);
-
-					$sslf->getByName( 'schema_version_group_B' );
-					if ( $sslf->getRecordCount() > 0 ) {
-						$ss_obj = $sslf->getCurrent();
-						$schema_version_group_b = $ss_obj->getValue();
-						Debug::text('Schema Version Group B: '. $schema_version_group_b, __FILE__, __LINE__, __METHOD__,9);
-
-						$tmp_name = 'schema_version_group_C';
-						$tmp_sslf = TTnew( 'SystemSettingListFactory' );
-						$tmp_sslf->getByName( $tmp_name );
-						if ( $tmp_sslf->getRecordCount() == 1 ) {
-							$tmp_obj = $tmp_sslf->getCurrent();
-						} else {
-							$tmp_obj = TTnew( 'SystemSettingListFactory' );
-						}
-						$tmp_obj->setName( $tmp_name );
-						$tmp_obj->setValue( $schema_version_group_b );
-						if ( $tmp_obj->isValid() ) {
-							if ( $tmp_obj->Save() === FALSE ) {
-								return FALSE;
-							}
-							return TRUE;
-						} else {
-							return FALSE;
-						}
-					}
-				}
 			}
 		}
 
@@ -740,7 +709,7 @@ class Install {
 		// 0 = OK
 		// 1 = Invalid
 		// 2 = Unsupported
-		if ( PRODUCTION == FALSE OR DEPLOYMENT_ON_DEMAND == TRUE ) {
+		if ( PRODUCTION == FALSE ) {
 			return 0; //Skip permission checks.
 		}
 
@@ -801,7 +770,8 @@ class Install {
 
 		// TODO FIX THE CREATION OF A CHECKSUM FILE
 		return 0; //Skip checksums.
-		if ( PRODUCTION == FALSE OR DEPLOYMENT_ON_DEMAND == TRUE ) {
+
+		if ( PRODUCTION == FALSE ) {
 			return 0; //Skip checksums.
 		}
 
@@ -1139,18 +1109,15 @@ class Install {
 	}
 
 	function checkCleanCacheDirectory() {
-		if ( DEPLOYMENT_ON_DEMAND == FALSE ) {
-			$raw_cache_files = scandir( $this->config_vars['cache']['dir'] );
+		$raw_cache_files = scandir( $this->config_vars['cache']['dir'] );
 
-			if ( is_array($raw_cache_files) AND count($raw_cache_files) > 0 ) {
-				foreach( $raw_cache_files as $cache_file ) {
-					if ( $cache_file != '.' AND $cache_file != '..' AND stristr( $cache_file, '.lock') === FALSE ) {
-						return 1;
-					}
+		if ( is_array($raw_cache_files) AND count($raw_cache_files) > 0 ) {
+			foreach( $raw_cache_files as $cache_file ) {
+				if ( $cache_file != '.' AND $cache_file != '..' AND stristr( $cache_file, '.lock') === FALSE ) {
+					return 1;
 				}
 			}
 		}
-
 		return 0;
 	}
 
@@ -1195,18 +1162,17 @@ class Install {
 	}
 
 	function getCurrentTimeTrexVersion() {
-		//return '1.2.1';
 		return APPLICATION_VERSION;
 	}
 
 	function getLatestTimeTrexVersion() {
-/*
-		if ( $this->checkSOAP() == 0 ) {
-			$ttsc = new TimeTrexSoapClient();
-			return $ttsc->getSoapObject()->getInstallerLatestVersion();
+		$latest_version = false;
+		$handle = @fopen("https://raw.github.com/Aydan/fairness/master/VERSION", "r");
+		if ($handle) {
+    	$latest_version = trim(fgets($handle, 4096));
+ 			fclose($handle);
 		}
-*/
-		return FALSE;
+		return $latest_version;
 	}
 
 	function checkTimeTrexVersion() {

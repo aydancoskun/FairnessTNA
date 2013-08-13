@@ -95,7 +95,7 @@ class TaxSummaryReport extends Report {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
 					// So just get custom columns with Selection and Formula.
-					$custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), NULL, 'TaxSummaryReport', 'custom_column' );
+					$custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), $rcclf->getOptions('display_column_type_ids'), NULL, 'TaxSummaryReport', 'custom_column' );
 					if ( is_array($custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $custom_column_labels, 9500 );
 					}
@@ -105,14 +105,14 @@ class TaxSummaryReport extends Report {
 // Aydan
 //				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
-					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(30,31), NULL, 'TaxSummaryReport', 'custom_column' );
+					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), $rcclf->getOptions('filter_column_type_ids'), NULL, 'TaxSummaryReport', 'custom_column' );
 //				}
                 break;
             case 'report_dynamic_custom_column':
 // Aydan
 //				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
-					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(10,40,50,90), 'TaxSummaryReport', 'custom_column' );
+					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), $rcclf->getOptions('display_column_type_ids'), $rcclf->getOptions('dynamic_format_ids'), 'TaxSummaryReport', 'custom_column' );
 					if ( is_array($report_dynamic_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_dynamic_custom_column_labels, 9700 );
 					}
@@ -122,7 +122,7 @@ class TaxSummaryReport extends Report {
 // Aydan
 //				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
-					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), array(10,20), array(20,30,60,70,80,100,110), 'TaxSummaryReport', 'custom_column' );
+					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), $rcclf->getOptions('display_column_type_ids'), $rcclf->getOptions('static_format_ids'), 'TaxSummaryReport', 'custom_column' );
 					if ( is_array($report_static_custom_column_labels) ) {
 						$retval = Misc::addSortPrefix( $report_static_custom_column_labels, 9700 );
 					}
@@ -445,6 +445,9 @@ class TaxSummaryReport extends Report {
 			$filter_data['permission_children_ids'] = $permission_children_ids;
 		}
 
+		if ( !isset($filter_data['exclude_ytd_adjustments']) ) {
+			$filter_data['exclude_ytd_adjustments'] = FALSE;
+		}
 
         $ulf = TTnew( 'UserListFactory' );
 		$ulf->getSearchByCompanyIdAndArrayCriteria( $this->getUserObject()->getCompany(), $filter_data );
@@ -501,7 +504,7 @@ class TaxSummaryReport extends Report {
 
                         $pself = TTnew( 'PayStubEntryListFactory' );
                 		//$pself->getAPIReportByCompanyIdAndArrayCriteria( $this->getUserObject()->getCompany(), $filter_data );
-                        $pself->getDateReportByCompanyIdAndUserIdAndPayPeriodId( $this->getUserObject()->getCompany(), $filter_data['user_ids'], $pay_period_ids );
+                        $pself->getDateReportByCompanyIdAndUserIdAndPayPeriodId( $this->getUserObject()->getCompany(), $filter_data['user_ids'], $pay_period_ids, $filter_data['exclude_ytd_adjustments'] );
 
                 		$this->getProgressBarObject()->start( $this->getAMFMessageID(), $pself->getRecordCount(), NULL, TTi18n::getText('Retrieving Data...') );
                 		if ( $pself->getRecordCount() > 0 ) {

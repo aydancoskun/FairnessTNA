@@ -145,7 +145,7 @@ class CompanyGenericTagFactory extends Factory {
 										'object_type' => FALSE,
 										'description' => 'Description',
 										'name' => 'Name',
-										'name_metaphone' => 'NameMetaphona',
+										'name_metaphone' => 'NameMetaphone',
 										'deleted' => 'Deleted',
 										);
 		return $variable_function_map;
@@ -362,6 +362,8 @@ class CompanyGenericTagFactory extends Factory {
 							if ( method_exists( $this, $function ) ) {
 								$data[$variable] = Option::getByKey( $this->$function(), $this->getOptions( $variable ) );
 							}
+							break;
+						case 'name_metaphone':
 							break;
 						default:
 							if ( method_exists( $this, $function ) ) {

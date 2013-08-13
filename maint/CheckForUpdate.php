@@ -32,71 +32,37 @@
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'global.inc.php');
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'CLI.inc.php');
 
-Debug::Text('Auto Update Notifications permanently disabled in file /main/CheckForUpdate.php', __FILE__, __LINE__, __METHOD__,10);
-/*
-$ttsc = new TimeTrexSoapClient();
-if ( $ttsc->isUpdateNotifyEnabled() == TRUE ) {
-	sleep( rand(0,60) ); //Further randomize when calls are made.
-	$clf = new CompanyListFactory();
-	$clf->getAll();
-	if ( $clf->getRecordCount() > 0 ) {
-		$i=0;
-		foreach ( $clf as $c_obj ) {
-			if ( $ttsc->getLocalRegistrationKey() == FALSE
-					OR $ttsc->getLocalRegistrationKey() == '' ) {
-				$ttsc->saveRegistrationKey();
-			}
-
-			//We must ensure that the data is up to date
-			//Otherwise version check will fail.
-			$ttsc->sendCompanyData( $c_obj->getId() );
-			$ttsc->sendCompanyUserLocationData( $c_obj->getId() );
-			$ttsc->sendCompanyUserCountData( $c_obj->getId() );
-			$ttsc->sendCompanyVersionData( $c_obj->getId() );
-
-			//Check for new license once it starts expiring.
-			//Help -> About, checking for new versions also gets the updated license file.
-//			if ( $c_obj->getID() == $config_vars['other']['primary_company_id'] AND getTTProductEdition() > PRODUCT_COMMUNITY_10 ) {
-			if ( $c_obj->getID() == $config_vars['other']['primary_company_id'] ) {
-				if ( !isset($system_settings['license']) ) {
-					$system_settings['license'] = NULL;
-				}
-			}
-
-			//Only need to call this on the last company
-			if ( $i == $clf->getRecordCount()-1 ) {
-				$latest_version = $ttsc->isLatestVersion( $c_obj->getId() );
-				$latest_tax_engine_version = $ttsc->isLatestTaxEngineVersion( $c_obj->getId() );
-				$latest_tax_data_version = $ttsc->isLatestTaxDataVersion( $c_obj->getId() );
-
-				$sslf = new SystemSettingListFactory();
-				$sslf->getByName('new_version');
-				if ( $sslf->getRecordCount() == 1 ) {
-					$obj = $sslf->getCurrent();
-				} else {
-					$obj = new SystemSettingListFactory();
-				}
-				$obj->setName( 'new_version' );
-
-				if( $latest_version == FALSE
-						OR $latest_tax_engine_version == FALSE
-						OR $latest_tax_data_version == FALSE ) {
-					$obj->setValue( 1 );
-				} else {
-					$obj->setValue( 0 );
-				}
-
-				if ( $obj->isValid() ) {
-					$obj->Save();
-				}
-			}
-
-			$i++;
-		}
-	}
+$latest_version = false;
+$handle = @fopen("https://raw.github.com/Aydan/fairness/master/VERSION", "r");
+if ($handle) {
+	$latest_version = trim(fgets($handle, 4096));
+	fclose($handle);
+	Debug::Text('Github says latest version is '.$latest_version, __FILE__, __LINE__, __METHOD__,10);
 } else {
-	Debug::Text('Auto Update Notifications are disabled!', __FILE__, __LINE__, __METHOD__,10);
+	Debug::Text('Auto Update Notifications failed!', __FILE__, __LINE__, __METHOD__,10);
 }
-*/
+
+		$sslf = new SystemSettingListFactory();
+		$sslf->getByName('new_version');
+		if ( $sslf->getRecordCount() == 1 ) {
+			$obj = $sslf->getCurrent();
+		} else {
+			$obj = new SystemSettingListFactory();
+		}
+		$obj->setName( 'new_version' );
+
+		if ( $latest_version AND version_compare( APPLICATION_VERSION, $latest_version, '<') === TRUE ) {
+			$obj->setValue( 1 );
+			Debug::Text('Auto Update Notifications check => new_version = TRUE', __FILE__, __LINE__, __METHOD__,10);
+		} else {
+			$obj->setValue( 0 );
+			Debug::Text('Auto Update Notifications check => FALSE', __FILE__, __LINE__, __METHOD__,10);
+		}
+
+		if ( $obj->isValid() ) {
+			$obj->Save();
+		}
+
+
 Debug::writeToLog();
 Debug::Display();

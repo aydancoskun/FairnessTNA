@@ -51,72 +51,99 @@ class APINotification extends APIFactory {
 		//Skip this step if disable_database_connection is enabled or the user is going through the installer still
 		switch ( strtolower($action) ) {
 			case 'login':
-				if ( ( !isset($disable_database_connection) OR ( isset($disable_database_connection) AND $disable_database_connection != TRUE ) )
-						AND ( !isset($config_vars['other']['installer_enabled']) OR ( isset($config_vars['other']['installer_enabled']) AND $config_vars['other']['installer_enabled'] != TRUE ) )) {
+				if ( ( !isset($disable_database_connection) 							OR ( isset($disable_database_connection) 								AND $disable_database_connection != TRUE ) )
+				 AND ( !isset($config_vars['other']['installer_enabled']) OR ( isset($config_vars['other']['installer_enabled'])	AND $config_vars['other']['installer_enabled'] != TRUE ) )
+				)
+				{
 					//Get all system settings, so they can be used even if the user isn't logged in, such as the login page.
 					$sslf = new SystemSettingListFactory();
 					$system_settings = $sslf->getAllArray();
+					unset($sslf);
 				}
-				unset($sslf);
 
-				//System Requirements not being met.
-				if ( isset($system_settings['valid_install_requirements']) AND DEPLOYMENT_ON_DEMAND == FALSE AND (int)$system_settings['valid_install_requirements'] == 0 ) {
-					$retarr[] = array(
+				$tmp_company_id = 1;
+				if ( isset($config_vars['other']['primary_company_id']) )
+					$tmp_company_id = $config_vars['other']['primary_company_id'];
+				// Only show these warnings to the primary company if SOFTWARE_AS_SERVICE
+				if ( ( ! SOFTWARE_AS_SERVICE OR $this->getCurrentCompanyObject()->getId() == $tmp_company_id ) AND DEMO_MODE == FALSE ) {
+
+					//System Requirements not being met.
+					if ( isset($system_settings['valid_install_requirements']) AND (int)$system_settings['valid_install_requirements'] == 0 ) {
+						$retarr[] = array(
 										  'delay' => -1, //0= Show until clicked, -1 = Show until next getNotifications call.
 										  'bg_color' => '#FF0000', //Red
 										  'message' => TTi18n::getText('WARNING: %1 system requirement check has failed! Please contact your %1 administrator immediately to re-run the %1 installer to correct the issue.', APPLICATION_NAME ),
 										  'destination' => NULL,
 										  );
-				}
+					}
 
-				//Check version mismatch
-				if ( isset($system_settings['system_version']) AND DEPLOYMENT_ON_DEMAND == FALSE AND APPLICATION_VERSION != $system_settings['system_version'] ) {
-					$retarr[] = array(
+					//Check version mismatch
+					if ( isset($system_settings['system_version']) AND APPLICATION_VERSION != $system_settings['system_version'] ) {
+						$retarr[] = array(
 										  'delay' => -1, //0= Show until clicked, -1 = Show until next getNotifications call.
 										  'bg_color' => '#FF0000', //Red
 										  'message' => TTi18n::getText('WARNING: %1 application version does not match database version. Please re-run the %1 installer to complete the upgrade process.', APPLICATION_NAME ),
 										  'destination' => NULL,
 										  );
-				}
+					}
 
-				//Only display message to the primary company.
-				if ( ( (time()-(int)APPLICATION_VERSION_DATE) > (86400*475) )
-						AND ( $this->getCurrentCompanyObject()->getId() == 1 OR ( isset($config_vars['other']['primary_company_id']) AND $this->getCurrentCompanyObject()->getId() == $config_vars['other']['primary_company_id'] ) ) ) { //~1yr and 3mths
-					$retarr[] = array(
+					if ( (time()-(int)APPLICATION_VERSION_DATE) > (86400*475) ) { //~1yr and 3mths
+						$retarr[] = array(
 										  'delay' => -1,
 										  'bg_color' => '#FF0000', //Red
 										  'message' => TTi18n::getText('WARNING: This %1 version (v%2) is severely out of date and may no longer be supported. Please upgrade to the latest version as soon as possible as invalid calculations may already be occurring.', array( APPLICATION_NAME, APPLICATION_VERSION ) ),
 										  'destination' => NULL,
 										  );
-				}
+					}
 
-				//New version available notification.
-				if ( 	DEMO_MODE == FALSE
-						AND ( isset($system_settings['new_version']) AND $system_settings['new_version'] == 1 )
-						AND ( $this->getCurrentCompanyObject()->getId() == 1 OR ( isset($config_vars['other']['primary_company_id']) AND $this->getCurrentCompanyObject()->getId() == $config_vars['other']['primary_company_id'] ) ) ) {
+					//New version available notification.
+					if ( isset( $system_settings['new_version'] ) AND $system_settings['new_version'] == 1 ) {
 
-					//Only display this every two weeks.
-					$new_version_available_notification_arr = UserSettingFactory::getUserSetting( $this->getCurrentUserObject()->getID(), 'new_version_available_notification' );
-					if ( !isset($new_version_available_notification_arr['value']) OR ( isset($new_version_available_notification_arr['value']) AND $new_version_available_notification_arr['value'] <= (time()-(86400*14)) ) ) {
-						UserSettingFactory::setUserSetting( $this->getCurrentUserObject()->getID(), 'new_version_available_notification', time() );
+						//Only display this every two weeks.
+						$new_version_available_notification_arr = UserSettingFactory::getUserSetting( $this->getCurrentUserObject()->getID(), 'new_version_available_notification' );
+						if ( !isset($new_version_available_notification_arr['value']) OR ( isset($new_version_available_notification_arr['value']) AND $new_version_available_notification_arr['value'] <= (time()-(86400*14)) ) ) {
+							UserSettingFactory::setUserSetting( $this->getCurrentUserObject()->getID(), 'new_version_available_notification', time() );
 
-						$retarr[] = array(
+							$retarr[] = array(
 											  'delay' => -1,
 											  'bg_color' => '#FFFF00', //Yellow
 											  'message' => TTi18n::getText('NOTICE: A new version of %1 available, it is highly recommended that you upgrade as soon as possible. Click here to download the latest version.', array( APPLICATION_NAME ) ),
 											  'destination' => 'https://github.com/Aydan/fairness',
 											  );
+						}
+						unset($new_version_available_notification);
 					}
-					unset($new_version_available_notification);
-				}
 
-				//Check for major new version.
+					//Make sure CronJobs are running correctly.
+					$cjlf = new CronJobListFactory();
+					$cjlf->getMostRecentlyRun();
+					if ( $cjlf->getRecordCount() > 0 ) {
+						//Is last run job more then 48hrs old?
+						$cj_obj = $cjlf->getCurrent();
+						if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE
+							AND $cj_obj->getLastRunDate() < ( time()-172800 )
+							AND $cj_obj->getCreatedDate() < ( time()-172800 ) ) {
+						$retarr[] = array(
+											  'delay' => -1,
+											  'bg_color' => '#FF0000', //Red
+											  'message' => TTi18n::getText('WARNING: Critical maintenance jobs have not run in the last 48hours. Please contact your %1 administrator immediately.', APPLICATION_NAME ),
+											  'destination' => NULL,
+											  );
+						}
+					}
+					unset($cjlf, $cj_obj);
+
+				}
+				unset($tmp_company_id);
+
+				//Check if we need to notify for major new version.
 				$new_version_notification_arr = UserSettingFactory::getUserSetting( $this->getCurrentUserObject()->getID(), 'new_version_notification' );
+				$tmp_value = "";
+				if ( isset( $new_version_notification_arr['value'] ) ) $tmp_value = $new_version_notification_arr['value'];
 				if (	DEMO_MODE == FALSE
-						AND ( !isset($config_vars['branding']['application_name']) OR ( $this->getCurrentCompanyObject()->getId() == 1 OR ( isset($config_vars['other']['primary_company_id']) AND $this->getCurrentCompanyObject()->getId() == $config_vars['other']['primary_company_id'] ) ) )
 						AND $this->getPermissionObject()->getLevel() >= 20 //Payroll Admin
 						AND $this->getCurrentUserObject()->getCreatedDate() <= APPLICATION_VERSION_DATE
-						AND ( !isset($new_version_notification_arr['value']) OR ( isset($new_version_notification_arr['value']) AND Misc::MajorVersionCompare( APPLICATION_VERSION, $new_version_notification_arr['value'], '>' ) ) ) ) {
+						AND ( ! $tmp_value OR ( $tmp_value AND Misc::MajorVersionCompare( APPLICATION_VERSION, $tmp_value, '>' ) ) ) ) {
 					UserSettingFactory::setUserSetting( $this->getCurrentUserObject()->getID(), 'new_version_notification', APPLICATION_VERSION );
 
 					$retarr[] = array(
@@ -126,7 +153,8 @@ class APINotification extends APIFactory {
 										  'destination' => $config_vars['urls']['whats_new'],
 										  );
 				}
-				unset($new_version_notification);
+				unset($new_version_notification_arr);
+				unset($tmp_value);
 
 				//Check installer enabled.
 				if ( isset($config_vars['other']['installer_enabled']) AND $config_vars['other']['installer_enabled'] == 1 ) {
@@ -137,27 +165,6 @@ class APINotification extends APIFactory {
 										  'destination' => NULL,
 										  );
 				}
-
-				//Make sure CronJobs are running correctly.
-				$cjlf = new CronJobListFactory();
-				$cjlf->getMostRecentlyRun();
-				if ( $cjlf->getRecordCount() > 0 ) {
-					//Is last run job more then 48hrs old?
-					$cj_obj = $cjlf->getCurrent();
-
-					if ( PRODUCTION == TRUE
-							AND DEMO_MODE == FALSE
-							AND $cj_obj->getLastRunDate() < ( time()-172800 )
-							AND $cj_obj->getCreatedDate() < ( time()-172800 ) ) {
-						$retarr[] = array(
-											  'delay' => -1,
-											  'bg_color' => '#FF0000', //Red
-											  'message' => TTi18n::getText('WARNING: Critical maintenance jobs have not run in the last 48hours. Please contact your %1 administrator immediately.', APPLICATION_NAME ),
-											  'destination' => NULL,
-											  );
-					}
-				}
-				unset($cjlf, $cj_obj);
 
 				//Check if any pay periods are past their transaction date and not closed.
 				if ( DEMO_MODE == FALSE AND $this->getPermissionObject()->Check('pay_period_schedule','enabled') AND $this->getPermissionObject()->Check('pay_period_schedule','view') ) {
@@ -179,7 +186,7 @@ class APINotification extends APIFactory {
 					unset($pplf, $pp_obj);
 				}
 
-				//CHeck for unread messages
+				//Check for unread messages
 				$mclf = new MessageControlListFactory();
 				$unread_messages = $mclf->getNewMessagesByCompanyIdAndUserId( $this->getCurrentCompanyObject()->getId(), $this->getCurrentUserObject()->getId() );
 				Debug::text('UnRead Messages: '. $unread_messages, __FILE__, __LINE__, __METHOD__, 10);
@@ -223,7 +230,7 @@ class APINotification extends APIFactory {
 					$retarr[] = array(
 										  'delay' => 30,
 										  'bg_color' => '#FF0000', //Red
-										  'message' => TTi18n::getText('WARNING: Please click here and enter an email address for your account, this is required to receive important notices and prevent your from being locked out.'),
+										  'message' => TTi18n::getText('WARNING: Please click here and enter an email address for your account, this is required to receive important notices and prevent your account from being locked out.'),
 										  'destination' => array('menu_name' => 'Contact Information'),
 										  );
 				}
@@ -239,7 +246,7 @@ class APINotification extends APIFactory {
 			//Setting timezone failed, alert user to this fact.
 			//WARNING: %1 was unable to set your time zone. Please contact your %1 administrator immediately.{/t} {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own')}<a href="">{t}For more information please click here.{/t}</a>{/if}
 			if ( $this->getPermissionObject()->Check('company','enabled') AND $this->getPermissionObject()->Check('company','edit_own') ) {
-				$destination_url = $config_vars['urls']['timezone_error']
+				$destination_url = $config_vars['urls']['timezone_error'];
 				$sub_message = TTi18n::getText('For more information please click here.');
 			} else {
 				$destination_url = NULL;

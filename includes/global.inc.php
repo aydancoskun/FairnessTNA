@@ -21,9 +21,9 @@
  * 02110-1301 USA.
   ********************************************************************************/
 /*
- * $Revision: 10254 $
- * $Id: global.inc.php 10254 2013-06-20 23:42:44Z ipso $
- * $Date: 2013-06-20 16:42:44 -0700 (Thu, 20 Jun 2013) $
+ * $Revision: 10609 $
+ * $Id: global.inc.php 10609 2013-07-31 17:29:20Z ipso $
+ * $Date: 2013-07-31 10:29:20 -0700 (Wed, 31 Jul 2013) $
  */
 
 //This should get rid of the timezone warnings
@@ -56,8 +56,8 @@ if ( ini_get('max_execution_time') < 1800 ) {
 //Check: http://ca3.php.net/manual/en/security.magicquotes.php#61188 for disabling magic_quotes_gpc
 ini_set( 'magic_quotes_runtime', 0 );
 
-define('APPLICATION_VERSION', '7.0.2' );
-define('APPLICATION_VERSION_DATE', strtotime('21-Jun-2013') ); //Release date of version.
+define('APPLICATION_VERSION', '7.1.1' );
+define('APPLICATION_VERSION_DATE', strtotime('02-Aug-2013') ); //Release date of version.
 
 if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') { define('OPERATING_SYSTEM', 'WIN'); } else { define('OPERATING_SYSTEM', 'LINUX'); }
 
@@ -82,14 +82,53 @@ if ( file_exists(CONFIG_FILE) ) {
 	exit;
 }
 
-( isset($config_vars['debug']['production']) AND $config_vars['debug']['production'] == 1 ) ? define('PRODUCTION', TRUE) : define('PRODUCTION', FALSE);
-( isset($config_vars['branding']['application_name']) AND $config_vars['branding']['application_name'] != '' ) ? define('APPLICATION_NAME', $config_vars['branding']['application_name']) : define('APPLICATION_NAME', (PRODUCTION == FALSE) ? 'APPLICATION_NAME-DEBUG' : 'APPLICATION_NAME');
-( isset($config_vars['branding']['organization_name']) AND $config_vars['branding']['organization_name'] != '' ) ? define('ORGANIZATION_NAME', $config_vars['branding']['organization_name']) : define('ORGANIZATION_NAME', 'ORGANISATION_NAME');
-( isset($config_vars['branding']['organization_url']) AND $config_vars['branding']['organization_url'] != '' ) ? define('ORGANIZATION_URL', $config_vars['branding']['organization_url']) : define('ORGANIZATION_URL', 'ORGANIZATION_URL');
-( isset($config_vars['branding']['product_edition']) AND $config_vars['branding']['product_edition'] != '' ) ? define('PRODUCT_EDITION', $config_vars['branding']['product_edition']) : define('PRODUCT_EDITION', '10');
-( isset($config_vars['other']['demo_mode']) AND $config_vars['other']['demo_mode'] == 1 ) ? define('DEMO_MODE', TRUE) : define('DEMO_MODE', FALSE);
-( isset($config_vars['branding']['deployment_on_demand']) AND $config_vars['branding']['deployment_on_demand'] == 1 ) ? define('DEPLOYMENT_ON_DEMAND', TRUE) : 	define('DEPLOYMENT_ON_DEMAND', FALSE);
-( isset($config_vars['other']['primary_company_id']) AND $config_vars['other']['primary_company_id'] > 0 ) ? define('PRIMARY_COMPANY_ID', (int)$config_vars['other']['primary_company_id']) : define('PRIMARY_COMPANY_ID', FALSE);
+if ( isset($config_vars['debug']['production']) AND $config_vars['debug']['production'] == TRUE )
+	define('PRODUCTION', TRUE);
+else
+	define('PRODUCTION', FALSE);
+
+if ( isset($config_vars['other']['application_name']) AND $config_vars['other']['application_name'] != '' AND PRODUCTION == TRUE)
+	define('APPLICATION_NAME', $config_vars['other']['application_name']);
+
+if ( isset($config_vars['other']['application_name']) AND $config_vars['other']['application_name'] != '' AND PRODUCTION == FALSE)
+	define('APPLICATION_NAME', $config_vars['other']['application_name']."-DEBUG");
+
+if( !	defined('APPLICATION_NAME') AND PRODUCTION == TRUE)
+	define('APPLICATION_NAME', "Fairness");
+
+if( !	defined('APPLICATION_NAME') AND PRODUCTION == FALSE)
+	define('APPLICATION_NAME', "Fairness-DEBUG");
+
+if ( isset($config_vars['other']['organization_name']) 	AND $config_vars['other']['organization_name'] != '' )
+	define('ORGANIZATION_NAME', $config_vars['other']['organization_name']);
+else
+	define('ORGANIZATION_NAME', 'ORGANIZATION_NAME');
+
+if ( isset($config_vars['other']['organization_url']) AND $config_vars['other']['organization_url'] != '' )
+	define('ORGANIZATION_URL', $config_vars['other']['organization_url']);
+else
+	define('ORGANIZATION_URL', 'ORGANIZATION_URL');
+
+if ( isset($config_vars['other']['product_edition']) AND $config_vars['other']['product_edition'] != '' )
+	define('PRODUCT_EDITION', $config_vars['other']['product_edition']);
+else
+	define('PRODUCT_EDITION', '10');
+
+if ( isset($config_vars['other']['demo_mode']) AND $config_vars['other']['demo_mode'] == 1 )
+	define('DEMO_MODE', TRUE);
+else
+	define('DEMO_MODE', FALSE);
+
+if ( isset($config_vars['other']['software_as_a_service']) AND $config_vars['other']['software_as_a_service'] == 1 )
+	define('SOFTWARE_AS_SERVICE', TRUE);
+else
+	define('SOFTWARE_AS_SERVICE', FALSE);
+
+if ( isset($config_vars['other']['primary_company_id']) 	AND $config_vars['other']['primary_company_id'] > 0 )
+	define('PRIMARY_COMPANY_ID', (int)$config_vars['other']['primary_company_id']);
+else
+	define('PRIMARY_COMPANY_ID', FALSE);
+
 //Try to dynamically load required PHP extensions if they aren't already.
 //This saves people from having to modify php.ini if possible.
 //v5.3 of PHP deprecates DL().

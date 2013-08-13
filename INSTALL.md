@@ -20,7 +20,7 @@ web server. Common locations include:
 
    An easy way to do this is just to make sure you have git installed and then:
 
-   From within your webroot directory do 'git init', then 'git clone https://github.com/username/Spoon-Knife.git'.
+   From within your webroot directory do 'git init', then 'git clone https://github.com/Aydan/fairness.git'.
 
    To learn more about git and how to keep updated read: https://help.github.com/articles/fork-a-repo
 
@@ -40,9 +40,11 @@ UPGRADE INSTRUCTIONS
    fairness.ini.php file, as it contains a cryptographic salt that if you lose you will
    not be able to login to Fairness or access encrypted data ever again.
 
-   **BE SURE TO BACKUP YOUR TimeTrex DATABASE AND YOUR fairness.ini.php FILE!**
+   **BE SURE TO BACKUP YOUR Fairness DATABASE AND YOUR fairness.ini.php FILE!**
 
 3. Copy the current version of Fairness over the top of your current installation.
+
+   if you use git just do 'git pull' which will pull the latest version in from github
 
 4. Edit fairness.ini.php in your new Fairness directory and set: installer_enabled = TRUE
 

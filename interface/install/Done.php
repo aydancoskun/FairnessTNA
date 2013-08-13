@@ -84,6 +84,9 @@ if ( $obj->isValid() ) {
 	$obj->Save();
 }
 
+//Write the version file
+file_put_contents(Environment::getBasePath() . "VERSION", APPLICATION_VERSION);
+
 $action = Misc::findSubmitButton();
 switch ($action) {
 	case 'back':

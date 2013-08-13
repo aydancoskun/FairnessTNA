@@ -93,6 +93,7 @@ class QualificationFactory extends Factory {
                                         'group_id' => 'Group',
                                         'group' => FALSE,
 										'name' => 'Name',
+										'name_metaphone' => 'NameMetaphone',
                                         'description' => 'Description',
 
                                         'tag' => 'Tag',
@@ -403,6 +404,8 @@ class QualificationFactory extends Factory {
 							if ( method_exists( $this, $function ) ) {
 								$data[$variable] = Option::getByKey( $this->$function(), $this->getOptions( $variable ) );
 							}
+							break;
+						case 'name_metaphone':
 							break;
 						default:
 							if ( method_exists( $this, $function ) ) {
