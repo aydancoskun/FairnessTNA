@@ -62,6 +62,7 @@ switch ($action) {
 		if ($handle) {
     	$latest_version = trim(fgets($handle, 4096));
  			fclose($handle);
+// 			$latest_version = "10.0.0";
 			Debug::Text('Github says latest version is '.$latest_version, __FILE__, __LINE__, __METHOD__,10);
 		}
 

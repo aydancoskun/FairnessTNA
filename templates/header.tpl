@@ -1,25 +1,22 @@
 <html>
 <head>
 <link rel="stylesheet" href="{$BASE_URL}{$css_file}" type="text/css" />
+<link rel="stylesheet" type="text/css" media="screen" href="{$BASE_URL}menu/superfish.css" />
 
 <title>{$APPLICATION_NAME}{if $title != ''} - {$title}{/if}</title>
 <SCRIPT language=JavaScript src="{$BASE_URL}global.js.php" type=text/javascript></SCRIPT>
 
-<SCRIPT language=JavaScript>
+<script language=JavaScript>
 {literal}
 function help_window(group) {
 	help=window.open('{/literal}{$BASE_URL}{literal}help/WindowViewHelp.php?script='+ encodeURI(group) +'&title='+ encodeURI('{/literal}{$title|escape}{literal}'),"Help","toolbar=0,status=1,menubar=0,scrollbars=1,fullscreen=no,width=400,height=600,resizable=1");
 }
 {/literal}
-</SCRIPT>
-
-<SCRIPT language=JavaScript src="{$BASE_URL}menu/milonic_src.js" type=text/javascript></SCRIPT>
-<script language=JavaScript>
-if(ns4)_d.write("<scr"+"ipt language=JavaScript src={$BASE_URL}menu/mmenuns4.js><\/scr"+"ipt>");
-else _d.write("<scr"+"ipt language=JavaScript src={$BASE_URL}menu/mmenudom.js><\/scr"+"ipt>");
 </script>
-<SCRIPT language=JavaScript src="{$BASE_URL}menu.js.php" type=text/javascript></SCRIPT>
 
+<script type="text/javascript" src="{$BASE_URL}js/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="{$BASE_URL}menu/hoverIntent.js"></script>
+<script type="text/javascript" src="{$BASE_URL}menu/superfish.js"></script>
 </head>
 <body id="body" onLoad="{*onload_quick_help();*}handleMenuOverlapLogo();onload_column_expand();{$body_onload};firstElementFocus();{if (!isset($newMailPopUp) AND $unread_messages > 0)}newMailPopUp('{$BASE_URL}');{/if}">
 
@@ -49,10 +46,11 @@ else _d.write("<scr"+"ipt language=JavaScript src={$BASE_URL}menu/mmenudom.js><\
 		</span>
 		<div id="rowHeaderContainer">
 		<div id="rowHeaderText">&nbsp;{$current_company->getName()} - {$current_user->getFullName()}</div>
-		<div id="rowHeaderMenu">M</script>
+		<div>{include file="menu.tpl"}</div>
 		</div>
 	</div>
 </div>
+<div class="clearfix"></div>
 <div id="rowBreadcrumbs">
 	{*
 	<span class="imgRight">

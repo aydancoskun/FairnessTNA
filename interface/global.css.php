@@ -109,14 +109,24 @@ a.footerLink, a.footerLink:link, a.footerLink:visited, a.footerLink:hover, a.foo
 .imgRight{float:right;}
 .imgLock{float:left; padding-right:5px;}
 
+/* clearfix */
+.clearfix {content: ".";display: block;height: 0;clear: both;visibility: hidden;}
+/*
+.clearfix:after {content: ".";display: block;height: 0;clear: both;visibility: hidden;}
+.clearfix {display: inline-block;}
+* html .clearfix {height: 1%;}
+.clearfix {display: block;}
+*/
 /* template page */
-#rowHeader{margin:0; padding:0; height:48px; text-align:left; border-bottom:3px solid #fff;}
+#rowHeader{clear:left;margin:0; padding:0 0 3px 0; height:50px; text-align:left; border-bottom:3px solid #c30;}
 #rowMenu{clear:both; margin:0; padding:6px; background:#336699; color:#336699;} /* padding:0; height:25px; */
 #rowMenu ul{list-style:none; margin:0; padding:0;}
 #rowMenu li{display:inline; margin:0 -3px 0 0;}
-#rowBreadcrumbs{margin:0; padding:3px 10px 5px 10px; background:#fff; color:#000; border-top:3px solid #c30;}
+
+#rowBreadcrumbs{margin:0; padding:0px 10px 7px 10px; background:#fff; color:#000; text-align:left;font-size:12px;}
 #rowBreadcrumbs a, #rowBreadcrumbs a:hover, #rowBreadcrumbs a:link, #rowBreadcrumbs a:visited, #rowBreadcrumbs a:active {text-decoration:none; color:#000;}
 #rowBreadcrumbs2{margin:0; padding:3px 10px; background:#EAF0F5; color:#000;}
+
 #rowContent{margin:0; padding:0;}
 #rowContentInner{margin:0; padding:2px 0px; background:#7a9bbd;}
 #rowContentInner2{margin:0; padding:10px;}
@@ -126,11 +136,6 @@ a.footerLink, a.footerLink:link, a.footerLink:visited, a.footerLink:hover, a.foo
 #rowHeaderText{padding:0px; margin:0; font-size:14px; font-weight:bold; color:#999;}
 #rowHeaderMenu{margin:0; padding:6px; background:#fff; color:#fff;}
 #rowHeaderContainer{margin:0; padding:0;}
-
-/*
-a.menuLink, a.menuLink:link, a.menuLink:visited{text-decoration:none; color:#fff; font-weight:bold; font-size:11px; padding:2px 10px 5px 10px; margin:0; background:transparent url(images/menu_separator.gif) no-repeat top right;}
-a.menuLink:hover, a.menuLink:active{text-decoration:none; color:#D9D981; font-weight:bold; font-size:11px; padding:2px 10px 5px 10px; margin:0; background:transparent url(images/menu_separator.gif) no-repeat top right;}
-*/
 
 .imgClientLogo{float:right; margin:0 10px; padding-top:4px;}
 
