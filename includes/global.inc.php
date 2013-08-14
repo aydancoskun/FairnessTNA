@@ -52,6 +52,12 @@ ob_start(); //Take care of GZIP in Apache
 if ( ini_get('max_execution_time') < 1800 ) {
 	ini_set( 'max_execution_time', 1800 );
 }
+
+// This handles a bug in the permissions screen where PHPs default max_input_vars = 1000 is throwing errors
+if ( ini_get('max_input_vars') < 2000 ) {
+	ini_set( 'max_input_vars', 2000 );
+}
+
 //Disable magic quotes at runtime. Require magic_quotes_gpc to be disabled during install.
 //Check: http://ca3.php.net/manual/en/security.magicquotes.php#61188 for disabling magic_quotes_gpc
 ini_set( 'magic_quotes_runtime', 0 );
