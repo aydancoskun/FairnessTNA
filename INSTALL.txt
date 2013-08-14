@@ -36,18 +36,16 @@ UPGRADE INSTRUCTIONS
 
 1. *IMPORTANT* Create a backup of your current installation, including your Fairness database.
 
-2. *VERY IMPORTANT* No really, create a backup of all your Fairness data including your
-   fairness.ini.php file, as it contains a cryptographic salt that if you lose you will
-   not be able to login to Fairness or access encrypted data ever again.
+2. *VERY IMPORTANT* Create a backup of your  fairness.ini.php file, as it contains a cryptographic salt that if you lose you will not be able to login to Fairness or access encrypted data ever again.
 
-   **BE SURE TO BACKUP YOUR Fairness DATABASE AND YOUR fairness.ini.php FILE!**
+3. DO NOT PROCEED UNLESS YOU HAVE A BACKUP OF YOUR FAIRNESS DATABASE AND YOUR fairness.ini.php FILE!
 
-3. Copy the current version of Fairness over the top of your current installation.
+4. Copy the current version of Fairness over the top of your current installation.
 
    if you use git just do 'git pull' which will pull the latest version in from github
 
-4. Edit fairness.ini.php in your new Fairness directory and set: installer_enabled = TRUE
+5. Edit fairness.ini.php in your new Fairness directory and set: installer_enabled = TRUE
 
-5. Point your web browser to: http://<web server address>/<fairness directory>/interface/install/install.php ie: http://localhost/fairness/interface/install/install.php
+6. Point your web browser to: http://<web server address>/<fairness directory>/interface/install/install.php ie: http://localhost/fairness/interface/install/install.php
 
-6. Follow instructions, Fairness will automatically upgrade your database tables as necessary.
+7. Follow instructions, Fairness will automatically upgrade your database tables as necessary.
