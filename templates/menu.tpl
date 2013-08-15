@@ -1,5 +1,5 @@
 <ul id="nav-one" class="sf-menu sf-navbar">
-	<li><a href="{$BASE_URL}/index.php" ><img src = "{$IMAGES_URL}home_icon.gif" /></a></li>
+	<!--li><a href="{$BASE_URL}/index.php" ><img src = "{$IMAGES_URL}home_icon.gif" /></a></li-->
 	{if $permission->Check('punch','enabled') }
 		<li>
 			<a href="#">
@@ -654,7 +654,7 @@
 	 	</li>
   {/if}
 </ul>
-<img src = "{$IMAGES_URL}tab_menu.gif" />
+<!-img src = "{$IMAGES_URL}tab_menu.gif" /-->
 
 <script type="text/javascript">
 {literal}
