@@ -430,7 +430,7 @@
 				      {if $permission->Check('report','view_general_ledger_summary')}
 					      <li><a href="{$BASE_URL}report/GeneralLedgerSummary.php">{t}General Ledger Summary{/t}</a></li>
 				      {/if}
-				      {if $permission->Check('report','enabled')}
+				      {if false AND $permission->Check('report','enabled')}
 					      <li><a href="#">{t}Expense Summary{/t}</a></li>
 				      {/if}
 							{if $permission->Check('report','view_wages_payable_summary')}
