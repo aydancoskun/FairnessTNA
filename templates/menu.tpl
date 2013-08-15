@@ -145,7 +145,7 @@
   <li>
     <a href="#">{t}Payroll{/t}</a>
     <ul>
-	    {if $false AND permission->Check('pay_period_schedule','enabled') AND $permission->Check('pay_period_schedule','view')}
+	    {if false AND permission->Check('pay_period_schedule','enabled') AND $permission->Check('pay_period_schedule','view')}
 	      <li><a href="#">{t}Process Payroll{/t}</a></li>
       {/if}
 			{if $permission->Check('pay_stub','view') OR $permission->Check('pay_stub','view_own')}
