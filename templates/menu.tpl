@@ -439,7 +439,7 @@
 	        </ul>
 	      </li>
 	      {/if}
-	      {if $permission->Check('job_report','enabled') }
+	      {if false AND $permission->Check('job_report','enabled') }
 	      <li>
 	        <a href="#">{t}Job Tracking Reports{/t}</a>
 	        <ul>
@@ -459,7 +459,7 @@
 	          <li><a href="{$BASE_URL}report/JobPayrollDetail.php">{t}Job Payroll Analysis{/t}</a></li>
 	          {/if}
 	          {if $permission->Check('job_report','view_job_barcode')}
-	          <li><a href="{$BASE_URL}report/JobBarcode.php">{t}Barcodes{/t}</a></li>
+	          <li><a href="{$BASE_URL}report/JobBarcode.php">{t}Job Barcodes{/t}</a></li>
 	          {/if}
 	        </ul>
 	      </li>
