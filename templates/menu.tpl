@@ -1,85 +1,77 @@
 <ul id="nav-one" class="sf-menu sf-navbar">
 	<li><a href="{$BASE_URL}/index.php" ><img src = "{$IMAGES_URL}home_icon.gif" /></a></li>
-  <li>
-    <a href="#">
-			{if $permission->Check('punch','view') OR $permission->Check('punch','view_own')}{if $display_exception_flag == 'red'}<img src = "{$IMAGES_URL}red_flag.gif" />{/if}{/if}
-			{t}Attendance{/t}
-    </a>
-    <ul>
-			{if $permission->Check('punch','enabled') }
-				<li>
-					<a href="#">
-						{if $permission->Check('punch','view') OR $permission->Check('punch','view_own')}{if $display_exception_flag == 'red'}<img src = "{$IMAGES_URL}red_flag.gif" />{/if}{/if}
-						{t}Attendance{/t}
-					</a>
-					<ul>
-						{if $permission->Check('punch','enabled') AND $permission->Check('punch','punch_in_out') }
-							<li><a href="#" onclick="javascript:timePunch();">{t}In / Out{/t}</a></li>
-						{/if}
-						{if $permission->Check('punch','view') OR $permission->Check('punch','view_own')}
-							<li><a href="{$BASE_URL}timesheet/ViewUserTimeSheet.php">{t}Timesheet{/t}</a></li>
-						{/if}
-						{if $permission->Check('punch','edit') OR $permission->Check('punch','edit_child')}
-							<li><a href="{$BASE_URL}punch/PunchList.php">{t}Punches{/t}</a></li>
-						{/if}
-						{if $permission->Check('punch','view') OR $permission->Check('punch','view_own')}
-							<li><a href="{$BASE_URL}punch/UserExceptionList.php">{if $display_exception_flag != false}<img src = "{$IMAGES_URL}{$display_exception_flag}_flag.gif" />{/if}{t}Exceptions{/t}</a></li>
-						{/if}
-						{if $permission->Check('request','view') OR $permission->Check('request','view_own')}
-							<li><a href="{$BASE_URL}request/UserRequestList.php">{t}Requests{/t}</a></li>
-						{/if}
-						{if $permission->Check('accrual','view') OR $permission->Check('accrual','view_own')}
-							<li><a href="{$BASE_URL}accrual/UserAccrualBalanceList.php">{t}Accrual Balances{/t}</a></li>
-						{/if}
-					</ul>
-				</li>
-			{/if}
-			{if $permission->Check('schedule','enabled') OR $permission->Check('recurring_schedule','enabled') OR $permission->Check('recurring_schedule_template','enabled')}
-				<li>
-  	      <a href="#">{t}Schedule{/t}</a>
-					<ul>
-						{if $permission->Check('schedule','view') OR $permission->Check('schedule','view_own')}
-							<li><a href="{$BASE_URL}schedule/ViewSchedule.php">{t}Schedules{/t}</a></li>
-						{/if}
-						{if $permission->Check('schedule','edit') OR $permission->Check('schedule','edit_child')}
-							<li><a href="{$BASE_URL}schedule/ScheduleList.php">{t}Scheduled Shifts{/t}</a></li>
-							<li><a href="{$BASE_URL}schedule/AddMassSchedule.php">{t}Mass Schedule{/t}</a></li>
-						{/if}
-						{if $permission->Check('recurring_schedule','enabled')}
-							<li><a href="{$BASE_URL}schedule/RecurringScheduleControlList.php">{t}Recurring Schedule{/t}</a></li>
-						{/if}
-						{if $permission->Check('recurring_schedule_template','enabled')}
-							<li><a href="{$BASE_URL}schedule/RecurringScheduleTemplateControlList.php">{t}Recurring Schedule Template{/t}</a></li>
-						{/if}
-					</ul>
-				</li>
-			{/if}
-			{if $permission->Check('job','enabled')	AND ( $permission->Check('job','view') OR $permission->Check('job','view_own') ) }
-				<li>
-					<a href="#">{t}Job Tracking{/t}</a>
-					<ul>
-		      	{if $permission->Check('job','view') OR $permission->Check('job','view_own')}
-							<li><a href="{$BASE_URL}job/JobList.php">{t}Jobs{/t}</a></li>
-						{/if}
-						{if $permission->Check('job_item','view') OR $permission->Check('job_item','view_own')}
-							<li><a href="{$BASE_URL}job_item/JobItemList.php">{t}Tasks{/t}</a></li>
-						{/if}
-						{if $permission->Check('job','view') OR $permission->Check('job','view_own')}
-							<li><a href="{$BASE_URL}job/JobGroupList.php">{t}Job Groups{/t}</a></li>
-						{/if}
-						{if $permission->Check('job_item','view') OR $permission->Check('job_item','view_own')}
-							<li><a href="{$BASE_URL}job_item/JobItemGroupList.php">{t}Task Groups{/t}</a></li>
-						{/if}
-					</ul>
-				</li>
-			{/if}
-    </ul>
-  </li>
+	{if $permission->Check('punch','enabled') }
+		<li>
+			<a href="#">
+				{if $permission->Check('punch','view') OR $permission->Check('punch','view_own')}{if $display_exception_flag == 'red'}<img src = "{$IMAGES_URL}red_flag.gif" />{/if}{/if}
+				{t}Attendance{/t}
+			</a>
+			<ul>
+				{if $permission->Check('punch','enabled') AND $permission->Check('punch','punch_in_out') }
+					<li><a href="#" onclick="javascript:timePunch();">{t}In / Out{/t}</a></li>
+				{/if}
+				{if $permission->Check('punch','view') OR $permission->Check('punch','view_own')}
+					<li><a href="{$BASE_URL}timesheet/ViewUserTimeSheet.php">{t}Timesheet{/t}</a></li>
+				{/if}
+				{if $permission->Check('punch','edit') OR $permission->Check('punch','edit_child')}
+					<li><a href="{$BASE_URL}punch/PunchList.php">{t}Punches{/t}</a></li>
+				{/if}
+				{if $permission->Check('punch','view') OR $permission->Check('punch','view_own')}
+					<li><a href="{$BASE_URL}punch/UserExceptionList.php">{if $display_exception_flag != false}<img src = "{$IMAGES_URL}{$display_exception_flag}_flag.gif" />{/if}{t}Exceptions{/t}</a></li>
+				{/if}
+				{if $permission->Check('request','view') OR $permission->Check('request','view_own')}
+					<li><a href="{$BASE_URL}request/UserRequestList.php">{t}Requests{/t}</a></li>
+				{/if}
+				{if $permission->Check('accrual','view') OR $permission->Check('accrual','view_own')}
+					<li><a href="{$BASE_URL}accrual/UserAccrualBalanceList.php">{t}Accrual Balances{/t}</a></li>
+				{/if}
+			</ul>
+		</li>
+	{/if}
+	{if $permission->Check('schedule','enabled') OR $permission->Check('recurring_schedule','enabled') OR $permission->Check('recurring_schedule_template','enabled')}
+		<li>
+      <a href="#">{t}Schedule{/t}</a>
+			<ul>
+				{if $permission->Check('schedule','view') OR $permission->Check('schedule','view_own')}
+					<li><a href="{$BASE_URL}schedule/ViewSchedule.php">{t}Schedules{/t}</a></li>
+				{/if}
+				{if $permission->Check('schedule','edit') OR $permission->Check('schedule','edit_child')}
+					<li><a href="{$BASE_URL}schedule/ScheduleList.php">{t}Scheduled Shifts{/t}</a></li>
+					<li><a href="{$BASE_URL}schedule/AddMassSchedule.php">{t}Mass Schedule{/t}</a></li>
+				{/if}
+				{if $permission->Check('recurring_schedule','enabled')}
+					<li><a href="{$BASE_URL}schedule/RecurringScheduleControlList.php">{t}Recurring Schedule{/t}</a></li>
+				{/if}
+				{if $permission->Check('recurring_schedule_template','enabled')}
+					<li><a href="{$BASE_URL}schedule/RecurringScheduleTemplateControlList.php">{t}Recurring Schedule Template{/t}</a></li>
+				{/if}
+			</ul>
+		</li>
+	{/if}
+	{if $permission->Check('job','enabled')	AND ( $permission->Check('job','view') OR $permission->Check('job','view_own') ) }
+		<li>
+			<a href="#">{t}Job Tracking{/t}</a>
+			<ul>
+      	{if $permission->Check('job','view') OR $permission->Check('job','view_own')}
+					<li><a href="{$BASE_URL}job/JobList.php">{t}Jobs{/t}</a></li>
+				{/if}
+				{if $permission->Check('job_item','view') OR $permission->Check('job_item','view_own')}
+					<li><a href="{$BASE_URL}job_item/JobItemList.php">{t}Tasks{/t}</a></li>
+				{/if}
+				{if $permission->Check('job','view') OR $permission->Check('job','view_own')}
+					<li><a href="{$BASE_URL}job/JobGroupList.php">{t}Job Groups{/t}</a></li>
+				{/if}
+				{if $permission->Check('job_item','view') OR $permission->Check('job_item','view_own')}
+					<li><a href="{$BASE_URL}job_item/JobItemGroupList.php">{t}Task Groups{/t}</a></li>
+				{/if}
+			</ul>
+		</li>
+	{/if}
   <li>
     <a href="#">{t}Employee{/t}</a>
     <ul>
       {if $permission->Check('user','enabled') AND ( $permission->Check('user','view') OR $permission->Check('user','view_child') )}
-	      <li><a href="{$BASE_URL}users/UserList.php">{t}Employee Administration{/t}</a></li>
+	      <li><a href="{$BASE_URL}users/UserList.php">{t}Employees{/t}</a></li>
       {/if}
       {if $permission->Check('user_contact','enabled') AND ( $permission->Check('user_contact','view') OR $permission->Check('user_contact','view_child') )}
   	    <li><a href="#">{t}Employee Contacts{/t}</a></li>
@@ -108,61 +100,45 @@
   <li>
     <a href="#">{t}Company{/t}</a>
     <ul>
-			<li>
-  	    <a href="#">{t}Company{/t}</a>
-				<ul>
-		      {if $permission->Check('company','enabled') AND $permission->Check('company','view')}
-		      <li><a href="{$BASE_URL}company/CompanyList.php">{t}Companies{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own')}
-		        <li><a href="{$BASE_URL}company/EditCompany.php?id">{t}Company Information{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('pay_period_schedule','enabled') AND $permission->Check('pay_period_schedule','view')}
-		        <li><a href="{$BASE_URL}payperiod/PayPeriodScheduleList.php">{t}Pay Period Schedules{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('branch','enabled') AND $permission->Check('branch','view')}
-			      <li><a href="{$BASE_URL}branch/BranchList.php">{t}Branches{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('department','enabled') AND $permission->Check('department','view')}
-		  	    <li><a href="{$BASE_URL}department/DepartmentList.php">{t}Departments{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('hierarchy','enabled') AND $permission->Check('hierarchy','view')}
-		        <li><a href="{$BASE_URL}hierarchy/HierarchyControlList.php">{t}Hierarchy{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('wage','enabled') AND $permission->Check('wage','view')}
-		    	  <li><a href="{$BASE_URL}company/WageGroupList.php">{t}Secondary Wage Groups{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('user','view') OR $permission->Check('user','view_own') OR $permission->Check('user','view_child')}
-		    	  <li><a href="#">{t}Ethnic Groups{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('station','enabled') AND $permission->Check('station','view')}
-			      <li><a href="{$BASE_URL}station/StationList.php">{t}Stations{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('permission','enabled') AND $permission->Check('permission','edit')}
-		  	    <li><a href="{$BASE_URL}permission/PermissionControlList.php">{t}Permission Groups{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('currency','enabled') AND $permission->Check('currency','view')}
-		    	  <li><a href="{$BASE_URL}currency/CurrencyList.php">{t}Currencies{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own_bank')}
-		        <li><a href="{$BASE_URL}bank_account/EditBankAccount.php?company_id">{t}Bank Account{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('other_field','enabled') AND $permission->Check('other_field','view')}
-			      <li><a href="{$BASE_URL}company/OtherFieldList.php">{t}Custom Fields{/t}</a></li>
-		      {/if}
-				</ul>
-			</li>
-			<li>
-  	    <a href="#">{t}Other{/t}</a>
-				<ul>
-		      {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own_bank')}
-		        <li><a href="#">{t}Import{/t}</a></li>
-		      {/if}
-		      {if $permission->Check('other_field','enabled') AND $permission->Check('other_field','view')}
-			      <li><a href="#">{t}Quick Start{/t}</a></li>
-		      {/if}
-				</ul>
-			</li>
+      {if $permission->Check('company','enabled') AND $permission->Check('company','view')}
+      <li><a href="{$BASE_URL}company/CompanyList.php">{t}Companies{/t}</a></li>
+      {/if}
+      {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own')}
+        <li><a href="{$BASE_URL}company/EditCompany.php?id">{t}Company Information{/t}</a></li>
+      {/if}
+      {if $permission->Check('pay_period_schedule','enabled') AND $permission->Check('pay_period_schedule','view')}
+        <li><a href="{$BASE_URL}payperiod/PayPeriodScheduleList.php">{t}Pay Period Schedules{/t}</a></li>
+      {/if}
+      {if $permission->Check('branch','enabled') AND $permission->Check('branch','view')}
+	      <li><a href="{$BASE_URL}branch/BranchList.php">{t}Branches{/t}</a></li>
+      {/if}
+      {if $permission->Check('department','enabled') AND $permission->Check('department','view')}
+  	    <li><a href="{$BASE_URL}department/DepartmentList.php">{t}Departments{/t}</a></li>
+      {/if}
+      {if $permission->Check('hierarchy','enabled') AND $permission->Check('hierarchy','view')}
+        <li><a href="{$BASE_URL}hierarchy/HierarchyControlList.php">{t}Hierarchy{/t}</a></li>
+      {/if}
+      {if $permission->Check('wage','enabled') AND $permission->Check('wage','view')}
+    	  <li><a href="{$BASE_URL}company/WageGroupList.php">{t}Secondary Wage Groups{/t}</a></li>
+      {/if}
+      {if $permission->Check('user','view') OR $permission->Check('user','view_own') OR $permission->Check('user','view_child')}
+    	  <li><a href="#">{t}Ethnic Groups{/t}</a></li>
+      {/if}
+      {if $permission->Check('station','enabled') AND $permission->Check('station','view')}
+	      <li><a href="{$BASE_URL}station/StationList.php">{t}Stations{/t}</a></li>
+      {/if}
+      {if $permission->Check('permission','enabled') AND $permission->Check('permission','edit')}
+  	    <li><a href="{$BASE_URL}permission/PermissionControlList.php">{t}Permission Groups{/t}</a></li>
+      {/if}
+      {if $permission->Check('currency','enabled') AND $permission->Check('currency','view')}
+    	  <li><a href="{$BASE_URL}currency/CurrencyList.php">{t}Currencies{/t}</a></li>
+      {/if}
+      {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own_bank')}
+        <li><a href="{$BASE_URL}bank_account/EditBankAccount.php?company_id">{t}Bank Account{/t}</a></li>
+      {/if}
+      {if $permission->Check('other_field','enabled') AND $permission->Check('other_field','view')}
+	      <li><a href="{$BASE_URL}company/OtherFieldList.php">{t}Custom Fields{/t}</a></li>
+      {/if}
     </ul>
   </li>
 
@@ -561,7 +537,7 @@
     OR $permission->Check('user','edit_own_bank')
     OR $permission->Check('message','enabled')}
 		<li>
-    	<a href="#">{t}My Account{/t}</a>
+    	<a href="#">{t}Account{/t}</a>
 			<ul>
 	      {if $permission->Check('user','edit_own') }
 		      <li>
@@ -630,6 +606,19 @@
 						</ul>
 					</li>
 				{/if}
+	      {if $permission->Check('user','edit_own') }
+					<li>
+						<a href="#">{t}Setup{/t}</a>
+						<ul>
+							{if $permission->Check('company','enabled') AND $permission->Check('company','edit_own_bank')}
+								<li><a href="#">{t}Import{/t}</a></li>
+							{/if}
+							{if $permission->Check('other_field','enabled') AND $permission->Check('other_field','view')}
+								<li><a href="#">{t}Quick Start{/t}</a></li>
+							{/if}
+						</ul>
+					</li>
+	      {/if}
 			  <li><a href="{$BASE_URL}Logout.php">{t}Logout{/t}</a></li>
 			</ul>
 		</li>
