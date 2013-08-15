@@ -33,7 +33,7 @@ if ( !$permission->Check('user','enabled')
 	$permission->Redirect( FALSE ); //Redirect
 }
 
-$smarty->assign('title', TTi18n::gettext($title = 'Employee Title List')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Job Titles')); // See index.php
 BreadCrumb::setCrumb($title);
 
 /*

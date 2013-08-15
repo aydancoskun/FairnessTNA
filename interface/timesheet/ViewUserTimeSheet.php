@@ -96,7 +96,7 @@ function TimeSheetFormatArrayByDate($input_arr, $type_arr, $calendar_array, $nam
 	return $total_rows;
 }
 
-$smarty->assign('title', TTi18n::gettext($title = 'My Timesheet')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Timesheet')); // See index.php
 
 
 /*

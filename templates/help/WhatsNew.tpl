@@ -155,7 +155,7 @@
 							<li>Exception Policy:
 								<ul>
 									<li>Added pre-mature exceptions that alert supervisors to exceptions that may need to be corrected by the end of the day.</li>
-									<li>Added search/filter capability to exception list page.</li>
+									<li>Added search/filter capability to exceptions page.</li>
 								</ul>
 							</li>
 							<br>

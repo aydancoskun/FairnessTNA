@@ -35,7 +35,7 @@ if ( !$permission->Check('schedule','enabled')
 
 //Debug::setVerbosity( 11 );
 
-$smarty->assign('title', TTi18n::gettext($title = 'Scheduled Shifts List')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Scheduled Shifts')); // See index.php
 
 /*
  * Get FORM variables

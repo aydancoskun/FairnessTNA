@@ -2643,7 +2643,7 @@ class ExceptionPolicyFactory extends Factory {
 			}
 		}
 
-		//Mark any existing exceptions that are not in the current exception list for deletion.
+		//Mark any existing exceptions that are not in the current exceptions for deletion.
 		$delete_exceptions = array();
 
 		$delete_exception = FALSE;

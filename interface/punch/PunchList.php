@@ -35,7 +35,7 @@ if ( !$permission->Check('punch','enabled')
 
 //Debug::setVerbosity( 11 );
 
-$smarty->assign('title', TTi18n::gettext($title = 'Punch List')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Punches')); // See index.php
 
 /*
  * Get FORM variables

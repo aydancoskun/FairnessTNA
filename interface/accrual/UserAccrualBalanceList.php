@@ -35,7 +35,7 @@ if ( !$permission->Check('accrual','enabled')
 
 //Debug::setVerbosity( 11 );
 
-$smarty->assign('title', TTi18n::gettext($title = 'Accrual Balance List')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Accrual Balances')); // See index.php
 BreadCrumb::setCrumb($title);
 /*
  * Get FORM variables

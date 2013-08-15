@@ -36,7 +36,7 @@ if ( !$permission->Check('schedule','enabled')
 	$permission->Redirect( FALSE ); //Redirect
 }
 
-$smarty->assign('title', TTi18n::gettext($title = 'My Schedule')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Schedules')); // See index.php
 //BreadCrumb::setCrumb($title);
 
 /*

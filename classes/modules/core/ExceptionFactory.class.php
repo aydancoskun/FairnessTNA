@@ -47,7 +47,7 @@ class ExceptionFactory extends Factory {
 				//   - If the exception is pre-mature, we wait 16-24hrs for it to become a full-blown exception
 				// - If the exception requires authorization, it sits in a pending state waiting for supervsior intervention.
 				// - Supervisor authorizes the exception, or makes a correction, leaves a note or something.
-				//	 - Exception no longer appears on timesheet/exception list.
+				//	 - Exception no longer appears on attendance/exceptions.
 				$retval = array(
 										5  => TTi18n::gettext('Pre-Mature'),
 										30 => TTi18n::gettext('PENDING AUTHORIZATION'),

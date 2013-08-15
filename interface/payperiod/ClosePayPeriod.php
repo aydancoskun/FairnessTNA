@@ -35,7 +35,7 @@ if ( !$permission->Check('pay_period_schedule','enabled')
 
 //Debug::setVerbosity(11);
 
-$smarty->assign('title', TTi18n::gettext($title = 'End of Pay Period')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Pay Periods')); // See index.php
 BreadCrumb::setCrumb($title);
 
 /*

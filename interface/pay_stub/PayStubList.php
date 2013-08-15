@@ -36,7 +36,7 @@ if ( !$permission->Check('pay_stub','enabled')
 	$permission->Redirect( FALSE ); //Redirect
 }
 
-$smarty->assign('title', TTi18n::gettext($title = 'Pay Stub List')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Pay Stubs')); // See index.php
 /*
  * Get FORM variables
  */

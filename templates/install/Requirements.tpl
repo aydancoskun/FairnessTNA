@@ -177,7 +177,6 @@
 								</td>
 							</tr>
 
-							<!-- Aydan if $install_obj->getTTProductEdition() >= 20 -->
 							<tr>
 								<td class="cellLeftEditTable">
 									{t}MCRYPT Enabled:{/t}
@@ -191,7 +190,6 @@
 									</span>
 								</td>
 							</tr>
-							<!--/if -->
 
 							<tr>
 								<td class="cellLeftEditTable">

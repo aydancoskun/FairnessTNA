@@ -35,7 +35,7 @@ if ( !$permission->Check('recurring_schedule','enabled')
 
 //Debug::setVerbosity(11);
 
-$smarty->assign('title', TTi18n::gettext($title = 'Recurring Schedule List')); // See index.php
+$smarty->assign('title', TTi18n::gettext($title = 'Recurring Schedules')); // See index.php
 
 /*
  * Get FORM variables
