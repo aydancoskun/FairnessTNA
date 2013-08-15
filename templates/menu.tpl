@@ -170,7 +170,7 @@
       {if $permission->Check('pay_stub_account','enabled') AND $permission->Check('pay_stub_account','view')}
         <li><a href="{$BASE_URL}pay_stub/EditPayStubEntryAccountLink.php">{t}Pay Stub Account Linking{/t}</a></li>
       {/if}
-      {if $permission->Check('user_expense','enabled') AND $permission->Check('user_expense','view') OR $permission->Check('user_expense','view_child') OR $permission->Check('user_expense','view_own') }
+      {if false AND $permission->Check('user_expense','enabled') AND $permission->Check('user_expense','view') OR $permission->Check('user_expense','view_child') OR $permission->Check('user_expense','view_own') }
         <li><a href="#">{t}Expenses{/t}</a></li>
       {/if}
     </ul>
