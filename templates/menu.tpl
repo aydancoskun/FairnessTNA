@@ -452,7 +452,7 @@
 	          {if false AND $permission->Check('job_report','enabled')}
 	          <li><a href="#">{t}Job Information{/t}</a></li>
 	          {/if}
-	          {if $permission->Check('job_report','enabled')}
+	          {if false AND $permission->Check('job_report','enabled')}
 	          <li><a href="#">{t}Task Information{/t}</a></li>
 	          {/if}
 	          {if $permission->Check('job_report','view_job_payroll_analysis')}
