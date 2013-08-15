@@ -220,7 +220,7 @@
         {if $permission->Check('absence_policy','enabled') AND $permission->Check('absence_policy','view')}
       	  <li><a href="{$BASE_URL}policy/AbsencePolicyList.php">{t}Absence Policies{/t}</a></li>
         {/if}
-				{if $permission->Check('user_expense','enabled') AND $permission->Check('user_expense','view') OR $permission->Check('user_expense','view_child') OR $permission->Check('user_expense','view_own') }
+				{if false AND $permission->Check('user_expense','enabled') AND $permission->Check('user_expense','view') OR $permission->Check('user_expense','view_child') OR $permission->Check('user_expense','view_own') }
     	    <li><a href="#">{t}Expense Policies{/t}</a></li>
         {/if}
         {if $permission->Check('holiday_policy','enabled') AND $permission->Check('holiday_policy','view')}
