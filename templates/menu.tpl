@@ -48,9 +48,9 @@
 			</ul>
 		</li>
 	{/if}
-	{if $permission->Check('job','enabled')	AND ( $permission->Check('job','view') OR $permission->Check('job','view_own') ) }
+	{if false AND $permission->Check('job','enabled')	AND ( $permission->Check('job','view') OR $permission->Check('job','view_own') ) }
 		<li>
-			<a href="#">{t}Job Tracking{/t}</a>
+			<a href="#">{t}Jobs{/t}</a>
 			<ul>
       	{if $permission->Check('job','view') OR $permission->Check('job','view_own')}
 					<li><a href="{$BASE_URL}job/JobList.php">{t}Jobs{/t}</a></li>
