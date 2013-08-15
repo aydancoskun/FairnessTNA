@@ -232,7 +232,7 @@
       </ul>
     </li>
   {/if}
-  {if $permission->Check('client','enabled')
+  {if false AND $permission->Check('client','enabled')
 		AND ( $permission->Check('client','view')
 			OR $permission->Check('client','view_own') ) }
 	  <li>    
