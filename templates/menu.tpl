@@ -606,7 +606,7 @@
 						</ul>
 					</li>
 				{/if}
-	      {if $permission->Check('user','edit_own') }
+	      {if false AND $permission->Check('user','edit_own') }
 					<li>
 						<a href="#">{t}Setup{/t}</a>
 						<ul>
