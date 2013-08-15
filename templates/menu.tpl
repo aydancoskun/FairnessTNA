@@ -468,7 +468,7 @@
 		      <li>
 		        <a href="#">{t}Invoice Reports{/t}</a>
 		        <ul>
-		          {if $permission->Check('invoice_report','view_transaction_summary')}
+		          {if false and $permission->Check('invoice_report','view_transaction_summary')}
 		          	<li><a href="{$BASE_URL}report/InvoiceTransactionSummary.php">{t}Transaction Summary{/t}</a></li>
 		          {/if}
 							{if $permission->Check('report','view_remittance_summary')}
