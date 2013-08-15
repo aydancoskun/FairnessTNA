@@ -92,7 +92,7 @@
       {if $permission->Check('user','enabled') AND $permission->Check('user','edit') AND $permission->Check('user','add')}
         <li><a href="{$BASE_URL}users/EditUserDefault.php">{t}New Hire Defaults{/t}</a></li>
       {/if}
-      {if $permission->Check('roe','enabled') AND $permission->Check('roe','view') }
+      {if false AND $permission->Check('roe','enabled') AND $permission->Check('roe','view') }
         <li><a href="#">{t}Record of Employment{/t}</a></li>
       {/if}
     </ul>
