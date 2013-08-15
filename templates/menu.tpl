@@ -100,7 +100,7 @@
   <li>
     <a href="#">{t}Company{/t}</a>
     <ul>
-      {if $permission->Check('company','enabled') AND $permission->Check('company','view')}
+      {if false AND $permission->Check('company','enabled') AND $permission->Check('company','view')}
       <li><a href="{$BASE_URL}company/CompanyList.php">{t}Companies{/t}</a></li>
       {/if}
       {if $permission->Check('company','enabled') AND $permission->Check('company','edit_own')}
