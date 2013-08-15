@@ -79,7 +79,7 @@
       {if false AND $permission->Check('user_preference','enabled') AND ( $permission->Check('user_preference','view') OR $permission->Check('user_preference','view_child') )}
     	  <li><a href="#">{t}Preferences{/t}</a></li>
       {/if}
-      {if $permission->Check('wage','enabled') AND ( $permission->Check('wage','view') )}
+      {if false AND $permission->Check('wage','enabled') AND ( $permission->Check('wage','view') )}
       	<li><a href="#">{t}Wages{/t}</a></li>
       {/if}
       {if $permission->Check('user','enabled') AND ( $permission->Check('user','edit_own_bank') OR $permission->Check('user','edit_bank') )}
