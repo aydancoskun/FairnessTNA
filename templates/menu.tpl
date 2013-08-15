@@ -580,7 +580,7 @@
 						</ul>
 					</li>
 				{/if}
-	      {if $permission->Check('document','enabled') }
+	      {if false AND $permission->Check('document','enabled') }
 		      <li>
 	  	      <a href="#">{t}Documents{/t}</a>
 						<ul>
