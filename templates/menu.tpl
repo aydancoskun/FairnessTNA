@@ -558,7 +558,7 @@
 							{if $permission->Check('user_preference','enabled') AND ( $permission->Check('user_preference','edit_own') OR $permission->Check('user_preference','edit') OR $permission->Check('user_preference','edit_child') )}
 								<li><a href="{$BASE_URL}users/EditUserPreference.php">{t}Preferences{/t}</a></li>
 							{/if}
-				      {if $permission->Check('user_expense','enabled') AND $permission->Check('user_expense','view_own') }
+				      {if false AND $permission->Check('user_expense','enabled') AND $permission->Check('user_expense','view_own') }
 								<li><a href="#">{t}Expenses{/t}</a></li>
 							{/if}
 						</ul>
