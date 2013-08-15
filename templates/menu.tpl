@@ -82,7 +82,7 @@
       {if false AND $permission->Check('wage','enabled') AND ( $permission->Check('wage','view') )}
       	<li><a href="#">{t}Wages{/t}</a></li>
       {/if}
-      {if $permission->Check('user','enabled') AND ( $permission->Check('user','edit_own_bank') OR $permission->Check('user','edit_bank') )}
+      {if false AND  $permission->Check('user','enabled') AND ( $permission->Check('user','edit_own_bank') OR $permission->Check('user','edit_bank') )}
 	      <li><a href="#">{t}Bank Accounts{/t}</a></li>
       {/if}
       {if $permission->Check('user','enabled') AND $permission->Check('user','edit') AND $permission->Check('user','add')}
