@@ -73,7 +73,7 @@
       {if $permission->Check('user','enabled') AND ( $permission->Check('user','view') OR $permission->Check('user','view_child') )}
 	      <li><a href="{$BASE_URL}users/UserList.php">{t}Employees{/t}</a></li>
       {/if}
-      {if $permission->Check('user_contact','enabled') AND ( $permission->Check('user_contact','view') OR $permission->Check('user_contact','view_child') )}
+      {if false AND $permission->Check('user_contact','enabled') AND ( $permission->Check('user_contact','view') OR $permission->Check('user_contact','view_child') )}
   	    <li><a href="#">{t}Employee Contacts{/t}</a></li>
       {/if}
       {if $permission->Check('user_preference','enabled') AND ( $permission->Check('user_preference','view') OR $permission->Check('user_preference','view_child') )}
