@@ -550,7 +550,7 @@
 								<li><a href="{$BASE_URL}message/UserMessageList.php">{t}Messages{/t}</a></li>
 							{/if}
 							{if $permission->Check('user','edit_own')}
-								<li><a href="{$BASE_URL}users/EditUser.php?id">{t}Contact Information{/t}</a></li>
+								<li><a href="{$BASE_URL}users/EditUser.php?id={$current_user->getId()}">{t}Contact Information{/t}</a></li>
 							{/if}
 							{if $permission->Check('user','edit_own_bank')}
 								<li><a href="{$BASE_URL}bank_account/EditBankAccount.php">{t}Bank Information{/t}</a></li>
