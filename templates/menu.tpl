@@ -566,7 +566,7 @@
 				{/if}
 	      {if $permission->Check('authorization','enabled') }
 		      <li>
-	  	      <a href="#">{t}Authoization{/t}</a>
+	  	      <a href="#">{t}Authorization{/t}</a>
 						<ul>
 							{if $permission->Check('request','view') OR $permission->Check('request','view_own')}
 								<li><a href="{$BASE_URL}request/UserRequestList.php">{t}Request Authorization{/t}</a></li>
@@ -574,7 +574,7 @@
 							{if $permission->Check('authorization','enabled') AND ( $permission->Check('authorization','view') )}
 								<li><a href="{$BASE_URL}authorization/AuthorizationList.php">{t}Timesheet Authorization{/t}</a></li>
 							{/if}
-							{if $permission->Check('user_expense','enabled') AND $permission->Check('user_expense','view') OR $permission->Check('user_expense','view_child') OR $permission->Check('user_expense','view_own') }
+							{if false AND $permission->Check('user_expense','enabled') AND $permission->Check('user_expense','view') OR $permission->Check('user_expense','view_child') OR $permission->Check('user_expense','view_own') }
 								<li><a href="#">{t}Expenses{/t}</a></li>
 							{/if}
 						</ul>
