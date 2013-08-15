@@ -121,7 +121,7 @@
       {if $permission->Check('wage','enabled') AND $permission->Check('wage','view')}
     	  <li><a href="{$BASE_URL}company/WageGroupList.php">{t}Secondary Wage Groups{/t}</a></li>
       {/if}
-      {if  false AND $permission->Check('user','view') OR $permission->Check('user','view_own') OR $permission->Check('user','view_child')}
+      {if  false AND ($permission->Check('user','view') OR $permission->Check('user','view_own') OR $permission->Check('user','view_child') )}
     	  <li><a href="#">{t}Ethnic Groups{/t}</a></li>
       {/if}
       {if $permission->Check('station','enabled') AND $permission->Check('station','view')}
