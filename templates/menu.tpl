@@ -449,7 +449,7 @@
 	          {if $permission->Check('job_report','view_job_analysis')}
 	          <li><a href="{$BASE_URL}report/JobDetail.php">{t}Job Analysis{/t}</a></li>
 	          {/if}
-	          {if $permission->Check('job_report','enabled')}
+	          {if false AND $permission->Check('job_report','enabled')}
 	          <li><a href="#">{t}Job Information{/t}</a></li>
 	          {/if}
 	          {if $permission->Check('job_report','enabled')}
