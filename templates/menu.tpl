@@ -510,7 +510,7 @@
 						</ul>
 					</li>
 				{/if}
-	      {if $permission->Check('report','enabled') }
+	      {if false AND $permission->Check('report','enabled') }
 		      <li>
 	  	      <a href="#">{t}HR Reports{/t}</a>
 						<ul>
