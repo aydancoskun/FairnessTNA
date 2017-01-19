@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -317,7 +317,7 @@ switch ($action) {
 		$dlf = TTnew( 'DepartmentListFactory' );
 		$department_options = $dlf->getByCompanyIdArray( $current_company->getId() );
 
-/* Aydan
+/* aydancoskun
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$jlf->getByCompanyIdAndUserIdAndStatus( $current_company->getId(),  $current_user->getId(), array(10) );
@@ -334,7 +334,7 @@ switch ($action) {
 		$ulf = TTnew( 'UserListFactory' );
 		$ulf->getSearchByCompanyIdAndArrayCriteria( $current_company->getId(), $filter_data );
 		$data['user_options'] = UserListFactory::getArrayByListFactory( $ulf, TRUE, TRUE );
-// Aydan
+// aydancoskun
 //		if ( $current_company->getProductEdition() > 10 ) {
 			$data['user_options'] = Misc::prependArray( array( 0 => '- '. TTi18n::getText('OPEN') .' -' ), $data['user_options'] );
 //		}

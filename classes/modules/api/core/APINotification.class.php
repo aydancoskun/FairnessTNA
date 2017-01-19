@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -108,7 +108,7 @@ class APINotification extends APIFactory {
 											  'delay' => -1,
 											  'bg_color' => '#FFFF00', //Yellow
 											  'message' => TTi18n::getText('NOTICE: A new version of %1 available, it is highly recommended that you upgrade as soon as possible. Click here to download the latest version.', array( APPLICATION_NAME ) ),
-											  'destination' => 'https://github.com/Aydan/fairness',
+											  'destination' => 'https://github.com/aydancoskun/fairness',
 											  );
 						}
 						unset($new_version_available_notification);

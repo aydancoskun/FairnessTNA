@@ -40,7 +40,7 @@
 							<span class="tblDataWarning">{t}Unable to Check Latest Version{/t}
 						{elseif $check_timetrex_version == 2}
 							<span class="tblDataWarning">A Newer Version of Fairness is Available.
-							<a href="https://github.com/Aydan/fairness">{t escape="no" 1=$install_obj->getLatestTimeTrexVersion()}Download v%1 Now{/t}</a>
+							<a href="https://github.com/aydancoskun/fairness">{t escape="no" 1=$install_obj->getLatestTimeTrexVersion()}Download v%1 Now{/t}</a>
 						{/if}
 						</span>
 					</td>

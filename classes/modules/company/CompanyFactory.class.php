@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -1737,7 +1737,7 @@ class CompanyFactory extends Factory {
 												100) ) {
 
 			global $config_vars;
-// Aydan
+// aydancoskun
 //			if ( $force == FALSE AND $this->isNew() == FALSE AND isset($config_vars['other']['primary_company_id']) AND $config_vars['other']['primary_company_id'] == $this->getId() AND getTTProductEdition() > 10 ) {
 			if ( $force == FALSE AND $this->isNew() == FALSE AND isset($config_vars['other']['primary_company_id']) AND $config_vars['other']['primary_company_id'] == $this->getId() ) {
 				//Don't change company name
@@ -3161,7 +3161,7 @@ class CompanyFactory extends Factory {
 					$sf->Save();
 				}
 
-// Aydan
+// aydancoskun
 //				if ( $this->getProductEdition() >= 15 ) {
 
 					$sf = TTnew( 'StationFactory' );

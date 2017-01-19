@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -562,7 +562,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$ppbf = new PremiumPolicyBranchFactory();
 		$ppdf = new PremiumPolicyDepartmentFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -593,7 +593,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							from 	'. $this->getTable() .' as x
 							LEFT JOIN '. $pcf->getTable() .' as pcf ON x.punch_control_id = pcf.id
 							LEFT JOIN '. $udf->getTable() .' as z ON pcf.user_date_id = z.id ';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ' LEFT JOIN '. $jf->getTable() .' as jf ON (pcf.job_id = jf.id AND jf.deleted = 0 )';
 			$query .= ' LEFT JOIN '. $jif->getTable() .' as jif ON (pcf.job_item_id = jif.id AND jf.deleted = 0 )';
@@ -625,7 +625,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		} elseif ( isset($filter_data['department_selection_type_id']) AND $filter_data['department_selection_type_id'] == 30 AND isset($filter_data['premium_policy_id']) ) {
 			$query .= ' AND pcf.department_id not in ( select zz.department_id from '. $ppdf->getTable() .' as zz WHERE zz.premium_policy_id = '. (int)$filter_data['premium_policy_id'] .' ) ';
 		}
-/* Aydan
+/* aydancoskun
 
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			//Job Group Criteria
@@ -1186,7 +1186,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$ulf = new UserListFactory();
 		$udf = new UserDateFactory();
 		$pcf = new PunchControlFactory();
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 		}
@@ -1225,7 +1225,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							LEFT JOIN '. $pcf->getTable() .' as b ON a.punch_control_id = b.id
 							LEFT JOIN '. $udf->getTable() .' as c ON a.user_date_id = c.id
 					';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as d ON b.job_id = d.id';
 		}
@@ -1300,7 +1300,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$udf = new UserDateFactory();
 		$pcf = new PunchControlFactory();
 		$uwf = new UserWageFactory();
-/* Aydan
+/* aydancoskun
 
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
@@ -1353,7 +1353,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 																			and z.deleted = 0
 																			order by z.effective_date desc limit 1)
 					';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as d ON b.job_id = d.id';
 		}
@@ -1513,7 +1513,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							z.id as user_wage_id,
 							z.effective_date as user_wage_effective_date ';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job_name,
@@ -1741,7 +1741,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							sf.source as station_source,
 							sf.description as station_description';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						jf.name as job,
@@ -1789,7 +1789,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 																			and z.deleted = 0
 																			order by z.effective_date desc limit 1) ';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as jf ON pcf.job_id = jf.id
 						LEFT JOIN '. $jif->getTable() .' as jif ON pcf.job_item_id = jif.id
@@ -1976,7 +1976,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -2053,7 +2053,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							z.last_name as updated_by_last_name
 							';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						r.name as job,
@@ -2114,7 +2114,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
 							LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
 					';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as r ON b.job_id = r.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as s ON b.job_item_id = s.id';
@@ -2323,7 +2323,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -2406,7 +2406,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							z.last_name as updated_by_last_name
 							';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						r.name as job,
@@ -2445,7 +2445,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 							LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
 							LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
 					';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as r ON b.job_id = r.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as s ON b.job_item_id = s.id';
@@ -2648,7 +2648,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 		$pcf = new PunchControlFactory();
 		$sf = new StationFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -2712,7 +2712,7 @@ class PunchListFactory extends PunchFactory implements IteratorAggregate {
 
 					';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON b.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON b.job_item_id = y.id';

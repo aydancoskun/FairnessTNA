@@ -657,7 +657,7 @@ function showProvince() {
 {if $user_data.id != ''
 	AND $current_company->getProductEdition() >= 50
 	AND ( $permission->Check('document','view') OR $permission->Check('document','view_own') OR $permission->Check('document','view_private') ) }
-						<!-- Aydan see above was >=20 -->
+						<!-- aydancoskun see above was >=20 -->
 
 <br>
 <br>

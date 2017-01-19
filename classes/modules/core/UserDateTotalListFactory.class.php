@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -3896,7 +3896,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 		$apf = new AbsencePolicyFactory();
 		$ppf = new PremiumPolicyFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -3937,7 +3937,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 
 					LEFT JOIN '. $ppf_b->getTable() .' as ppf ON b.pay_period_id = ppf.id ';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '
 					LEFT JOIN '. $jf->getTable() .' as jf ON a.job_id = jf.id
@@ -4079,7 +4079,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 		$mpf = new MealPolicyFactory();
 		$bpf = new BreakPolicyFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -4145,7 +4145,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 							z.id as user_wage_id,
 							z.effective_date as user_wage_effective_date ';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job,
@@ -4185,7 +4185,7 @@ class UserDateTotalListFactory extends UserDateTotalFactory implements IteratorA
 																			and z.deleted = 0
 																			order by z.effective_date desc LiMiT 1)
 					';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON a.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON a.job_item_id = y.id';

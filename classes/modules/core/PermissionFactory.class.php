@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -77,7 +77,7 @@ class PermissionFactory extends Factory {
 					$retval[30] = TTi18n::gettext('Payroll');
 					$retval[70] = TTi18n::gettext('Human Resources');
 				}
-/* Aydan
+/* aydancoskun
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[40] = TTi18n::gettext('Job Costing');
 					$retval[50] = TTi18n::gettext('Document Management');
@@ -127,7 +127,7 @@ class PermissionFactory extends Factory {
 					$product_edition = getTTProductEdition();
 				}
 
-/* Aydan
+/* aydancoskun
 				if ( $product_edition == PRODUCT_ENTERPRISE_25 ) { //Enterprise
 				} elseif ( $product_edition == PRODUCT_CORPORATE_20 ) { //Corporate
 					unset( $retval['recruitment'] );

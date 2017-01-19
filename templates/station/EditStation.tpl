@@ -143,7 +143,7 @@ if ( TTProductEdition >= 20 ) {
 				</tr>
 
 				{if $current_company->getProductEdition() >= 50}
-									<!-- Aydan see above was >=20 -->
+									<!-- aydancoskun see above was >=20 -->
 
 					{if count($data.job_options) > 1}
 					<tr onClick="showHelpEntry('job_id')">

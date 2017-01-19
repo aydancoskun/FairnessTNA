@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -69,7 +69,7 @@ class ImportUser extends Import {
 
 				//Since getOptions() can be called without first setting a company, we don't always know the product edition for the currently
 				//logged in employee.
-/* Aydan
+/* aydancoskun
 				if ( ( is_object($this->getCompanyObject()) AND $this->getCompanyObject()->getProductEdition() < PRODUCT_CORPORATE_20 )
 						OR ( !is_object($this->getCompanyObject()) AND getTTProductEdition() < PRODUCT_CORPORATE_20 ) ) {
 					unset($retval['-1104-default_job_id'],$retval['-1105-default_job_item_id']);

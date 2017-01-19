@@ -240,7 +240,7 @@ function getScheduleTotalTime() {
 				</tr>
 
 				{if $current_company->getProductEdition() >= 50 AND $permission->Check('job','enabled') }
-									<!-- Aydan see above was >=20 -->
+									<!-- aydancoskun see above was >=20 -->
 
 				<tr onClick="showHelpEntry('job')">
 					<td class="{isvalid object="sf" label="job" value="cellLeftEditTable"}">

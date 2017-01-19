@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -350,7 +350,7 @@ class PunchControlListFactory extends PunchControlFactory implements IteratorAgg
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -404,7 +404,7 @@ class PunchControlListFactory extends PunchControlFactory implements IteratorAgg
 							z.id as user_wage_id,
 							z.effective_date as user_wage_effective_date ';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job_name,

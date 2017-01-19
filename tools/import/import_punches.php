@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -283,7 +283,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					$department_options = $dlf->getArrayByListFactory( $dlf, FALSE, TRUE );
 					unset($dlf);
 				}
-/* Aydan
+/* aydancoskun
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND !isset($job_options) ) {
 					//Get jobs
 					$jlf = new JobListFactory();
@@ -529,7 +529,7 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 					$pcf->setDepartment( Misc::importCallInputParseFunction( 'department_id', $mapped_row['department_id'], $filtered_import_map['department_id']['default_value'], $filtered_import_map['department_id']['parse_hint'] ) );
 				}
 
-/* Aydan
+/* aydancoskun
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					if ( isset($mapped_row['job_id']) AND $mapped_row['job_id'] != '' ) {
 						$pcf->setJob( Misc::importCallInputParseFunction( 'job_id', $mapped_row['job_id'], $filtered_import_map['job_id']['default_value'], $filtered_import_map['job_id']['parse_hint'] ) );

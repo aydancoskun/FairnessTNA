@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -105,7 +105,7 @@ $professional_edition_static_columns = array(
 									'-1190-job_item' => TTi18n::gettext('Task'),
 									);
 
-/* Aydan
+/* aydancoskun
 if ( $current_company->getProductEdition() >= 20 ) {
 	$static_columns = Misc::prependArray( $static_columns, $professional_edition_static_columns);
 	ksort($static_columns);
@@ -231,7 +231,7 @@ switch ($action) {
 			}
 
 			$slf = TTnew( 'ScheduleListFactory' );
-			/* Aydan
+			/* aydancoskun
 			if ( $current_company->getProductEdition() >= 20 ) {
 				if ( !isset($filter_data['job_item_ids']) ) {
 					$filter_data['job_item_ids'] = array();
@@ -301,7 +301,7 @@ switch ($action) {
 
 			$dlf = TTnew( 'DepartmentListFactory' );
 			$department_options = $dlf->getByCompanyIdArray( $current_company->getId() );
-/* Aydan
+/* aydancoskun
 			if ( $current_company->getProductEdition() >= 20 ) {
 				$jlf = TTnew( 'JobListFactory' );
 				$job_options = $jlf->getByCompanyIdArray( $current_company->getId() );
@@ -623,7 +623,7 @@ switch ($action) {
 		$filter_data['src_user_title_options'] = Misc::arrayDiffByKey( (array)$filter_data['user_title_ids'], $user_title_options );
 		$filter_data['selected_user_title_options'] = Misc::arrayIntersectByKey( (array)$filter_data['user_title_ids'], $user_title_options );
 
-/* Aydan
+/* aydancoskun
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 

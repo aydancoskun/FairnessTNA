@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -392,7 +392,7 @@ class PunchControlFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-					/* Aydan
+					/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
@@ -424,7 +424,7 @@ class PunchControlFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}
@@ -1155,7 +1155,7 @@ class PunchControlFactory extends Factory {
 				}
 			}
 		}
-					/* Aydan
+					/* aydancoskun
 
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $this->getEnableStrictJobValidation() == TRUE ) {
 			if ( $this->getJob() > 0 ) {

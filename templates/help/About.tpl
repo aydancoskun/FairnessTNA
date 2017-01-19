@@ -28,7 +28,7 @@
 						<br>
 						{t}This version may contain tax table updates necessary for accurate payroll calculation, we recommend that you upgrade as soon as possible.{/t}
 						<br>
-						{t escape="no"}The latest version can be downloaded from:{/t} <a href="https://github.com/Aydan/fairness" target="_blank"><b>https://github.com/Aydan/fairness</b></a>
+						{t escape="no"}The latest version can be downloaded from:{/t} <a href="https://github.com/aydancoskun/fairness" target="_blank"><b>https://github.com/aydancoskun/fairness</b></a>
 						<br>
 						<br>
 					</td>
@@ -153,7 +153,7 @@
 						{t}Download:{/t}
 					</td>
 					<td class="cellRightEditTable">
-						This software can be downloaded from <a href="https://github.com/Aydan/fairness" target="_blank"><strong>Github</strong></a>.
+						This software can be downloaded from <a href="https://github.com/aydancoskun/fairness" target="_blank"><strong>Github</strong></a>.
 						<br>
 						<br>
 					</td>

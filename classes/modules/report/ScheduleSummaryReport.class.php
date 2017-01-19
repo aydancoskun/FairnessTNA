@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -128,7 +128,7 @@ class ScheduleSummaryReport extends Report {
 				}
 				break;
             case 'report_custom_column':
-// Aydan
+// aydancoskun
 //				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					// Because the Filter type is just only a filter criteria and not need to be as an option of Display Columns, Group By, Sub Total, Sort By dropdowns.
@@ -140,14 +140,14 @@ class ScheduleSummaryReport extends Report {
 //				}
                 break;
             case 'report_custom_filters':
-// Aydan
+// aydancoskun
 //				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$retval = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), $rcclf->getOptions('filter_column_type_ids'), NULL, 'ScheduleSummaryReport', 'custom_column' );
 //				}
                 break;
             case 'report_dynamic_custom_column':
-// Aydan
+// aydancoskun
 //				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_dynamic_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), $rcclf->getOptions('display_column_type_ids'), $rcclf->getOptions('dynamic_format_ids'), 'ScheduleSummaryReport', 'custom_column' );
@@ -157,7 +157,7 @@ class ScheduleSummaryReport extends Report {
 //				}
                 break;
             case 'report_static_custom_column':
-// Aydan
+// aydancoskun
 //				if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 					$rcclf = TTnew( 'ReportCustomColumnListFactory' );
 					$report_static_custom_column_labels = $rcclf->getByCompanyIdAndTypeIdAndFormatIdAndScriptArray( $this->getUserObject()->getCompany(), $rcclf->getOptions('display_column_type_ids'), $rcclf->getOptions('static_format_ids'), 'ScheduleSummaryReport', 'custom_column' );
@@ -652,7 +652,7 @@ class ScheduleSummaryReport extends Report {
 		//Debug::Arr($permission_children_ids, 'Permission Children: '. count($permission_children_ids), __FILE__, __LINE__, __METHOD__,10);
 		//Debug::Arr($wage_permission_children_ids, 'Wage Children: '. count($wage_permission_children_ids), __FILE__, __LINE__, __METHOD__,10);
 
-/* Aydan
+/* aydancoskun
 		if ( $this->getUserObject()->getCompanyObject()->getProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 			$job_status_options = $jlf->getOptions('status');
@@ -660,7 +660,7 @@ class ScheduleSummaryReport extends Report {
 			$job_status_options = array();
 		}
 */
-// Aydan REMOVE BELOW WHEN YOU ENABLE ABOVE
+// aydancoskun REMOVE BELOW WHEN YOU ENABLE ABOVE
 			$job_status_options = array();
 
 		$pay_period_ids = array();
@@ -869,7 +869,7 @@ class ScheduleSummaryReport extends Report {
 		}
 
 		$company_obj = $this->getUserObject()->getCompanyObject();
-// Aydan
+// aydancoskun
 //		if ( is_object( $company_obj ) AND $company_obj->getProductEdition() > 10 ) {
 			if ( $config_vars['other']['force_ssl'] == 1 ) {
 				$protocol = 'https';

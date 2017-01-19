@@ -473,7 +473,7 @@ function showAccrualRate() {
 				</tbody>
 
 				{if $current_company->getProductEdition() >= 50}
-					<!-- Aydan see above was >=20 -->
+					<!-- aydancoskun see above was >=20 -->
 					<tbody id="filter_job_group_on" style="display:none" >
 					<tr>
 						<td class="{isvalid object="ppf" label="job_group" value="cellLeftEditTable"}" nowrap>

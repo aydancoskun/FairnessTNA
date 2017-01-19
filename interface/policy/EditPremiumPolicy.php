@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -248,7 +248,7 @@ switch ($action) {
 		} else {
 			$ppf->setExcludeDefaultDepartment( FALSE );
 		}
-/* Aydan
+/* aydancoskun
 		if ( $current_company->getProductEdition() >= 20 ) {
 			$ppf->setJobGroupSelectionType( $data['job_group_selection_type_id'] );
 			$ppf->setJobSelectionType( $data['job_selection_type_id'] );
@@ -289,7 +289,7 @@ switch ($action) {
 			} else {
 				$ppf->setDepartment( array() );
 			}
-/* Aydan
+/* aydancoskun
 			if ( $current_company->getProductEdition() >= 20 ) {
 				if ( isset($data['job_group_ids']) ){
 					$ppf->setJobGroup( $data['job_group_ids'] );
@@ -465,7 +465,7 @@ switch ($action) {
 		$data['src_department_options'] = Misc::arrayDiffByKey( (array)$data['department_ids'], $department_options );
 		$data['selected_department_options'] = Misc::arrayIntersectByKey( (array)$data['department_ids'], $department_options );
 
-/* Aydan
+/* aydancoskun
 		if ( $current_company->getProductEdition() >= 20 ) {
 			//Get Job Groups
 			$jglf = TTnew( 'JobGroupListFactory' );

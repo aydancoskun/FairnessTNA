@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -698,7 +698,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$ugf = new UserGroupFactory();
 		$utf = new UserTitleFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -756,7 +756,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							uwf.hourly_rate as user_wage_hourly_rate,
 							uwf.effective_date as user_wage_effective_date ';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						x.name as job,
@@ -789,7 +789,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and z.deleted = 0
 																			order by z.effective_date desc limit 1)
 					';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as x ON a.job_id = x.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as y ON a.job_item_id = y.id';
@@ -1222,7 +1222,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$udf = new UserDateFactory();
 		$uwf = new UserWageFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -1283,7 +1283,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							z.middle_name as updated_by_middle_name,
 							z.last_name as updated_by_last_name';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						w.name as job,
@@ -1320,7 +1320,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and m.deleted = 0
 																			order by m.effective_date desc limit 1)
 					';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as w ON a.job_id = w.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as x ON a.job_item_id = x.id';
@@ -1528,7 +1528,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 		$ppf = new PayPeriodFactory();
 		$uwf = new UserWageFactory();
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jf = new JobFactory();
 			$jif = new JobItemFactory();
@@ -1597,7 +1597,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 							z.middle_name as updated_by_middle_name,
 							z.last_name as updated_by_last_name';
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= ',
 						w.name as job_name,
@@ -1631,7 +1631,7 @@ class ScheduleListFactory extends ScheduleFactory implements IteratorAggregate {
 																			and m.deleted = 0
 																			order by m.effective_date desc limit 1)
 					';
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$query .= '	LEFT JOIN '. $jf->getTable() .' as w ON a.job_id = w.id';
 			$query .= '	LEFT JOIN '. $jif->getTable() .' as x ON a.job_item_id = x.id';

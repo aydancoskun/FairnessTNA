@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -51,7 +51,7 @@ class StationFactory extends Factory {
 											10 	=> TTi18n::gettext('PC'),
 									);
 
-// Aydan
+// aydancoskun
 //				if ( getTTProductEdition() >= 15 ) {
 					$retval[20]	= TTi18n::gettext('PHONE');
 					$retval[25]	= TTi18n::gettext('WirelessWeb (WAP)');
@@ -173,7 +173,7 @@ class StationFactory extends Factory {
 
 										1073741824 => TTi18n::gettext('Enable: Diagnostic Logs'),
 									);
-/* Aydan
+/* aydancoskun
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[128]  = TTi18n::gettext('Enable: Job');
 					$retval[256]  = TTi18n::gettext('Enable: Task');
@@ -553,7 +553,7 @@ class StationFactory extends Factory {
 		}
 
 		Debug::Text('Job ID: '. $id, __FILE__, __LINE__, __METHOD__,10);
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
@@ -1976,7 +1976,7 @@ class StationFactory extends Factory {
 	}
 
 	function Validate() {
-// Aydan
+// aydancoskun
 /*		if ( is_object($this->getCompanyObject() ) AND $this->getCompanyObject()->getProductEdition() == 10 AND $this->getType() > 10 ) {
 			$this->Validator->isTrue(		'type_id',
 											FALSE,

@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -6060,7 +6060,7 @@ class DemoData {
 
 			$policy_ids['overtime'][] = $this->createOverTimePolicy( $company_id, 10 );
 			$policy_ids['overtime'][] = $this->createOverTimePolicy( $company_id, 20, $policy_ids['accrual'][0] );
-/* Aydan
+/* aydancoskun
 
 			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$policy_ids['expense'][] = $this->createExpensePolicy( $company_id, 100 ); // Tax(Percent) - HST
@@ -6122,7 +6122,7 @@ class DemoData {
 										NULL,
 										$policy_ids['expense'] );
 
-/* Aydan
+/* aydancoskun
 			if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				//Client Groups
 				$client_group_ids[] = $this->createClientGroup( $company_id, 10, 0 );
@@ -6211,7 +6211,7 @@ class DemoData {
 				$shipping_policy_ids[] = 0;
 				$invoice_ids[] = 0;
 			}
-/* Aydan
+/* aydancoskun
 
             if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				//Task Groups
@@ -6265,7 +6265,7 @@ class DemoData {
 				$task_ids[] = 0;
 				$job_ids[] = 0;
 			}
-/* Aydan
+/* aydancoskun
 
 			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$user_expense_ids[] = $this->createUserExpense( $user_ids[0], $policy_ids['expense'][3], $branch_ids[0],$department_ids[1], $currency_ids[0], $job_ids[1],$task_ids[1] );
@@ -6422,7 +6422,7 @@ class DemoData {
 				}
             }
 
-/* Aydan
+/* aydancoskun
 
 			if ( getTTProductEdition() >= PRODUCT_ENTERPRISE_25 ) {
 				$x = 1;
@@ -6693,7 +6693,7 @@ class DemoData {
             $this->createReportCustomColumn( $company_id, 'TimesheetDetailReport', 200 );
 
 
-/* Aydan
+/* aydancoskun
 			if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 				// Attach  document to employee
 				foreach( $user_ids as $user_id ) {

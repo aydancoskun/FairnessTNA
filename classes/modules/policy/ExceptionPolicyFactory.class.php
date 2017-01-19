@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -677,7 +677,7 @@ class ExceptionPolicyFactory extends Factory {
 
 	function getTypeOptions( $product_edition = 10 ) {
 		$options = $this->getOptions('type');
-// Aydan
+// aydancoskun
 
 //		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 OR $product_edition < 20 ) {
 			$corporate_exceptions = array('J1','J2','J3','J4');
@@ -2401,7 +2401,7 @@ class ExceptionPolicyFactory extends Factory {
 						}
 						break;
 					case 'j1': //Not Allowed on Job
-						/* Aydan
+						/* aydancoskun
 						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
@@ -2436,7 +2436,7 @@ class ExceptionPolicyFactory extends Factory {
 						*/
 						break;
 					case 'j2': //Not Allowed on Task
-					/* Aydan
+					/* aydancoskun
 						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
@@ -2472,7 +2472,7 @@ class ExceptionPolicyFactory extends Factory {
 					*/
 						break;
 					case 'j3': //Job already completed
-						/* Aydan
+						/* aydancoskun
 						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {
 								if ( $p_obj->getStatus() == 10 ) { //In punches
@@ -2510,7 +2510,7 @@ class ExceptionPolicyFactory extends Factory {
 						break;
 					case 'j4': //No Job or Task
 						$add_exception = FALSE;
-						/* Aydan
+						/* aydancoskun
 
 						if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 AND $plf->getRecordCount() > 0 ) {
 							foreach ( $plf as $p_obj ) {

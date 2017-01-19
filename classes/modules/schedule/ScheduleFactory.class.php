@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -89,7 +89,7 @@ class ScheduleFactory extends Factory {
 										'-2030-updated_date' => TTi18n::gettext('Updated Date'),
 							);
 
-/* Aydan
+/* aydancoskun
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval['-1180-job'] = TTi18n::gettext('Job');
 					$retval['-1190-job_item'] = TTi18n::gettext('Task');
@@ -128,7 +128,7 @@ class ScheduleFactory extends Factory {
 								'department',
 								);
 
-/* Aydan
+/* aydancoskun
 				if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 					$retval[] = 'job';
 					$retval[] = 'job_item';
@@ -246,7 +246,7 @@ class ScheduleFactory extends Factory {
 		$ulf = TTnew( 'UserListFactory' );
 
 		//Allow "blank" user for OPEN shifts.
-// Aydan		if ( ( $id == 0 AND getTTProductEdition() > PRODUCT_COMMUNITY_10 )
+// aydancoskun		if ( ( $id == 0 AND getTTProductEdition() > PRODUCT_COMMUNITY_10 )
 		if ( ( $id == 0 )
 				OR
 				$this->Validator->isResultSetWithRows(	'user_id',
@@ -659,7 +659,7 @@ class ScheduleFactory extends Factory {
 		if ( $id == FALSE OR $id == 0 OR $id == '' ) {
 			$id = 0;
 		}
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jlf = TTnew( 'JobListFactory' );
 		}
@@ -692,7 +692,7 @@ class ScheduleFactory extends Factory {
 			$id = 0;
 		}
 
-/* Aydan
+/* aydancoskun
 		if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$jilf = TTnew( 'JobItemListFactory' );
 		}

@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -1167,7 +1167,7 @@ class Install {
 
 	function getLatestTimeTrexVersion() {
 		$latest_version = false;
-		$handle = @fopen("https://raw.github.com/Aydan/fairness/master/VERSION", "r");
+		$handle = @fopen("https://raw.github.com/aydancoskun/fairness/master/VERSION", "r");
 		if ($handle) {
     	$latest_version = trim(fgets($handle, 4096));
  			fclose($handle);
@@ -1235,7 +1235,7 @@ class Install {
 		$retarr[$this->checkPHPMemoryLimit()]++;
 		$retarr[$this->checkPHPMagicQuotesGPC()]++;
 
-// Aydan
+// aydancoskun
 //		if ( $this->getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			$retarr[$this->checkMCRYPT()]++;
 //		}
@@ -1339,7 +1339,7 @@ class Install {
 		if ( $fail_all == TRUE OR $this->checkPHPMagicQuotesGPC() != 0 ) {
 			$retarr[] = 'PHPMagicQuotesGPC';
 		}
-// Aydan
+// aydancoskun
 //		if ( $fail_all == TRUE OR $this->getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 			if ( $fail_all == TRUE OR $this->checkPEARValidate() != 0 ) {
 				$retarr[] = 'PEARVal';

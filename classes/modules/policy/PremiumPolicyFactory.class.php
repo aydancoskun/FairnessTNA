@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -1327,7 +1327,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobGroup() {
-	return false; // Aydan
+	return false; // aydancoskun
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1345,7 +1345,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobGroup($ids) {
-	return false; // Aydan
+	return false; // aydancoskun
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1427,7 +1427,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJob() {
-	return false; // Aydan
+	return false; // aydancoskun
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1445,7 +1445,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJob($ids) {
-	return false; // Aydan
+	return false; // aydancoskun
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1527,7 +1527,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobItemGroup() {
-	return false; // Aydan
+	return false; // aydancoskun
 
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
@@ -1546,7 +1546,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobItemGroup($ids) {
-	return false; // Aydan
+	return false; // aydancoskun
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1628,7 +1628,7 @@ class PremiumPolicyFactory extends Factory {
 	}
 
 	function getJobItem() {
-	return false; // Aydan
+	return false; // aydancoskun
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}
@@ -1646,7 +1646,7 @@ class PremiumPolicyFactory extends Factory {
 		return FALSE;
 	}
 	function setJobItem($ids) {
-	return false; // Aydan
+	return false; // aydancoskun
 		if ( getTTProductEdition() < PRODUCT_CORPORATE_20 ) {
 			return FALSE;
 		}

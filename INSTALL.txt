@@ -20,7 +20,7 @@ web server. Common locations include:
 
    An easy way to do this is just to make sure you have git installed and then:
 
-   From within your webroot directory do 'git init', then 'git clone https://github.com/Aydan/fairness.git'.
+   From within your webroot directory do 'git init', then 'git clone https://github.com/aydancoskun/fairness.git'.
 
    To learn more about git and how to keep updated read: https://help.github.com/articles/fork-a-repo
 

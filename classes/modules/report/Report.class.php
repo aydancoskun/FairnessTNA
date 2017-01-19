@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -2900,7 +2900,7 @@ class Report {
 	}
 
     function setCustomColumnConfig( $columns ) {
-// Aydan
+// aydancoskun
 //		if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$rcclf = TTnew('ReportCustomColumnListFactory');
 			$rcclf->getByCompanyId( $this->getUserObject()->getCompany() );
@@ -2958,7 +2958,7 @@ class Report {
         return TRUE;
     }
     function calculateCustomColumnFilters( $type_id ) {
-// Aydan
+// aydancoskun
 //        if ( getTTProductEdition() >= PRODUCT_PROFESSIONAL_15 ) {
 			$this->profiler->startTimer( 'calculateCustomColumnFilters' );
 			ReportCustomColumnFactory::calculateCustomColumnFilters( $this, $type_id );

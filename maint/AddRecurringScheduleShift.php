@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coscun (aydan.ayfer.coskun@gmail.com)
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
  * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
  * because Fairness is a fork of "TimeTrex Workforce Management" Software.
  *
@@ -314,7 +314,7 @@ if ( $clf->getRecordCount() > 0 ) {
 															$pcf->setDepartment( $recurring_schedule_shift['department_id'] );
 														}
 
-/* Aydan
+/* aydancoskun
 														if ( getTTProductEdition() >= PRODUCT_CORPORATE_20 ) {
 															if ( isset($recurring_schedule_shift['job_id']) ) {
 																$pcf->setJob( $recurring_schedule_shift['job_id'] );
