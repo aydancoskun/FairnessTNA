@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,15 +20,8 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 676 $
- * $Id: PayStubCalculationTest.php 676 2007-03-07 23:47:29Z ipso $
- * $Date: 2007-03-07 15:47:29 -0800 (Wed, 07 Mar 2007) $
- */
-require_once('PHPUnit/Framework/TestCase.php');
 
 class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
-
 	protected $company_id = NULL;
 	protected $user_id = NULL;
 	protected $pay_period_schedule_id = NULL;
@@ -37,19 +30,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 	protected $branch_ids = NULL;
 	protected $department_ids = NULL;
 
-    public function __construct() {
-        global $db, $cache, $profiler;
-    }
-
-    public function setUp() {
+	public function setUp() {
 		global $dd;
-        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
+
+		TTDate::setTimeZone('PST8PDT', TRUE); //Due to being a singleton and PHPUnit resetting the state, always force the timezone to be set.
 
 		$dd = new DemoData();
 		$dd->setEnableQuickPunch( FALSE ); //Helps prevent duplicate punch IDs and validation failures.
 		$dd->setUserNamePostFix( '_'.uniqid( NULL, TRUE ) ); //Needs to be super random to prevent conflicts and random failing tests.
 		$this->company_id = $dd->createCompany();
-		Debug::text('Company ID: '. $this->company_id, __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('Company ID: '. $this->company_id, __FILE__, __LINE__, __METHOD__, 10);
 
 		//$dd->createPermissionGroups( $this->company_id, 40 ); //Administrator only.
 
@@ -65,11 +56,34 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 		$this->user_id = $dd->createUser( $this->company_id, 100 );
 
-		$this->createPayPeriodSchedule();
-		$this->createPayPeriods();
-		$this->getAllPayPeriods();
+		//$this->createPayPeriodSchedule();
+		//$this->createPayPeriods();
+		//$this->getAllPayPeriods();
 
-		$this->absence_policy_id = $dd->createAbsencePolicy( $this->company_id, 10 );
+		$this->policy_ids['pay_formula_policy'][100] = $this->createPayFormulaPolicy( $this->company_id, 100 ); //Reg 1.0x
+
+		$this->policy_ids['pay_code'][100] = $dd->createPayCode( $this->company_id, 100, $this->policy_ids['pay_formula_policy'][100] ); //Regular
+		$this->policy_ids['pay_code'][190] = $dd->createPayCode( $this->company_id, 190 ); //Lunch
+		$this->policy_ids['pay_code'][192] = $dd->createPayCode( $this->company_id, 192 ); //Break
+		$this->policy_ids['pay_code'][200] = $dd->createPayCode( $this->company_id, 200, $this->policy_ids['pay_formula_policy'][100] ); //Overtime1
+		$this->policy_ids['pay_code'][300] = $dd->createPayCode( $this->company_id, 300 ); //Prem1
+		$this->policy_ids['pay_code'][310] = $dd->createPayCode( $this->company_id, 310 ); //Prem2
+		$this->policy_ids['pay_code'][900] = $dd->createPayCode( $this->company_id, 900 ); //Vacation
+		$this->policy_ids['pay_code'][910] = $dd->createPayCode( $this->company_id, 910 ); //Bank
+		$this->policy_ids['pay_code'][920] = $dd->createPayCode( $this->company_id, 920 ); //Sick
+
+		$this->policy_ids['contributing_pay_code_policy'][10] = $dd->createContributingPayCodePolicy( $this->company_id, 10, array( $this->policy_ids['pay_code'][100] ) ); //Regular
+		$this->policy_ids['contributing_pay_code_policy'][12] = $dd->createContributingPayCodePolicy( $this->company_id, 12, array( $this->policy_ids['pay_code'][100], $this->policy_ids['pay_code'][190], $this->policy_ids['pay_code'][192], $this->policy_ids['pay_code'][200] ) ); //Regular+Meal/Break+Overtime
+		$this->policy_ids['contributing_pay_code_policy'][14] = $dd->createContributingPayCodePolicy( $this->company_id, 14, array( $this->policy_ids['pay_code'][100], $this->policy_ids['pay_code'][190], $this->policy_ids['pay_code'][192], $this->policy_ids['pay_code'][900] ) ); //Regular+Meal/Break+Absence
+		$this->policy_ids['contributing_pay_code_policy'][90] = $dd->createContributingPayCodePolicy( $this->company_id, 90, array( $this->policy_ids['pay_code'][900] ) ); //Absence
+		$this->policy_ids['contributing_pay_code_policy'][99] = $dd->createContributingPayCodePolicy( $this->company_id, 99, $this->policy_ids['pay_code'] ); //All Time
+
+		$this->policy_ids['contributing_shift_policy'][12] = $dd->createContributingShiftPolicy( $this->company_id, 10, $this->policy_ids['contributing_pay_code_policy'][12] ); //Regular+Meal/Break
+
+		$this->absence_policy_id = $dd->createAbsencePolicy( $this->company_id, 10, $this->policy_ids['pay_code'][100] );
+
+		$this->policy_ids['regular'][] = $dd->createRegularTimePolicy( $this->company_id, 10, $this->policy_ids['contributing_shift_policy'][12], $this->policy_ids['pay_code'][100] );
+		$this->policy_ids['overtime'][] = $dd->createOverTimePolicy( $this->company_id, 10, $this->policy_ids['contributing_shift_policy'][12], $this->policy_ids['pay_code'][200] );
 
 		$this->branch_ids[] = $dd->createBranch( $this->company_id, 10 );
 		$this->branch_ids[] = $dd->createBranch( $this->company_id, 20 );
@@ -80,16 +94,16 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		$this->assertGreaterThan( 0, $this->company_id );
 		$this->assertGreaterThan( 0, $this->user_id );
 
-        return TRUE;
-    }
+		return TRUE;
+	}
 
-    public function tearDown() {
-        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__,10);
+	public function tearDown() {
+		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
 
 		//$this->deleteAllSchedules();
 
-        return TRUE;
-    }
+		return TRUE;
+	}
 
 	function getPayStubAccountLinkArray() {
 		$this->pay_stub_account_link_arr = array(
@@ -188,15 +202,15 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		$ppsf->setTimeZone('PST8PDT');
 
 		$ppsf->setDayStartTime( 0 );
-		$ppsf->setNewDayTriggerTime( (4*3600) );
-		$ppsf->setMaximumShiftTime( (16*3600) );
+		$ppsf->setNewDayTriggerTime( (4 * 3600) );
+		$ppsf->setMaximumShiftTime( (30 * 3600) ); //Need to make this longer than 24hrs for some tests.
 		$ppsf->setShiftAssignedDay( 10 );
 		//$ppsf->setContinuousTime( (4*3600) );
 
 		$ppsf->setEnableInitialPayPeriods( FALSE );
 		if ( $ppsf->isValid() ) {
 			$insert_id = $ppsf->Save(FALSE);
-			Debug::Text('Pay Period Schedule ID: '. $insert_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::Text('Pay Period Schedule ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
 
 			$ppsf->setUser( array($this->user_id) );
 			$ppsf->Save();
@@ -206,13 +220,13 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 			return $insert_id;
 		}
 
-		Debug::Text('Failed Creating Pay Period Schedule!', __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('Failed Creating Pay Period Schedule!', __FILE__, __LINE__, __METHOD__, 10);
 
 		return FALSE;
 
 	}
 
-	function createPayPeriods() {
+	function createPayPeriods( $initial_date = FALSE ) {
 		$max_pay_periods = 35;
 
 		$ppslf = new PayPeriodScheduleListFactory();
@@ -222,15 +236,19 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 			for ( $i = 0; $i < $max_pay_periods; $i++ ) {
 				if ( $i == 0 ) {
-					//$end_date = TTDate::getBeginYearEpoch( strtotime('01-Jan-07') );
-					$end_date = TTDate::getBeginYearEpoch( time() );
+					if ( $initial_date !== FALSE ) {
+						$end_date = $initial_date;
+					} else {
+						//$end_date = TTDate::getBeginYearEpoch( strtotime('01-Jan-07') );
+						$end_date = TTDate::getBeginWeekEpoch( ( TTDate::getBeginYearEpoch( time() ) - (86400 * (7 * 6) ) ) );
+					}
 				} else {
-					$end_date = $end_date + ( (86400*14) );
+					$end_date = ($end_date + ( (86400 * 14) ));
 				}
 
-				Debug::Text('I: '. $i .' End Date: '. TTDate::getDate('DATE+TIME', $end_date) , __FILE__, __LINE__, __METHOD__,10);
+				Debug::Text('I: '. $i .' End Date: '. TTDate::getDate('DATE+TIME', $end_date), __FILE__, __LINE__, __METHOD__, 10);
 
-				$pps_obj->createNextPayPeriod( $end_date , (86400*3600) );
+				$pps_obj->createNextPayPeriod( $end_date, (86400 * 3600), FALSE ); //Don't import punches, as that causes deadlocks when running tests in parallel.
 			}
 
 		}
@@ -285,12 +303,12 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 		if ( $hpf->isValid() ) {
 			$insert_id = $hpf->Save();
-			Debug::Text('Holiday Policy ID: '. $insert_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::Text('Holiday Policy ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
 
 			return $insert_id;
 		}
 
-		Debug::Text('Failed Creating Holiday Policy!', __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('Failed Creating Holiday Policy!', __FILE__, __LINE__, __METHOD__, 10);
 
 		return FALSE;
 	}
@@ -308,12 +326,12 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 		if ( $hf->isValid() ) {
 			$insert_id = $hf->Save();
-			Debug::Text('Holiday ID: '. $insert_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::Text('Holiday ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
 
 			return $insert_id;
 		}
 
-		Debug::Text('Failed Creating Holiday!', __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('Failed Creating Holiday!', __FILE__, __LINE__, __METHOD__, 10);
 
 		return FALSE;
 	}
@@ -323,7 +341,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 		$punch_date = $this->pay_period_objs[0]->getStartDate();
 		$end_punch_date = $this->pay_period_objs[0]->getEndDate();
-		$i=0;
+		$i = 0;
 		while ( $punch_date <= $end_punch_date ) {
 			$date_stamp = TTDate::getDate('DATE', $punch_date );
 
@@ -366,7 +384,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 											)
 									);
 
-			$punch_date+=86400;
+			$punch_date += 86400;
 			$i++;
 		}
 		unset($punch_options_arr, $punch_date, $user_id);
@@ -380,42 +398,394 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 		//Get only system totals.
 		//$udtlf->getByCompanyIDAndUserIdAndStatusAndStartDateAndEndDate( $this->company_id, $this->user_id, 10, $start_date, $end_date);
-		$udtlf->getByCompanyIDAndUserIdAndStatusAndTypeAndStartDateAndEndDate( $this->company_id, $this->user_id, 10, array(10,20,40), $start_date, $end_date);
+		$udtlf->getByCompanyIDAndUserIdAndObjectTypeAndStartDateAndEndDate( $this->company_id, $this->user_id, array(5, 20, 30, 40, 100, 110), $start_date, $end_date);
 		if ( $udtlf->getRecordCount() > 0 ) {
 			foreach($udtlf as $udt_obj) {
-				$user_date_stamp = TTDate::strtotime( $udt_obj->getColumn('user_date_stamp') );
+				$type_and_policy_id = $udt_obj->getObjectType().(int)$udt_obj->getPayCode();
 
-				$type_and_policy_id = $udt_obj->getType().(int)$udt_obj->getOverTimePolicyID();
-
-				$date_totals[$user_date_stamp][] = array(
-												'date_stamp' => $udt_obj->getColumn('user_date_stamp'),
+				$date_totals[$udt_obj->getDateStamp()][] = array(
+												'date_stamp' => $udt_obj->getDateStamp(),
 												'id' => $udt_obj->getId(),
-												'user_date_id' => $udt_obj->getUserDateId(),
+
+												//Keep legacy status_id/type_id for now, so we don't have to change as many unit tests.
 												'status_id' => $udt_obj->getStatus(),
 												'type_id' => $udt_obj->getType(),
-												'over_time_policy_id' => $udt_obj->getOverTimePolicyID(),
-												'premium_policy_id' => $udt_obj->getPremiumPolicyID(),
+												'src_object_id' => $udt_obj->getSourceObject(),
+
+												'object_type_id' => $udt_obj->getObjectType(),
+												'pay_code_id' => $udt_obj->getPayCode(),
+
 												'type_and_policy_id' => $type_and_policy_id,
 												'branch_id' => (int)$udt_obj->getBranch(),
 												'department_id' => $udt_obj->getDepartment(),
 												'total_time' => $udt_obj->getTotalTime(),
 												'name' => $udt_obj->getName(),
+
+												'start_time_stamp' => $udt_obj->getStartTimeStamp(),
+												'end_time_stamp' => $udt_obj->getEndTimeStamp(),
+
+												//'start_time_stamp_display' => TTDate::getDate('DATE+TIME', $udt_obj->getStartTimeStamp() ),
+												//'end_time_stamp_display' => TTDate::getDate('DATE+TIME', $udt_obj->getEndTimeStamp() ),
+
+												'quantity' => $udt_obj->getQuantity(),
+												'bad_quantity' => $udt_obj->getBadQuantity(),
+
+												'hourly_rate' => $udt_obj->getHourlyRate(),
+												'hourly_rate_with_burden' => $udt_obj->getHourlyRateWithBurden(),
 												//Override only shows for SYSTEM override columns...
 												//Need to check Worked overrides too.
 												'tmp_override' => $udt_obj->getOverride()
 												);
-
 			}
 		}
 
 		return $date_totals;
 	}
 
-	function createPremiumPolicy( $company_id, $type, $accrual_policy_id = NULL ) {
+	function createPayCode( $company_id, $type, $pay_formula_policy_id = 0 ) {
+		$pcf = TTnew( 'PayCodeFactory' );
+		$pcf->setCompany( $company_id );
+
+		switch ( $type ) {
+			case 100:
+				$pcf->setName( 'Premium1' );
+				//$pcf->setRate( '1.5' );
+				break;
+			case 110:
+				$pcf->setName( 'Premium2' );
+				//$pcf->setRate( '2.0' );
+				break;
+			case 120:
+				$pcf->setName( 'Premium3' );
+				//$pcf->setRate( '2.5' );
+				break;
+			case 200:
+				$pcf->setName( 'Premium4' );
+				//$pcf->setRate( '1.5' );
+				break;
+		}
+
+		$pcf->setCode( md5( $pcf->getName() ) );
+		$pcf->setType( 10 ); //Paid
+		$pcf->setPayFormulaPolicy( $pay_formula_policy_id );
+		$pcf->setPayStubEntryAccountID( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Over Time 1') );
+
+		if ( $pcf->isValid() ) {
+			$insert_id = $pcf->Save();
+			Debug::Text('Pay Code ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
+
+			return $insert_id;
+		}
+
+		Debug::Text('Failed Creating Pay Code!', __FILE__, __LINE__, __METHOD__, 10);
+
+		return FALSE;
+	}
+
+	function createPayFormulaPolicy( $company_id, $type, $accrual_policy_account_id = 0 ) {
+		$pfpf = TTnew( 'PayFormulaPolicyFactory' );
+		$pfpf->setCompany( $company_id );
+
+		switch ( $type ) {
+			case 10:
+				$pfpf->setName( 'None ($0)' );
+				$pfpf->setPayType( 10 ); //Pay Multiplied By Factor
+				$pfpf->setRate( 0 );
+				$pfpf->setAccrualPolicyAccount( $accrual_policy_account_id );
+				$pfpf->setAccrualRate( 0 );
+				break;
+			case 100:
+				$pfpf->setName( 'Regular' );
+				$pfpf->setPayType( 10 ); //Pay Multiplied By Factor
+				$pfpf->setRate( 1.0 );
+				$pfpf->setAccrualPolicyAccount( $accrual_policy_account_id );
+				$pfpf->setAccrualRate( 1.0 );
+				break;
+			case 200:
+				$pfpf->setName( 'OverTime (1.5x)' );
+				$pfpf->setPayType( 10 ); //Pay Multiplied By Factor
+				$pfpf->setRate( 1.5 );
+				$pfpf->setAccrualPolicyAccount( $accrual_policy_account_id );
+				$pfpf->setAccrualRate( 1.0 );
+				break;
+			case 210:
+				$pfpf->setName( 'OverTime (2.0x)' );
+				$pfpf->setPayType( 10 ); //Pay Multiplied By Factor
+				$pfpf->setRate( 2.0 );
+				$pfpf->setAccrualPolicyAccount( $accrual_policy_account_id );
+				$pfpf->setAccrualRate( 1.0 );
+				break;
+			case 220:
+				$pfpf->setName( 'OverTime (2.5x)' );
+				$pfpf->setPayType( 10 ); //Pay Multiplied By Factor
+				$pfpf->setRate( 2.5 );
+				$pfpf->setAccrualPolicyAccount( $accrual_policy_account_id );
+				$pfpf->setAccrualRate( 1.0 );
+				break;
+			case 510:
+				$pfpf->setName( 'OverTime (4.0x)' );
+				$pfpf->setPayType( 10 ); //Pay Multiplied By Factor
+				$pfpf->setRate( 4.0 );
+				$pfpf->setAccrualPolicyAccount( $accrual_policy_account_id );
+				$pfpf->setAccrualRate( 1.0 );
+				break;
+
+		}
+
+		if ( $pfpf->isValid() ) {
+			$insert_id = $pfpf->Save();
+			Debug::Text('Pay Formula Policy ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
+
+			return $insert_id;
+		}
+
+		Debug::Text('Failed Creating Pay Formula Policy!', __FILE__, __LINE__, __METHOD__, 10);
+
+		return FALSE;
+	}
+
+	function createContributingShiftPolicy( $company_id, $type, $contributing_pay_code_policy_id, $holiday_policy_id = NULL ) {
+		$cspf = TTnew( 'ContributingShiftPolicyFactory' );
+		$cspf->setCompany( $company_id );
+
+		switch ( $type ) {
+			case 10:
+				$cspf->setName('Regular Shifts');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setMon( TRUE );
+				$cspf->setTue( TRUE );
+				$cspf->setWed( TRUE );
+				$cspf->setThu( TRUE );
+				$cspf->setFri( TRUE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				break;
+			case 20:
+				$cspf->setName('Regular Shifts + Meal/Break');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setMon( TRUE );
+				$cspf->setTue( TRUE );
+				$cspf->setWed( TRUE );
+				$cspf->setThu( TRUE );
+				$cspf->setFri( TRUE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				break;
+			case 30:
+				$cspf->setName('Regular+Overtime');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setMon( TRUE );
+				$cspf->setTue( TRUE );
+				$cspf->setWed( TRUE );
+				$cspf->setThu( TRUE );
+				$cspf->setFri( TRUE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				break;
+			case 40:
+				$cspf->setName('Regular+Overtime+Absence');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setMon( TRUE );
+				$cspf->setTue( TRUE );
+				$cspf->setWed( TRUE );
+				$cspf->setThu( TRUE );
+				$cspf->setFri( TRUE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				break;
+			case 100:
+				$cspf->setName('Holiday (Midnight to Midnight)');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setFilterStartTime( strtotime('12:00AM') );
+				$cspf->setFilterEndTime( strtotime('11:59:59PM') );
+
+				$cspf->setMon( FALSE );
+				$cspf->setTue( FALSE );
+				$cspf->setWed( FALSE );
+				$cspf->setThu( FALSE );
+				$cspf->setFri( FALSE );
+				$cspf->setSat( FALSE );
+				$cspf->setSun( FALSE );
+
+				$cspf->setIncludeHolidayType(20); //Always on Holidays (eligible or not)
+				$cspf->setIncludeShiftType( 100 ); //Partial Shifts
+				break;
+			case 110:
+				$cspf->setName('Holiday (1PM to 5PM)');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setFilterStartTime( strtotime('1:00PM') );
+				$cspf->setFilterEndTime( strtotime('5:00PM') );
+
+				$cspf->setMon( FALSE );
+				$cspf->setTue( FALSE );
+				$cspf->setWed( FALSE );
+				$cspf->setThu( FALSE );
+				$cspf->setFri( FALSE );
+				$cspf->setSat( FALSE );
+				$cspf->setSun( FALSE );
+
+				$cspf->setIncludeHolidayType(20); //Always on Holidays (eligible or not)
+				$cspf->setIncludeShiftType( 100 ); //Partial Shifts
+				break;
+			case 200:
+				$cspf->setName('Regular+Meal/Break');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setMon( TRUE );
+				$cspf->setTue( TRUE );
+				$cspf->setWed( TRUE );
+				$cspf->setThu( TRUE );
+				$cspf->setFri( TRUE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				$cspf->setIncludeShiftType( 200 ); //Full Shift (Shift Must Start & End)
+				break;
+			case 210: //Shift Start
+				$cspf->setName('Shift Start (3PM to 11PM)');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setFilterStartTime( strtotime('3:00PM') );
+				$cspf->setFilterEndTime( strtotime('11:00PM') );
+
+				$cspf->setMon( TRUE );
+				$cspf->setTue( TRUE );
+				$cspf->setWed( TRUE );
+				$cspf->setThu( TRUE );
+				$cspf->setFri( TRUE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				$cspf->setIncludeShiftType( 210 ); //Full Shift (Shift Must Start)
+				break;
+			case 220: //Shift End
+				$cspf->setName('Shift End (3PM to 11PM)');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setFilterStartTime( strtotime('3:00PM') );
+				$cspf->setFilterEndTime( strtotime('11:00PM') );
+
+				$cspf->setMon( TRUE );
+				$cspf->setTue( TRUE );
+				$cspf->setWed( TRUE );
+				$cspf->setThu( TRUE );
+				$cspf->setFri( TRUE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				$cspf->setIncludeShiftType( 220 ); //Full Shift (Shift Must End)
+				break;
+			case 230: //Majority Shift
+				$cspf->setName('Majority Shift (3PM to 11PM)');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setFilterStartTime( strtotime('3:00PM') );
+				$cspf->setFilterEndTime( strtotime('11:00PM') );
+
+				$cspf->setMon( TRUE );
+				$cspf->setTue( TRUE );
+				$cspf->setWed( TRUE );
+				$cspf->setThu( TRUE );
+				$cspf->setFri( TRUE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				$cspf->setIncludeShiftType( 230 ); //Full Shift (Majority of Shift)
+				break;
+			case 231: //Majority Shift - Specific days, and spanning midnight.
+				$cspf->setName('Majority Shift (10PM to 6AM)');
+				$cspf->setContributingPayCodePolicy( $contributing_pay_code_policy_id );
+
+				$cspf->setFilterStartTime( strtotime('10:00PM') );
+				$cspf->setFilterEndTime( strtotime('6:00AM') );
+
+				$cspf->setMon( FALSE );
+				$cspf->setTue( FALSE );
+				$cspf->setWed( FALSE );
+				$cspf->setThu( FALSE );
+				$cspf->setFri( FALSE );
+				$cspf->setSat( TRUE );
+				$cspf->setSun( TRUE );
+
+				$cspf->setIncludeHolidayType(10); //Have no effect
+				$cspf->setIncludeShiftType( 230 ); //Full Shift (Majority of Shift)
+				break;
+
+		}
+
+		if ( $cspf->isValid() ) {
+			$insert_id = $cspf->Save(FALSE);
+			Debug::Text('Contributing Shift Policy ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
+
+			if ( $holiday_policy_id != '' ) {
+				$cspf->setHolidayPolicy( $holiday_policy_id );
+				if ( $cspf->isValid() ) {
+					$cspf->Save();
+				}
+			}
+
+			return $insert_id;
+		}
+
+		Debug::Text('Failed Creating Contributing Shift Policy!', __FILE__, __LINE__, __METHOD__, 10);
+
+		return FALSE;
+	}
+
+	function createPremiumPolicy( $company_id, $type, $contributing_shift_policy_id = 0, $pay_code_id = 0 ) {
 		$ppf = new PremiumPolicyFactory();
 		$ppf->setCompany( $company_id );
 
 		switch ( $type ) {
+			case 10: //Applies in all cases
+				$ppf->setName( 'Basic (Apply Always)' );
+				$ppf->setType( 10 );
+
+				$ppf->setPayType( 10 ); //Pay Multiplied by factor
+
+				$ppf->setStartDate( NULL );
+				$ppf->setEndDate( NULL );
+
+				$ppf->setStartTime( NULL );
+				$ppf->setEndTime( NULL );
+
+				$ppf->setDailyTriggerTime( 0 );
+				$ppf->setWeeklyTriggerTime( 0 );
+
+				$ppf->setMon( TRUE );
+				$ppf->setTue( TRUE );
+				$ppf->setWed( TRUE );
+				$ppf->setThu( TRUE );
+				$ppf->setFri( TRUE );
+				$ppf->setSat( TRUE );
+				$ppf->setSun( TRUE );
+
+				$ppf->setIncludePartialPunch( TRUE );
+				//$ppf->setMaximumNoBreakTime( $data['maximum_no_break_time'] );
+				//$ppf->setMinimumBreakTime( $data['minimum_break_time'] );
+
+				$ppf->setMinimumTime( 0 );
+				$ppf->setMaximumTime( 0 );
+				$ppf->setIncludeMealPolicy( TRUE );
+				break;
 			case 90: //Basic Min/Max only.
 				$ppf->setName( 'Min/Max Only' );
 				$ppf->setType( 10 );
@@ -447,8 +817,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 7200 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -488,8 +858,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 7200 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -504,8 +874,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setPayType( 10 ); //Pay Multiplied by factor
 
-				$ppf->setStartDate( $this->pay_period_objs[0]->getStartDate()+86400 );
-				$ppf->setEndDate( $this->pay_period_objs[0]->getStartDate()+(86400*3) ); //2nd & 3rd days.
+				$ppf->setStartDate( $this->pay_period_objs[0]->getStartDate() + 86400 );
+				$ppf->setEndDate( $this->pay_period_objs[0]->getStartDate() + (86400 * 3) ); //2nd & 3rd days.
 
 				$ppf->setStartTime( TTDate::parseDateTime('12:00 AM') );
 				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
@@ -529,8 +899,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -545,8 +915,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setPayType( 10 ); //Pay Multiplied by factor
 
-				$ppf->setStartDate( $this->pay_period_objs[0]->getStartDate()+86400 );
-				$ppf->setEndDate( $this->pay_period_objs[0]->getStartDate()+(86400*3) ); //2nd & 3rd days.
+				$ppf->setStartDate( $this->pay_period_objs[0]->getStartDate() + 86400 );
+				$ppf->setEndDate( $this->pay_period_objs[0]->getStartDate() + (86400 * 3) ); //2nd & 3rd days.
 
 				$ppf->setStartTime( TTDate::parseDateTime('12:00 AM') );
 				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
@@ -554,44 +924,44 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setDailyTriggerTime( 0 );
 				$ppf->setWeeklyTriggerTime( 0 );
 
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 1
-							OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*3)) == 1 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 1
+							OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 3)) == 1 ) {
 					$ppf->setMon( TRUE );
 				} else {
 					$ppf->setMon( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 2
-						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*3)) == 2) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 2
+						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 3)) == 2) {
 					$ppf->setTue( TRUE );
 				} else {
 					$ppf->setTue( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 3
-						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*3)) == 3) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 3
+						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 3)) == 3) {
 					$ppf->setWed( TRUE );
 				} else {
 					$ppf->setWed( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 4
-						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*3)) == 4) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 4
+						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 3)) == 4) {
 					$ppf->setThu( TRUE );
 				} else {
 					$ppf->setThu( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 5
-						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*3)) == 5 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 5
+						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 3)) == 5 ) {
 					$ppf->setFri( TRUE );
 				} else {
 					$ppf->setFri( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 6
-						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*3)) == 6) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 6
+						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 3)) == 6) {
 					$ppf->setSat( TRUE );
 				} else {
 					$ppf->setSat( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 0
-						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*3)) == 0) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 0
+						OR TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 3)) == 0) {
 					$ppf->setSun( TRUE );
 				} else {
 					$ppf->setSun( FALSE );
@@ -605,8 +975,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -647,8 +1017,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -689,8 +1059,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -731,8 +1101,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -773,8 +1143,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -815,8 +1185,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -857,8 +1227,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -868,7 +1238,91 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				//$ppf->setJobItemSelectionType( 10 );
 
 				break;
-			case 127:
+			case 127: //Same as above type: 122, only Advanced type.
+				$ppf->setName( 'Time Based/Evening Shift w/Partial+Span Midnight' );
+				$ppf->setType( 100 );
+
+				$ppf->setPayType( 10 ); //Pay Multiplied by factor
+
+				$ppf->setStartDate( '' );
+				$ppf->setEndDate( '' );
+
+				$ppf->setStartTime( TTDate::parseDateTime('12:00 AM') );
+				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
+
+				$ppf->setDailyTriggerTime( 0 );
+				$ppf->setWeeklyTriggerTime( 0 );
+
+				$ppf->setMon( TRUE );
+				$ppf->setTue( TRUE );
+				$ppf->setWed( TRUE );
+				$ppf->setThu( TRUE );
+				$ppf->setFri( TRUE );
+				$ppf->setSat( TRUE );
+				$ppf->setSun( TRUE );
+
+				$ppf->setIncludePartialPunch( TRUE );
+				//$ppf->setMaximumNoBreakTime( $data['maximum_no_break_time'] );
+				//$ppf->setMinimumBreakTime( $data['minimum_break_time'] );
+
+				$ppf->setMinimumTime( 0 );
+				$ppf->setMaximumTime( 0 );
+				$ppf->setIncludeMealPolicy( TRUE );
+
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+
+				//$ppf->setExcludeDefaultBranch( FALSE );
+				//$ppf->setExcludeDefaultDepartment( FALSE );
+				//$ppf->setJobGroupSelectionType( 10 );
+				//$ppf->setJobSelectionType( 10 );
+				//$ppf->setJobItemGroupSelectionType( 10 );
+				//$ppf->setJobItemSelectionType( 10 );
+
+				break;
+			case 128: //Same as above type: 122, only Advanced type.
+				$ppf->setName( 'Time Based/Evening Shift w/Partial+Span Midnight' );
+				$ppf->setType( 100 );
+
+				$ppf->setPayType( 10 ); //Pay Multiplied by factor
+
+				$ppf->setStartDate( '' );
+				$ppf->setEndDate( '' );
+
+				$ppf->setStartTime( TTDate::parseDateTime('12:00 AM') );
+				$ppf->setEndTime( TTDate::parseDateTime('10:00 AM') );
+
+				$ppf->setDailyTriggerTime( 0 );
+				$ppf->setWeeklyTriggerTime( 0 );
+
+				$ppf->setMon( TRUE );
+				$ppf->setTue( TRUE );
+				$ppf->setWed( TRUE );
+				$ppf->setThu( TRUE );
+				$ppf->setFri( TRUE );
+				$ppf->setSat( TRUE );
+				$ppf->setSun( TRUE );
+
+				$ppf->setIncludePartialPunch( TRUE );
+				//$ppf->setMaximumNoBreakTime( $data['maximum_no_break_time'] );
+				//$ppf->setMinimumBreakTime( $data['minimum_break_time'] );
+
+				$ppf->setMinimumTime( 0 );
+				$ppf->setMaximumTime( 0 );
+				$ppf->setIncludeMealPolicy( TRUE );
+
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+
+				//$ppf->setExcludeDefaultBranch( FALSE );
+				//$ppf->setExcludeDefaultDepartment( FALSE );
+				//$ppf->setJobGroupSelectionType( 10 );
+				//$ppf->setJobSelectionType( 10 );
+				//$ppf->setJobItemGroupSelectionType( 10 );
+				//$ppf->setJobItemSelectionType( 10 );
+
+				break;
+			case 129:
 				$ppf->setName( 'Effective Days Only w/Partial' );
 				$ppf->setType( 10 );
 
@@ -901,8 +1355,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 20 ); //Always on holidays. This is key to test for a specific bug.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -912,7 +1366,6 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				//$ppf->setJobItemSelectionType( 10 );
 
 				break;
-
 			case 130:
 				$ppf->setName( 'Time Based/Evening Shift w/o Partial' );
 				$ppf->setType( 10 );
@@ -944,8 +1397,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -986,8 +1439,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1009,7 +1462,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setStartTime( TTDate::parseDateTime('12:00 AM') );
 				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
 
-				$ppf->setDailyTriggerTime( (3600*5) );
+				$ppf->setDailyTriggerTime( (3600 * 5) );
 				$ppf->setWeeklyTriggerTime( 0 );
 
 				$ppf->setMon( TRUE );
@@ -1028,8 +1481,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1052,7 +1505,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
 
 				$ppf->setDailyTriggerTime( 0 );
-				$ppf->setWeeklyTriggerTime( (3600*9) );
+				$ppf->setWeeklyTriggerTime( (3600 * 9) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1070,8 +1523,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1093,8 +1546,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setStartTime( TTDate::parseDateTime('12:00 AM') );
 				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
 
-				$ppf->setDailyTriggerTime( (3600*3) );
-				$ppf->setWeeklyTriggerTime( (3600*9) );
+				$ppf->setDailyTriggerTime( (3600 * 3) );
+				$ppf->setWeeklyTriggerTime( (3600 * 9) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1112,8 +1565,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1135,8 +1588,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setStartTime( TTDate::parseDateTime('7:00 PM') );
 				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
 
-				$ppf->setDailyTriggerTime( (3600*5) );
-				$ppf->setWeeklyTriggerTime( (3600*9) );
+				$ppf->setDailyTriggerTime( (3600 * 5) );
+				$ppf->setWeeklyTriggerTime( (3600 * 9) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1154,8 +1607,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1179,8 +1632,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				$ppf->setExcludeDefaultBranch( FALSE );
 				$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1207,8 +1660,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				$ppf->setExcludeDefaultBranch( FALSE );
 				$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1236,8 +1689,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 3600 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				$ppf->setExcludeDefaultBranch( FALSE );
 				$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1260,16 +1713,16 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludePartialPunch( TRUE );
 
-				$ppf->setDailyTriggerTime( (3600*5) );
-				$ppf->setMaximumNoBreakTime( (3600*5) );
+				$ppf->setDailyTriggerTime( (3600 * 5) );
+				$ppf->setMaximumNoBreakTime( (3600 * 5) );
 				$ppf->setMinimumBreakTime(  1800 );
 
 				$ppf->setMinimumTime( 1800 );
 				$ppf->setMaximumTime( 1800 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setJobGroupSelectionType( 10 );
 				//$ppf->setJobSelectionType( 10 );
@@ -1283,8 +1736,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setPayType( 10 ); //Pay Multiplied by factor
 
-				$ppf->setMinimumShiftTime( (4*3600) );
-				$ppf->setMinimumTimeBetweenShift( (8*3600) );
+				$ppf->setMinimumShiftTime( (4 * 3600) );
+				$ppf->setMinimumTimeBetweenShift( (8 * 3600) );
 
 				$ppf->setIncludePartialPunch( TRUE );
 				//$ppf->setMaximumNoBreakTime( $data['maximum_no_break_time'] );
@@ -1294,8 +1747,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1308,8 +1761,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setPayType( 10 ); //Pay Multiplied by factor
 
-				$ppf->setMinimumShiftTime( (4*3600) );
-				$ppf->setMinimumTimeBetweenShift( (8*3600) );
+				$ppf->setMinimumShiftTime( (4 * 3600) );
+				$ppf->setMinimumTimeBetweenShift( (8 * 3600) );
 
 				$ppf->setIncludePartialPunch( TRUE );
 				//$ppf->setMaximumNoBreakTime( $data['maximum_no_break_time'] );
@@ -1319,14 +1772,29 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				$ppf->setExcludeDefaultBranch( FALSE );
 				$ppf->setExcludeDefaultDepartment( FALSE );
 
 				$ppf->setBranchSelectionType( 20 );
 
+				break;
+			case 352:
+				$ppf->setName( 'Minimum Shift Time (0 Time Between Shifts)' );
+				$ppf->setType( 50 );
+
+				$ppf->setPayType( 10 ); //Pay Multiplied by factor
+
+				$ppf->setMinimumShiftTime( (4 * 3600) );
+				$ppf->setMinimumTimeBetweenShift( (0 * 3600) );
+
+				$ppf->setIncludePartialPunch( TRUE );
+
+				$ppf->setMinimumTime( 0 );
+				$ppf->setMaximumTime( 0 );
+				$ppf->setIncludeMealPolicy( TRUE );
 				break;
 			case 400:
 				$ppf->setName( 'Holiday (Basic)' );
@@ -1344,8 +1812,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setJobGroupSelectionType( 10 );
 				//$ppf->setJobSelectionType( 10 );
@@ -1358,8 +1826,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setPayType( 10 ); //Pay Multiplied by factor
 
-				$ppf->setStartDate( $this->pay_period_objs[0]->getStartDate()+86400 );
-				$ppf->setEndDate( $this->pay_period_objs[0]->getStartDate()+(86400*3) ); //2nd & 3rd days.
+				$ppf->setStartDate( $this->pay_period_objs[0]->getStartDate() + 86400 );
+				$ppf->setEndDate( $this->pay_period_objs[0]->getStartDate() + (86400 * 3) ); //2nd & 3rd days.
 
 				$ppf->setStartTime( TTDate::parseDateTime('12:00 AM') );
 				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
@@ -1385,8 +1853,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 20 ); //Always on holidays
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1402,8 +1870,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setPayType( 10 ); //Pay Multiplied by factor
 
-				$ppf->setStartDate( $this->pay_period_objs[0]->getStartDate()+86400 );
-				$ppf->setEndDate( $this->pay_period_objs[0]->getStartDate()+(86400*3) ); //2nd & 3rd days.
+				$ppf->setStartDate( $this->pay_period_objs[0]->getStartDate() + 86400 );
+				$ppf->setEndDate( $this->pay_period_objs[0]->getStartDate() + (86400 * 3) ); //2nd & 3rd days.
 
 				$ppf->setStartTime( TTDate::parseDateTime('12:00 AM') );
 				$ppf->setEndTime( TTDate::parseDateTime('11:59 PM') );
@@ -1429,8 +1897,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 30 ); //Never on holidays
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1453,7 +1921,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setEndTime( '' );
 
 				$ppf->setDailyTriggerTime( 0 );
-				$ppf->setWeeklyTriggerTime( (3600*40) );
+				$ppf->setWeeklyTriggerTime( (3600 * 40) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1473,8 +1941,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 30 ); //Never on Holiday
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1484,7 +1952,6 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				//$ppf->setJobItemSelectionType( 10 );
 
 				break;
-
 			case 500:
 				$ppf->setName( 'Daily Before/After Time 8-10hrs' );
 				$ppf->setType( 10 );
@@ -1497,8 +1964,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setStartTime( '' );
 				$ppf->setEndTime( '' );
 
-				$ppf->setDailyTriggerTime( (8*3600) );
-				$ppf->setMaximumDailyTriggerTime( (10*3600) );
+				$ppf->setDailyTriggerTime( (8 * 3600) );
+				$ppf->setMaximumDailyTriggerTime( (10 * 3600) );
 				$ppf->setWeeklyTriggerTime( 0 );
 				$ppf->setMaximumWeeklyTriggerTime( 0 );
 
@@ -1518,8 +1985,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
 			case 501:
@@ -1534,8 +2001,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setStartTime( '' );
 				$ppf->setEndTime( '' );
 
-				$ppf->setDailyTriggerTime( (10*3600) );
-				$ppf->setMaximumDailyTriggerTime( (11*3600) );
+				$ppf->setDailyTriggerTime( (10 * 3600) );
+				$ppf->setMaximumDailyTriggerTime( (11 * 3600) );
 				$ppf->setWeeklyTriggerTime( 0 );
 				$ppf->setMaximumWeeklyTriggerTime( 0 );
 
@@ -1555,8 +2022,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
 			case 510:
@@ -1573,8 +2040,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setDailyTriggerTime( 0 );
 				$ppf->setMaximumDailyTriggerTime( 0 );
-				$ppf->setWeeklyTriggerTime( (20*3600) );
-				$ppf->setMaximumWeeklyTriggerTime( (30*3600) );
+				$ppf->setWeeklyTriggerTime( (20 * 3600) );
+				$ppf->setMaximumWeeklyTriggerTime( (30 * 3600) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1592,8 +2059,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
 			case 511:
@@ -1610,8 +2077,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setDailyTriggerTime( 0 );
 				$ppf->setMaximumDailyTriggerTime( 0 );
-				$ppf->setWeeklyTriggerTime( (30*3600) );
-				$ppf->setMaximumWeeklyTriggerTime( (40*3600) );
+				$ppf->setWeeklyTriggerTime( (30 * 3600) );
+				$ppf->setMaximumWeeklyTriggerTime( (40 * 3600) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1629,11 +2096,10 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
-
 			case 520:
 				$ppf->setName( 'Daily After 8/Weekly Before 40' );
 				$ppf->setType( 10 );
@@ -1646,10 +2112,10 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setStartTime( '' );
 				$ppf->setEndTime( '' );
 
-				$ppf->setDailyTriggerTime( (8*3600) );
+				$ppf->setDailyTriggerTime( (8 * 3600) );
 				$ppf->setMaximumDailyTriggerTime( 0 );
 				$ppf->setWeeklyTriggerTime( 0 );
-				$ppf->setMaximumWeeklyTriggerTime( (40*3600) );
+				$ppf->setMaximumWeeklyTriggerTime( (40 * 3600) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1667,8 +2133,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
 			case 521:
@@ -1683,9 +2149,9 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setStartTime( '' );
 				$ppf->setEndTime( '' );
 
-				$ppf->setDailyTriggerTime( (8*3600) );
+				$ppf->setDailyTriggerTime( (8 * 3600) );
 				$ppf->setMaximumDailyTriggerTime( 0 );
-				$ppf->setWeeklyTriggerTime( (40*3600) );
+				$ppf->setWeeklyTriggerTime( (40 * 3600) );
 				$ppf->setMaximumWeeklyTriggerTime( 0 );
 
 				$ppf->setMon( TRUE );
@@ -1704,8 +2170,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
 			case 522:
@@ -1721,8 +2187,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setEndTime( '' );
 
 				$ppf->setDailyTriggerTime( 0 );
-				$ppf->setMaximumDailyTriggerTime( (8*3600) );
-				$ppf->setWeeklyTriggerTime( (40*3600) );
+				$ppf->setMaximumDailyTriggerTime( (8 * 3600) );
+				$ppf->setWeeklyTriggerTime( (40 * 3600) );
 				$ppf->setMaximumWeeklyTriggerTime( 0 );
 
 				$ppf->setMon( TRUE );
@@ -1741,8 +2207,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
 			case 523:
@@ -1760,7 +2226,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setDailyTriggerTime( 0 );
 				$ppf->setMaximumDailyTriggerTime( 0 );
 				$ppf->setWeeklyTriggerTime( 0 );
-				$ppf->setMaximumWeeklyTriggerTime( (40*3600) );
+				$ppf->setMaximumWeeklyTriggerTime( (40 * 3600) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1778,8 +2244,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
 			case 524:
@@ -1795,9 +2261,9 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setEndTime( '' );
 
 				$ppf->setDailyTriggerTime( 0 );
-				$ppf->setMaximumDailyTriggerTime( (8*3600) );
+				$ppf->setMaximumDailyTriggerTime( (8 * 3600) );
 				$ppf->setWeeklyTriggerTime( 0 );
-				$ppf->setMaximumWeeklyTriggerTime( (40*3600) );
+				$ppf->setMaximumWeeklyTriggerTime( (40 * 3600) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1815,8 +2281,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setIncludeHolidayType( 10 ); //No effect.
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				break;
 			case 600:
@@ -1834,37 +2300,37 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setDailyTriggerTime( 0 );
 				$ppf->setWeeklyTriggerTime( 0 );
 
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 1 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 1 ) {
 					$ppf->setMon( TRUE );
 				} else {
 					$ppf->setMon( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 2 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 2 ) {
 					$ppf->setTue( TRUE );
 				} else {
 					$ppf->setTue( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 3 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 3 ) {
 					$ppf->setWed( TRUE );
 				} else {
 					$ppf->setWed( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 4 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 4 ) {
 					$ppf->setThu( TRUE );
 				} else {
 					$ppf->setThu( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 5 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 5 ) {
 					$ppf->setFri( TRUE );
 				} else {
 					$ppf->setFri( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 6 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 6 ) {
 					$ppf->setSat( TRUE );
 				} else {
 					$ppf->setSat( FALSE );
 				}
-				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate()+(86400*2)) == 0 ) {
+				if ( TTDate::getDayOfWeek($this->pay_period_objs[0]->getStartDate() + (86400 * 2)) == 0 ) {
 					$ppf->setSun( TRUE );
 				} else {
 					$ppf->setSun( FALSE );
@@ -1878,8 +2344,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 				//$ppf->setExcludeDefaultBranch( FALSE );
 				//$ppf->setExcludeDefaultDepartment( FALSE );
@@ -1895,7 +2361,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 				$ppf->setPayType( 10 ); //Pay Multiplied by factor
 
-				$ppf->setDailyTriggerTime( (3600*8) );
+				$ppf->setDailyTriggerTime( (3600 * 8) );
 				$ppf->setWeeklyTriggerTime( 0 );
 
 				$ppf->setMon( TRUE );
@@ -1914,8 +2380,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 
 				$ppf->setExcludeDefaultBranch( FALSE );
@@ -1934,7 +2400,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setDailyTriggerTime( 0 );
 				$ppf->setMaximumDailyTriggerTime( 0 );
 				$ppf->setWeeklyTriggerTime( 0 );
-				$ppf->setMaximumWeeklyTriggerTime( (40*3600) );
+				$ppf->setMaximumWeeklyTriggerTime( (40 * 3600) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1952,8 +2418,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 
 				$ppf->setExcludeDefaultBranch( FALSE );
@@ -1972,7 +2438,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setDailyTriggerTime( 0 );
 				$ppf->setMaximumDailyTriggerTime( 0 );
 				$ppf->setWeeklyTriggerTime( 0 );
-				$ppf->setMaximumWeeklyTriggerTime( (40*3600) );
+				$ppf->setMaximumWeeklyTriggerTime( (40 * 3600) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -1990,8 +2456,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 
 				$ppf->setExcludeDefaultBranch( FALSE );
@@ -2008,9 +2474,9 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setPayType( 10 ); //Pay Multiplied by factor
 
 				$ppf->setDailyTriggerTime( 0 );
-				$ppf->setMaximumDailyTriggerTime( (8*3600) );
+				$ppf->setMaximumDailyTriggerTime( (8 * 3600) );
 				$ppf->setWeeklyTriggerTime( 0 );
-				$ppf->setMaximumWeeklyTriggerTime( (40*3600) );
+				$ppf->setMaximumWeeklyTriggerTime( (40 * 3600) );
 
 				$ppf->setMon( TRUE );
 				$ppf->setTue( TRUE );
@@ -2028,8 +2494,8 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				$ppf->setMaximumTime( 0 );
 				$ppf->setIncludeMealPolicy( TRUE );
 
-				$ppf->setRate( 1.0 );
-				$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
+				//$ppf->setRate( 1.0 );
+				//$ppf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Premium 1') );
 
 
 				$ppf->setExcludeDefaultBranch( FALSE );
@@ -2041,46 +2507,81 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 				break;
 		}
 
+		$ppf->setContributingShiftPolicy( $contributing_shift_policy_id );
+		$ppf->setPayCode( $pay_code_id );
+
 		if ( $ppf->isValid() ) {
 			$insert_id = $ppf->Save(FALSE);
-			Debug::Text('Premium Policy ID: '. $insert_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::Text('Premium Policy ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
 
 			switch ( $type ) {
 				case 200:
-					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__,10);
+					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__, 10);
 					$ppf->setBranch( array($this->branch_ids[0]) );
 					break;
 				case 210:
+				case 212:
 				case 351:
-					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__,10);
+					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__, 10);
 					$ppf->setBranch( array($this->branch_ids[0]) );
 					$ppf->setDepartment( array($this->department_ids[0]) );
 					break;
 				case 700:
-					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__,10);
+					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__, 10);
 					$ppf->setBranch( array($this->branch_ids[0]) );
 					$ppf->setDepartment( array($this->department_ids[0]) );
 					break;
 				case 723:
-					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__,10);
+					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__, 10);
 					$ppf->setBranch( array($this->branch_ids[0]) );
 					$ppf->setDepartment( array($this->department_ids[0]) );
 					break;
 				case 724: //Same as 729.
 				case 729:
-					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__,10);
+					Debug::Text('Post Save Data...', __FILE__, __LINE__, __METHOD__, 10);
 					$ppf->setBranch( array($this->branch_ids[1]) );
 					$ppf->setDepartment( array($this->department_ids[1]) );
 					break;
 			}
 
-			Debug::Text('Post Save...', __FILE__, __LINE__, __METHOD__,10);
+			Debug::Text('Post Save...', __FILE__, __LINE__, __METHOD__, 10);
 			$ppf->Save();
 
 			return $insert_id;
 		}
 
-		Debug::Text('Failed Creating Premium Policy!', __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('Failed Creating Premium Policy!', __FILE__, __LINE__, __METHOD__, 10);
+
+		return FALSE;
+	}
+
+	function createOverTimePolicy( $company_id, $type, $contributing_shift_policy_id = 0, $pay_code_id = 0 ) {
+		$otpf = TTnew( 'OverTimePolicyFactory' );
+		$otpf->setCompany( $company_id );
+
+		switch ( $type ) {
+			case 100:
+				$otpf->setName( 'Daily (>0hrs)' );
+				$otpf->setType( 10 );
+				$otpf->setTriggerTime( (3600 * 0) );
+				$otpf->setContributingShiftPolicy( $contributing_shift_policy_id );
+				$otpf->setPayCode( $pay_code_id );
+				//$otpf->setRate( '1.0' );
+				//$otpf->setPayStubEntryAccountId( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($company_id, 10, 'Over Time 2') );
+
+				//$otpf->setAccrualPolicyId( $accrual_policy_id );
+				//$otpf->setAccrualRate( '1.0' );
+				break;
+		}
+
+		if ( $otpf->isValid() ) {
+			$insert_id = $otpf->Save();
+			Debug::Text('Overtime Policy ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
+
+			return $insert_id;
+		}
+
+		Debug::Text('Failed Creating Overtime Policy!', __FILE__, __LINE__, __METHOD__, 10);
 
 		return FALSE;
 	}
@@ -2107,22 +2608,39 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		Advanced Time+Hour+Branch+Department+Job
 	*/
 
+	/**
+	 * @group PremiumPolicy_testNoPremiumPolicyA
+	 */
 	function testNoPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
 		$date_epoch = $this->pay_period_objs[0]->getStartDate();
@@ -2146,38 +2664,61 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['hourly_rate'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['hourly_rate_with_burden'], 0 );
+
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['hourly_rate'], 21.50 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['hourly_rate_with_burden'], ( 21.50 * 1.135 ) );
+
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyA
+	 */
 	function testMinMaxPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2198,17 +2739,25 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (0.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (0.5 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['hourly_rate'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['hourly_rate_with_burden'], 0 );
+
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (0.5*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (0.5 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['hourly_rate'], 21.50 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['hourly_rate_with_burden'], ( 21.50 * 1.135 ) );
+
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['hourly_rate'], 21.50 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['hourly_rate_with_burden'], ( 21.50 * 1.135 ) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -2216,25 +2765,41 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyB
+	 */
 	function testMinMaxPremiumPolicyB() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2255,43 +2820,58 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (1.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1.5*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1.5 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyC
+	 */
 	function testMinMaxPremiumPolicyC() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2312,17 +2892,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -2330,25 +2910,42 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyD
+	 */
 	function testMinMaxPremiumPolicyD() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2369,17 +2966,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -2387,25 +2984,42 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyE
+	 */
 	function testMinMaxPremiumPolicyE() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2440,47 +3054,68 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (0.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (0.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (0.5*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], 900 );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], 2700 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (900) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (900) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (900) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2700) );
 
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyF
+	 */
 	function testMinMaxPremiumPolicyF() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 90, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2515,46 +3150,68 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], 1800 );
-
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], 5400 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (0.5 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1800) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (5400) );
 
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyA2
+	 */
 	function testMinMaxPremiumPolicyA2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2575,17 +3232,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (0.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (0.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (0.5*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (0.5 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -2593,23 +3250,41 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyB2
+	 */
 	function testMinMaxPremiumPolicyB2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2630,17 +3305,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (1.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1.5 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -2648,23 +3323,40 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyC2
+	 */
 	function testMinMaxPremiumPolicyC2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
-
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2685,17 +3377,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -2703,23 +3395,41 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyD2
+	 */
 	function testMinMaxPremiumPolicyD2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2740,17 +3450,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -2758,23 +3468,41 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyE2
+	 */
 	function testMinMaxPremiumPolicyE2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2809,45 +3537,67 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (0.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (0.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (0.5*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], 900 );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], 2700 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (900) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (900) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (900) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2700) );
 
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinMaxPremiumPolicyF2
+	 */
 	function testMinMaxPremiumPolicyF2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 91, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2882,43 +3632,65 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], 1800 );
-
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], 5400 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (0.5 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1800) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (5400) );
 
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testEffectiveDaysOnlyPremiumPolicyA
+	 */
 	function testEffectiveDaysOnlyPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 127 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 129, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
 		$date_epoch = $this->pay_period_objs[0]->getStartDate();
@@ -2942,17 +3714,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -2960,23 +3732,41 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testEffectiveDaysOnlyPremiumPolicyB
+	 */
 	function testEffectiveDaysOnlyPremiumPolicyB() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 127 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 129, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -2997,13 +3787,13 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
 		//Premium Time = NONE
 
 		//Make sure no other hours
@@ -3012,26 +3802,42 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
-
+	/**
+	 * @group PremiumPolicy_testDatePremiumPolicyA
+	 */
 	function testDatePremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -3052,17 +3858,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -3070,28 +3876,45 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testEffectiveDatePremiumPolicyA
+	 */
 	function testEffectiveDatePremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -3112,25 +3935,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['premium_policy_id'], $policy_ids['premium'][0] );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -3151,46 +3973,66 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyA
+	 */
 	function testTimeBasedPartialPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -3211,51 +4053,68 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7*3600) );
-		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyB
+	 */
 	function testTimeBasedPartialPremiumPolicyB() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 122 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 122, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 7:00PM'),
@@ -3275,42 +4134,60 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
+
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyB2
+	 */
 	function testTimeBasedPartialPremiumPolicyB2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 124 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 124, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 7:00PM'),
@@ -3330,43 +4207,60 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyC
+	 */
 	function testTimeBasedPartialPremiumPolicyC() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 122 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 122, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 2:00PM'),
@@ -3400,42 +4294,64 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10.5*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3.5 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		return TRUE;
 	}
+
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyC2
+	 */
 	function testTimeBasedPartialPremiumPolicyC2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 124 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 124, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 2:00PM'),
@@ -3469,43 +4385,63 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10.5*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3.5 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyD
+	 */
 	function testTimeBasedPartialPremiumPolicyD() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 122 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 122, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 1:00AM'),
@@ -3539,46 +4475,68 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (6*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
+
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyD2
+	 */
 	function testTimeBasedPartialPremiumPolicyD2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 124 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 124, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 1:00AM'),
@@ -3612,47 +4570,68 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (6*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyE
+	 */
 	function testTimeBasedPartialPremiumPolicyE() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 122 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 122, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		//Test punching in before the premium start time, and out after the premium end time.
 		$dd->createPunchPair( 	$this->user_id,
@@ -3673,42 +4652,59 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (11*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (11 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
+
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyE2
+	 */
 	function testTimeBasedPartialPremiumPolicyE2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 124 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 124, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		//Test punching in before the premium start time, and out after the premium end time.
 		$dd->createPunchPair( 	$this->user_id,
@@ -3729,43 +4725,60 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (11*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (11 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyF
+	 */
 	function testTimeBasedPartialPremiumPolicyF() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 123 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 123, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		//Test punching in before the premium start time, and out after the premium end time.
 		$dd->createPunchPair( 	$this->user_id,
@@ -3786,42 +4799,60 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
+
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyF2
+	 */
 	function testTimeBasedPartialPremiumPolicyF2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 125 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 125, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		//Test punching in before the premium start time, and out after the premium end time.
 		$dd->createPunchPair( 	$this->user_id,
@@ -3842,43 +4873,158 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyF3
+	 */
+	function testTimeBasedPartialPremiumPolicyF3() {
+		//Test creating punches in one timezone, then recalculating them in another timezone to make sure they are proper.
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		TTDate::setTimeZone('PST8PDT');
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 125, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 6));
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		//Test punching in before the premium start time, and out after the premium end time.
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 5:00AM'),
+								strtotime($date_stamp.' 8:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (12 * 3600) );
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		TTDate::setTimeZone('EST5EDT');
+		$recalc_result = UserDateTotalFactory::reCalculateDay( $this->user_id, $date_epoch, TRUE );
+		TTDate::setTimeZone('PST8PDT');
+
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 6));
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (12 * 3600) );
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyG
+	 */
 	function testTimeBasedPartialPremiumPolicyG() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 123 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 123, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*7);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 7));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		//Test punching in before the premium start time, and out after the premium end time.
 		$dd->createPunchPair( 	$this->user_id,
@@ -3899,42 +5045,60 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
+
+	/**
+	 * @group PremiumPolicy_testTimeBasedPartialPremiumPolicyG2
+	 */
 	function testTimeBasedPartialPremiumPolicyG2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 125 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 125, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*7);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 7));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		//Test punching in before the premium start time, and out after the premium end time.
 		$dd->createPunchPair( 	$this->user_id,
@@ -3955,43 +5119,62 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (15 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (15 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedNoPartialPremiumPolicyA
+	 */
 	function testTimeBasedNoPartialPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 130 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 130, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -4012,46 +5195,65 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedNoPartialPremiumPolicyB
+	 */
 	function testTimeBasedNoPartialPremiumPolicyB() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 125, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 8:00AM'),
@@ -4085,38 +5287,60 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (5 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (5 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedNoPartialPremiumPolicyC
+	 */
 	function testTimeBasedNoPartialPremiumPolicyC() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 2:30PM'),
@@ -4150,39 +5374,62 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
-	//Put a 5hr gap between the two punch pairs to signify a new shift starting, so premium does kick in.
+
+	/**
+	 * @group PremiumPolicy_testTimeBasedNoPartialPremiumPolicyD
+	 */
 	function testTimeBasedNoPartialPremiumPolicyD() {
+		//Put a 5hr gap between the two punch pairs to signify a new shift starting, so premium does kick in.
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 8:00AM'),
@@ -4198,6 +5445,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 								TRUE
 								);
 
+		//This starts a new shift due to the gap between the NORMAL OUT and NORMAL IN punches.
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 7:00PM'),
 								strtotime($date_stamp.' 10:00PM'),
@@ -4216,43 +5464,64 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (5 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (3 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedNoPartialPremiumPolicyE
+	 */
 	function testTimeBasedNoPartialPremiumPolicyE() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 1:00AM'),
@@ -4286,47 +5555,69 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (4 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//v9.2.X changed to ensure that if Partial Punches was DISABLED, the entire shift had to fall within the differential times.
+		//Premium
+		//$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		//$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		//$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (4*3600) );
+		//Premium
+		//$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		//$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		//$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (4*3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedNoPartialPremiumPolicyF
+	 */
 	function testTimeBasedNoPartialPremiumPolicyF() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
-		$date_stamp2 = TTDate::getDate('DATE', $date_epoch+86400 );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 11:00PM'),
@@ -4360,48 +5651,167 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (4 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//v9.2.X changed to ensure that if Partial Punches was DISABLED, the entire shift had to fall within the differential times.
+		//Premium
+		//$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		//$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		//$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (4*3600) );
+		//Premium
+		//$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		//$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		//$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (4*3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeBasedNoPartialPremiumPolicyG
+	 */
+	function testTimeBasedNoPartialPremiumPolicyG() {
+		global $dd;
 
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+
+		//6P - 3A
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 132, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+								   NULL, //Meal
+								   NULL, //Exception
+								   NULL, //Holiday
+								   NULL, //OT
+								   $policy_ids['premium'], //Premium
+								   NULL, //Round
+								   array($this->user_id), //Users
+								   NULL, //Break
+								   NULL, //Accrual
+								   NULL, //Expense
+								   NULL, //Absence
+								   $this->policy_ids['regular'] //Regular
+		);
+
+
+		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+		$date_stamp2 = TTDate::getDate('DATE', ($date_epoch + 86400) );
+
+		$dd->createPunchPair( 	$this->user_id,
+								 strtotime($date_stamp.' 6:00PM'),
+								 strtotime($date_stamp.' 10:00PM'),
+								 array(
+										 'in_type_id' => 10,
+										 'out_type_id' => 20,
+										 'branch_id' => 0,
+										 'department_id' => 0,
+										 'job_id' => 0,
+										 'job_item_id' => 0,
+								 ),
+								 TRUE
+		);
+
+		$dd->createPunchPair( 	$this->user_id,
+								 strtotime($date_stamp.' 11:00PM'),
+								 strtotime($date_stamp2.' 3:00AM'),
+								 array(
+										 'in_type_id' => 20,
+										 'out_type_id' => 10,
+										 'branch_id' => 0,
+										 'department_id' => 0,
+										 'job_id' => 0,
+										 'job_item_id' => 0,
+								 ),
+								 TRUE
+		);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (4 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (4 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (4 * 3600) );
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDailyHourPremiumPolicyA
+	 */
 	function testDailyHourPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 140 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 140, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -4422,53 +5832,73 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7*3600) );
-		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testWeeklyHourPremiumPolicyA
+	 */
 	function testWeeklyHourPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 150 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 150, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -4489,24 +5919,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -4527,53 +5957,73 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (5*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7*3600) );
-		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (5 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testDailyWeeklyHourPremiumPolicyA
+	 */
 	function testDailyWeeklyHourPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 160 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 160, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -4594,24 +6044,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -4632,53 +6082,73 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7*3600) );
-		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testTimeDailyWeeklyHourPremiumPolicyA
+	 */
 	function testTimeDailyWeeklyHourPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 170 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 170, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -4699,24 +6169,22 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
-		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -4737,51 +6205,70 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7*3600) );
-		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testBranchDifferentialPremiumPolicyA
+	 */
 	function testBranchDifferentialPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 200 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 200, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		//
@@ -4822,55 +6309,74 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
-		//Premium Time 1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (3*3600) );
-		//Premium Time 2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (3*3600) );
-		//Premium Time 3
-		$this->assertEquals( $udt_arr[$date_epoch][5]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][5]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (4*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][5]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][5]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (4 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 6 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testBranchDepartmentDifferentialPremiumPolicyA
+	 */
 	function testBranchDepartmentDifferentialPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 210 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 210, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		//
@@ -4911,55 +6417,75 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
-		//Premium Time 1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (3*3600) );
-		//Premium Time 2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (3*3600) );
-		//Premium Time 3
-		$this->assertEquals( $udt_arr[$date_epoch][5]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][5]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (4*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][5]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][5]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (4 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 6 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testBranchDepartmentDifferentialPremiumPolicyB
+	 */
 	function testBranchDepartmentDifferentialPremiumPolicyB() {
+		//
+		//Test where premium policy differential DOES match.
+		//
 		global $dd;
 
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 212 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 212, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		//
@@ -5000,30 +6526,134 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
-		//Premium Time 1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testBranchDepartmentDifferentialPremiumPolicyC
+	 */
+	function testBranchDepartmentDifferentialPremiumPolicyC() {
+		//
+		//Test where premium policy differential DOES NOT match.
+		//
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 212, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+
+		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		//
+		// Punch Pair 1
+		//
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 8:00AM'),
+								strtotime($date_stamp.' 12:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		//
+		// Punch Pair 2
+		//
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 1:00PM'),
+								strtotime($date_stamp.' 4:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0, //Should not match
+											'department_id' => 0, //Should not match
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testMealPremiumPolicyA
+	 */
+	/* //No need to test meal premium policies anymore as they are discontinued.
 	function testMealPremiumPolicyA() {
 		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
 
 		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
 		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
@@ -5061,24 +6691,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], 1800 );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7*3600) );
 		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (7*3600) );
 
 		//Make sure no other hours
@@ -5086,9 +6716,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 		return TRUE;
 	}
-
+	*/
+	/**
+	 * @group PremiumPolicy_testMealPremiumPolicyB
+	 */
+	/* //No need to test meal premium policies anymore as they are discontinued.
 	function testMealPremiumPolicyB() {
 		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
 
 		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 100 );
 		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
@@ -5146,57 +6784,78 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
 
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3*3600) );
-		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (3*3600) );
-
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (4*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (4*3600) );
+		//Premium Time3
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (3*3600) );
+
 		//Premium Time4
-		$this->assertEquals( $udt_arr[$date_epoch][5]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][5]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][5]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][5]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (4*3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 6 );
 
 		return TRUE;
 	}
+	*/
 
+	/**
+	 * @group PremiumPolicy_testMinimumShiftTimeA
+	 */
 	function testMinimumShiftTimeA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 350 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 350, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -5217,18 +6876,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
@@ -5250,15 +6908,19 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (4*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (4 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (4*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 9:30PM'),
@@ -5278,26 +6940,33 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (6*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -5318,25 +6987,145 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
-		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testMinimumShiftTimeB
+	 */
 	function testMinimumShiftTimeB() {
 		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		//$policy_ids['overtime'][] = $dd->createOverTimePolicy( $this->company_id, 10, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] ); //Daily >8
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 352, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									$this->policy_ids['overtime'], //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+
+		//
+		// Test case where we just switch into overtime so the amount of time in OT is less than the minimum shift.
+		// This helps to test the getShiftData() function.
+
+		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 6:00AM'),
+								strtotime($date_stamp.' 11:00AM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 11:30AM'),
+								strtotime($date_stamp.' 3:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8.5 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['start_time_stamp'], strtotime($date_stamp.' 6:00AM') );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['end_time_stamp'], strtotime($date_stamp.' 3:00PM') );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['start_time_stamp'], strtotime($date_stamp.' 11:30AM') );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['end_time_stamp'], strtotime($date_stamp.' 2:30PM') );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (5 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['start_time_stamp'], strtotime($date_stamp.' 6:00AM') );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['end_time_stamp'], strtotime($date_stamp.' 11:00AM') );
+		//Overtime
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 30 ); //30=Overtime
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $this->policy_ids['pay_code'][200] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (0.5 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['start_time_stamp'], strtotime($date_stamp.' 2:30PM') );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['end_time_stamp'], strtotime($date_stamp.' 3:00PM') );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (0.50 * 3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['start_time_stamp'], strtotime($date_stamp.' 3:00PM') );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['end_time_stamp'], strtotime($date_stamp.' 3:30PM') );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testMinimumShiftTimeB
+	 */
+	/* //No longer handling Shift Differential in Minimum Shift premium policies, use Contributing Shifts for that instead.
+	function testMinimumShiftTimeB() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
 
 		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 351 );
 
@@ -5375,16 +7164,16 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2*3600) );
 		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2*3600) );
 
 		//Make sure no other hours
@@ -5408,20 +7197,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (4.5*3600) );
 		//Regular Time1
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2*3600) );
 		//Regular Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5*3600) );
 		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2*3600) );
 
 		//Make sure no other hours
@@ -5445,24 +7234,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6.5*3600) );
 		//Regular Time1
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5*3600) );
 		//Regular Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2*3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2*3600) );
 
 
@@ -5494,12 +7283,12 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
 		//Premium Time
 		//$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
@@ -5532,45 +7321,66 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
 		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
+	*/
+
+	/**
+	 * @group PremiumPolicy_testHolidayPremiumPolicyA
+	 */
 
 	function testHolidayPremiumPolicyA() {
 		global $dd;
 
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
 
 		//Holiday
 		$policy_ids['holiday'][] = $this->createHolidayPolicy( $this->company_id, 10 );
 		$this->createHoliday( $this->company_id, 10, $date_epoch, $policy_ids['holiday'][0] );
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 400 );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 400, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									$policy_ids['holiday'],
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
-
+								   NULL, //Meal
+								   NULL, //Exception
+								   $policy_ids['holiday'], //Holiday
+								   NULL, //OT
+								   $policy_ids['premium'], //Premium
+								   NULL, //Round
+								   array($this->user_id), //Users
+								   NULL, //Break
+								   NULL, //Accrual
+								   NULL, //Expense
+								   NULL, //Absence
+								   $this->policy_ids['regular'] //Regular
+		);
 
 		//
 		// Punch Pair 1
@@ -5610,58 +7420,83 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+
 
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (3 * 3600) );
 
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (4*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (4 * 3600) );
 
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
 
 		return TRUE;
 	}
 
+
+	/**
+	 * @group PremiumPolicy_testHolidayPremiumPolicyB
+	 */
 	function testHolidayPremiumPolicyB() {
 		global $dd;
 
-		$date_epoch1 = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$date_epoch1 = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp1 = TTDate::getDate('DATE', $date_epoch1 );
 
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
-		$date_epoch2 = $this->pay_period_objs[0]->getStartDate()+(86400*4);
+		$date_epoch2 = ($this->pay_period_objs[0]->getStartDate() + (86400 * 4));
 		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
 
 		//Holiday
 		$policy_ids['holiday'][] = $this->createHolidayPolicy( $this->company_id, 10 );
 		$this->createHoliday( $this->company_id, 10, $date_epoch, $policy_ids['holiday'][0] );
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 400 );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 400, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									$policy_ids['holiday'],
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
-
+								   NULL, //Meal
+								   NULL, //Exception
+								   $policy_ids['holiday'], //Holiday
+								   NULL, //OT
+								   $policy_ids['premium'], //Premium
+								   NULL, //Round
+								   array($this->user_id), //Users
+								   NULL, //Break
+								   NULL, //Accrual
+								   NULL, //Expense
+								   NULL, //Absence
+								   $this->policy_ids['regular'] //Regular
+		);
 
 		//
 		// Punch Pair 1
@@ -5687,16 +7522,16 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//Total Time
 		$this->assertEquals( $udt_arr[$date_epoch1][0]['status_id'], 10 );
 		$this->assertEquals( $udt_arr[$date_epoch1][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch1][0]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch1][0]['total_time'], (8 * 3600) );
 		//Regular Time
 		$this->assertEquals( $udt_arr[$date_epoch1][1]['status_id'], 10 );
 		$this->assertEquals( $udt_arr[$date_epoch1][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch1][1]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch1][1]['total_time'], (8 * 3600) );
 
 		//Premium Time1
 		$this->assertEquals( $udt_arr[$date_epoch1][2]['status_id'], 10 );
 		$this->assertEquals( $udt_arr[$date_epoch1][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch1][2]['total_time'], (2*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch1][2]['total_time'], (2 * 3600) );
 
 
 		//Make sure no other hours
@@ -5722,18 +7557,18 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8 * 3600) );
 
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (6 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -5741,28 +7576,92 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+
+	/**
+	 * @group ContributingShiftHolidayPremiumPolicyA
+	 */
+	function testContributingShiftHolidayPremiumPolicyA() {
+		return TRUE;
+	}
+
+	/**
+	 * @group ContributingShiftHolidayPremiumPolicyB
+	 */
+	function testContributingShiftHolidayPremiumPolicyB() {
+		return TRUE;
+	}
+
+	/**
+	 * @group ContributingShiftHolidayPremiumPolicyC
+	 */
+	function testContributingShiftHolidayPremiumPolicyC() {
+			return TRUE;
+	}
+
+	/**
+	 * @group ContributingShiftHolidayPremiumPolicyD
+	 */
+	function testContributingShiftHolidayPremiumPolicyD() {
+		return TRUE;
+	}
+
+	/**
+	 * @group ContributingShiftHolidayPremiumPolicyE
+	 */
+	function testContributingShiftHolidayPremiumPolicyE() {
+		return TRUE;
+	}
+
+
+	/**
+	 * @group ContributingShiftHolidayPremiumPolicyF
+	 */
+	function testContributingShiftHolidayPremiumPolicyF() {
+		return TRUE;
+	}
+
+
+	/**
+	 * @group PremiumPolicy_testHolidayDatePremiumPolicyA
+	 */
 	function testHolidayDatePremiumPolicyA() {
 		global $dd;
 
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
 
 		//Holiday
 		$policy_ids['holiday'][] = $this->createHolidayPolicy( $this->company_id, 10 );
 		$this->createHoliday( $this->company_id, 10, $date_epoch, $policy_ids['holiday'][0] );
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 410 );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 410, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									$policy_ids['holiday'],
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
-
+								   NULL, //Meal
+								   NULL, //Exception
+								   $policy_ids['holiday'], //Holiday
+								   NULL, //OT
+								   $policy_ids['premium'], //Premium
+								   NULL, //Round
+								   array($this->user_id), //Users
+								   NULL, //Break
+								   NULL, //Accrual
+								   NULL, //Expense
+								   NULL, //Absence
+								   $this->policy_ids['regular'] //Regular
+		);
 
 		$dd->createPunchPair( 	$this->user_id,
 								strtotime($date_stamp.' 8:00AM'),
@@ -5782,17 +7681,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
 		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -5800,17 +7699,46 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testHolidayDatePremiumPolicyB
+	 */
 	function testHolidayDatePremiumPolicyB() {
 		global $dd;
 
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
 
 		//Holiday
 		$policy_ids['holiday'][] = $this->createHolidayPolicy( $this->company_id, 10 );
 		$this->createHoliday( $this->company_id, 10, $date_epoch, $policy_ids['holiday'][0] );
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 412 );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 412, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+								   NULL, //Meal
+								   NULL, //Exception
+								   $policy_ids['holiday'], //Holiday
+								   NULL, //OT
+								   $policy_ids['premium'], //Premium
+								   NULL, //Round
+								   array($this->user_id), //Users
+								   NULL, //Break
+								   NULL, //Accrual
+								   NULL, //Expense
+								   NULL, //Absence
+								   $this->policy_ids['regular'] //Regular
+		);
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
@@ -5841,13 +7769,13 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
@@ -5855,26 +7783,46 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testWeeklyHourNeverHolidayPremiumPolicyA
+	 */
 	function testWeeklyHourNeverHolidayPremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 414 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 414, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+								   NULL, //Meal
+								   NULL, //Exception
+								   NULL, //Holiday
+								   NULL, //OT
+								   $policy_ids['premium'], //Premium
+								   NULL, //Round
+								   array($this->user_id), //Users
+								   NULL, //Break
+								   NULL, //Accrual
+								   NULL, //Expense
+								   NULL, //Absence
+								   $this->policy_ids['regular'] //Regular
+		);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -5895,20 +7843,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -5929,20 +7877,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day3
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -5963,20 +7911,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day4
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*4);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 4));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -5997,20 +7945,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day5
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6031,24 +7979,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (5 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day6
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*6);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 6));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6069,41 +8017,62 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		return TRUE;
 	}
 
+
+	/**
+	 * @group PremiumPolicy_testDailyHourBeforePremiumPolicyA
+	 */
 	function testDailyHourBeforePremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 500 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 501 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 500, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 501, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*0);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 0));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6124,49 +8093,68 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (12*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (12 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (12*3600) );
-		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (12 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
+		//Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (2 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testWeeklyHourBeforePremiumPolicyA
+	 */
 	function testWeeklyHourBeforePremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 510 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 511 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 510, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 511, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6187,20 +8175,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6221,20 +8209,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day3
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6255,24 +8243,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (7 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day4
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*4);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 4));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6293,28 +8281,28 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (3 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (6 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		//
 		// Day5
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6335,24 +8323,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day6
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*6);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 6));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6373,41 +8361,59 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testLastSecondOfDayDatePremiumPolicyA
+	 */
 	function testLastSecondOfDayDatePremiumPolicyA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 600 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 110 );
-		//$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 120 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 600, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
-		$date_epoch2 = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch2 = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6428,17 +8434,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
 		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -6446,28 +8452,48 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testDailyAndWeeklyHourBeforeAfterPremiumPolicy
+	 */
 	function testDailyAndWeeklyHourBeforeAfterPremiumPolicy() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 520 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 521 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 522 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 520, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 521, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 522, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6488,24 +8514,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6526,24 +8552,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day3
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6564,24 +8590,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day4
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*4);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 4));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6602,24 +8628,24 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
 
 		//
 		// Day5
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6640,29 +8666,28 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
-		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (4*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (4 * 3600) );
+		//Premium Time3
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		//
 		// Day6
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*6);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 6));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6683,21 +8708,21 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (9 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9*3600) );
-		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (9 * 3600) );
 		//Premium Time3
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][2] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
+		//Premium Time2
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
@@ -6705,11 +8730,43 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testAdvancedActiveAfterWithDifferentialA
+	 */
+	/* //Contributing shifts handles this now.
 	function testAdvancedActiveAfterWithDifferentialA() {
 		global $dd;
 
-		//Test to make sure active after Daily time includes all worked time, not just time matching the differential criteria.
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
 
+		//Test to make sure active after Daily time includes all worked time, not just time matching the differential criteria.
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 520, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 521, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 522, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][2] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 700 );
 
 		//Create Policy Group
@@ -6747,12 +8804,12 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (3*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (3*3600) );
 
 		//Make sure no other hours
@@ -6776,16 +8833,16 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (5.5*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3*3600) );
 
 		//Make sure no other hours
@@ -6809,20 +8866,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
 		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8.5*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5*3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
 		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (6*3600) );
 		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
 		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (0.5*3600) );
 
 		//Make sure no other hours
@@ -6830,22 +8887,41 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 		return TRUE;
 	}
+	*/
 
-
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
 	function testDSTA() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 126 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 126, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 
 		//$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
@@ -6873,17 +8949,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (7 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (7 * 3600) );
 		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -6891,20 +8967,511 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
-	function testDSTB() {
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTA2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 126 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 126, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+
+		//$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = strtotime('10-Mar-2013'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 1:00PM'),
+								strtotime($date_stamp.' 11:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTA3() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 126, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+
+		//$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = strtotime('11-Mar-2013'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 1:00PM'),
+								strtotime($date_stamp.' 11:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTA4() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 128, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+
+		//$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = strtotime('10-Mar-2013'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch2 = strtotime('11-Mar-2013'); //Use current year
+		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 10:30PM'),
+								strtotime($date_stamp2.' 9:30AM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (11 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9.5 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTA5() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 127, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+		//
+		// March
+		//
+		$date_epoch = strtotime('08-Mar-2015'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch2 = strtotime('08-Mar-2015'); //Use current year
+		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 6:00AM'),
+								strtotime($date_stamp2.' 2:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+
+		//
+		// November
+		//
+		$date_epoch = strtotime('01-Nov-2015'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch2 = strtotime('01-Nov-2015'); //Use current year
+		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 6:00AM'),
+								strtotime($date_stamp2.' 2:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTA6() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 127, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+		//
+		// March
+		//
+		$date_epoch = strtotime('07-Mar-2015'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch2 = strtotime('08-Mar-2015'); //Use current year
+		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 6:00PM'),
+								strtotime($date_stamp2.' 3:00AM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) ); //9hr day in total, minus 1hr time change.
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+
+		//
+		// November
+		//
+		$date_epoch = strtotime('31-Oct-2015'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch2 = strtotime('01-Nov-2015'); //Use current year
+		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 6:00PM'),
+								strtotime($date_stamp2.' 3:00AM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) ); //9hr day in total, plus 1hr time change.
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (6 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTB() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 126, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 
 		//$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
@@ -6932,17 +9499,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8 * 3600) );
 		//Premium Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -6950,27 +9517,402 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
-	function testDailyAndWeeklyBeforePremiumPolicyA() {
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTB2() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 523 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 524 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 126, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+
+		//$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		//$date_epoch = strtotime('02-Nov-2013'); //Use current year
+		//$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch = strtotime('02-Nov-2013'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 1:00PM'),
+								strtotime($date_stamp.' 11:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTB3() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 126, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+		//$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		//$date_epoch = strtotime('02-Nov-2013'); //Use current year
+		//$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch = strtotime('03-Nov-2013'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 1:00PM'),
+								strtotime($date_stamp.' 11:00PM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTB4() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( strtotime('01-Jan-2013') );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 128, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+
+		//$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = strtotime('03-Nov-2013'); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch2 = strtotime('04-Nov-2013'); //Use current year
+		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 10:30PM'),
+								strtotime($date_stamp2.' 9:30AM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (11 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9.5 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDST
+	 */
+	function testDSTZ1() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods( TTDate::getBeginYearEpoch( time() ) );
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 127, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
+		//
+		// March
+		//
+		$date_epoch = TTDate::getBeginDayEpoch( ( TTDate::getMiddleDayEpoch( strtotime('Second Sunday March 0') ) - 86400 ) ); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch2 = TTDate::getBeginDayEpoch( ( TTDate::getMiddleDayEpoch( strtotime('Second Sunday March 0') ) ) ); //Use current year
+		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 6:00PM'),
+								strtotime($date_stamp2.' 3:00AM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) ); //9hr day in total, minus 1hr time change.
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+
+		//
+		// November
+		//
+		$date_epoch = TTDate::getBeginDayEpoch( ( TTDate::getMiddleDayEpoch( strtotime('First Sunday November 0') ) - 86400 ) ); //Use current year
+		$date_stamp = TTDate::getDate('DATE', $date_epoch );
+
+		$date_epoch2 = TTDate::getBeginDayEpoch(  ( TTDate::getMiddleDayEpoch( strtotime('First Sunday November 0') ) ) ); //Use current year
+		$date_stamp2 = TTDate::getDate('DATE', $date_epoch2 );
+
+		$dd->createPunchPair( 	$this->user_id,
+								strtotime($date_stamp.' 6:00PM'),
+								strtotime($date_stamp2.' 3:00AM'),
+								array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										),
+								TRUE
+								);
+
+		$udt_arr = $this->getUserDateTotalArray( $date_epoch, $date_epoch );
+		//print_r($udt_arr);
+
+		//Total Time
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) ); //9hr day in total, plus 1hr time change.
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
+		//Premium Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (6 * 3600) );
+
+		//Make sure no other hours
+		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testDailyAndWeeklyBeforePremiumPolicyA
+	 */
+	function testDailyAndWeeklyBeforePremiumPolicyA() {
+		global $dd;
+
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 523, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 524, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
+
+		//Create Policy Group
+		$dd->createPolicyGroup( 	$this->company_id,
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -6991,21 +9933,21 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (10 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
@@ -7013,7 +9955,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7034,28 +9976,28 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (10 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		//
 		// Day3
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7076,21 +10018,21 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (10 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
@@ -7098,7 +10040,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day4
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*4);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 4));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7119,28 +10061,28 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (8 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
 
 		//
 		// Day5 (a)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7161,21 +10103,21 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (1.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1.5 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1.5 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 4 );
@@ -7183,7 +10125,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day5 (a)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7204,59 +10146,81 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (5.0*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (5.0 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (5.0*3600) );
-		
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3.5 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (0.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (0.5 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (0.5*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (1.5 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][5]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][5]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (0.5 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][5]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][5]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][6]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][6]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][6]['total_time'], (1.5 * 3600) );
 
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 6 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 7 );
 
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testDailyAndWeeklyBeforePremiumPolicyB
+	 */
 	function testDailyAndWeeklyBeforePremiumPolicyB() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 723 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 729 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 723, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 729, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7277,13 +10241,13 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
@@ -7291,7 +10255,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7312,20 +10276,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day3
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7346,20 +10310,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day4
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*4);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 4));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7380,20 +10344,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (8 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (8 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day5 (a)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7414,17 +10378,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (1.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (1.5 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -7432,7 +10396,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day5 (a)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7453,26 +10417,26 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (5.0*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (5.0 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (3.5 * 3600) );
 
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (0.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (0.5 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (1.5 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
@@ -7480,27 +10444,47 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testDailyAndWeeklyBeforePremiumPolicyC
+	 */
 	function testDailyAndWeeklyBeforePremiumPolicyC() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 723 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 724 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 723, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 724, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7521,13 +10505,13 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
@@ -7535,7 +10519,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7556,20 +10540,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day3
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7590,20 +10574,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day4
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*4);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 4));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7624,13 +10608,13 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (6 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
@@ -7641,7 +10625,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day5 (a)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7662,17 +10646,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -7683,7 +10667,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day5 (b)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7704,26 +10688,26 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (4.0*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (4.0 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5 * 3600) );
 
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1.5 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2.5 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
@@ -7734,7 +10718,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day5 (c)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7755,29 +10739,32 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11.0*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11.0 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (1.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (8.5*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7.0 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (1.5 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][5]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][5]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (2.5 * 3600) );
 
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 6 );
 
 		//
 		// This is a special case where the premium time trigger must match *exactly* what the premium policy specifies to test < vs <=
@@ -7786,27 +10773,47 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PremiumPolicy_testDailyAndWeeklyBeforePremiumPolicyD
+	 */
 	function testDailyAndWeeklyBeforePremiumPolicyD() {
 		global $dd;
 
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 723 );
-		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 724 );
+		$this->createPayPeriodSchedule( 10 );
+		$this->createPayPeriods();
+		$this->getAllPayPeriods();
+
+		$policy_ids['pay_formula_policy'][] = $this->policy_ids['pay_formula_policy'][100]; //Reg1.0
+
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 100, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 110, $policy_ids['pay_formula_policy'][0] );
+		$policy_ids['pay_code'][]  = $this->createPayCode( $this->company_id, 120, $policy_ids['pay_formula_policy'][0] );
+
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 723, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][0] );
+		$policy_ids['premium'][] = $this->createPremiumPolicy( $this->company_id, 724, $this->policy_ids['contributing_shift_policy'][12], $policy_ids['pay_code'][1] );
 
 		//Create Policy Group
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									NULL, //OT
+									$policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
+
 
 		//
 		// Day1
 		//
 		//$date_epoch = TTDate::getBeginWeekEpoch( time() );
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+86400;
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + 86400);
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7827,13 +10834,13 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
@@ -7841,7 +10848,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day2
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*2);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 2));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7862,20 +10869,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day3
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*3);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 3));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7896,20 +10903,20 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (10 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (10 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
 		//
 		// Day4
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*4);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 4));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7930,13 +10937,13 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (6 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (6*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (6 * 3600) );
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 2 );
 
@@ -7947,7 +10954,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day5 (a)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -7968,17 +10975,17 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (2.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 3 );
@@ -7989,7 +10996,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day5 (b)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -8010,26 +11017,26 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (4.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (4.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.0*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.0 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5 * 3600) );
 
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1.5 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2.5 * 3600) );
 
 		//Make sure no other hours
 		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
@@ -8040,7 +11047,7 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//
 		// Day5 (c)
 		//
-		$date_epoch = $this->pay_period_objs[0]->getStartDate()+(86400*5);
+		$date_epoch = ($this->pay_period_objs[0]->getStartDate() + (86400 * 5));
 		$date_stamp = TTDate::getDate('DATE', $date_epoch );
 
 		$dd->createPunchPair( 	$this->user_id,
@@ -8061,29 +11068,31 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 		//print_r($udt_arr);
 
 		//Total Time
-		$this->assertEquals( $udt_arr[$date_epoch][0]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['type_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['object_type_id'], 5 ); //5=System Total
+		$this->assertEquals( $udt_arr[$date_epoch][0]['pay_code_id'], 0 );
+		$this->assertEquals( $udt_arr[$date_epoch][0]['total_time'], (11.5 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][1]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][1]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][1]['total_time'], (2.0 * 3600) );
 		//Regular Time
-		$this->assertEquals( $udt_arr[$date_epoch][2]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['type_id'], 20 );
-		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (9.0*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][2]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][2]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][2]['total_time'], (2.5 * 3600) );
+		//Regular Time
+		$this->assertEquals( $udt_arr[$date_epoch][3]['object_type_id'], 20 ); //20=Regular
+		$this->assertEquals( $udt_arr[$date_epoch][3]['pay_code_id'], $this->policy_ids['pay_code'][100] );
+		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (7.0 * 3600) );
 		//Premium Time1
-		$this->assertEquals( $udt_arr[$date_epoch][3]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][3]['total_time'], (1.5*3600) );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][4]['pay_code_id'], $policy_ids['pay_code'][1] );
+		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (1.5 * 3600) );
 		//Premium Time2
-		$this->assertEquals( $udt_arr[$date_epoch][4]['status_id'], 10 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['type_id'], 40 );
-		$this->assertEquals( $udt_arr[$date_epoch][4]['total_time'], (2.5*3600) );
-
+		$this->assertEquals( $udt_arr[$date_epoch][5]['object_type_id'], 40 ); //40=Premium
+		$this->assertEquals( $udt_arr[$date_epoch][5]['pay_code_id'], $policy_ids['pay_code'][0] );
+		$this->assertEquals( $udt_arr[$date_epoch][5]['total_time'], (2.5 * 3600) );
 		//Make sure no other hours
-		$this->assertEquals( count($udt_arr[$date_epoch]), 5 );
+		$this->assertEquals( count($udt_arr[$date_epoch]), 6 );
 
 		//
 		// This is a special case where the premium time trigger must match *exactly* what the premium policy specifies to test < vs <=
@@ -8091,6 +11100,98 @@ class PremiumPolicyTest extends PHPUnit_Framework_TestCase {
 
 		return TRUE;
 	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeA
+	 */
+	function testContributingShiftIncludeShiftTypeA() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeA2
+	 */
+	function testContributingShiftIncludeShiftTypeA2() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeA3
+	 */
+	function testContributingShiftIncludeShiftTypeA3() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeA4
+	 */
+	function testContributingShiftIncludeShiftTypeA4() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeA4B
+	 */
+	function testContributingShiftIncludeShiftTypeA4B() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeB
+	 */
+	function testContributingShiftIncludeShiftTypeB() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeB2
+	 */
+	function testContributingShiftIncludeShiftTypeB2() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeC1
+	 */
+	function testContributingShiftIncludeShiftTypeC1() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeC2
+	 */
+	function testContributingShiftIncludeShiftTypeC2() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeC3
+	 */
+	function testContributingShiftIncludeShiftTypeC3() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeD1
+	 */
+	function testContributingShiftIncludeShiftTypeD1() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeD2
+	 */
+	function testContributingShiftIncludeShiftTypeD2() {
+		return TRUE;
+	}
+
+	/**
+	 * @group PremiumPolicy_testContributingShiftIncludeShiftTypeD3
+	 */
+	function testContributingShiftIncludeShiftTypeD3() {
+		return TRUE;
+	}
+
 
 }
 ?>

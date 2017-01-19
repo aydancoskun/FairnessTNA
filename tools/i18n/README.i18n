@@ -1,11 +1,11 @@
-TimeTrex Message Internationalization(i18n) README
+Fairness Message Internationalization(i18n) README
 
 by Open Source Consulting, S.A.
 
 
 = OVERVIEW =
 
-TimeTrex contains english strings embedded throughout the PHP code and
+Fairness contains english strings embedded throughout the PHP code and
 smarty templates.  The GNU Gettext suite of tools has been chosen to aid 
 with the tasks of:
 
@@ -21,14 +21,14 @@ about gettext here:
 
 http://www.gnu.org/software/gettext/
 
-Below, we will explain more about how gettext is integrated with TimeTrex, 
+Below, we will explain more about how gettext is integrated with Fairness, 
 how to properly code strings for translation, and how the translation 
 maintenance tools work.
  
 
 = TTi18n Class =
 
-TimeTrex now includes a class for handling all i18n related matters.
+Fairness now includes a class for handling all i18n related matters.
 Methods related to message translation include:
 
   - chooseBestLocale()  -- determines which locale to use for messages.
@@ -95,7 +95,7 @@ call adds some performance overhead.
 
 The locale directory exists at
 
- timetrex/interface/locale
+ fairness/interface/locale
  
 This directory contains:
  - the messages.pot master string dictionary with all english strings.
@@ -154,7 +154,7 @@ calc_l10n_stats.php
 
 notify_translator.php
  This file notifies the translator by e-mail when new source 
- strings are available for TimeTrex.  Be careful not to run this by 
+ strings are available for Fairness.  Be careful not to run this by 
  accident, as you may end up spamming people unnecessarily.
 
 tsmarty2c.php
@@ -165,7 +165,7 @@ tsmarty2c.php
 updatetranslation.sh
  This script is used to merge a single messages.po file 
  provided by a translator with the corresponding messages.po files within 
- TimeTrex.
+ Fairness.
 
 
 = Using the translation helper tools on a daily basis =

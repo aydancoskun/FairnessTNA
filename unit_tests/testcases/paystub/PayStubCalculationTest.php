@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,35 +20,25 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 9521 $
- * $Id: PayStubCalculationTest.php 9521 2013-04-08 23:09:52Z ipso $
- * $Date: 2013-04-08 16:09:52 -0700 (Mon, 08 Apr 2013) $
- */
-require_once('PHPUnit/Framework/TestCase.php');
 
 class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
-
 	protected $company_id = NULL;
 	protected $user_id = NULL;
 	protected $pay_period_schedule_id = NULL;
 	protected $pay_period_objs = NULL;
 	protected $pay_stub_account_link_arr = NULL;
 
-    public function __construct() {
-        global $db, $cache, $profiler;
-    }
-
-    public function setUp() {
+	public function setUp() {
 		global $dd;
-        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
-		TTDate::setTimeZone('PST8PDT');
+		Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
+
+		TTDate::setTimeZone('PST8PDT', TRUE); //Due to being a singleton and PHPUnit resetting the state, always force the timezone to be set.
 
 		$dd = new DemoData();
 		$dd->setEnableQuickPunch( FALSE ); //Helps prevent duplicate punch IDs and validation failures.
 		$dd->setUserNamePostFix( '_'.uniqid( NULL, TRUE ) ); //Needs to be super random to prevent conflicts and random failing tests.
 		$this->company_id = $dd->createCompany();
-		Debug::text('Company ID: '. $this->company_id, __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('Company ID: '. $this->company_id, __FILE__, __LINE__, __METHOD__, 10);
 
 		$dd->createCurrency( $this->company_id, 10 );
 
@@ -73,43 +63,111 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		$this->getAllPayPeriods();
 
 		//Create policies
-		$policy_ids['overtime'][] = $dd->createOverTimePolicy( $this->company_id, 10 );
-		//$policy_ids['overtime'][] = $dd->createOverTimePolicy( $this->company_id, 20, $policy_ids['accrual'][0] );
-		$policy_ids['overtime'][] = $dd->createOverTimePolicy( $this->company_id, 20 );
+		$this->policy_ids['pay_formula_policy'][100] = $dd->createPayFormulaPolicy( $this->company_id, 100 ); //Regular
+		$this->policy_ids['pay_formula_policy'][110] = $dd->createPayFormulaPolicy( $this->company_id, 110 ); //Vacation
+		$this->policy_ids['pay_formula_policy'][120] = $dd->createPayFormulaPolicy( $this->company_id, 120 ); //Bank
+		$this->policy_ids['pay_formula_policy'][130] = $dd->createPayFormulaPolicy( $this->company_id, 130 ); //Sick
+		$this->policy_ids['pay_formula_policy'][200] = $dd->createPayFormulaPolicy( $this->company_id, 200 ); //OT1.5
+		$this->policy_ids['pay_formula_policy'][210] = $dd->createPayFormulaPolicy( $this->company_id, 210 ); //OT2.0
+		$this->policy_ids['pay_formula_policy'][300] = $dd->createPayFormulaPolicy( $this->company_id, 300 ); //Prem1
+		$this->policy_ids['pay_formula_policy'][310] = $dd->createPayFormulaPolicy( $this->company_id, 310 ); //Prem2
 
-		$policy_ids['premium'][] = $dd->createPremiumPolicy( $this->company_id, 10 );
-		$policy_ids['premium'][] = $dd->createPremiumPolicy( $this->company_id, 20 );
+		$this->policy_ids['pay_code'][100] = $dd->createPayCode( $this->company_id, 100, $this->policy_ids['pay_formula_policy'][100] ); //Regular
+		$this->policy_ids['pay_code'][190] = $dd->createPayCode( $this->company_id, 190, $this->policy_ids['pay_formula_policy'][100] ); //Lunch
+		$this->policy_ids['pay_code'][192] = $dd->createPayCode( $this->company_id, 192, $this->policy_ids['pay_formula_policy'][100] ); //Break
+		$this->policy_ids['pay_code'][200] = $dd->createPayCode( $this->company_id, 200, $this->policy_ids['pay_formula_policy'][200] ); //OT1
+		$this->policy_ids['pay_code'][210] = $dd->createPayCode( $this->company_id, 210, $this->policy_ids['pay_formula_policy'][210] ); //OT2
+		$this->policy_ids['pay_code'][300] = $dd->createPayCode( $this->company_id, 300, $this->policy_ids['pay_formula_policy'][300] ); //Prem1
+		$this->policy_ids['pay_code'][310] = $dd->createPayCode( $this->company_id, 310, $this->policy_ids['pay_formula_policy'][310] ); //Prem2
+		$this->policy_ids['pay_code'][900] = $dd->createPayCode( $this->company_id, 900, $this->policy_ids['pay_formula_policy'][110] ); //Vacation
+		$this->policy_ids['pay_code'][910] = $dd->createPayCode( $this->company_id, 910, $this->policy_ids['pay_formula_policy'][120] ); //Bank
+		$this->policy_ids['pay_code'][920] = $dd->createPayCode( $this->company_id, 920, $this->policy_ids['pay_formula_policy'][130] ); //Sick
 
-		//Create Policy Group
+		$this->policy_ids['contributing_pay_code_policy'][10] = $dd->createContributingPayCodePolicy( $this->company_id, 10, array( $this->policy_ids['pay_code'][100] ) ); //Regular
+		$this->policy_ids['contributing_pay_code_policy'][12] = $dd->createContributingPayCodePolicy( $this->company_id, 12, array( $this->policy_ids['pay_code'][100], $this->policy_ids['pay_code'][190], $this->policy_ids['pay_code'][192] ) ); //Regular+Meal/Break
+		$this->policy_ids['contributing_pay_code_policy'][14] = $dd->createContributingPayCodePolicy( $this->company_id, 14, array( $this->policy_ids['pay_code'][100], $this->policy_ids['pay_code'][190], $this->policy_ids['pay_code'][192], $this->policy_ids['pay_code'][900] ) ); //Regular+Meal/Break+Absence
+		$this->policy_ids['contributing_pay_code_policy'][20] = $dd->createContributingPayCodePolicy( $this->company_id, 20, array( $this->policy_ids['pay_code'][100], $this->policy_ids['pay_code'][200], $this->policy_ids['pay_code'][210], $this->policy_ids['pay_code'][190], $this->policy_ids['pay_code'][192] ) ); //Regular+OT+Meal/Break
+		$this->policy_ids['contributing_pay_code_policy'][90] = $dd->createContributingPayCodePolicy( $this->company_id, 90, array( $this->policy_ids['pay_code'][900] ) ); //Absence
+		$this->policy_ids['contributing_pay_code_policy'][99] = $dd->createContributingPayCodePolicy( $this->company_id, 99, $this->policy_ids['pay_code'] ); //All Time
+
+		$this->policy_ids['contributing_shift_policy'][12] = $dd->createContributingShiftPolicy( $this->company_id, 10, $this->policy_ids['contributing_pay_code_policy'][12] ); //Regular+Meal/Break
+		$this->policy_ids['contributing_shift_policy'][20] = $dd->createContributingShiftPolicy( $this->company_id, 20, $this->policy_ids['contributing_pay_code_policy'][20] ); //Regular+OT+Meal/Break
+
+		$this->policy_ids['regular'][] = $dd->createRegularTimePolicy( $this->company_id, 10, $this->policy_ids['contributing_shift_policy'][12], $this->policy_ids['pay_code'][100] );
+
+		$this->policy_ids['overtime'][] = $dd->createOverTimePolicy( $this->company_id, 10, $this->policy_ids['contributing_shift_policy'][12], $this->policy_ids['pay_code'][200] );
+		$this->policy_ids['overtime'][] = $dd->createOverTimePolicy( $this->company_id, 20, $this->policy_ids['contributing_shift_policy'][12], $this->policy_ids['pay_code'][210] );
+
+		$this->policy_ids['premium'][] = $dd->createPremiumPolicy( $this->company_id, 10, $this->policy_ids['contributing_shift_policy'][20], $this->policy_ids['pay_code'][300] );
+		$this->policy_ids['premium'][] = $dd->createPremiumPolicy( $this->company_id, 20, $this->policy_ids['contributing_shift_policy'][20], $this->policy_ids['pay_code'][310] );
+
 		$dd->createPolicyGroup( 	$this->company_id,
-									NULL,
-									NULL,
-									NULL,
-									$policy_ids['overtime'],
-									$policy_ids['premium'],
-									NULL,
-									array($this->user_id) );
-
+									NULL, //Meal
+									NULL, //Exception
+									NULL, //Holiday
+									$this->policy_ids['overtime'], //OT
+									$this->policy_ids['premium'], //Premium
+									NULL, //Round
+									array($this->user_id), //Users
+									NULL, //Break
+									NULL, //Accrual
+									NULL, //Expense
+									NULL, //Absence
+									$this->policy_ids['regular'] //Regular
+									);
 
 		$this->createPunchData();
-
-		$this->addPayStubAmendments();
-
-		$this->createPayStub();
 
 		$this->assertGreaterThan( 0, $this->company_id );
 		$this->assertGreaterThan( 0, $this->user_id );
 
-        return TRUE;
-    }
+		return TRUE;
+	}
 
-    public function tearDown() {
-        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__,10);
+	public function tearDown() {
+		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
 
 		//$this->deleteAllSchedules();
 
-        return TRUE;
-    }
+		return TRUE;
+	}
+
+	function deleteUserWage( $user_id ) {
+		$uwlf = TTnew( 'UserWageListFactory' );
+		$uwlf->getByUserId( $user_id );
+		if ( $uwlf->getRecordCount() > 0 ) {
+			foreach ($uwlf as $uw_obj ) {
+				$uw_obj->setDeleted(TRUE);
+				if ( $uw_obj->isValid() ) {
+					$uw_obj->Save();
+				}
+			}
+		}
+		return TRUE;
+	}
+
+	function createUserSalaryWage( $user_id, $rate, $effective_date, $wage_group_id = 0 ) {
+		$uwf = TTnew( 'UserWageFactory' );
+
+		$uwf->setUser( $user_id );
+		$uwf->setWageGroup( $wage_group_id );
+		$uwf->setType( 13 ); //BiWeekly
+		$uwf->setWage(	$rate );
+		$uwf->setWeeklyTime( ( 3600 * 40 ) );
+		$uwf->setHourlyRate( 10.00 );
+		$uwf->setEffectiveDate( $effective_date );
+
+		if ( $uwf->isValid() ) {
+			$insert_id = $uwf->Save();
+			Debug::Text('User Wage ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
+
+			return $insert_id;
+		}
+
+		Debug::Text('Failed Creating User Wage!', __FILE__, __LINE__, __METHOD__, 10);
+
+		return FALSE;
+	}
 
 	function getPayStubAccountLinkArray() {
 		$this->pay_stub_account_link_arr = array(
@@ -118,17 +176,17 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 			'employer_contribution' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 40, 'Employer Total Contributions'),
 			'net_pay' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 40, 'Net Pay'),
 			'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
-            'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+			'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
 			'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
-            'cpp' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'CPP'),
-            'ei' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'EI'),
-            'advanced_percent_2' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Advanced Percent 2'),
-            'advanced_percent_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Advanced Percent 1'),
-            'other2' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Other2'),
-            'other' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Other'),
-            
-            
-            );
+			'cpp' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'CPP'),
+			'ei' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'EI'),
+			'advanced_percent_2' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Advanced Percent 2'),
+			'advanced_percent_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Advanced Percent 1'),
+			'other2' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Other2'),
+			'other' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Other'),
+
+
+			);
 
 		return TRUE;
 	}
@@ -157,9 +215,9 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		if ( $pseaf->isValid() ) {
 			$pseaf->Save();
 		}
-        
-        Debug::text('Saving.... Employee Deduction - Custom1', __FILE__, __LINE__, __METHOD__, 10);
-        $pseaf = new PayStubEntryAccountFactory();
+
+		Debug::text('Saving.... Employee Deduction - Custom1', __FILE__, __LINE__, __METHOD__, 10);
+		$pseaf = new PayStubEntryAccountFactory();
 		$pseaf->setCompany( $this->company_id );
 		$pseaf->setStatus(10);
 		$pseaf->setType(20);
@@ -169,9 +227,9 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		if ( $pseaf->isValid() ) {
 			$pseaf->Save();
 		}
-        
-        Debug::text('Saving.... Employee Deduction - Custom2', __FILE__, __LINE__, __METHOD__, 10);
-        $pseaf = new PayStubEntryAccountFactory();
+
+		Debug::text('Saving.... Employee Deduction - Custom2', __FILE__, __LINE__, __METHOD__, 10);
+		$pseaf = new PayStubEntryAccountFactory();
 		$pseaf->setCompany( $this->company_id );
 		$pseaf->setStatus(10);
 		$pseaf->setType(20);
@@ -181,7 +239,7 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		if ( $pseaf->isValid() ) {
 			$pseaf->Save();
 		}
-        
+
 
 		Debug::text('Saving.... Employee Deduction - Advanced Percent 1', __FILE__, __LINE__, __METHOD__, 10);
 		$pseaf = new PayStubEntryAccountFactory();
@@ -338,113 +396,7 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 				$cdf->Save();
 			}
 		}
-        
-        $cdf = new CompanyDeductionFactory();
-        $cdf->setCompany( $this->company_id );
-        $cdf->setStatus( 10 );
-        $cdf->setType( 30 );
-        $cdf->setName( 'Test Custom Formula' );
-        $cdf->setCalculation( 69 );
-        $cdf->setCalculationOrder( 80 );
-        $cdf->setPayStubEntryAccount( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Other2') );
-        $cdf->setCompanyValue1( "(#custom_value1#+#custom_value2#+#custom_value3#+#custom_value4#+#custom_value5#+#custom_value6#+#custom_value7#+#custom_value8#+#custom_value9#+#custom_value10#)/100" );
-        $cdf->setUserValue1( 10 );
-        $cdf->setUserValue2( 20 );
-        $cdf->setUserValue3( 30 );
-        $cdf->setUserValue4( 40 );
-        $cdf->setUserValue5( 50 );
-        $cdf->setUserValue6( 60 );
-        $cdf->setUserValue7( 70 );
-        $cdf->setUserValue8( 80 );
-        $cdf->setUserValue9( 90 );
-        $cdf->setUserValue10( 100 );
-        
-        if ( $cdf->isValid() ) {
-			$cdf->Save(FALSE);
 
-			$cdf->setIncludePayStubEntryAccount( array( $this->pay_stub_account_link_arr['total_deductions'] ) );
-
-			if ( $cdf->isValid() ) {
-				$cdf->Save();
-			}
-		}
-        
-        $cdf = new CompanyDeductionFactory();
-        $cdf->setCompany( $this->company_id );
-        $cdf->setStatus( 10 );
-        $cdf->setType( 20 );
-        $cdf->setName( 'Test Custom Formula 1' );
-        $cdf->setCalculation( 69 );
-        $cdf->setCalculationOrder( 80 );
-        $cdf->setPayStubEntryAccount( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Custom1') );
-        $cdf->setCompanyValue1( "(#custom_value1#*((#custom_value2#+#custom_value3#)*#custom_value4#/#custom_value5#)+#custom_value6#/(#custom_value7#+#custom_value8#)+#custom_value9#+#custom_value10#)/100" );
-        $cdf->setUserValue1( 45 );
-        $cdf->setUserValue2( 20 );
-        $cdf->setUserValue3( 30 );
-        $cdf->setUserValue4( 40 );
-        $cdf->setUserValue5( 78.12 );
-        $cdf->setUserValue6( 60 );
-        $cdf->setUserValue7( 44.34 );
-        $cdf->setUserValue8( 33 );
-        $cdf->setUserValue9( 90 );
-        $cdf->setUserValue10( 8 );
-        
-        if ( $cdf->isValid() ) {
-			$cdf->Save(FALSE);
-
-			$cdf->setIncludePayStubEntryAccount( array( $this->pay_stub_account_link_arr['total_deductions'] ) );
-
-			if ( $cdf->isValid() ) {
-				$cdf->Save();
-			}
-		}
-        
-        $cdf = new CompanyDeductionFactory();
-        $cdf->setCompany( $this->company_id );
-        $cdf->setStatus( 10 );
-        $cdf->setType( 20 );
-        $cdf->setName( 'Test Custom Formula 2' );
-        $cdf->setCalculation( 69 );
-        $cdf->setCalculationOrder( 80 );
-        $cdf->setPayStubEntryAccount( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Custom2') );
-        $cdf->setCompanyValue1( "values(n) = (#custom_value1#+#custom_value2#+#custom_value3#+#custom_value4#+#custom_value5#+#custom_value6#+#custom_value7#+#custom_value8#+#custom_value9#+#custom_value10#)/n
-                                include_amounts(n)=(#include_pay_stub_amount#+#include_pay_stub_ytd_amount#)/n
-                                exclude_amounts(n)=(#exclude_pay_stub_amount#+#exclude_pay_stub_ytd_amount#)/n
-                                (values(2)+include_amounts(3)+exclude_amounts(4)+#employee_hourly_rate#)/100" );
-        $cdf->setUserValue1( 0.23 );
-        $cdf->setUserValue2( 1114.65 );
-        $cdf->setUserValue3( 30 );
-        $cdf->setUserValue4( 40.55 );
-        $cdf->setUserValue5( 55.55 );
-        $cdf->setUserValue6( 32.33 );
-        $cdf->setUserValue7( 44.34 );
-        $cdf->setUserValue8( 21 );
-        $cdf->setUserValue9( 47 );
-        $cdf->setUserValue10( 8 );
-        if ( $cdf->isValid() ) {
-			$cdf->Save(FALSE);
-
-			$cdf->setIncludePayStubEntryAccount( array( 
-                                                    //$this->pay_stub_account_link_arr['total_deductions'],
-                                                    //$this->pay_stub_account_link_arr['employer_contribution'],
-                                                    $this->pay_stub_account_link_arr['regular_time'],
-                                                    $this->pay_stub_account_link_arr['vacation_accrual'],
-                                                    $this->pay_stub_account_link_arr['advanced_percent_1'],
-                                                    $this->pay_stub_account_link_arr['cpp'],
-                                                    $this->pay_stub_account_link_arr['ei'],
-                                                ) );
-                                                
-            $cdf->setExcludePayStubEntryAccount( array(
-                                                    //$this->pay_stub_account_link_arr['vacation_accrual_release'],
-                                                    $this->pay_stub_account_link_arr['total_gross'],
-                                                    //$this->pay_stub_account_link_arr['other2'],
-                                                ) );
-
-			if ( $cdf->isValid() ) {
-				$cdf->Save();
-			}
-		}
-        
 
 		$cdf = new CompanyDeductionFactory();
 		$cdf->setCompany( $this->company_id );
@@ -507,13 +459,13 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		$ppsf->setTimeZone('PST8PDT');
 
 		$ppsf->setDayStartTime( 0 );
-		$ppsf->setNewDayTriggerTime( (4*3600) );
-		$ppsf->setMaximumShiftTime( (16*3600) );
+		$ppsf->setNewDayTriggerTime( (4 * 3600) );
+		$ppsf->setMaximumShiftTime( (16 * 3600) );
 
 		$ppsf->setEnableInitialPayPeriods( FALSE );
 		if ( $ppsf->isValid() ) {
 			$insert_id = $ppsf->Save(FALSE);
-			Debug::Text('Pay Period Schedule ID: '. $insert_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::Text('Pay Period Schedule ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
 
 			$ppsf->setUser( array($this->user_id) );
 			$ppsf->Save();
@@ -523,32 +475,30 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 			return $insert_id;
 		}
 
-		Debug::Text('Failed Creating Pay Period Schedule!', __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('Failed Creating Pay Period Schedule!', __FILE__, __LINE__, __METHOD__, 10);
 
 		return FALSE;
 
 	}
 
 	function createPayPeriods() {
-		$max_pay_periods = 29;
+		$max_pay_periods = 5;
 
 		$ppslf = new PayPeriodScheduleListFactory();
 		$ppslf->getById( $this->pay_period_schedule_id );
 		if ( $ppslf->getRecordCount() > 0 ) {
 			$pps_obj = $ppslf->getCurrent();
 
-
 			for ( $i = 0; $i < $max_pay_periods; $i++ ) {
 				if ( $i == 0 ) {
 					$end_date = TTDate::getBeginYearEpoch( strtotime('01-Jan-06') );
 				} else {
-					$end_date = $end_date + ( (86400*14) );
+					$end_date = ($end_date + ( (86400 * 14) ));
 				}
 
-				Debug::Text('I: '. $i .' End Date: '. TTDate::getDate('DATE+TIME', $end_date) , __FILE__, __LINE__, __METHOD__,10);
+				Debug::Text('I: '. $i .' End Date: '. TTDate::getDate('DATE+TIME', $end_date), __FILE__, __LINE__, __METHOD__, 10);
 
-
-				$pps_obj->createNextPayPeriod( $end_date , (86400*360) );
+				$pps_obj->createNextPayPeriod( $end_date, (86400 * 3600), FALSE ); //Don't import punches, as that causes deadlocks when running tests in parallel.
 			}
 
 		}
@@ -657,7 +607,7 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 
 		$punch_date = $this->pay_period_objs[0]->getStartDate();
 		$end_punch_date = $this->pay_period_objs[0]->getEndDate();
-		$i=0;
+		$i = 0;
 		while ( $punch_date <= $end_punch_date ) {
 			$date_stamp = TTDate::getDate('DATE', $punch_date );
 
@@ -700,7 +650,7 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 											)
 									);
 
-			$punch_date+=86400;
+			$punch_date += 86400;
 			$i++;
 		}
 		unset($punch_options_arr, $punch_date, $user_id);
@@ -908,7 +858,6 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 	}
 
 	function createPayStub() {
-
 		$cps = new CalculatePayStub();
 		$cps->setUser( $this->user_id );
 		$cps->setPayPeriod( $this->pay_period_objs[0]->getId() );
@@ -937,7 +886,13 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		return FALSE;
 	}
 
+	/**
+	 * @group PayStubCalculation_testMain
+	 */
 	function testMain() {
+		$this->addPayStubAmendments();
+		$this->createPayStub();
+
 		$pse_accounts = array(
 							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
 							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
@@ -959,9 +914,6 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 							'employer_medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
 							'employer_fica' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Social Security (FICA)'),
 							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
-                            'test_custom_formula' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Other2'),
-                            'test_custom_formula_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Custom1'),
-                            'test_custom_formula_2' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'Custom2'),
 							);
 
 		$pay_stub_id = $this->getPayStub();
@@ -1037,16 +989,6 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( $pse_arr[$pse_accounts['cpp']][1]['amount'], '10.70' );
 		$this->assertEquals( $pse_arr[$pse_accounts['cpp']][1]['ytd_amount'], '1910.70' );
 
-		//Custom formula deductions.
-        $this->assertEquals( $pse_arr[$pse_accounts['test_custom_formula']][0]['amount'], '5.50' );
-		$this->assertEquals( $pse_arr[$pse_accounts['test_custom_formula']][0]['ytd_amount'], '5.500' );
-
-        $this->assertEquals( $pse_arr[$pse_accounts['test_custom_formula_1']][0]['amount'], '12.51' );
-		$this->assertEquals( $pse_arr[$pse_accounts['test_custom_formula_1']][0]['ytd_amount'], '12.51' );
-
-        $this->assertEquals( $pse_arr[$pse_accounts['test_custom_formula_2']][0]['amount'], '35.40' );
-		$this->assertEquals( $pse_arr[$pse_accounts['test_custom_formula_2']][0]['ytd_amount'], '35.40' );
-
 		if ( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'] >= 600
 				AND $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'] <= 800
 				AND $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'] == $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'] ) {
@@ -1098,7 +1040,7 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 
 		if ( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'] >= 3300
 				AND $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'] <= 3450
-				AND ( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount']+(1000+1.99) ) == $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'] ) {
+				AND ( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'] + (1000 + 1.99) ) == $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'] ) {
 			$this->assertTrue( TRUE );
 		} else {
 			$this->assertTrue( FALSE, 'Total Gross not within range!' );
@@ -1123,7 +1065,23 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PayStubCalculation_testMainCustomFormulas
+	 */
+	function testMainCustomFormulas() {
+		$this->addPayStubAmendments();
+		$this->createPayStub();
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStubCalculation_testNoHoursPayStub
+	 */
 	function testNoHoursPayStub() {
+		$this->addPayStubAmendments();
+		$this->createPayStub();
+
 		$pse_accounts = array(
 							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
 							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
@@ -1146,7 +1104,7 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 							'employer_fica' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Social Security (FICA)'),
 							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
 							);
-		
+
 		$pay_stub_id = $this->getPayStub( $this->pay_period_objs[1]->getId() );
 
 		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
@@ -1173,21 +1131,547 @@ class PayStubCalculationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( $pse_arr[$pse_accounts['advanced_percent_2']][0]['amount'], '0.92' ); //Nearing Wage Base, this should be less than 1!!
 		$this->assertEquals( $pse_arr[$pse_accounts['advanced_percent_2']][0]['ytd_amount'], '25.00' );
 
-		if ( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'] >= 110
-				AND $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'] <= 150
-				AND ( bcadd($pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], 3984.97)) == $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'] ) {
-			$this->assertTrue( TRUE );
-		} else {
-			$this->assertTrue( FALSE, 'Total Deductions not within range! Total Deductions: '. $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'] .' YTD Amount: '. $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'] );
+			if ( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'] >= 65
+					AND $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'] <= 80
+					AND ( bcadd($pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], 3931.56)) == $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'] ) {
+				$this->assertTrue( TRUE );
+			} else {
+				$this->assertTrue( FALSE, 'Total Deductions not within range! Total Deductions: '. $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'] .' YTD Amount: '. $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'] );
+			}
+
+			if ( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'] >= 225
+					AND $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'] <= 350
+					AND bcadd($pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], 443.28) == $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'] ) {
+				$this->assertTrue( TRUE );
+			} else {
+				$this->assertTrue( FALSE, 'NET PAY not within range! Net Pay: '. $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'] .' YTD Amount: '. $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount']);
+			}
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStubCalculation_testSalaryPayStubA
+	 */
+	//Test basic salary calculation.
+	function testSalaryPayStubA() {
+		$this->deleteUserWage( $this->user_id );
+
+		//First Wage Entry
+		$this->createUserSalaryWage( $this->user_id, 1, strtotime('01-Jan-2001') );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[0]->getStartDate() - (86400) ) );
+
+		$this->addPayStubAmendments();
+		$this->createPayStub();
+
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							);
+
+		$pay_stub_id = $this->getPayStub( $this->pay_period_objs[0]->getId() );
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+		//var_dump($pse_arr);
+
+		$this->assertEquals( (float)$pse_arr[$pse_accounts['regular_time']][0]['rate'], '0.00' ); //MySQL returns NULL, so make sure we cast to float.
+		//$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['units'], '3.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '1000.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '1000.00' );
+
+		$this->assertEquals( count($pse_arr[$pse_accounts['regular_time']]), 1 );
+
+
+		$pay_stub_id = $this->getPayStub( $this->pay_period_objs[1]->getId() );
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+		//var_dump($pse_arr);
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['rate'], '33.33' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['units'], '3.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '99.99' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '1099.99' );
+
+		$this->assertEquals( count($pse_arr[$pse_accounts['regular_time']]), 1 );
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStubCalculation_testSalaryPayStubB
+	 */
+	//Test advanced pro-rating salary calculation.
+	function testSalaryPayStubB() {
+		$this->deleteUserWage( $this->user_id );
+
+		//First Wage Entry
+		$this->createUserSalaryWage( $this->user_id, 1, strtotime('01-Jan-2001') );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[0]->getStartDate() - (86400) ) );
+		$this->createUserSalaryWage( $this->user_id, 1500, ( $this->pay_period_objs[0]->getStartDate() + (86400 * 4) ) );
+		$this->createUserSalaryWage( $this->user_id, 2000, ( $this->pay_period_objs[0]->getStartDate() + (86400 * 8) ) );
+
+		$this->addPayStubAmendments();
+		$this->createPayStub();
+
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							);
+
+		$pay_stub_id = $this->getPayStub( $this->pay_period_objs[0]->getId() );
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+		//var_dump($pse_arr);
+
+		$this->assertEquals( (float)$pse_arr[$pse_accounts['regular_time']][0]['rate'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['units'], '48.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '857.14' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+
+		$this->assertEquals( (float)$pse_arr[$pse_accounts['regular_time']][1]['rate'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['units'], '32.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '428.57' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '0.00' );
+
+		$this->assertEquals( (float)$pse_arr[$pse_accounts['regular_time']][2]['rate'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][2]['units'], '32.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][2]['amount'], '285.71' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][2]['ytd_amount'], '1571.42' );
+
+		$this->assertEquals( count($pse_arr[$pse_accounts['regular_time']]), 3 );
+
+
+		$pay_stub_id = $this->getPayStub( $this->pay_period_objs[1]->getId() );
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+		//var_dump($pse_arr);
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['rate'], '33.33' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['units'], '3.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '99.99' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '1671.41' );
+
+		$this->assertEquals( count($pse_arr[$pse_accounts['regular_time']]), 1 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStubCalculation_testSalaryPayStubC
+	 */
+	//Test advanced pro-rating salary calculation.
+	function testSalaryPayStubC() {
+		$this->deleteUserWage( $this->user_id );
+
+		//First Wage Entry
+		$this->createUserSalaryWage( $this->user_id, 1, strtotime('01-Jan-2001') );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() - (86400) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 1) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 2) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 3) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 4) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 5) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 6) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 7) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 8) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 9) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 10) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 11) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 12) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 13) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 14) ) );
+		$this->createUserSalaryWage( $this->user_id, 1000, ( $this->pay_period_objs[1]->getStartDate() + (86400 * 15) ) );
+
+
+		//Create one punch in the next pay period so we can test pro-rating without any regular time.
+		global $dd;
+		$date_stamp = TTDate::getDate('DATE', $this->pay_period_objs[1]->getStartDate() );
+		$dd->createPunchPair( 	$this->user_id,
+									strtotime($date_stamp.' 08:00AM'),
+									strtotime($date_stamp.' 11:00AM'),
+									array(
+											'in_type_id' => 10,
+											'out_type_id' => 10,
+											'branch_id' => 0,
+											'department_id' => 0,
+											'job_id' => 0,
+											'job_item_id' => 0,
+										)
+								);
+
+		$this->addPayStubAmendments();
+		$this->createPayStub();
+
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							);
+
+		//Just check the final pay stub.
+		$pay_stub_id = $this->getPayStub( $this->pay_period_objs[1]->getId() );
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+		//var_dump($pse_arr);
+
+		for( $i = 0; $i <= 12; $i++ ) {
+			$this->assertEquals( (float)$pse_arr[$pse_accounts['regular_time']][$i]['rate'], '0.00' );
+			$this->assertEquals( (float)$pse_arr[$pse_accounts['regular_time']][$i]['units'], '0.00' );
+			$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][$i]['amount'], '71.43' );
+			$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][$i]['ytd_amount'], '0.00' );
 		}
 
-		if ( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'] >= 225
-				AND $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'] <= 290
-				AND bcadd($pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], 389.87) == $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'] ) {
-			$this->assertTrue( TRUE );
-		} else {
-			$this->assertTrue( FALSE, 'NET PAY not within range! Net Pay: '. $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'] .' YTD Amount: '. $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount']);
-		}
+		$this->assertEquals( (float)$pse_arr[$pse_accounts['regular_time']][13]['rate'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][13]['units'], '3.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][13]['amount'], '71.43' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][13]['ytd_amount'], '0.00' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][14]['rate'], '33.33' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][14]['units'], '3.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][14]['amount'], '99.99' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][14]['ytd_amount'], '1172.37' );
+
+		$this->assertEquals( count($pse_arr[$pse_accounts['regular_time']]), 15 );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStubCalculation_testCPPAgeLimitsA
+	 */
+	//Test 18/70 age limits for CPP and pro-rating.
+	function testCPPAgeLimitsA() {
+		$cdf = new CompanyDeductionFactory();
+		$cdf->setCompany( $this->company_id );
+		$cdf->setStatus( 10 ); //Enabled
+		$cdf->setType( 10 ); //Tax
+		$cdf->setName( 'CPP' );
+		$cdf->setCalculation( 90 ); //CPP
+		$cdf->setCalculationOrder( 90 );
+		$cdf->setPayStubEntryAccount( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'CPP') );
+		$cdf->setMinimumUserAge( 18 );
+		$cdf->setMaximumUserAge( 70 );
+		//if ( $cdf->isValid() ) {
+		//	$cdf->Save(FALSE);
+		//	$cdf->setIncludePayStubEntryAccount( array( $this->pay_stub_account_link_arr['total_gross'] ) );
+		//	if ( $cdf->isValid() ) {
+		//		$cdf->Save( FALSE );
+		//	}
+		//}
+
+		$birth_date = strtotime('16-Oct-1997'); //18yrs old
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Sep-2014') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Sep-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Oct-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Oct-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Nov-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Nov-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Dec-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Dec-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('14-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('16-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Jan-2017') ), TRUE );
+
+		$birth_date = strtotime('31-Dec-1997'); //18yrs old
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Sep-2014') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Sep-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Oct-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Oct-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Nov-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Nov-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Dec-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Dec-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('14-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('16-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('31-Jan-2017') ), TRUE );
+
+
+		$birth_date = strtotime('15-Jun-1997'); //18yrs old
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2011') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2011') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2011') ), FALSE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2012') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2012') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2012') ), FALSE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2013') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2013') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2013') ), FALSE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2014') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2014') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2014') ), FALSE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-May-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Jun-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('15-Jun-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Jul-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('03-Jul-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('15-Jul-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Aug-2015') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2016') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2017') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2017') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2017') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2018') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2018') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2018') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2019') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2019') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2019') ), TRUE );
+
+
+
+		$birth_date = strtotime('15-Jun-1960'); //55yrs old
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2011') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2011') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2011') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2012') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2012') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2012') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2013') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2013') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2013') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2014') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2014') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2014') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2015') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2016') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2016') ), TRUE );
+
+
+
+		$birth_date = strtotime('15-Jun-1945'); //70yrs old
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2011') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2011') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2011') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2012') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2012') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2012') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2013') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2013') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2013') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2014') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2014') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2014') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-May-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Jun-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('15-Jun-2015') ), TRUE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2015') ), TRUE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('01-Jul-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('03-Jul-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('15-Jul-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2015') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Aug-2015') ), FALSE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2016') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2016') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2016') ), FALSE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2017') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2017') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2017') ), FALSE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2018') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2018') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2018') ), FALSE );
+
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-May-2019') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jun-2019') ), FALSE );
+		$this->assertEquals( $cdf->isCPPAgeEligible( $birth_date, strtotime('30-Jul-2019') ), FALSE );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStubCalculation_testCPPAgeLimitsB
+	 */
+	//Test 18/70 age limits for CPP and pro-rating.
+	function testCPPAgeLimitsB() {
+		$cdf = new CompanyDeductionFactory();
+		$cdf->setCompany( $this->company_id );
+		$cdf->setStatus( 10 ); //Enabled
+		$cdf->setType( 10 ); //Tax
+		$cdf->setName( 'CPP' );
+		$cdf->setCalculation( 90 ); //CPP
+		$cdf->setCalculationOrder( 100 );
+		$cdf->setPayStubEntryAccount( CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'CPP') );
+		//if ( $cdf->isValid() ) {
+		//	$cdf->Save(FALSE);
+		//	$cdf->setIncludePayStubEntryAccount( array( $this->pay_stub_account_link_arr['total_gross'] ) );
+		//	if ( $cdf->isValid() ) {
+		//		$cdf->Save( FALSE );
+		//	}
+		//}
+
+
+		$udf = new UserDeductionFactory();
+		$udf->setUser( $this->user_id );
+		$udf->setStartDate( strtotime( '16-Oct-2015' ) );
+		$udf->setEndDate( '' );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Sep-2014') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Sep-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Oct-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Oct-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Nov-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Nov-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Dec-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Dec-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('14-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('16-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Jan-2017') ), TRUE );
+
+		$udf->setStartDate( strtotime('31-Dec-2015') ); //18yrs old
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Sep-2014') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Sep-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Oct-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Oct-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Nov-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Nov-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Dec-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Dec-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('14-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('16-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Jan-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('31-Jan-2017') ), TRUE );
+
+
+		$udf->setStartDate( strtotime('15-Jun-2015') );	//18yrs old
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2011') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2011') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2011') ), FALSE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2012') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2012') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2012') ), FALSE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2013') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2013') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2013') ), FALSE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2014') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2014') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2014') ), FALSE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-May-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Jun-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('15-Jun-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Jul-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('03-Jul-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('15-Jul-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Aug-2015') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2016') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2017') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2017') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2017') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2018') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2018') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2018') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2019') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2019') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2019') ), TRUE );
+
+
+
+		$udf->setStartDate( strtotime('15-Jun-2010') );	//55yrs old
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2011') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2011') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2011') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2012') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2012') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2012') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2013') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2013') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2013') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2014') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2014') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2014') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2015') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2016') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2016') ), TRUE );
+
+
+
+		$udf->setStartDate( strtotime('15-Jun-1970') );
+		$udf->setEndDate( strtotime('15-Jun-2015') );	//70yrs old
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2011') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2011') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2011') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2012') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2012') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2012') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2013') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2013') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2013') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2014') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2014') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2014') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-May-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Jun-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('15-Jun-2015') ), TRUE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2015') ), TRUE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('01-Jul-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('03-Jul-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('15-Jul-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2015') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Aug-2015') ), FALSE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2016') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2016') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2016') ), FALSE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2017') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2017') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2017') ), FALSE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2018') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2018') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2018') ), FALSE );
+
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-May-2019') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jun-2019') ), FALSE );
+		$this->assertEquals( $cdf->isActiveDate( $udf, NULL, strtotime('30-Jul-2019') ), FALSE );
 
 		return TRUE;
 	}

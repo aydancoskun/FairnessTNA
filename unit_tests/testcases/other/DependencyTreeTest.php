@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,34 +20,26 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 7639 $
- * $Id: DependencyTreeTest.php 7639 2012-09-13 19:19:41Z ipso $
- * $Date: 2012-09-13 12:19:41 -0700 (Thu, 13 Sep 2012) $
+
+/**
+ * @group DependencyTree
  */
-require_once('PHPUnit/Framework/TestCase.php');
-
 class DependencyTreeTest extends PHPUnit_Framework_TestCase {
-
-    public function __construct() {
-        global $db, $cache, $profiler;
-
+	public function setUp() {
+		Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
 		require_once( Environment::getBasePath().'/classes/modules/core/DependencyTree.class.php');
-    }
 
-    public function setUp() {
-        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+		return TRUE;
+	}
 
-    public function tearDown() {
-        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+	public function tearDown() {
+		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
+		return TRUE;
+	}
 
 	function indexOf($tofind,$arr) {
-		   foreach($arr as $k=>$v) {
-				   if($tofind==$v) { return $k; }
+		   foreach($arr as $k => $v) {
+				   if($tofind == $v) { return $k; }
 		   }
 
 		   return -1;
@@ -1085,6 +1077,18 @@ class DependencyTreeTest extends PHPUnit_Framework_TestCase {
 
 
 	}
+/*
+$deptree->addNode('P17', 	array(), 			array(124), 6000380 );
 
+$deptree->addNode('U7897', 	array(104,121), 	array(120), 6000100 ); //Average Vacation Rate (per Day)
+$deptree->addNode('U7905', 	array(120), 		array(104), 4000200 ); //Vacation Pay (Based on Average Rate/Day)
+$deptree->addNode('U7907', 	array(104,121), 	array(121), 4000100 ); //Vac Normalization
+$deptree->addNode('U7909', 	array(121,104), 	array(92), 	5000205 ); //Income Tax
+
+
+U7905 (R: 120 P: 104) -> U7897 (R:104,121 P: 120)
+						 U7907 (R:104,121 P: 121)
+
+ */
 }
 ?>

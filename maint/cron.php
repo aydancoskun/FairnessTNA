@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,11 +20,7 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 8337 $
- * $Id: cron.php 8337 2012-11-20 04:40:27Z ipso $
- * $Date: 2012-11-19 20:40:27 -0800 (Mon, 19 Nov 2012) $
- */
+
 /*
  * Cron replica
  * Run this script every minute from the real cron.
@@ -34,7 +30,9 @@ require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'CLI.inc.php');
 
 if ( isset($config_vars['other']['installer_enabled']) AND $config_vars['other']['installer_enabled'] == TRUE ) {
-	Debug::text('CRON: Installer is enabled, skipping cron jobs for now...', __FILE__, __LINE__, __METHOD__, 0);
+	Debug::text( 'CRON: Installer is enabled, skipping cron jobs for now...', __FILE__, __LINE__, __METHOD__, 0 );
+} elseif ( isset($config_vars['other']['down_for_maintenance']) AND $config_vars['other']['down_for_maintenance'] == TRUE ) {
+	Debug::text( 'CRON: System is down for maintenance, skipping cron jobs for now...', __FILE__, __LINE__, __METHOD__, 0 );
 } else {
 	//$current_epoch = strtotime('28-Mar-08 1:30 PM');
 	$current_epoch = TTDate::getTime();
@@ -63,7 +61,7 @@ if ( isset($config_vars['other']['installer_enabled']) AND $config_vars['other']
 	Debug::text('CRON: Jobs Executed: '. $executed_jobs .' of '. $total_jobs, __FILE__, __LINE__, __METHOD__, 0);
 
 	//Save file to log directory with the last executed date, so we know if the CRON daemon is actually calling us.
-	$file_name = $config_vars['path']['log'] . DIRECTORY_SEPARATOR .'timetrex_cron_last_executed.log';
+	$file_name = $config_vars['path']['log'] . DIRECTORY_SEPARATOR .'fairness_cron_last_executed.log';
 	@file_put_contents( $file_name, TTDate::getDate('DATE+TIME', time() )."\n" );
 }
 Debug::writeToLog();

@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,11 +20,7 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 8603 $
- * $Id: AddPayPeriod.php 8603 2012-12-14 01:36:15Z ipso $
- * $Date: 2012-12-13 17:36:15 -0800 (Thu, 13 Dec 2012) $
- */
+
 /*
  * Adds pay periods X hrs in advance, so schedules/shifts have something to attach to.
  * This file should/can be run as often as it needs to (once an hour)
@@ -42,7 +38,7 @@ $offset = 86400*2; //48hrs
 $ppslf = new PayPeriodScheduleListFactory();
 
 $clf = new CompanyListFactory();
-$clf->getAll();
+$clf->getByStatusID( array(10,20,23), NULL, array('a.id' => 'asc') );
 if ( $clf->getRecordCount() > 0 ) {
 	foreach ( $clf as $c_obj ) {
 		if ( $c_obj->getStatus() != 30 ) {
@@ -52,7 +48,7 @@ if ( $clf->getRecordCount() > 0 ) {
 				$end_date = NULL;
 
 				$pay_period_schedule->createNextPayPeriod($end_date, $offset);
-				if ( PRODUCTION == TRUE AND DEMO_MODE == FALSE ) {
+				if ( PRODUCTION == TRUE ) {
 					$pay_period_schedule->forceClosePreviousPayPeriods( $current_epoch );
 				}
 

@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,11 +20,7 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 1246 $
- * $Id: set_admin_permissions.php 1246 2007-09-14 23:47:42Z ipso $
- * $Date: 2007-09-14 16:47:42 -0700 (Fri, 14 Sep 2007) $
- */
+
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'global.inc.php');
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'CLI.inc.php');
 
@@ -37,22 +33,22 @@ require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR
 
  Proceedure to Convert MySQL to PostgreSQL:
 
- 1. Upgrade to latest version of TimeTrex still using MySQL.
+ 1. Upgrade to latest version of Fairness still using MySQL.
 
  2. Run: convert_mysql_to_postgresql.php sequence > update_sequences.sql
  3. Run: convert_mysql_to_postgresql.php truncate > delete_all_data.sql
 
  4. Dump MySQL database with the following command:
-	mysqldump -t --skip-add-locks --compatible=postgresql --complete-insert <TimeTrex_Database_Name> > timetrex_mysql.sql
+	mysqldump -t --skip-add-locks --compatible=postgresql --complete-insert <Fairness_Database_Name> > fairness_mysql.sql
 
- 5. Install a fresh copy of TimeTrex on PostgreSQL, make sure its the latest version of TimeTrex and it matches the version
+ 5. Install a fresh copy of Fairness on PostgreSQL, make sure its the latest version of Fairness and it matches the version
 	currently installed and running on MySQL.
 
- 6. Run: psql <TimeTrex_Database_Name> < delete_all_data.sql
- 7. Run: psql <TimeTrex_Database_Name> < timetrex_mysql.sql.
+ 6. Run: psql <Fairness_Database_Name> < delete_all_data.sql
+ 7. Run: psql <Fairness_Database_Name> < fairness_mysql.sql.
 		- There will be a few errors because it will try to update non-existant *_seq tables.
 			This is fine because the next step handles this.
- 8. Run: psql <TimeTrex_Database_Name> < update_sequences.sql
+ 8. Run: psql <Fairness_Database_Name> < update_sequences.sql
 
  9. Done!
 
@@ -98,7 +94,7 @@ if ( $argc < 2 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 	}
 }
 
-//echo "WARNING: Clear TimeTrex cache after running this.\n";
+//echo "WARNING: Clear Fairness cache after running this.\n";
 
 //Debug::Display();
 ?>

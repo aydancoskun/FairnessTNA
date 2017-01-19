@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,36 +20,31 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 2217 $
- * $Id: CAPayrollDeductionTest.php 2217 2009-10-31 22:48:21Z ipso $
- * $Date: 2009-10-31 15:48:21 -0700 (Fri, 31 Oct 2009) $
+
+/**
+ * @group CAPayrollDeductionTest2009
  */
-require_once('PHPUnit/Framework/TestCase.php');
-
 class CAPayrollDeductionTest2009 extends PHPUnit_Framework_TestCase {
+	public $company_id = NULL;
 
-    public $company_id = 1;
-
-    public function __construct() {
-        global $db, $cache;
-
-		$this->tax_table_file = dirname(__FILE__).'/CAPayrollDeductionTest2009.csv';
+	public function setUp() {
+		Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
 
 		require_once( Environment::getBasePath().'/classes/payroll_deduction/PayrollDeduction.class.php');
 
-		TTDate::setTimeZone('PST');
-    }
+		$this->tax_table_file = dirname(__FILE__).'/CAPayrollDeductionTest2009.csv';
 
-    public function setUp() {
-        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+		$this->company_id = PRIMARY_COMPANY_ID;
 
-    public function tearDown() {
-        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+		TTDate::setTimeZone('Etc/GMT+8'); //Force to non-DST timezone. 'PST' isnt actually valid.
+
+		return TRUE;
+	}
+
+	public function tearDown() {
+		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
+		return TRUE;
+	}
 
 	public function mf($amount) {
 		return Misc::MoneyFormat($amount, FALSE);
@@ -68,12 +63,12 @@ class CAPayrollDeductionTest2009 extends PHPUnit_Framework_TestCase {
 
 		$test_rows = Misc::parseCSV( $this->tax_table_file, TRUE );
 
-		$total_rows = count($test_rows)+1;
+		$total_rows = (count($test_rows) + 1);
 		$i = 2;
 		foreach( $test_rows as $row ) {
 			//Debug::text('Province: '. $row['province'] .' Income: '. $row['gross_income'], __FILE__, __LINE__, __METHOD__,10);
 			if ( $row['gross_income'] == '' AND $row['low_income'] != '' AND $row['high_income'] != '' ) {
-				$row['gross_income'] = $row['low_income'] + ( ($row['high_income'] - $row['low_income']) / 2 );
+				$row['gross_income'] = ($row['low_income'] + ( ($row['high_income'] - $row['low_income']) / 2 ));
 			}
 			if ( $row['country'] != '' AND $row['gross_income'] != '' ) {
 				//echo $i.'/'.$total_rows.'. Testing Province: '. $row['province'] .' Income: '. $row['gross_income'] ."\n";
@@ -113,16 +108,16 @@ class CAPayrollDeductionTest2009 extends PHPUnit_Framework_TestCase {
 		}
 
 		//Make sure all rows are tested.
-		$this->assertEquals( $total_rows, $i-1);
+		$this->assertEquals( $total_rows, ($i - 1));
 	}
 
 	//
 	// CPP/ EI
 	//
 	function testCA_2009a_BiWeekly_CPP_LowIncome() {
-		Debug::text('CA - BiWeekly - CPP - Beginning of 2009 01-Jan-09: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('CA - BiWeekly - CPP - Beginning of 2009 01-Jan-09: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('CA','BC');
+		$pd_obj = new PayrollDeduction('CA', 'BC');
 		$pd_obj->setDate(strtotime('01-Jan-09'));
 		$pd_obj->setEnableCPPAndEIDeduction(TRUE); //Deduct CPP/EI.
 		$pd_obj->setAnnualPayPeriods( 26 );
@@ -148,9 +143,9 @@ class CAPayrollDeductionTest2009 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testCA_2009a_SemiMonthly_CPP_LowIncome() {
-		Debug::text('CA - BiWeekly - CPP - Beginning of 2009 01-Jan-09: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('CA - BiWeekly - CPP - Beginning of 2009 01-Jan-09: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('CA','BC');
+		$pd_obj = new PayrollDeduction('CA', 'BC');
 		$pd_obj->setDate(strtotime('01-Jan-09'));
 		$pd_obj->setEnableCPPAndEIDeduction(TRUE); //Deduct CPP/EI.
 		$pd_obj->setAnnualPayPeriods( 24 );
@@ -176,9 +171,9 @@ class CAPayrollDeductionTest2009 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testCA_2009a_EI_LowIncome() {
-		Debug::text('CA - EI - Beginning of 2009 01-Jan-09: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('CA - EI - Beginning of 2009 01-Jan-09: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('CA','BC');
+		$pd_obj = new PayrollDeduction('CA', 'BC');
 		$pd_obj->setDate(strtotime('01-Jan-09'));
 		$pd_obj->setEnableCPPAndEIDeduction(TRUE); //Deduct CPP/EI.
 		$pd_obj->setAnnualPayPeriods( 26 );

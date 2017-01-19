@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,36 +20,30 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 2217 $
- * $Id: CAPayrollDeductionTest.php 2217 2008-10-31 22:48:21Z ipso $
- * $Date: 2008-10-31 15:48:21 -0700 (Fri, 31 Oct 2008) $
+
+/**
+ * @group CAPayrollDeductionTest2006
  */
-require_once('PHPUnit/Framework/TestCase.php');
-
 class CAPayrollDeductionTest2006 extends PHPUnit_Framework_TestCase {
-
     public $company_id = NULL;
 
-    public function __construct() {
-        global $db, $cache;
+    public function setUp() {
+        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
 
 		require_once( Environment::getBasePath().'/classes/payroll_deduction/PayrollDeduction.class.php');
 
 		$this->company_id = PRIMARY_COMPANY_ID;
 
-		TTDate::setTimeZone('PST');
-    }
+		TTDate::setTimeZone('Etc/GMT+8'); //Force to non-DST timezone. 'PST' isnt actually valid.
+		TTi18n::setLocale('en_US', LC_ALL, TRUE ); //Due to being a singleton and PHPUnit resetting the state, always force the timezone to be set.
 
-    public function setUp() {
-        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+		return TRUE;
+	}
 
-    public function tearDown() {
-        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+	public function tearDown() {
+		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
+		return TRUE;
+	}
 
 	public function mf($amount) {
 		return Misc::MoneyFormat($amount, FALSE);

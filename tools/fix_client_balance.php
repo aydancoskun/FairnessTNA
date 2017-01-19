@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,35 +20,64 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 1246 $
- * $Id: fix_client_balance.php 1246 2007-09-14 23:47:42Z ipso $
- * $Date: 2007-09-14 16:47:42 -0700 (Fri, 14 Sep 2007) $
- */
+
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'global.inc.php');
 require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'CLI.inc.php');
 
-if ( $argc < 2 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
-	$help_output = "Usage: fix_client_balance.php [company_id]\n";
+if ( isset($argv[1]) AND in_array($argv[1], array('--help', '-help', '-h', '-?') ) ) {
+	$help_output = "Usage: fix_client_balance.php -company_id [company_id] -client_id [client_id]\n";
 	echo $help_output;
 } else {
-	//Rebuilt Hierarhcy Tree if a transation fails using MyISAM or something
-	$company_id = $argv[1];
-
-	if ( $company_id != '' ) {
-		$cbf = new ClientBalanceFactory();
-		$cbf->StartTransaction();
-
-		$clf = new ClientListFactory();
-		$clf->getByCompanyId( $company_id );
-		foreach( $clf as $c_obj ) {
-			$cbf->reCalculateBalance( $c_obj->getId(), $c_obj->getCompany() );
-			//break;
-		}
-
-		//$cbf->FailTransaction();
-		$cbf->CommitTransaction();
+	if ( in_array('-company_id', $argv) ) {
+		$company_id = trim($argv[array_search('-company_id', $argv)+1]);
 	}
+
+	if ( in_array('-client_id', $argv) ) {
+		$client_id = trim($argv[array_search('-client_id', $argv)+1]);
+	}
+
+	//Force flush after each output line.
+	ob_implicit_flush( TRUE );
+	ob_end_flush();
+
+	$clf = new CompanyListFactory();
+	if ( isset($company_id) AND $company_id > 0 ) {
+		$clf->getByCompanyId( $company_id );
+	} else {
+		$clf->getAll();
+	}
+	if ( $clf->getRecordCount() > 0 ) {
+		foreach ( $clf as $c_obj ) {
+			echo 'Company: '. $c_obj->getName() ."...\n";
+
+			$cbf = new ClientBalanceFactory();
+			$cbf->StartTransaction();
+
+			$tmp_clf = new ClientListFactory();
+			if ( isset($client_id) AND $client_id > 0 ) {
+				$tmp_clf->getByIdAndCompanyId( $client_id, $c_obj->getId() );
+			} else {
+				$tmp_clf->getByCompanyId( $c_obj->getId() );
+			}
+
+			$max = $tmp_clf->getRecordCount();
+			$i = 0;
+			foreach( $tmp_clf as $tmp_c_obj ) {
+				//if ( !in_array( $tmp_c_obj->getId(), array(195,1249,1800) ) ) {
+				//	continue;
+				//}
+
+				echo '  '. $i .'/'. $max .' Recalculating: '. $tmp_c_obj->getCompanyName() ."...\n";
+				$cbf->reCalculateBalance( $tmp_c_obj->getId(), $tmp_c_obj->getCompany() );
+
+				$i++;
+			}
+
+			//$cbf->FailTransaction();
+			$cbf->CommitTransaction();
+		}
+	}
+
 }
 //Debug::Display();
 ?>

@@ -1,0 +1,129 @@
+<?php
+/*********************************************************************************
+ * This file is part of "Fairness", a Payroll and Time Management program.
+ * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
+ *
+ * Fairness is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation, either version 3 of the License, or (at you option )
+ * any later version.
+ *
+ * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program; if not, see http://www.gnu.org/licenses or write to the Free
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301 USA.
+  ********************************************************************************/
+
+
+/**
+ * @package Modules\SOAP
+ */
+class FairnessSoapClient {
+	var $soap_client_obj = NULL;
+
+	function __construct() {
+		$this->getSoapObject();
+
+		return TRUE;
+	}
+
+	function getSoapObject() {
+		if ( $this->soap_client_obj == NULL ) {
+			if ( function_exists('openssl_encrypt') ) {
+				$location = 'https://';
+			} else {
+				$location = 'http://';
+			}
+			$location .= 'github.com/aydancoskun/fairness'; // set this up
+
+			$this->soap_client_obj = new SoapClient(NULL, array(
+											'location' => $location,
+											'uri' => 'urn:test',
+											'style' => SOAP_RPC,
+											'use' => SOAP_ENCODED,
+											'encoding' => 'UTF-8',
+											'connection_timeout' => 30,
+											'keep_alive' => FALSE, //This should prevent "Error fetching HTTP headers" or "errno=10054 An existing connection was forcibly closed by the remote host." SOAP errors.
+											'trace' => 1,
+											'exceptions' => 0
+											)
+									);
+		}
+
+		return $this->soap_client_obj;
+	}
+
+	function printSoapDebug() {
+		echo "<pre>\n";
+		echo "Request :\n".htmlspecialchars($this->getSoapObject()->__getLastRequest()) ."\n";
+		echo "Response :\n".htmlspecialchars($this->getSoapObject()->__getLastResponse()) ."\n";
+		echo "</pre>\n";
+	}
+
+	function ping() {
+		return $this->getSoapObject()->ping();
+	}
+
+	//
+	// Currency Data Feed functions
+	//
+	function getCurrencyExchangeRates( $company_id, $currency_arr, $base_currency ) {
+		if ( $company_id == '' ) {
+			return FALSE;
+		}
+
+		if ( !is_array($currency_arr) ) {
+			return FALSE;
+		}
+
+		if ( $base_currency == '' ) {
+			return FALSE;
+		}
+
+		$currency_rates = $this->getSoapObject()->getCurrencyExchangeRates( false, $company_id, $currency_arr, $base_currency );
+
+		if ( isset($currency_rates) AND is_array($currency_rates) AND count($currency_rates) > 0 ) {
+			return $currency_rates;
+		}
+
+		return FALSE;
+	}
+
+	function getCurrencyExchangeRatesByDate( $company_id, $currency_arr, $base_currency, $start_date = NULL, $end_date = NULL ) {
+		if ( $company_id == '' ) {
+			return FALSE;
+		}
+
+		if ( !is_array($currency_arr) ) {
+			return FALSE;
+		}
+
+		if ( $base_currency == '' ) {
+			return FALSE;
+		}
+
+		if ( $start_date == '' ) {
+			$start_date = time();
+		}
+
+		if ( $end_date == '' ) {
+			$end_date = time();
+		}
+
+		$currency_rates = $this->getSoapObject()->getCurrencyExchangeRatesByDate( false, $company_id, $currency_arr, $base_currency, $start_date, $end_date );
+
+		if ( isset($currency_rates) AND is_array($currency_rates) AND count($currency_rates) > 0 ) {
+			return $currency_rates;
+		}
+
+		return FALSE;
+	}
+}
+?>

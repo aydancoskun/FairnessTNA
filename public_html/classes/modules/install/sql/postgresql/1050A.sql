@@ -1,0 +1,11 @@
+CREATE INDEX pay_period_pay_period_schedule_id ON pay_period USING btree (pay_period_schedule_id);
+CREATE INDEX pay_stub_entry_account_company_id ON pay_stub_entry_account USING btree (company_id);
+CREATE INDEX policy_group_user_user_id ON policy_group_user USING btree (user_id);
+CREATE INDEX pay_period_schedule_user_user_id ON pay_period_schedule_user USING btree (user_id);
+CREATE INDEX users_company_id ON users USING btree (company_id);
+CREATE INDEX schedule_start_time ON schedule USING btree (start_time);
+CREATE INDEX request_status_id_authorized ON request USING btree (status_id,authorized);
+DROP INDEX recurring_schedule_user_id;
+CREATE INDEX recurring_schedule_id ON recurring_schedule_user USING btree (id);
+CREATE INDEX recurring_schedule_recurring_schedule_control_id ON recurring_schedule_user USING btree (recurring_schedule_control_id);
+CREATE INDEX recurring_schedule_user_id ON recurring_schedule_user USING btree (user_id);

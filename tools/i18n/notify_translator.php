@@ -3,8 +3,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -22,10 +22,6 @@
  * 02110-1301 USA.
   ********************************************************************************/
 /*
- * $Revision: 924 $
- * $Id: notify_translator.php 924 2007-06-05 21:02:29Z ipso $
- * $Date: 2007-06-05 14:02:29 -0700 (Tue, 05 Jun 2007) $
- *
  * File Contributed By: Open Source Consulting, S.A.   San Jose, Costa Rica.
  * http://osc.co.cr
  */
@@ -61,12 +57,12 @@
             
             $emailTeam= search_email($team);
             if ($emailTeam != NULL){
-            	send_mail($emailTeam,'timetrex',$string_lang,$pct);
+            	send_mail($emailTeam,'fairness',$string_lang,$pct);
             }  
             
             $emailTrans= search_email($trans);
             if ($emailTrans != NULL){
-            	send_mail($emailTrans,'timetrex',$string_lang,$pct);
+            	send_mail($emailTrans,'fairness',$string_lang,$pct);
             } 
             fwrite( $fh, "$file|$pct|$team|$trans|$string_lang\n" );
          }
@@ -193,7 +189,7 @@
    
 function send_mail($to,$from,$lang,$pct){
 $subject= <<<END
-Timetrex updated, {$lang} translation out of date
+Fairness updated, {$lang} translation out of date
 END;
 
 $msg= <<<END
@@ -204,7 +200,7 @@ subject: {$subject}
 Hello,
 
 You are receiving this email because you previously contributed {$lang} 
-translations to Timetrex.  The application has recently been updated, which
+translations to Fairness.  The application has recently been updated, which
 means that new english text needs to be translated.
 
 As of this moment, the {$lang} translation file is {$pct}% complete.
@@ -219,7 +215,7 @@ You can always find the latest language files and instructions at:
 
 Best,
 
-Timetrex
+Fairness
 END;
 		
 	$msg = wordwrap($msg, 100);

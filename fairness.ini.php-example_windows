@@ -1,6 +1,7 @@
+;<?php die('Access denied...');?>
 ;
 ;
-; TimeTrex Configuration File
+; Fairness Configuration File
 ; *Windows Example*
 ;
 ;
@@ -9,19 +10,19 @@
 ; System paths. NO TRAILING SLASHES!
 ;
 [path]
-;URL to TimeTrex web root directory. ie: http://your.domain.com/<*BASE_URL*>
+;URL to Fairness web root directory. ie: http://your.domain.com/<*BASE_URL*>
 ;DO NOT INCLUDE http://your.domain.com, just the directory AFTER your domain
-base_url = /timetrex/interface
+base_url = /fairness/interface
 
 ;
 ;log directory
 ;
-log = c:\timetrex\log
+log = c:\fairness\log
 
 ;
 ;Misc storage, for attachments/images
 ;
-storage = c:\timetrex\storage
+storage = c:\fairness\storage
 
 ;
 ;Full path and name to the PHP CLI Binary
@@ -38,16 +39,16 @@ type = mysqlt
 ;type = postgres8
 
 host = localhost
-database_name = timetrex
-user = timetrex
-password = ENTER_PASSWORD_HERE
+database_name = fairness
+user = fairness
+password = "ENTER_PASSWORD_HERE"
 
 
 ;
 ; Email delivery settings.
 ;
 [mail]
-;Least setup, deliver email through TimeTrex's email relay via SOAP (HTTP port 80)
+;Least setup, deliver email through Fairness's email relay via SOAP (HTTP port 80)
 delivery_method = soap 
 
 ;Deliver email through local sendmail command specified in php.ini
@@ -57,7 +58,7 @@ delivery_method = soap
 ;delivery_method = smtp  
 ;smtp_host=smtp.gmail.com
 ;smtp_port=587
-;smtp_username=timetrex@gmail.com
+;smtp_username=fairness@gmail.com
 ;smtp_password=testpass123
 
 
@@ -66,7 +67,7 @@ delivery_method = soap
 ;
 [cache]
 enable = TRUE
-dir = c:\temp\timetrex
+dir = c:\temp\fairness
 
 
 
@@ -89,9 +90,10 @@ installer_enabled = TRUE
 primary_company_id = 0
 hostname = localhost
 
-;default_interface = flex
+; System Administrators Email address to send critical errors to if necessary. Set to FALSE to disable completely.
+;system_admin_email = "sysadmin@mydomain.com"
 
-;WARNING: DO NOT CHANGE THIS AFTER YOU HAVE INSTALLED TIMETREX.
+;WARNING: DO NOT CHANGE THIS AFTER YOU HAVE INSTALLED FAIRNESS.
 ;If you do it will cause all your passwords to become invalid,
 ;and you may lose access to some encrypted data.
 salt = 0

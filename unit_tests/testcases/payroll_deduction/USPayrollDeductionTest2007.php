@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,36 +20,29 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 2273 $
- * $Id: USPayrollDeductionTest.php 2273 2008-12-08 21:58:11Z root $
- * $Date: 2008-12-08 13:58:11 -0800 (Mon, 08 Dec 2008) $
+
+/**
+ * @group USPayrollDeductionTest2007
  */
-require_once('PHPUnit/Framework/TestCase.php');
-
 class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
+	public $company_id = NULL;
 
-    public $company_id = NULL;
-
-    public function __construct() {
-        global $db, $cache;
+	public function setUp() {
+		Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
 
 		require_once( Environment::getBasePath().'/classes/payroll_deduction/PayrollDeduction.class.php');
 
 		$this->company_id = PRIMARY_COMPANY_ID;
 
-		TTDate::setTimeZone('PST');
-    }
+		TTDate::setTimeZone('Etc/GMT+8'); //Force to non-DST timezone. 'PST' isnt actually valid.
 
-    public function setUp() {
-        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+		return TRUE;
+	}
 
-    public function tearDown() {
-        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+	public function tearDown() {
+		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
+		return TRUE;
+	}
 
 	public function mf($amount) {
 		return Misc::MoneyFormat($amount, FALSE);
@@ -63,9 +56,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	//
 	//
 	function testUS_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -84,9 +77,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -104,9 +97,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 
 
 	function testUS_2007a_BiWeekly_Married_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -123,9 +116,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_SemiMonthly_Single_LowIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -142,9 +135,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_SemiMonthly_Married_LowIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -163,9 +156,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_SemiMonthly_Single_MedIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -182,9 +175,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_SemiMonthly_Single_HighIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -201,9 +194,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_SemiMonthly_Single_LowIncome_3Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -220,9 +213,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_SemiMonthly_Single_LowIncome_5Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -239,9 +232,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_SemiMonthly_Single_LowIncome_8AllowancesA() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -258,9 +251,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2007a_SemiMonthly_Single_LowIncome_8AllowancesB() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -280,9 +273,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// OK
 	//
 	function testOK_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','OK');
+		$pd_obj = new PayrollDeduction('US', 'OK');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -303,9 +296,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testOK_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','OK');
+		$pd_obj = new PayrollDeduction('US', 'OK');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -326,9 +319,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testOK_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','OK');
+		$pd_obj = new PayrollDeduction('US', 'OK');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -354,9 +347,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// NM
 	//
 	function testNM_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','NM');
+		$pd_obj = new PayrollDeduction('US', 'NM');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -379,9 +372,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testNM_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','NM');
+		$pd_obj = new PayrollDeduction('US', 'NM');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -402,9 +395,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testNM_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','NM');
+		$pd_obj = new PayrollDeduction('US', 'NM');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -507,9 +500,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// MN
 	//
 	function testMN_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MN');
+		$pd_obj = new PayrollDeduction('US', 'MN');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -532,9 +525,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testMN_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MN');
+		$pd_obj = new PayrollDeduction('US', 'MN');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -555,9 +548,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testMN_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MN');
+		$pd_obj = new PayrollDeduction('US', 'MN');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -583,9 +576,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// HI
 	//
 	function testHI_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','HI');
+		$pd_obj = new PayrollDeduction('US', 'HI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -608,9 +601,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testHI_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','HI');
+		$pd_obj = new PayrollDeduction('US', 'HI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -631,9 +624,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testHI_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','HI');
+		$pd_obj = new PayrollDeduction('US', 'HI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -659,9 +652,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// CO
 	//
 	function testCO_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','CO');
+		$pd_obj = new PayrollDeduction('US', 'CO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -684,9 +677,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testCO_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','CO');
+		$pd_obj = new PayrollDeduction('US', 'CO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -707,9 +700,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testCO_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','CO');
+		$pd_obj = new PayrollDeduction('US', 'CO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -735,9 +728,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// MI
 	//
 	function testMI_2007a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MI');
+		$pd_obj = new PayrollDeduction('US', 'MI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -757,9 +750,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testMI_2007a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MI');
+		$pd_obj = new PayrollDeduction('US', 'MI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -784,9 +777,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// CA
 	//
 	function testCA_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','CA');
+		$pd_obj = new PayrollDeduction('US', 'CA');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -807,9 +800,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testCA_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','CA');
+		$pd_obj = new PayrollDeduction('US', 'CA');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -830,9 +823,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testCA_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','CA');
+		$pd_obj = new PayrollDeduction('US', 'CA');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -858,9 +851,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// KY
 	//
 	function testKY_2007a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','KY');
+		$pd_obj = new PayrollDeduction('US', 'KY');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -881,9 +874,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testKY_2007a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','KY');
+		$pd_obj = new PayrollDeduction('US', 'KY');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -905,9 +898,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testKY_2007a_SemiMonthly_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','KY');
+		$pd_obj = new PayrollDeduction('US', 'KY');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 );
 
@@ -932,9 +925,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// MO
 	//
 	function testMO_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -955,9 +948,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testMO_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -978,9 +971,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testMO_2007a_SemiMonthly_Married_HighIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -1006,9 +999,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// NC
 	//
 	function testNC_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','NC');
+		$pd_obj = new PayrollDeduction('US', 'NC');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1031,9 +1024,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testNC_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','NC');
+		$pd_obj = new PayrollDeduction('US', 'NC');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1054,9 +1047,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testNC_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','NC');
+		$pd_obj = new PayrollDeduction('US', 'NC');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -1082,9 +1075,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// ND
 	//
 	function testND_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','ND');
+		$pd_obj = new PayrollDeduction('US', 'ND');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1107,9 +1100,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testND_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','ND');
+		$pd_obj = new PayrollDeduction('US', 'ND');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1130,9 +1123,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testND_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','ND');
+		$pd_obj = new PayrollDeduction('US', 'ND');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -1158,9 +1151,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// OR
 	//
 	function testOR_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','OR');
+		$pd_obj = new PayrollDeduction('US', 'OR');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1183,9 +1176,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testOR_2007a_BiWeekly_Single_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','OR');
+		$pd_obj = new PayrollDeduction('US', 'OR');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1208,9 +1201,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testOR_2007a_BiWeekly_Single_LowIncomeC() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','OR');
+		$pd_obj = new PayrollDeduction('US', 'OR');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1233,9 +1226,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testOR_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','OR');
+		$pd_obj = new PayrollDeduction('US', 'OR');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1258,9 +1251,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testOR_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','OR');
+		$pd_obj = new PayrollDeduction('US', 'OR');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -1286,9 +1279,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// RI
 	//
 	function testRI_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','RI');
+		$pd_obj = new PayrollDeduction('US', 'RI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1311,9 +1304,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testRI_2007a_BiWeekly_Single_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','RI');
+		$pd_obj = new PayrollDeduction('US', 'RI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 52 ); //Weekly
 
@@ -1336,9 +1329,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testRI_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','RI');
+		$pd_obj = new PayrollDeduction('US', 'RI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1359,9 +1352,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testRI_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','RI');
+		$pd_obj = new PayrollDeduction('US', 'RI');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -1387,9 +1380,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	// VT
 	//
 	function testVT_2007a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','VT');
+		$pd_obj = new PayrollDeduction('US', 'VT');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1412,9 +1405,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testVT_2007a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - BiWeekly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','VT');
+		$pd_obj = new PayrollDeduction('US', 'VT');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
 
@@ -1435,9 +1428,9 @@ class USPayrollDeductionTest2007 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testVT_2007a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2007 01-Jan-07: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','VT');
+		$pd_obj = new PayrollDeduction('US', 'VT');
 		$pd_obj->setDate(strtotime('01-Jan-07'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 

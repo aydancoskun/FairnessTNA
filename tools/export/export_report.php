@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,14 +20,10 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 5014 $
- * $Id: import.php 5014 2011-07-20 17:50:39Z ipso $
- * $Date: 2011-07-20 10:50:39 -0700 (Wed, 20 Jul 2011) $
- */
-require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR .'api'. DIRECTORY_SEPARATOR .'client'. DIRECTORY_SEPARATOR .'TimeTrexClientAPI.class.php');
 
-//Example: php export_report.php -server "http://192.168.1.1/timetrex/api/soap/api.php" -username myusername -password mypass -report UserSummaryReport -template "by_employee+contact" /tmp/employee_list.csv csv
+require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR .'api'. DIRECTORY_SEPARATOR .'client'. DIRECTORY_SEPARATOR .'FairnessClientAPI.class.php');
+
+//Example: php export_report.php -server "http://192.168.1.1/fairness/api/soap/api.php" -username myusername -password mypass -report UserSummaryReport -template "by_employee+contact" /tmp/employee_list.csv csv
 if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 	$help_output = "Usage: export_report.php [OPTIONS] [output file] [file format]\n";
 	$help_output .= "\n";
@@ -52,19 +48,19 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 	}
 
 	if ( in_array('-server', $argv) ) {
-		$api_url = strtolower( trim($argv[array_search('-server', $argv)+1]) );
+		$api_url = trim($argv[array_search('-server', $argv)+1]);
 	} else {
 		$api_url = FALSE;
 	}
 
 	if ( in_array('-username', $argv) ) {
-		$username = strtolower( trim($argv[array_search('-username', $argv)+1]) );
+		$username = trim($argv[array_search('-username', $argv)+1]);
 	} else {
 		$username = FALSE;
 	}
 
 	if ( in_array('-password', $argv) ) {
-		$password = strtolower( trim($argv[array_search('-password', $argv)+1]) );
+		$password = trim($argv[array_search('-password', $argv)+1]);
 	} else {
 		$password = FALSE;
 	}
@@ -108,22 +104,22 @@ if ( $argc < 3 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
 		exit;
 	}
 
-	$TIMETREX_URL = $api_url;
+	$FAIRNESS_URL = $api_url;
 
-	$api_session = new TimeTrexClientAPI();
+	$api_session = new FairnessClientAPI();
 	$api_session->Login( $username, $password );
-	if ( $TIMETREX_SESSION_ID == FALSE ) {
+	if ( $FAIRNESS_SESSION_ID == FALSE ) {
 		echo "API Username/Password is incorrect!\n";
 		exit(1);
 	}
-	//echo "Session ID: $TIMETREX_SESSION_ID\n";
+	//echo "Session ID: $FAIRNESS_SESSION_ID\n";
 
 	if ( $report != '' ) {
-		$report_obj = new TimeTrexClientAPI( $report );
+		$report_obj = new FairnessClientAPI( $report );
 
 		$config = array();
 		if ( $saved_report != '' ) {
-			$saved_report_obj = new TimeTrexClientAPI( 'UserReportData' );
+			$saved_report_obj = new FairnessClientAPI( 'UserReportData' );
 			$saved_report_result = $saved_report_obj->getUserReportData( array('filter_data' => array('name' => trim($saved_report) ) ) );
 			$saved_report_data = $saved_report_result->getResult();
 			if ( is_array($saved_report_data) AND isset($saved_report_data[0]) AND isset($saved_report_data[0]['data']) ) {

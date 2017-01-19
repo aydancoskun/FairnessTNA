@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,11 +20,7 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 1396 $
- * $Id: CheckForUpdate.php 1396 2007-11-07 16:49:35Z ipso $
- * $Date: 2007-11-07 08:49:35 -0800 (Wed, 07 Nov 2007) $
- */
+
 /*
  * Checks for any version updates...
  *
@@ -36,30 +32,20 @@ require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR
 //Check system requirements.
 //
 if ( PRODUCTION == TRUE ) {
-	Debug::Text('Checking system requirements... '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__,10);
+	Debug::Text('Checking system requirements... '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__, 10);
 	$install_obj = new Install();
-	$failed_requirment_requirements = $install_obj->getFailedRequirements( FALSE, array('clean_cache', 'file_checksums') );
+	$failed_requirment_requirements = $install_obj->getFailedRequirements( FALSE, array('base_url', 'clean_cache') );
 
-	$sslf = new SystemSettingListFactory();
-	$sslf->getByName('valid_install_requirements');
-	if ( $sslf->getRecordCount() == 1 ) {
-		$obj = $sslf->getCurrent();
-	} else {
-		$obj = new SystemSettingListFactory();
-	}
-	$obj->setName( 'valid_install_requirements' );
 	if ( is_array( $failed_requirment_requirements ) AND count($failed_requirment_requirements) > 1 ) {
-		$obj->setValue( 0 );
-		Debug::Text('Failed system requirements: '. implode($failed_requirment_requirements), __FILE__, __LINE__, __METHOD__,10);
+		SystemSettingFactory::setSystemSetting( 'valid_install_requirements', 0 );
+		Debug::Text('Failed system requirements: '. implode($failed_requirment_requirements), __FILE__, __LINE__, __METHOD__, 10);
 		TTLog::addEntry( 0, 510, 'Failed system requirements: '. implode($failed_requirment_requirements), 0, 'company' );
 	} else {
-		$obj->setValue( 1 );
+		SystemSettingFactory::setSystemSetting( 'valid_install_requirements', 1 );
 	}
-	if ( $obj->isValid() ) {
-		$obj->Save();
-	}
-	unset($install_obj, $sslf, $obj, $check_all_requirements);
-	Debug::Text('Checking system requirements complete... '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__,10);
+
+	unset($install_obj, $check_all_requirements);
+	Debug::Text('Checking system requirements complete... '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__, 10);
 }
 
 //
@@ -82,14 +68,26 @@ if ( !isset($config_vars['other']['disable_cache_purging'])
 			AND strpos( $config_vars['path']['log'], $config_vars['cache']['dir'] ) === FALSE
 			AND strpos( $config_vars['path']['storage'], $config_vars['cache']['dir'] ) === FALSE ) {
 
-		Debug::Text('Purging Cache directory: '. $config_vars['cache']['dir'] .' - '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('Purging Cache directory: '. $config_vars['cache']['dir'] .' - '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__, 10);
 		$install_obj = new Install();
-		$install_obj->cleanCacheDirectory();
-		Debug::Text('Purging Cache directory complete: '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__,10);
+		$install_obj->cleanCacheDirectory( '' ); //Don't exclude .ZIP files, so if there is a corrupt one it will be redownloaded within a week.
+		Debug::Text('Purging Cache directory complete: '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__, 10);
 	} else {
-		Debug::Text('Cache directory is invalid: '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('Cache directory is invalid: '. TTDate::getDate('DATE+TIME', time() ), __FILE__, __LINE__, __METHOD__, 10);
 	}
 }
+
+//
+//Check for severely out of date versions and take out of production mode if necessary.
+//
+if ( PRODUCTION == TRUE AND ( (time() - (int)APPLICATION_VERSION_DATE) > (86400 * 455) ) ) {
+	Debug::Text('ERROR: Application version is severely out of date, changing production mode... ', __FILE__, __LINE__, __METHOD__, 10);
+	$install_obj = new Install();
+	$tmp_config_vars['debug']['production'] = 'FALSE';
+	$write_config_result = $install_obj->writeConfigFile( $tmp_config_vars );
+	unset($install_obj, $tmp_config_vars, $write_config_result);
+}
+
 Debug::writeToLog();
 Debug::Display();
 ?>

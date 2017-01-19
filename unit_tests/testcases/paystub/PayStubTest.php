@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,37 +20,26 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 9521 $
- * $Id: PayStubTest.php 9521 2013-04-08 23:09:52Z ipso $
- * $Date: 2013-04-08 16:09:52 -0700 (Mon, 08 Apr 2013) $
- */
-require_once('PHPUnit/Framework/TestCase.php');
 
 class PayStubTest extends PHPUnit_Framework_TestCase {
-
 	protected $company_id = NULL;
 	protected $user_id = NULL;
 	protected $pay_period_schedule_id = NULL;
 	protected $pay_period_objs = NULL;
 	protected $pay_stub_account_link_arr = NULL;
 
-    public function __construct() {
-        global $db, $cache, $profiler;
-    }
-
-    public function setUp() {
-        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
+	public function setUp() {
+		Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
 
 		$dd = new DemoData();
 		$dd->setEnableQuickPunch( FALSE ); //Helps prevent duplicate punch IDs and validation failures.
 		$dd->setUserNamePostFix( '_'.uniqid( NULL, TRUE ) ); //Needs to be super random to prevent conflicts and random failing tests.
 		$this->company_id = $dd->createCompany();
-		Debug::text('Company ID: '. $this->company_id, __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('Company ID: '. $this->company_id, __FILE__, __LINE__, __METHOD__, 10);
 
 		$dd->createCurrency( $this->company_id, 10 );
 
-		$dd->createPermissionGroups( $this->company_id, 40 ); //Administrator only.
+		//$dd->createPermissionGroups( $this->company_id, 40 ); //Administrator only.
 
 		$dd->createUserWageGroups( $this->company_id );
 
@@ -68,16 +57,16 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$this->assertGreaterThan( 0, $this->company_id );
 		$this->assertGreaterThan( 0, $this->user_id );
 
-        return TRUE;
-    }
+		return TRUE;
+	}
 
-    public function tearDown() {
-        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__,10);
+	public function tearDown() {
+		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
 
 		//$this->deleteAllSchedules();
 
-        return TRUE;
-    }
+		return TRUE;
+	}
 
 	function getPayStubAccountLinkArray() {
 		$this->pay_stub_account_link_arr = array(
@@ -113,13 +102,13 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$ppsf->setTimeZone('PST8PDT');
 
 		$ppsf->setDayStartTime( 0 );
-		$ppsf->setNewDayTriggerTime( (4*3600) );
-		$ppsf->setMaximumShiftTime( (16*3600) );
+		$ppsf->setNewDayTriggerTime( (4 * 3600) );
+		$ppsf->setMaximumShiftTime( (16 * 3600) );
 
 		$ppsf->setEnableInitialPayPeriods( FALSE );
 		if ( $ppsf->isValid() ) {
 			$insert_id = $ppsf->Save(FALSE);
-			Debug::Text('Pay Period Schedule ID: '. $insert_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::Text('Pay Period Schedule ID: '. $insert_id, __FILE__, __LINE__, __METHOD__, 10);
 
 			$ppsf->setUser( array($this->user_id) );
 			$ppsf->Save();
@@ -129,7 +118,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 			return $insert_id;
 		}
 
-		Debug::Text('Failed Creating Pay Period Schedule!', __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('Failed Creating Pay Period Schedule!', __FILE__, __LINE__, __METHOD__, 10);
 
 		return FALSE;
 
@@ -146,15 +135,14 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 			for ( $i = 0; $i < $max_pay_periods; $i++ ) {
 				if ( $i == 0 ) {
 					//$end_date = TTDate::getBeginYearEpoch();
-					$end_date = strtotime('01-Jan-06')-86400;
+					$end_date = (strtotime('01-Jan-06') - 86400);
 				} else {
-					$end_date = $end_date + ( (86400*14) );
+					$end_date = ($end_date + ( (86400 * 14) ));
 				}
 
-				Debug::Text('I: '. $i .' End Date: '. TTDate::getDate('DATE+TIME', $end_date) , __FILE__, __LINE__, __METHOD__,10);
+				Debug::Text('I: '. $i .' End Date: '. TTDate::getDate('DATE+TIME', $end_date), __FILE__, __LINE__, __METHOD__, 10);
 
-
-				$pps_obj->createNextPayPeriod( $end_date , (86400*360) );
+				$pps_obj->createNextPayPeriod( $end_date, (86400 * 3600), FALSE ); //Don't import punches, as that causes deadlocks when running tests in parallel.
 			}
 
 		}
@@ -232,6 +220,81 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		return FALSE;
 	}
 
+	/**
+	 * @group PayStub_testProRateSalary
+	 */
+	//Test basic salary calculation.
+	function testProRateSalaryCalculation() {
+		//Hire Date should be assumed to be the beginning of the day. (inclusive)
+		//Termination Date should be assumed to be the end of the day. (inclusive)
+		//Wage Effective Date is also assumed to be the beginning of the day (inclusive).
+		//
+		//So if an employee is hired and terminated on the same day, and is salary, they should get one day pay.
+
+		//									 proRateSalary($salary, $wage_effective_date, $prev_wage_effective_date, $pp_start_date, $pp_end_date, $termination_date )
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('13-Aug-2016'), FALSE );
+		$this->assertEquals( $pro_rated_salary, '1000.00' );
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('13-Aug-2016'), FALSE, strtotime('13-Aug-2016') );
+		$this->assertEquals( $pro_rated_salary, '1000.00' );
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('13-Aug-2016 11:59:59PM'), FALSE, strtotime('13-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '1000.00' );
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '1000.00' );
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('02-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '900.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('06-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '500.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('10-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '100.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('11-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '0.00' );
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('09-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '900.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('05-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '500.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('01-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '100.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016 6:00AM'), FALSE, strtotime('01-Aug-2016 12:00:00AM'), strtotime('10-Aug-2016 11:59:59PM'), FALSE, strtotime('31-Jul-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '0.00' );
+
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('10-Aug-2016'), strtotime('01-Aug-2016 9:00AM'), strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '1000.00' );
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('11-Aug-2016'), strtotime('02-Aug-2016 9:00AM'), strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '900.00' );
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Jul-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('11-Aug-2016'), strtotime('02-Aug-2016 9:00AM'), strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '900.00' );
+
+		//
+		//Test changing salary in the middle of a pay period.
+		//
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('05-Aug-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('11-Aug-2016'), strtotime('01-Aug-2016 9:00AM'), strtotime('11-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '600.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Jul-2016'), strtotime('05-Aug-2016'), strtotime('01-Aug-2016'), strtotime('11-Aug-2016'), strtotime('01-Aug-2016 9:00AM'), strtotime('10-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '400.00' );
+
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('10-Aug-2016 11:59:59PM') );
+		$this->assertEquals( $pro_rated_salary, '1000.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Aug-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('10-Aug-2016 11:59:59PM'), strtotime('02-Aug-2016 9:00AM'), strtotime('08-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '700.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('05-Aug-2016'), FALSE, strtotime('01-Aug-2016'), strtotime('10-Aug-2016 11:59:59PM'), strtotime('02-Aug-2016 9:00AM'), strtotime('08-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '400.00' );
+		$pro_rated_salary = UserWageFactory::proRateSalary( 1000.00, strtotime('01-Jul-2016'), strtotime('05-Aug-2016'), strtotime('01-Aug-2016'), strtotime('10-Aug-2016 11:59:59PM'), strtotime('02-Aug-2016 9:00AM'), strtotime('08-Aug-2016 9:00AM') );
+		$this->assertEquals( $pro_rated_salary, '300.00' );
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStub_testSinglePayStub
+	 */
 	function testSinglePayStub() {
 		//Test all parts of a single pay stub.
 
@@ -239,7 +302,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
 		$pay_stub->setPayPeriod( $this->pay_period_objs[0]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setStatus( 10 ); //New
 
 		//$pay_stub->setStartDate( $this->pay_period_objs[0]->getStartDate() );
 		//$pay_stub->setEndDate( $this->pay_period_objs[0]->getEndDate() );
@@ -259,7 +322,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
 							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
 							);
-		
+
 		//addEntry( $pay_stub_entry_account_id, $amount, $units = NULL, $rate = NULL, $description = NULL, $ps_amendment_id = NULL, $ytd_amount = NULL, $ytd_units = NULL) {
 		$pay_stub->addEntry( $pse_accounts['regular_time'], 100.01 );
 		$pay_stub->addEntry( $pse_accounts['regular_time'], 10.01 );
@@ -280,7 +343,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setEnableProcessEntries(TRUE);
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
-			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
 			$pay_stub_id = $pay_stub->Save();
 		}
 
@@ -327,6 +390,9 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PayStub_testSinglePayStubLargeAmounts
+	 */
 	function testSinglePayStubLargeAmounts() {
 		//Test all parts of a single pay stub.
 
@@ -334,7 +400,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
 		$pay_stub->setPayPeriod( $this->pay_period_objs[0]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setStatus( 10 ); //New
 
 		//$pay_stub->setStartDate( $this->pay_period_objs[0]->getStartDate() );
 		//$pay_stub->setEndDate( $this->pay_period_objs[0]->getEndDate() );
@@ -375,7 +441,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setEnableProcessEntries(TRUE);
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
-			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
 			$pay_stub_id = $pay_stub->Save();
 		}
 
@@ -422,13 +488,16 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PayStub_testMultiplePayStub
+	 */
 	function testMultiplePayStub() {
 		//Test all parts of multiple pay stubs that span a year boundary.
 
 		//Start 6 pay periods from the last one. Should be beginning/end of December,
 		//Its the TRANSACTION date that counts
-		$start_pay_period_id = count($this->pay_period_objs)-6;
-		Debug::text('Starting Pay Period: '. TTDate::getDate('DATE+TIME', $this->pay_period_objs[$start_pay_period_id]->getStartDate() ), __FILE__, __LINE__, __METHOD__,10);
+		$start_pay_period_id = (count($this->pay_period_objs) - 6);
+		Debug::text('Starting Pay Period: '. TTDate::getDate('DATE+TIME', $this->pay_period_objs[$start_pay_period_id]->getStartDate() ), __FILE__, __LINE__, __METHOD__, 10);
 
 		//
 		// First Pay Stub
@@ -439,7 +508,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
 		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setStatus( 10 ); //New
 
 		$pay_stub->setDefaultDates();
 
@@ -473,15 +542,10 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 5.01 );
 
 
-//YTD: $pay_stub->addEntry( $psa_obj->getPayStubEntryNameId() , 0, NULL, NULL, $psa_obj->getDescription(), $psa_obj->getID(), $amount, $psa_obj->getUnits() );
-//       $pay_stub->addEntry( $psa_obj->getPayStubEntryNameId() , $amount, $psa_obj->getUnits(), $psa_obj->getRate(), $psa_obj->getDescription(), $psa_obj->getID() );
-
-
-
 		$pay_stub->setEnableProcessEntries(TRUE);
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
-			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
 			$pay_stub_id = $pay_stub->Save();
 		}
 
@@ -536,8 +600,8 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub = new PayStubFactory();
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
-		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id+1]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
 
 		$pay_stub->setDefaultDates();
 
@@ -569,7 +633,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setEnableProcessEntries(TRUE);
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
-			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
 			$pay_stub_id = $pay_stub->Save();
 		}
 
@@ -620,8 +684,8 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub = new PayStubFactory();
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
-		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id+2]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 2)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
 
 		$pay_stub->setDefaultDates();
 
@@ -654,7 +718,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
 			$pay_stub_id = $pay_stub->Save();
-			Debug::text('Pay Stub is valid, final save, ID: '. $pay_stub_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save, ID: '. $pay_stub_id, __FILE__, __LINE__, __METHOD__, 10);
 		}
 
 		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
@@ -700,14 +764,16 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
-	//Test editing pay stub in the middle of the year, and having the other pay stubs YTD re-calculated.
-	function testEditMultiplePayStub() {
+	/**
+	 * @group PayStub_testMultiplePayStubAndPayRuns
+	 */
+	function testMultiplePayStubAndRuns() {
 		//Test all parts of multiple pay stubs that span a year boundary.
 
 		//Start 6 pay periods from the last one. Should be beginning/end of December,
 		//Its the TRANSACTION date that counts
-		$start_pay_period_id = count($this->pay_period_objs)-6;
-		Debug::text('Starting Pay Period: '. TTDate::getDate('DATE+TIME', $this->pay_period_objs[$start_pay_period_id]->getStartDate() ), __FILE__, __LINE__, __METHOD__,10);
+		$start_pay_period_id = (count($this->pay_period_objs) - 6);
+		Debug::text('Starting Pay Period: '. TTDate::getDate('DATE+TIME', $this->pay_period_objs[$start_pay_period_id]->getStartDate() ), __FILE__, __LINE__, __METHOD__, 10);
 
 		//
 		// First Pay Stub
@@ -718,7 +784,351 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
 		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 1 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 100.01 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 10.01 );
+		$pay_stub->addEntry( $pse_accounts['over_time_1'], 100.02 );
+
+		//Adjust YTD balance, emulating a YTD PS amendment
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 0, NULL, NULL, 'Vacation Accrual YTD adjustment', -1, 2.03, 0 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.00 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 50.01 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 25.04 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 10.01 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 15.05 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 5.01 );
+
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
+			$pay_stub_id = $pay_stub->Save();
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '100.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '110.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '100.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '50.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '50.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '25.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '25.04' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '15.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '15.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '0.00' ); //YTD adjustment
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '2.03' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][2]['amount'], '5.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][2]['ytd_amount'], '6.04' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '211.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '211.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '75.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '75.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '135.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '135.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '25.06' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '25.06' );
+
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		//
+		//
+		//
+		//Second Pay Stub
+		//
+		//
+		//
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 1 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 198.01 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 12.01 );
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.03 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 53.01 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 27.04 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 13.04 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 16.09 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 6.01 );
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
+			$pay_stub_id = $pay_stub->Save();
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '198.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '12.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '320.04' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '2.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '53.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '103.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '27.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '52.08' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '13.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '23.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '16.09' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '31.14' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '6.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '11.02' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '211.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '422.09' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '80.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '155.10' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '131.00' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '266.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '29.13' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '54.19' );
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		//
+		//
+		//
+		//Third Pay Stub -- 2nd run in the same pay period.
+		//
+		//
+		//
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 2 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 1.01 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 1.01 );
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.01 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 1.01 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 1.01 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 1.01 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 1.01 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 1.01 );
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
+			$pay_stub_id = $pay_stub->Save();
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '322.06' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '3.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '104.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '53.09' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '24.06' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '32.15' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '11.02' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '3.03' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '425.12' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '2.02' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '157.12' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '268.00' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '2.02' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '56.21' );
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		//
+		//
+		//
+		//Forth Pay Stub -- 3nd run in the same pay period.
+		//
+		//
+		//
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 3 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 1.02 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 1.02 );
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.02 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 1.02 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 1.02 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 1.02 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 1.02 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 1.02 );
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
+			$pay_stub_id = $pay_stub->Save();
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '324.10' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '4.06' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '105.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '54.11' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '25.08' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '33.17' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '11.02' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '3.06' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '428.18' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '2.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '159.16' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '269.02' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '2.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '58.25' );
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		//
+		// Last Pay Stub
+		// THIS SHOULD BE IN THE NEW YEAR, so YTD amounts are zero'd.
+		//
+
+
+		//Test UnUsed YTD entries...
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 2)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 1 );
 
 		$pay_stub->setDefaultDates();
 
@@ -750,7 +1160,547 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setEnableProcessEntries(TRUE);
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
-			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__,10);
+			$pay_stub_id = $pay_stub->Save();
+			Debug::text('Pay Stub is valid, final save, ID: '. $pay_stub_id, __FILE__, __LINE__, __METHOD__, 10);
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		//
+		// IN NEW YEAR, YTD amounts are zero'd!
+		//
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '100.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '110.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '100.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '50.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '50.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '25.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '25.04' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '15.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '15.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '5.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '15.03' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '211.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '211.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '75.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '75.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '135.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '135.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '25.06' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '25.06' );
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStub_testMultiplePayStubAndPayRunsB
+	 */
+	function testMultiplePayStubAndRunsB() {
+		//Test all parts of multiple pay stubs that span a year boundary.
+
+		//Start 6 pay periods from the last one. Should be beginning/end of December,
+		//Its the TRANSACTION date that counts
+		$start_pay_period_id = (count($this->pay_period_objs) - 6);
+		Debug::text('Starting Pay Period: '. TTDate::getDate('DATE+TIME', $this->pay_period_objs[$start_pay_period_id]->getStartDate() ), __FILE__, __LINE__, __METHOD__, 10);
+
+		//
+		// First Pay Stub
+		//
+
+		//Test UnUsed YTD entries...
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 1 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 100.01 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 10.01 );
+		$pay_stub->addEntry( $pse_accounts['over_time_1'], 100.02 );
+
+		//Adjust YTD balance, emulating a YTD PS amendment
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 0, NULL, NULL, 'Vacation Accrual YTD adjustment', -1, 2.03, 0 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.00 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 50.01 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 25.04 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 10.01 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 15.05 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 5.01 );
+
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
+			$pay_stub_id = $pay_stub->Save();
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '100.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '110.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '100.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '50.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '50.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '25.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '25.04' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '15.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '15.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '0.00' ); //YTD adjustment
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '2.03' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][2]['amount'], '5.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][2]['ytd_amount'], '6.04' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '211.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '211.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '75.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '75.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '135.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '135.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '25.06' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '25.06' );
+
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		//
+		//
+		//
+		//Second Pay Stub
+		//
+		//
+		//
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 1 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 198.01 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 12.01 );
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.03 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 53.01 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 27.04 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 13.04 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 16.09 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 6.01 );
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
+			$pay_stub_id = $pay_stub->Save();
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '198.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '12.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '320.04' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '2.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '53.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '103.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '27.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '52.08' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '13.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '23.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '16.09' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '31.14' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '6.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '11.02' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '211.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '422.09' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '80.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '155.10' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '131.00' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '266.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '29.13' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '54.19' );
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		//
+		//
+		//
+		//Third Pay Stub -- 2nd run in the same pay period.
+		//
+		//
+		//
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 2 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 1.01 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 1.01 );
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.01 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 1.01 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 1.01 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 1.01 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 1.01 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 1.01 );
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
+			$pay_stub_id = $pay_stub->Save();
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '322.06' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '3.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '104.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '53.09' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '24.06' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '32.15' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '11.02' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '3.03' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '425.12' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '2.02' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '157.12' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '1.01' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '268.00' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '2.02' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '56.21' );
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		//
+		//
+		//
+		//
+		// 2nd Last Pay Stub
+		// THIS SHOULD BE IN THE NEW YEAR, so YTD amounts are zero'd.
+		//
+		//
+		//
+		//
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 3 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->setTransactionDate( ( TTDate::getEndYearEpoch( $pay_stub->getTransactionDate() ) + 86400 ) ); //Push transaction date into new year to zero YTD values.
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 1.02 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 1.02 );
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.02 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 1.02 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 1.02 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 1.02 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 1.02 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 1.02 );
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
+			$pay_stub_id = $pay_stub->Save();
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		//
+		// IN NEW YEAR, YTD amounts are zero'd!
+		//
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '2.04' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '1.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '11.02' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '3.06' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '3.06' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '2.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '2.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '1.02' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '2.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '2.04' );
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		//
+		// Last Pay Stub
+		//
+		//Test UnUsed YTD entries...
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 2)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+		$pay_stub->setRun( 1 );
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 100.01 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 10.01 );
+		$pay_stub->addEntry( $pse_accounts['over_time_1'], 100.02 );
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.00 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 50.01 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 25.04 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 10.01 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 15.05 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 5.01 );
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			$pay_stub_id = $pay_stub->Save();
+			Debug::text('Pay Stub is valid, final save, ID: '. $pay_stub_id, __FILE__, __LINE__, __METHOD__, 10);
+		}
+
+		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['amount'], '100.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['regular_time']][1]['ytd_amount'], '112.06' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['amount'], '100.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['over_time_1']][0]['ytd_amount'], '100.02' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['amount'], '1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual_release']][0]['ytd_amount'], '2.02' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['amount'], '50.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['federal_income_tax']][0]['ytd_amount'], '51.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['amount'], '25.04' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_income_tax']][0]['ytd_amount'], '26.06' );
+
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['amount'], '10.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['medicare']][0]['ytd_amount'], '11.03' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['amount'], '15.05' );
+		$this->assertEquals( $pse_arr[$pse_accounts['state_unemployment']][0]['ytd_amount'], '16.07' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['amount'], '-1.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][0]['ytd_amount'], '0.00' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['amount'], '5.01' );
+		$this->assertEquals( $pse_arr[$pse_accounts['vacation_accrual']][1]['ytd_amount'], '15.03' );
+
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['amount'], '211.04' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_gross']][0]['ytd_amount'], '214.10' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['amount'], '75.05' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['total_deductions']][0]['ytd_amount'], '77.09' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['amount'], '135.99' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['net_pay']][0]['ytd_amount'], '137.01' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['amount'], '25.06' );
+		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '27.10' );
+		unset($pse_arr, $pay_stub_id, $pay_stub);
+
+		return TRUE;
+	}
+
+	/**
+	 * @group PayStub_testEditMultiplePayStub
+	 */
+	//Test editing pay stub in the middle of the year, and having the other pay stubs YTD re-calculated.
+	function testEditMultiplePayStub() {
+		//Test all parts of multiple pay stubs that span a year boundary.
+
+		//Start 6 pay periods from the last one. Should be beginning/end of December,
+		//Its the TRANSACTION date that counts
+		$start_pay_period_id = (count($this->pay_period_objs) - 6);
+		Debug::text('Starting Pay Period: '. TTDate::getDate('DATE+TIME', $this->pay_period_objs[$start_pay_period_id]->getStartDate() ), __FILE__, __LINE__, __METHOD__, 10);
+
+		//
+		// First Pay Stub
+		//
+
+		//Test UnUsed YTD entries...
+		$pay_stub = new PayStubFactory();
+		$pay_stub->setUser( $this->user_id );
+		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
+		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id]->getId() );
+		$pay_stub->setStatus( 10 ); //New
+
+		$pay_stub->setDefaultDates();
+
+		$pay_stub->loadPreviousPayStub();
+		$pse_accounts = array(
+							'regular_time' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Regular Time'),
+							'over_time_1' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Over Time 1'),
+							'vacation_accrual_release' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 10, 'Vacation Accrual Release'),
+							'federal_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'US - Federal Income Tax'),
+							'state_income_tax' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 20, 'NY - State Income Tax'),
+							'medicare' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'Medicare'),
+							'state_unemployment' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 30, 'NY - Unemployment Insurance'),
+							'vacation_accrual' => CompanyDeductionFactory::getPayStubEntryAccountByCompanyIDAndTypeAndFuzzyName($this->company_id, 50, 'Vacation Accrual'),
+							);
+
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 100.01 );
+		$pay_stub->addEntry( $pse_accounts['regular_time'], 10.01 );
+		$pay_stub->addEntry( $pse_accounts['over_time_1'], 100.02 );
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual_release'], 1.00 );
+
+		$pay_stub->addEntry( $pse_accounts['federal_income_tax'], 50.01 );
+		$pay_stub->addEntry( $pse_accounts['state_income_tax'], 25.04 );
+
+		$pay_stub->addEntry( $pse_accounts['medicare'], 10.01 );
+		$pay_stub->addEntry( $pse_accounts['state_unemployment'], 15.05 );
+
+		$pay_stub->addEntry( $pse_accounts['vacation_accrual'], 5.01 );
+
+		$pay_stub->setEnableProcessEntries(TRUE);
+		$pay_stub->processEntries();
+		if ( $pay_stub->isValid() == TRUE ) {
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
 			$first_pay_stub_id = $pay_stub_id = $pay_stub->Save();
 		}
 
@@ -801,8 +1751,8 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub = new PayStubFactory();
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
-		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id+1]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
 
 		$pay_stub->setDefaultDates();
 
@@ -834,7 +1784,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setEnableProcessEntries(TRUE);
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
-			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
 			$second_pay_stub_id = $pay_stub_id = $pay_stub->Save();
 		}
 
@@ -883,8 +1833,8 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub = new PayStubFactory();
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
-		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id+2]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 2)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
 
 		$pay_stub->setDefaultDates();
 
@@ -917,7 +1867,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
 			$third_pay_stub_id = $pay_stub_id = $pay_stub->Save();
-			Debug::text('Pay Stub is valid, final save, ID: '. $pay_stub_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save, ID: '. $pay_stub_id, __FILE__, __LINE__, __METHOD__, 10);
 		}
 
 		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
@@ -1041,7 +1991,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		//
 		// Confirm YTD values in second pay stub are correct
 		//
-		Debug::Text('First Pay Stub ID: '. $first_pay_stub_id .' Second Pay Stub ID: '. $second_pay_stub_id, __FILE__, __LINE__, __METHOD__,10);
+		Debug::Text('First Pay Stub ID: '. $first_pay_stub_id .' Second Pay Stub ID: '. $second_pay_stub_id, __FILE__, __LINE__, __METHOD__, 10);
 
 		$pse_arr = $this->getPayStubEntryArray( $second_pay_stub_id );
 		//Debug::Arr($pse_arr, 'Second Pay Stub Entry Arr: ', __FILE__, __LINE__, __METHOD__,10);
@@ -1122,13 +2072,16 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		return TRUE;
 	}
 
+	/**
+	 * @group PayStub_testMultiplePayStubAccruals
+	 */
 	function testMultiplePayStubAccruals() {
 		//Test all parts of multiple pay stubs that span a year boundary.
 
 		//Start 6 pay periods from the last one. Should be beginning/end of December,
 		//Its the TRANSACTION date that counts
-		$start_pay_period_id = count($this->pay_period_objs)-8;
-		Debug::text('Starting Pay Period: '. TTDate::getDate('DATE+TIME', $this->pay_period_objs[$start_pay_period_id]->getStartDate() ), __FILE__, __LINE__, __METHOD__,10);
+		$start_pay_period_id = (count($this->pay_period_objs) - 8);
+		Debug::text('Starting Pay Period: '. TTDate::getDate('DATE+TIME', $this->pay_period_objs[$start_pay_period_id]->getStartDate() ), __FILE__, __LINE__, __METHOD__, 10);
 
 		//
 		// First Pay Stub
@@ -1139,7 +2092,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
 		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setStatus( 10 ); //New
 
 		$pay_stub->setDefaultDates();
 
@@ -1175,7 +2128,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setEnableProcessEntries(TRUE);
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
-			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
 			$pay_stub_id = $pay_stub->Save();
 		}
 
@@ -1231,8 +2184,8 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub = new PayStubFactory();
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
-		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id+1]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 1)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
 
 		$pay_stub->setDefaultDates();
 
@@ -1264,7 +2217,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->setEnableProcessEntries(TRUE);
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
-			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save.', __FILE__, __LINE__, __METHOD__, 10);
 			$pay_stub_id = $pay_stub->Save();
 		}
 
@@ -1313,8 +2266,8 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub = new PayStubFactory();
 		$pay_stub->setUser( $this->user_id );
 		$pay_stub->setCurrency( $pay_stub->getUserObject()->getCurrency() );
-		$pay_stub->setPayPeriod( $this->pay_period_objs[$start_pay_period_id+2]->getId() );
-		$pay_stub->setStatus('NEW');
+		$pay_stub->setPayPeriod( $this->pay_period_objs[($start_pay_period_id + 2)]->getId() );
+		$pay_stub->setStatus( 10 ); //New
 
 		$pay_stub->setDefaultDates();
 
@@ -1347,7 +2300,7 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$pay_stub->processEntries();
 		if ( $pay_stub->isValid() == TRUE ) {
 			$pay_stub_id = $pay_stub->Save();
-			Debug::text('Pay Stub is valid, final save, ID: '. $pay_stub_id, __FILE__, __LINE__, __METHOD__,10);
+			Debug::text('Pay Stub is valid, final save, ID: '. $pay_stub_id, __FILE__, __LINE__, __METHOD__, 10);
 		}
 
 		$pse_arr = $this->getPayStubEntryArray( $pay_stub_id );
@@ -1390,7 +2343,6 @@ class PayStubTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( $pse_arr[$this->pay_stub_account_link_arr['employer_contribution']][0]['ytd_amount'], '79.25' );
 
 		unset($pse_arr, $pay_stub_id, $pay_stub);
-
 
 		return TRUE;
 	}

@@ -13,39 +13,40 @@ However reading through the source code there is all sorts of additional restric
 
 Each source file states the following:
 
-
-	TimeTrex is a Payroll and Time Management program developed by TimeTrex Software Inc.
-	Copyright (C) 2003 - 2013 TimeTrex Software Inc.
-
-	This program is free software; you can redistribute it and/or modify it under
-	the terms of the GNU Affero General Public License version 3 as published by
-	the Free Software Foundation with the addition of the following permission
-	added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
-	WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE
-	WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
-
-	This program is distributed in the hope that it will be useful, but WITHOUT
-	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-	FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
-	details.
-
-	You should have received a copy of the GNU Affero General Public License along
-	with this program; if not, see http://www.gnu.org/licenses or write to the Free
-	Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-	02110-1301 USA.
-
-	You can contact TimeTrex headquarters at Unit 22 - 2475 Dobbin Rd. Suite
-	292 Westbank, BC V4T 2E9, Canada or at email address info@timetrex.com.
-
-	The interactive user interfaces in modified source and object code versions
-	of this program must display Appropriate Legal Notices, as required under
-	Section 5 of the GNU Affero General Public License version 3.
-
-	In accordance with Section 7(b) of the GNU Affero General Public License
-	version 3, these Appropriate Legal Notices must retain the display of the
-	"Powered by TimeTrex" logo. If the display of the logo is not reasonably
-	feasible for technical reasons, the Appropriate Legal Notices must display
-	the words "Powered by TimeTrex".
+/*********************************************************************************
+ * TimeTrex is a Workforce Management program developed by
+ * TimeTrex Software Inc. Copyright (C) 2003 - 2016 TimeTrex Software Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by
+ * the Free Software Foundation with the addition of the following permission
+ * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program; if not, see http://www.gnu.org/licenses or write to the Free
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301 USA.
+ *
+ * You can contact TimeTrex headquarters at Unit 22 - 2475 Dobbin Rd. Suite
+ * #292 West Kelowna, BC V4T 2E9, Canada or at email address info@timetrex.com.
+ *
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License version 3.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Powered by TimeTrex" logo. If the display of the logo is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Powered by TimeTrex".
+ ********************************************************************************/
 
 We will try to comment on two points.
 
@@ -72,7 +73,7 @@ They changed it to:
 
 	FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY TIMETREX, TIMETREX DISCLAIMS THE WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 
-It appears that Timetrex is trying to cover themselves in case of there is any infringements against the copyright of third parties (i.e. libaries they are using). We speculate that this is possibly because they are using a commercial javascript menu which is licensed to them with a serial code (see below). We have removed this menu in fairness and replaced it with JQuery's superfish menu. 
+It appears that Timetrex is trying to cover themselves in case of there is any infringements against the copyright of third parties (i.e. libaries they are using). We speculate that this is possibly because they used to use a commercial javascript menu which was licensed to them with a serial code. 
 
 Point 2)
 
@@ -111,7 +112,7 @@ Article 0 is very clear as to what is meant by "Appropriate Legal Notices". The 
 
 There is another point we would bring up talking about licensing / copyright.
 
-There is an encrypted file called TTlicense.php. It states:
+There used to be an encrypted file called TTlicense.php. It states:
 
 	<?php /* Reverse engineering of this file is strictly prohibited. File protected by copyright law and provided under license. */
 
@@ -145,7 +146,7 @@ List of removals:
 
 For the record we are keeping a list of files that we found that have other "further restrictions" imposed which we removed:
 
-About.tpl
+About.tpl (in past versions)
 
 	{* REMOVING OR CHANGING THIS LOGO IS IN STRICT VIOLATION OF THE LICENSE AGREEMENT *}
 	<a href="http://{$ORGANIZATION_URL}"><img src="{$BASE_URL}/send_file.php?object_type=copyright" 	alt="Time and Attendance"></a>
@@ -184,7 +185,7 @@ send_file.php
 		//
 		if ( getTTProductEdition() > 10 ) { $file_name = Environment::getImagesPath().'/powered_by.jpg';Debug::Text('File Name: '. $file_name, __FILE__, __LINE__, __METHOD__,10);if ( $file_name != '' AND file_exists($file_name) ) { $params['file'] = $file_name;$params['contentdisposition'] = 'attachment; filename=pro_copyright.jpg';$params['data'] = file_get_contents($file_name);$params['cache'] = TRUE;}} else {$params['contentdisposition'] = 'attachment; filename=copyright.jpg';$params['data'] = base64_decode('/9j/4AAQSkZJRgABA (... loads more img data ...) 2K0aqSg7KStZeOmNPK//9k=');$params['cache'] = TRUE;}
 
-All of Milonic's menu code.
+All of Milonic's menu code. (No longer in current versions)
 
 I initially contacted Milonic to see if we can get a free license for the Open Source Project or what they suggest we do with this but we ended up just replacing the whole code with JQuery as the Milonic menu is really not compatible with the AGPL.
 

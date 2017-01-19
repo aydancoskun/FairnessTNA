@@ -2,8 +2,8 @@
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright (C) 2003 - 2013 TimeTrex Software Inc.
- * because Fairness is a fork of "TimeTrex Workforce Management" Software.
+ * Portions of this software are Copyright of T i m e T r e x Software Inc.
+ * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
  *
  * Fairness is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
@@ -20,38 +20,31 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
   ********************************************************************************/
-/*
- * $Revision: 2217 $
- * $Id: CAPayrollDeductionTest.php 2217 2009-10-31 22:48:21Z ipso $
- * $Date: 2009-10-31 15:48:21 -0700 (Fri, 31 Oct 2009) $
+
+/**
+ * @group USPayrollDeductionTest2013
  */
-require_once('PHPUnit/Framework/TestCase.php');
-
 class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
+	public $company_id = NULL;
 
-    public $company_id = NULL;
-
-    public function __construct() {
-        global $db, $cache;
-
-		$this->tax_table_file = dirname(__FILE__).'/USPayrollDeductionTest2013.csv';
+	public function setUp() {
+		Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
 
 		require_once( Environment::getBasePath().'/classes/payroll_deduction/PayrollDeduction.class.php');
 
+		$this->tax_table_file = dirname(__FILE__).'/USPayrollDeductionTest2013.csv';
+
 		$this->company_id = PRIMARY_COMPANY_ID;
 
-		TTDate::setTimeZone('PST');
-    }
+		TTDate::setTimeZone('Etc/GMT+8'); //Force to non-DST timezone. 'PST' isnt actually valid.
 
-    public function setUp() {
-        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+		return TRUE;
+	}
 
-    public function tearDown() {
-        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__,10);
-        return TRUE;
-    }
+	public function tearDown() {
+		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
+		return TRUE;
+	}
 
 	public function mf($amount) {
 		return Misc::MoneyFormat($amount, FALSE);
@@ -79,12 +72,12 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 
 		$test_rows = Misc::parseCSV( $this->tax_table_file, TRUE );
 
-		$total_rows = count($test_rows)+1;
+		$total_rows = (count($test_rows) + 1);
 		$i = 2;
 		foreach( $test_rows as $row ) {
 			//Debug::text('Province: '. $row['province'] .' Income: '. $row['gross_income'], __FILE__, __LINE__, __METHOD__,10);
 			if ( $row['gross_income'] == '' AND isset($row['low_income']) AND $row['low_income'] != '' AND isset($row['high_income']) AND $row['high_income'] != '' ) {
-				$row['gross_income'] = $row['low_income'] + ( ($row['high_income'] - $row['low_income']) / 2 );
+				$row['gross_income'] = ($row['low_income'] + ( ($row['high_income'] - $row['low_income']) / 2 ));
 			}
 			if ( $row['country'] != '' AND $row['gross_income'] != '' ) {
 				//echo $i.'/'.$total_rows.'. Testing Province: '. $row['province'] .' Income: '. $row['gross_income'] ."\n";
@@ -102,13 +95,13 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 				//Some states use other values for allowance/deductions.
 				switch ($row['province']) {
 					case 'GA':
-						Debug::text('Setting UserValue3: '. $row['allowance'], __FILE__, __LINE__, __METHOD__,10);
+						Debug::text('Setting UserValue3: '. $row['allowance'], __FILE__, __LINE__, __METHOD__, 10);
 						$pd_obj->setUserValue3( $row['allowance'] );
 						break;
 					case 'IN':
 					case 'IL':
 					case 'VA':
-						Debug::text('Setting UserValue1: '. $row['allowance'], __FILE__, __LINE__, __METHOD__,10);
+						Debug::text('Setting UserValue1: '. $row['allowance'], __FILE__, __LINE__, __METHOD__, 10);
 						$pd_obj->setUserValue1( $row['allowance'] );
 						break;
 				}
@@ -133,7 +126,7 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 		}
 
 		//Make sure all rows are tested.
-		$this->assertEquals( $total_rows, $i-1);
+		$this->assertEquals( $total_rows, ($i - 1));
 	}
 
 /*
@@ -168,9 +161,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 	// US Social Security
 	//
 	function testUS_2013a_SocialSecurity() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -190,9 +183,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2013a_SocialSecurity_Max() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -212,9 +205,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2013a_Medicare() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -233,9 +226,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( $this->mf( $pd_obj->getEmployerMedicare() ), '14.50' );
 	}
 	function testUS_2013a_Additional_MedicareA() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -256,9 +249,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( $this->mf( $pd_obj->getEmployerMedicare() ), '14.50' );
 	}
 	function testUS_2013a_Additional_MedicareB() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -280,9 +273,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2013a_Additional_MedicareC() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -303,9 +296,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( $this->mf( $pd_obj->getEmployerMedicare() ), '14.50' );
 	}
 	function testUS_2013a_Additional_MedicareD() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -327,9 +320,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2013a_FederalUI_NoState() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -351,9 +344,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2013a_FederalUI_NoState_Max() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 
@@ -379,9 +372,9 @@ class USPayrollDeductionTest2013 extends PHPUnit_Framework_TestCase {
 	}
 
 	function testUS_2013a_FederalUI_State_Max() {
-		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__,10);
+		Debug::text('US - SemiMonthly - Beginning of 2013 01-Jan-2013: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','MO');
+		$pd_obj = new PayrollDeduction('US', 'MO');
 		$pd_obj->setDate(strtotime('01-Jan-2013'));
 		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
 

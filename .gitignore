@@ -1,11 +1,10 @@
 fairness.ini.php
 DS_Store
-templates_c
+templates_c/*
+cache/*
+logs/*
+storage/*
 .buildpath
 .project
 .settings
-interface/company/CompanyList.php
-templates/company/CompanyList.tpl
-interface/quick_punch
-templates/quick_punch
 .idea/
