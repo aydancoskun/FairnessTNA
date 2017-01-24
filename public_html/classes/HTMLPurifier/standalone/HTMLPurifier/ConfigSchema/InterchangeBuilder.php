@@ -174,12 +174,14 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
     }
 
     /**
-     * Evaluates an array PHP code string without array() wrapper
-     * @param string $contents
+     * Convenience function that creates an HTMLPurifier_ConfigSchema_Interchange_Id
+     * object based on a string Id.
+     * @param string $id
+     * @return HTMLPurifier_ConfigSchema_Interchange_Id
      */
-    protected function evalArray($contents)
+    protected function id($id)
     {
-        return eval('return array(' . $contents . ');');
+        return HTMLPurifier_ConfigSchema_Interchange_Id::make($id);
     }
 
     /**
@@ -197,14 +199,12 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
     }
 
     /**
-     * Convenience function that creates an HTMLPurifier_ConfigSchema_Interchange_Id
-     * object based on a string Id.
-     * @param string $id
-     * @return HTMLPurifier_ConfigSchema_Interchange_Id
+     * Evaluates an array PHP code string without array() wrapper
+     * @param string $contents
      */
-    protected function id($id)
+    protected function evalArray($contents)
     {
-        return HTMLPurifier_ConfigSchema_Interchange_Id::make($id);
+        return eval('return array(' . $contents . ');');
     }
 
     /**

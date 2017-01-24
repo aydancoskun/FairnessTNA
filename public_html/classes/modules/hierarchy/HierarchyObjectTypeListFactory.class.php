@@ -19,105 +19,109 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Hierarchy
  */
-class HierarchyObjectTypeListFactory extends HierarchyObjectTypeFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class HierarchyObjectTypeListFactory extends HierarchyObjectTypeFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByHierarchyControlId($id, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getByHierarchyControlId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	hierarchy_control_id = ?
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndObjectTypeId($id, $object_type_id, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getByCompanyIdAndObjectTypeId($id, $object_type_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $object_type_id == '' ) {
-			return FALSE;
-		}
+        if ($object_type_id == '') {
+            return false;
+        }
 
-		$strict_order = TRUE;
-		if ( $order == NULL ) {
-			//$order = array('b.last_name' => 'asc');
-			$strict_order = FALSE;
-		}
+        $strict_order = true;
+        if ($order == null) {
+            //$order = array('b.last_name' => 'asc');
+            $strict_order = false;
+        }
 
-		$cache_id = $id.$object_type_id;
+        $cache_id = $id . $object_type_id;
 
-		$hcf = new HierarchyControlFactory();
-		$hotf = new HierarchyObjectTypeFactory();
+        $hcf = new HierarchyControlFactory();
+        $hotf = new HierarchyObjectTypeFactory();
 
-		$this->rs = $this->getCache($cache_id);
-		if ( $this->rs === FALSE ) {
-			$ph = array(
-						'id' => (int)$id,
-						'object_type_id' => (int)$object_type_id,
-						);
+        $this->rs = $this->getCache($cache_id);
+        if ($this->rs === false) {
+            $ph = array(
+                'id' => (int)$id,
+                'object_type_id' => (int)$object_type_id,
+            );
 
-			$query = '
+            $query = '
 						select	*
-						from	'. $this->getTable() .' as a,
-								'. $hcf->getTable() .' as b,
-								'. $hotf->getTable() .' as c
+						from	' . $this->getTable() . ' as a,
+								' . $hcf->getTable() . ' as b,
+								' . $hotf->getTable() . ' as c
 
 						where	a.hierarchy_control_id = b.id
 							AND a.hierarchy_control_id = c.hierarchy_control_id
@@ -125,64 +129,63 @@ class HierarchyObjectTypeListFactory extends HierarchyObjectTypeFactory implemen
 							AND c.object_type_id = ?
 							AND b.deleted = 0
 					';
-			$query .= $this->getWhereSQL( $where );
-			$query .= $this->getSortSQL( $order, $strict_order );
+            $query .= $this->getWhereSQL($where);
+            $query .= $this->getSortSQL($order, $strict_order);
 
-			$this->ExecuteSQL( $query, $ph );
+            $this->ExecuteSQL($query, $ph);
 
-			$this->saveCache($this->rs, $cache_id);
-		}
+            $this->saveCache($this->rs, $cache_id);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($id, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getByCompanyIdArray($id)
+    {
+        $hotlf = new HierarchyObjectTypeListFactory();
+        $hotlf->getByCompanyId($id);
 
-		$strict_order = TRUE;
-		if ( $order == NULL ) {
-			//$order = array('b.last_name' => 'asc');
-			$strict_order = FALSE;
-		}
+        $object_types = array();
+        foreach ($hotlf as $object_type) {
+            $object_types[] = $object_type->getObjectType();
+        }
 
-		$hcf = new HierarchyControlFactory();
+        return $object_types;
+    }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+    public function getByCompanyId($id, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
+
+        $strict_order = true;
+        if ($order == null) {
+            //$order = array('b.last_name' => 'asc');
+            $strict_order = false;
+        }
+
+        $hcf = new HierarchyControlFactory();
+
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .' as a,
-							'. $hcf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $hcf->getTable() . ' as b
 
 					where	a.hierarchy_control_id = b.id
 						AND b.company_id = ?
 						AND b.deleted = 0
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict_order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict_order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
-
-
-	function getByCompanyIdArray($id) {
-
-		$hotlf = new HierarchyObjectTypeListFactory();
-		$hotlf->getByCompanyId( $id ) ;
-
-		$object_types = array();
-		foreach ($hotlf as $object_type) {
-			$object_types[] = $object_type->getObjectType();
-		}
-
-		return $object_types;
-	}
+        return $this;
+    }
 }
-?>

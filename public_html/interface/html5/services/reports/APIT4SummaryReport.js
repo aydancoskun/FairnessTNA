@@ -1,68 +1,67 @@
-var APIT4SummaryReport = ServiceCaller.extend( {
+var APIT4SummaryReport = ServiceCaller.extend({
 
-	key_name: 'T4SummaryReport',
-	className: 'APIT4SummaryReport',
+    key_name: 'T4SummaryReport',
+    className: 'APIT4SummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonT4SummaryReportData: function() {
+    getCommonT4SummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonT4SummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonT4SummaryReportData', arguments);
 
-	},
+    },
 
-	getT4SummaryReport: function() {
+    getT4SummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getT4SummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getT4SummaryReport', arguments);
 
-	},
+    },
 
-	setT4SummaryReport: function() {
+    setT4SummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setT4SummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setT4SummaryReport', arguments);
 
-	},
+    },
 
-	getT4SummaryReportDefaultData: function() {
+    getT4SummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getT4SummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getT4SummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteT4SummaryReport: function() {
+    deleteT4SummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteT4SummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteT4SummaryReport', arguments);
 
-	},
+    },
 
-	validateT4SummaryReport: function() {
+    validateT4SummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateT4SummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validateT4SummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	setCompanyFormConfig: function() {
+    setCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'setCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'setCompanyFormConfig', arguments);
 
-	},
+    },
 
-	getCompanyFormConfig: function() {
+    getCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyFormConfig', arguments);
 
-	}
+    }
 
 
-
-} );
+});

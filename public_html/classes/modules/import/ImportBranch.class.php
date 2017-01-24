@@ -19,66 +19,68 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
-
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Import
  */
-class ImportBranch extends Import {
+class ImportBranch extends Import
+{
+    public $class_name = 'APIBranch';
 
-	public $class_name = 'APIBranch';
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'columns':
+                $bf = TTNew('BranchFactory');
+                $retval = $bf->getOptions('columns');
+                break;
+            case 'import_options':
+                $retval = array(
+                    '-1010-fuzzy_match' => TTi18n::getText('Enable smart matching.'),
+                );
+                break;
+            case 'parse_hint':
+                $retval = array();
+                break;
+        }
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
-
-		$retval = NULL;
-		switch( $name ) {
-			case 'columns':
-				$bf = TTNew('BranchFactory');
-				$retval = $bf->getOptions('columns');
-				break;
-			case 'import_options':
-				$retval = array(
-								'-1010-fuzzy_match' => TTi18n::getText('Enable smart matching.'),
-								);
-				break;
-			case 'parse_hint':
-				$retval = array();
-				break;
-		}
-
-		return $retval;
-	}
+        return $retval;
+    }
 
 
-	function _preParseRow( $row_number, $raw_row ) {
-		$retval = $this->getObject()->stripReturnHandler( $this->getObject()->getBranchDefaultData() );
-		$retval['manual_id'] += $row_number; //Auto increment manual_id automatically.
+    public function _preParseRow($row_number, $raw_row)
+    {
+        $retval = $this->getObject()->stripReturnHandler($this->getObject()->getBranchDefaultData());
+        $retval['manual_id'] += $row_number; //Auto increment manual_id automatically.
 
-		return $retval;
-	}
+        return $retval;
+    }
 
-	function _import( $validate_only ) {
-		return $this->getObject()->setBranch( $this->getParsedData(), $validate_only );
-	}
+    public function _import($validate_only)
+    {
+        return $this->getObject()->setBranch($this->getParsedData(), $validate_only);
+    }
 
-	//
-	// Generic parser functions.
-	//
-	function parse_status( $input, $default_value = NULL, $parse_hint = NULL, $raw_row = NULL ) {
-		if ( strtolower( $input ) == 'e'
-				OR strtolower( $input ) == 'enabled' ) {
-			$retval = 10;
-		} elseif ( strtolower( $input ) == 'd'
-				OR strtolower( $input ) == 'disabled' ) {
-			$retval = 20;
-		} else {
-			$retval = (int)$input;
-		}
+    //
+    // Generic parser functions.
+    //
+    public function parse_status($input, $default_value = null, $parse_hint = null, $raw_row = null)
+    {
+        if (strtolower($input) == 'e'
+            or strtolower($input) == 'enabled'
+        ) {
+            $retval = 10;
+        } elseif (strtolower($input) == 'd'
+            or strtolower($input) == 'disabled'
+        ) {
+            $retval = 20;
+        } else {
+            $retval = (int)$input;
+        }
 
-		return $retval;
-	}
-
+        return $retval;
+    }
 }
-?>

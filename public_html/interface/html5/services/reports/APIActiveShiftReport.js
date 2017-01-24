@@ -1,56 +1,55 @@
-var APIActiveShiftReport = ServiceCaller.extend( {
+var APIActiveShiftReport = ServiceCaller.extend({
 
-	key_name: 'ActiveShiftReport',
-	className: 'APIActiveShiftReport',
+    key_name: 'ActiveShiftReport',
+    className: 'APIActiveShiftReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonActiveShiftReportData: function() {
+    getCommonActiveShiftReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonActiveShiftReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonActiveShiftReportData', arguments);
 
-	},
+    },
 
-	getActiveShiftReport: function() {
+    getActiveShiftReport: function () {
 
-		return this.argumentsHandler( this.className, 'getActiveShiftReport', arguments );
+        return this.argumentsHandler(this.className, 'getActiveShiftReport', arguments);
 
-	},
+    },
 
-	setActiveShiftReport: function() {
+    setActiveShiftReport: function () {
 
-		return this.argumentsHandler( this.className, 'setActiveShiftReport', arguments );
+        return this.argumentsHandler(this.className, 'setActiveShiftReport', arguments);
 
-	},
+    },
 
-	getActiveShiftReportDefaultData: function() {
+    getActiveShiftReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getActiveShiftReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getActiveShiftReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteActiveShiftReport: function() {
+    deleteActiveShiftReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteActiveShiftReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteActiveShiftReport', arguments);
 
-	},
+    },
 
-	validateActiveShiftReport: function() {
+    validateActiveShiftReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateActiveShiftReport', arguments );
+        return this.argumentsHandler(this.className, 'validateActiveShiftReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

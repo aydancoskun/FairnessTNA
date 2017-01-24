@@ -1,58 +1,55 @@
-var APIRequest = ServiceCaller.extend( {
+var APIRequest = ServiceCaller.extend({
 
-	key_name: 'Request',
-	className: 'APIRequest',
+    key_name: 'Request',
+    className: 'APIRequest',
 
-	getRequestDefaultData: function() {
+    getRequestDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getRequestDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getRequestDefaultData', arguments);
 
-	},
+    },
 
-	getHierarchyLevelOptions: function() {
+    getHierarchyLevelOptions: function () {
 
-		return this.argumentsHandler( this.className, 'getHierarchyLevelOptions', arguments );
+        return this.argumentsHandler(this.className, 'getHierarchyLevelOptions', arguments);
 
-	},
+    },
 
-	getRequest: function() {
+    getRequest: function () {
 
-		return this.argumentsHandler( this.className, 'getRequest', arguments );
+        return this.argumentsHandler(this.className, 'getRequest', arguments);
 
-	},
+    },
 
-	getCommonRequestData: function() {
+    getCommonRequestData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonRequestData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonRequestData', arguments);
 
-	},
+    },
 
-	validateRequest: function() {
+    validateRequest: function () {
 
-		return this.argumentsHandler( this.className, 'validateRequest', arguments );
+        return this.argumentsHandler(this.className, 'validateRequest', arguments);
 
-	},
+    },
 
-	setRequest: function() {
+    setRequest: function () {
 
-		return this.argumentsHandler( this.className, 'setRequest', arguments );
+        return this.argumentsHandler(this.className, 'setRequest', arguments);
 
-	},
+    },
 
-	deleteRequest: function() {
-		return this.argumentsHandler( this.className, 'deleteRequest', arguments );
-	},
+    deleteRequest: function () {
+        return this.argumentsHandler(this.className, 'deleteRequest', arguments);
+    },
 
-	copyRequest: function() {
-		return this.argumentsHandler( this.className, 'copyRequest', arguments );
-	},
+    copyRequest: function () {
+        return this.argumentsHandler(this.className, 'copyRequest', arguments);
+    },
 
-	exportRequest: function() {
-		return this.argumentsHandler( this.className, 'exportRequest', arguments );
-	}
-
-
+    exportRequest: function () {
+        return this.argumentsHandler(this.className, 'exportRequest', arguments);
+    }
 
 
-
-} );
+});

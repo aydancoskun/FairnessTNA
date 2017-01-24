@@ -1,68 +1,67 @@
-var APIKPIReport = ServiceCaller.extend( {
+var APIKPIReport = ServiceCaller.extend({
 
-	key_name: 'KPIReport',
-	className: 'APIKPIReport',
+    key_name: 'KPIReport',
+    className: 'APIKPIReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonKPIReportData: function() {
+    getCommonKPIReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonKPIReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonKPIReportData', arguments);
 
-	},
+    },
 
-	getKPIReport: function() {
+    getKPIReport: function () {
 
-		return this.argumentsHandler( this.className, 'getKPIReport', arguments );
+        return this.argumentsHandler(this.className, 'getKPIReport', arguments);
 
-	},
+    },
 
-	setKPIReport: function() {
+    setKPIReport: function () {
 
-		return this.argumentsHandler( this.className, 'setKPIReport', arguments );
+        return this.argumentsHandler(this.className, 'setKPIReport', arguments);
 
-	},
+    },
 
-	getKPIReportDefaultData: function() {
+    getKPIReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getKPIReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getKPIReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteKPIReport: function() {
+    deleteKPIReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteKPIReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteKPIReport', arguments);
 
-	},
+    },
 
-	validateKPIReport: function() {
+    validateKPIReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateKPIReport', arguments );
+        return this.argumentsHandler(this.className, 'validateKPIReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	setCompanyFormConfig: function() {
+    setCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'setCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'setCompanyFormConfig', arguments);
 
-	},
+    },
 
-	getCompanyFormConfig: function() {
+    getCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyFormConfig', arguments);
 
-	}
+    }
 
 
-
-} );
+});

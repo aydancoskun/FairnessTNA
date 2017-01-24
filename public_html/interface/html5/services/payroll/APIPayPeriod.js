@@ -1,52 +1,52 @@
-var APIPayPeriod = ServiceCaller.extend( {
+var APIPayPeriod = ServiceCaller.extend({
 
-	key_name: 'PayPeriod',
-	className: 'APIPayPeriod',
+    key_name: 'PayPeriod',
+    className: 'APIPayPeriod',
 
-	getPayPeriodDefaultData: function() {
+    getPayPeriodDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayPeriodDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayPeriodDefaultData', arguments);
 
-	},
+    },
 
-	getPayPeriod: function() {
+    getPayPeriod: function () {
 
-		return this.argumentsHandler( this.className, 'getPayPeriod', arguments );
+        return this.argumentsHandler(this.className, 'getPayPeriod', arguments);
 
-	},
-	getCommonPayPeriodData: function() {
+    },
+    getCommonPayPeriodData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayPeriodData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayPeriodData', arguments);
 
-	},
-	validatePayPeriod: function() {
+    },
+    validatePayPeriod: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayPeriod', arguments );
+        return this.argumentsHandler(this.className, 'validatePayPeriod', arguments);
 
-	},
-	setPayPeriod: function() {
+    },
+    setPayPeriod: function () {
 
-		return this.argumentsHandler( this.className, 'setPayPeriod', arguments );
+        return this.argumentsHandler(this.className, 'setPayPeriod', arguments);
 
-	},
-	deletePayPeriod: function() {
+    },
+    deletePayPeriod: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayPeriod', arguments );
+        return this.argumentsHandler(this.className, 'deletePayPeriod', arguments);
 
-	},
-	exportPayPeriod: function() {
-		return this.argumentsHandler( this.className, 'exportPayPeriod', arguments );
-	},
-	importData: function() {
+    },
+    exportPayPeriod: function () {
+        return this.argumentsHandler(this.className, 'exportPayPeriod', arguments);
+    },
+    importData: function () {
 
-		return this.argumentsHandler( this.className, 'importData', arguments );
+        return this.argumentsHandler(this.className, 'importData', arguments);
 
-	},
-	deleteData: function() {
+    },
+    deleteData: function () {
 
-		return this.argumentsHandler( this.className, 'deleteData', arguments );
+        return this.argumentsHandler(this.className, 'deleteData', arguments);
 
-	}
+    }
 
 
-} );
+});

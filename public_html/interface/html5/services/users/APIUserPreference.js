@@ -1,53 +1,53 @@
-var APIUserPreference = ServiceCaller.extend( {
+var APIUserPreference = ServiceCaller.extend({
 
 
-	key_name: 'UserPreference',
-	className: 'APIUserPreference',
+    key_name: 'UserPreference',
+    className: 'APIUserPreference',
 
-	getUserPreferenceDefaultData: function() {
-		return this.argumentsHandler( this.className, 'getUserPreferenceDefaultData', arguments );
+    getUserPreferenceDefaultData: function () {
+        return this.argumentsHandler(this.className, 'getUserPreferenceDefaultData', arguments);
 //		  this.call(this.get('className'),'getUserPreferenceDefaultData',onResult,onError,args,delegate);
 
-	},
+    },
 
-	getUserPreference: function() {
-		return this.argumentsHandler( this.className, 'getUserPreference', arguments );
+    getUserPreference: function () {
+        return this.argumentsHandler(this.className, 'getUserPreference', arguments);
 
-	},
+    },
 
-	getCommonUserPreferenceData: function() {
-		return this.argumentsHandler( this.className, 'getCommonUserPreferenceData', arguments );
+    getCommonUserPreferenceData: function () {
+        return this.argumentsHandler(this.className, 'getCommonUserPreferenceData', arguments);
 
-	},
+    },
 
-	validateUserPreference: function() {
-		return this.argumentsHandler( this.className, 'validateUserPreference', arguments );
+    validateUserPreference: function () {
+        return this.argumentsHandler(this.className, 'validateUserPreference', arguments);
 
-	},
+    },
 
-	setUserPreference: function() {
-		return this.argumentsHandler( this.className, 'setUserPreference', arguments );
+    setUserPreference: function () {
+        return this.argumentsHandler(this.className, 'setUserPreference', arguments);
 
-	},
+    },
 
-	deleteUserPreference: function() {
-		return this.argumentsHandler( this.className, 'deleteUserPreference', arguments );
+    deleteUserPreference: function () {
+        return this.argumentsHandler(this.className, 'deleteUserPreference', arguments);
 
-	},
+    },
 
-	copyUserPreference: function() {
-		return this.argumentsHandler( this.className, 'copyUserPreference', arguments );
+    copyUserPreference: function () {
+        return this.argumentsHandler(this.className, 'copyUserPreference', arguments);
 
-	},
+    },
 
-	getScheduleIcalendarURL: function() {
-		return this.argumentsHandler( this.className, 'getScheduleIcalendarURL', arguments );
+    getScheduleIcalendarURL: function () {
+        return this.argumentsHandler(this.className, 'getScheduleIcalendarURL', arguments);
 
-	},
+    },
 
-	exportUserPreference: function() {
-		return this.argumentsHandler( this.className, 'exportUserPreference', arguments );
+    exportUserPreference: function () {
+        return this.argumentsHandler(this.className, 'exportUserPreference', arguments);
 
-	},
+    },
 
-} );
+});

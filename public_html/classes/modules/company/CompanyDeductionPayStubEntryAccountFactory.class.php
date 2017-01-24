@@ -19,182 +19,216 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Company
  */
-class CompanyDeductionPayStubEntryAccountFactory extends Factory {
-	protected $table = 'company_deduction_pay_stub_entry_account';
-	protected $pk_sequence_name = 'company_deduction_pay_stub_entry_account_id_seq'; //PK Sequence name
+class CompanyDeductionPayStubEntryAccountFactory extends Factory
+{
+    protected $table = 'company_deduction_pay_stub_entry_account';
+    protected $pk_sequence_name = 'company_deduction_pay_stub_entry_account_id_seq'; //PK Sequence name
 
-	protected $pay_stub_entry_account_obj = NULL;
+    protected $pay_stub_entry_account_obj = null;
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'type':
+                $retval = array(
+                    10 => TTi18n::gettext('Include'),
+                    20 => TTi18n::gettext('Exclude'),
+                );
+                break;
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'type':
-				$retval = array(
-										10 => TTi18n::gettext('Include'),
-										20 => TTi18n::gettext('Exclude'),
-									);
-				break;
+        }
 
-		}
+        return $retval;
+    }
 
-		return $retval;
-	}
+    public function setCompanyDeduction($id)
+    {
+        $id = trim($id);
 
-	function getPayStubEntryAccountObject() {
-		if ( is_object($this->pay_stub_entry_account_obj) ) {
-			return $this->pay_stub_entry_account_obj;
-		} else {
-			$psealf = TTnew( 'PayStubEntryAccountListFactory' );
-			$psealf->getById( $this->getPayStubEntryAccount() );
-			if ( $psealf->getRecordCount() > 0 ) {
-				$this->pay_stub_entry_account_obj = $psealf->getCurrent();
-				return $this->pay_stub_entry_account_obj;
-			}
+        Debug::Text('ID: ' . $id, __FILE__, __LINE__, __METHOD__, 10);
+        $cdlf = TTnew('CompanyDeductionListFactory');
 
-			return FALSE;
-		}
-	}
+        if ($id != 0
+            or
+            $this->Validator->isResultSetWithRows('company_deduction',
+                $cdlf->getByID($id),
+                TTi18n::gettext('Tax / Deduction is invalid')
+            )
+        ) {
+            $this->data['company_deduction_id'] = $id;
 
-	function getCompanyDeduction() {
-		if ( isset($this->data['company_deduction_id']) ) {
-			return (int)$this->data['company_deduction_id'];
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setCompanyDeduction($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		Debug::Text('ID: '. $id, __FILE__, __LINE__, __METHOD__, 10);
-		$cdlf = TTnew( 'CompanyDeductionListFactory' );
+    public function setType($type)
+    {
+        $type = trim($type);
 
-		if (	$id != 0
-				OR
-				$this->Validator->isResultSetWithRows(	'company_deduction',
-														$cdlf->getByID($id),
-														TTi18n::gettext('Tax / Deduction is invalid')
-													) ) {
+        if ($this->Validator->inArrayKey('type',
+            $type,
+            TTi18n::gettext('Incorrect Type'),
+            $this->getOptions('type'))
+        ) {
+            $this->data['type_id'] = $type;
 
-			$this->data['company_deduction_id'] = $id;
+            return true;
+        }
 
-			return TRUE;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setPayStubEntryAccount($id)
+    {
+        $id = trim($id);
 
-	function getType() {
-		if ( isset($this->data['type_id']) ) {
-			return (int)$this->data['type_id'];
-		}
+        Debug::Text('ID: ' . $id, __FILE__, __LINE__, __METHOD__, 10);
+        $psealf = TTnew('PayStubEntryAccountListFactory');
 
-		return FALSE;
-	}
-	function setType($type) {
-		$type = trim($type);
+        if (
+        $this->Validator->isResultSetWithRows('pay_stub_entry_account',
+            $psealf->getByID($id),
+            TTi18n::gettext('Pay Stub Account is invalid')
+        )
+        ) {
+            $this->data['pay_stub_entry_account_id'] = $id;
 
-		if ( $this->Validator->inArrayKey(	'type',
-											$type,
-											TTi18n::gettext('Incorrect Type'),
-											$this->getOptions('type')) ) {
+            return true;
+        }
 
-			$this->data['type_id'] = $type;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function getDeleted()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
 
+    public function getCreatedDate()
+    {
+        return false;
+    }
 
-	function getPayStubEntryAccount() {
-		if ( isset($this->data['pay_stub_entry_account_id']) ) {
-			return (int)$this->data['pay_stub_entry_account_id'];
-		}
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
-	function setPayStubEntryAccount($id) {
-		$id = trim($id);
+    //This table doesn't have any of these columns, so overload the functions.
 
-		Debug::Text('ID: '. $id, __FILE__, __LINE__, __METHOD__, 10);
-		$psealf = TTnew( 'PayStubEntryAccountListFactory' );
+    public function getCreatedBy()
+    {
+        return false;
+    }
 
-		if (
-				$this->Validator->isResultSetWithRows(	'pay_stub_entry_account',
-														$psealf->getByID($id),
-														TTi18n::gettext('Pay Stub Account is invalid')
-													) ) {
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
 
-			$this->data['pay_stub_entry_account_id'] = $id;
+    public function getUpdatedDate()
+    {
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getUpdatedBy()
+    {
+        return false;
+    }
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getDeletedDate()
+    {
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
 
+    public function getDeletedBy()
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 
-	function addLog( $log_action ) {
-		$obj = $this->getPayStubEntryAccountObject();
-		if ( is_object($obj) ) {
-			$type = Option::getByKey($this->getType(), Misc::TrimSortPrefix( $this->getOptions('type') ) );
-			return TTLog::addEntry( $this->getCompanyDeduction(), $log_action, $type .' '. TTi18n::getText('Pay Stub Account').': '. $obj->getName(), NULL, $this->getTable() );
-		}
-	}
+    public function addLog($log_action)
+    {
+        $obj = $this->getPayStubEntryAccountObject();
+        if (is_object($obj)) {
+            $type = Option::getByKey($this->getType(), Misc::TrimSortPrefix($this->getOptions('type')));
+            return TTLog::addEntry($this->getCompanyDeduction(), $log_action, $type . ' ' . TTi18n::getText('Pay Stub Account') . ': ' . $obj->getName(), null, $this->getTable());
+        }
+    }
+
+    public function getPayStubEntryAccountObject()
+    {
+        if (is_object($this->pay_stub_entry_account_obj)) {
+            return $this->pay_stub_entry_account_obj;
+        } else {
+            $psealf = TTnew('PayStubEntryAccountListFactory');
+            $psealf->getById($this->getPayStubEntryAccount());
+            if ($psealf->getRecordCount() > 0) {
+                $this->pay_stub_entry_account_obj = $psealf->getCurrent();
+                return $this->pay_stub_entry_account_obj;
+            }
+
+            return false;
+        }
+    }
+
+    public function getPayStubEntryAccount()
+    {
+        if (isset($this->data['pay_stub_entry_account_id'])) {
+            return (int)$this->data['pay_stub_entry_account_id'];
+        }
+
+        return false;
+    }
+
+    public function getType()
+    {
+        if (isset($this->data['type_id'])) {
+            return (int)$this->data['type_id'];
+        }
+
+        return false;
+    }
+
+    public function getCompanyDeduction()
+    {
+        if (isset($this->data['company_deduction_id'])) {
+            return (int)$this->data['company_deduction_id'];
+        }
+
+        return false;
+    }
 }
-?>

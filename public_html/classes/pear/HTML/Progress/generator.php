@@ -52,7 +52,6 @@ require_once 'HTML/Progress/generator/pages.php';
  * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  */
-
 class HTML_Progress_Generator extends HTML_QuickForm_Controller
 {
     /**#@+
@@ -62,13 +61,13 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
      * @since      1.1
      * @access     private
      */
-    var $_buttonBack   = '<< Back';
-    var $_buttonNext   = 'Next >>';
-    var $_buttonCancel = 'Cancel';
-    var $_buttonReset  = 'Reset';
-    var $_buttonApply  = 'Preview';
-    var $_buttonSave   = 'Save';
-    var $_buttonAttr   = array('style'=>'width:80px;');
+    public $_buttonBack = '<< Back';
+    public $_buttonNext = 'Next >>';
+    public $_buttonCancel = 'Cancel';
+    public $_buttonReset = 'Reset';
+    public $_buttonApply = 'Preview';
+    public $_buttonSave = 'Save';
+    public $_buttonAttr = array('style' => 'width:80px;');
     /**#@-*/
 
     /**
@@ -78,7 +77,7 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
      * @since      1.1
      * @access     private
      */
-    var $_tabs;
+    public $_tabs;
 
     /**
      * The progress object renders into this generator.
@@ -87,7 +86,7 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
      * @since      1.2.0
      * @access     private
      */
-    var $_progress;
+    public $_progress;
 
 
     /**
@@ -113,46 +112,45 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
      *   $generator = new HTML_Progress_Generator($controllerName, $attributes);
      *   </code>
      *
-     * @param      string    $controllerName(optional) Name of generator wizard (QuickForm)
-     * @param      array     $attributes    (optional) List of renderer options
-     * @param      array     $errorPrefs    (optional) Hash of params to configure error handler
+     * @param      string $controllerName (optional) Name of generator wizard (QuickForm)
+     * @param      array $attributes (optional) List of renderer options
+     * @param      array $errorPrefs (optional) Hash of params to configure error handler
      *
      * @since      1.1
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      */
-    function HTML_Progress_Generator($controllerName = 'ProgressGenerator', $attributes = array(), $errorPrefs = array())
+    public function HTML_Progress_Generator($controllerName = 'ProgressGenerator', $attributes = array(), $errorPrefs = array())
     {
         $this->_progress = new HTML_Progress($errorPrefs);
 
         if (!is_string($controllerName)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$controllerName',
-                      'was' => gettype($controllerName),
-                      'expected' => 'string',
-                      'paramnum' => 1));
-
+                    'was' => gettype($controllerName),
+                    'expected' => 'string',
+                    'paramnum' => 1));
         } elseif (!is_array($attributes)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$attributes',
-                      'was' => gettype($attributes),
-                      'expected' => 'array',
-                      'paramnum' => 2));
+                    'was' => gettype($attributes),
+                    'expected' => 'array',
+                    'paramnum' => 2));
         }
         parent::HTML_QuickForm_Controller($controllerName);
 
         // Check if Action(s) are customized
-        $ActionPreview = isset($attributes['preview'])? $attributes['preview']: 'ActionPreview';
-        $ActionDisplay = isset($attributes['display'])? $attributes['display']: 'ActionDisplay';
-        $ActionProcess = isset($attributes['process'])? $attributes['process']: 'ActionProcess';
+        $ActionPreview = isset($attributes['preview']) ? $attributes['preview'] : 'ActionPreview';
+        $ActionDisplay = isset($attributes['display']) ? $attributes['display'] : 'ActionDisplay';
+        $ActionProcess = isset($attributes['process']) ? $attributes['process'] : 'ActionProcess';
 
         $this->_tabs = array(
             0 => array('page1', 'Property1', 'Progress'),
             1 => array('page2', 'Property2', 'Cell'),
             2 => array('page3', 'Property3', 'Border'),
             3 => array('page4', 'Property4', 'String'),
-            4 => array('page5', 'Preview',   'Preview'),
-            5 => array('page6', 'Save',      'Save')
+            4 => array('page5', 'Preview', 'Preview'),
+            5 => array('page6', 'Save', 'Save')
         );
 
         foreach ($this->_tabs as $tab) {
@@ -181,7 +179,7 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
         $preview->addAction('apply', new $ActionPreview());
         $this->addAction('display', new $ActionDisplay());
         $this->addAction('process', new $ActionProcess());
-        $this->addAction('cancel',  new $ActionProcess());
+        $this->addAction('cancel', new $ActionProcess());
 
         // set ProgressBar default values on first run
         $sess = $this->container();
@@ -190,40 +188,40 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
         if (count($sess['defaults']) == 0) {
             $this->setDefaults(array(
                 'progressclass' => 'progressBar',
-                'shape'         => HTML_PROGRESS_BAR_HORIZONTAL,
-                'way'           => 'natural',
-                'autosize'      => true,
-                'progresssize'  => array('bgcolor' => '#FFFFFF'),
-                'rAnimSpeed'    => 100,
+                'shape' => HTML_PROGRESS_BAR_HORIZONTAL,
+                'way' => 'natural',
+                'autosize' => true,
+                'progresssize' => array('bgcolor' => '#FFFFFF'),
+                'rAnimSpeed' => 100,
 
                 'borderpainted' => false,
-                'borderclass'   => 'progressBarBorder',
-                'borderstyle'   => array('style' => 'solid', 'width' => 0, 'color' => '#000000'),
+                'borderclass' => 'progressBarBorder',
+                'borderstyle' => array('style' => 'solid', 'width' => 0, 'color' => '#000000'),
 
-                'cellid'        => 'progressCell%01s',
-                'cellclass'     => 'cell',
-                'cellvalue'     => array('min' => 0, 'max' => 100, 'inc' => 1),
-                'cellsize'      => array('width' => 15, 'height' => 20, 'spacing' => 2, 'count' => 10),
-                'cellcolor'     => array('active' => '#006600', 'inactive' => '#CCCCCC'),
-                'cellfont'      => array('family' => 'Courier, Verdana', 'size' => 8, 'color' => '#000000'),
+                'cellid' => 'progressCell%01s',
+                'cellclass' => 'cell',
+                'cellvalue' => array('min' => 0, 'max' => 100, 'inc' => 1),
+                'cellsize' => array('width' => 15, 'height' => 20, 'spacing' => 2, 'count' => 10),
+                'cellcolor' => array('active' => '#006600', 'inactive' => '#CCCCCC'),
+                'cellfont' => array('family' => 'Courier, Verdana', 'size' => 8, 'color' => '#000000'),
 
                 'stringpainted' => false,
-                'stringid'      => 'installationProgress',
-                'stringsize'    => array('width' => 50, 'height' => '', 'bgcolor' => '#FFFFFF'),
-                'stringvalign'  => 'right',
-                'stringalign'   => 'right',
-                'stringfont'    => array('family' => 'Verdana, Arial, Helvetica, sans-serif', 'size' => 12, 'color' => '#000000'),
-                'strings'       => implode(";\n", array(
-                                       0 => '10,Hello world',
-                                       1 => '20,Welcome',
-                                       2 => '30,to',
-                                       3 => '40,HTML_Progress v1',
-                                       4 => '60,by',
-                                       5 => '70,Laurent Laville',
-                                       6 => '100,Have a nice day !'
-                                    )),
+                'stringid' => 'installationProgress',
+                'stringsize' => array('width' => 50, 'height' => '', 'bgcolor' => '#FFFFFF'),
+                'stringvalign' => 'right',
+                'stringalign' => 'right',
+                'stringfont' => array('family' => 'Verdana, Arial, Helvetica, sans-serif', 'size' => 12, 'color' => '#000000'),
+                'strings' => implode(";\n", array(
+                    0 => '10,Hello world',
+                    1 => '20,Welcome',
+                    2 => '30,to',
+                    3 => '40,HTML_Progress v1',
+                    4 => '60,by',
+                    5 => '70,Laurent Laville',
+                    6 => '100,Have a nice day !'
+                )),
 
-                'phpcss'        => array('P'=>true)
+                'phpcss' => array('P' => true)
             ));
         }
     }
@@ -231,29 +229,28 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
     /**
      * Adds all necessary tabs to the given page object.
      *
-     * @param      object    $page          Page where to put the button
-     * @param      mixed     $attributes    (optional) Either a typical HTML attribute string
+     * @param      object $page Page where to put the button
+     * @param      mixed $attributes (optional) Either a typical HTML attribute string
      *                                      or an associative array.
      * @return     void
      * @since      1.1
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      */
-    function createTabs(&$page, $attributes = null)
+    public function createTabs(&$page, $attributes = null)
     {
         if (!is_a($page, 'HTML_QuickForm_Page')) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$page',
-                      'was' => gettype($page),
-                      'expected' => 'HTML_QuickForm_Page object',
-                      'paramnum' => 1));
-
+                    'was' => gettype($page),
+                    'expected' => 'HTML_QuickForm_Page object',
+                    'paramnum' => 1));
         } elseif (!is_array($attributes) && !is_string($attributes) && !is_null($attributes)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$attributes',
-                      'was' => gettype($attributes),
-                      'expected' => 'array | string',
-                      'paramnum' => 2));
+                    'was' => gettype($attributes),
+                    'expected' => 'array | string',
+                    'paramnum' => 2));
         }
 
         $here = $attributes = HTML_Common::_parseAttributes($attributes);
@@ -272,37 +269,35 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
     /**
      * Adds all necessary buttons to the given page object.
      *
-     * @param      object    $page          Page where to put the button
-     * @param      array     $buttons       Key/label of each button/event to handle
-     * @param      mixed     $attributes    (optional) Either a typical HTML attribute string
+     * @param      object $page Page where to put the button
+     * @param      array $buttons Key/label of each button/event to handle
+     * @param      mixed $attributes (optional) Either a typical HTML attribute string
      *                                      or an associative array.
      * @return     void
      * @since      1.1
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      */
-    function createButtons(&$page, $buttons, $attributes = null)
+    public function createButtons(&$page, $buttons, $attributes = null)
     {
         if (!is_a($page, 'HTML_QuickForm_Page')) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$page',
-                      'was' => gettype($page),
-                      'expected' => 'HTML_QuickForm_Page object',
-                      'paramnum' => 1));
-
+                    'was' => gettype($page),
+                    'expected' => 'HTML_QuickForm_Page object',
+                    'paramnum' => 1));
         } elseif (!is_array($buttons)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$buttons',
-                      'was' => gettype($buttons),
-                      'expected' => 'array',
-                      'paramnum' => 2));
-
+                    'was' => gettype($buttons),
+                    'expected' => 'array',
+                    'paramnum' => 2));
         } elseif (!is_array($attributes) && !is_string($attributes) && !is_null($attributes)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$attributes',
-                      'was' => gettype($attributes),
-                      'expected' => 'array | string',
-                      'paramnum' => 3));
+                    'was' => gettype($attributes),
+                    'expected' => 'array | string',
+                    'paramnum' => 3));
         }
 
         $confirm = $attributes = HTML_Common::_parseAttributes($attributes);
@@ -331,42 +326,41 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
      *
      * Buttons [ = events] : back, next, cancel, reset, apply, help
      *
-     * @param      object    $page          Page where you want to activate buttons
-     * @param      array     $events        (optional) List of buttons
+     * @param      object $page Page where you want to activate buttons
+     * @param      array $events (optional) List of buttons
      *
      * @since      1.1
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        disableButton()
      */
-    function enableButton(&$page, $events = array())
+    public function enableButton(&$page, $events = array())
     {
         if (!is_a($page, 'HTML_QuickForm_Page')) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$page',
-                      'was' => gettype($page),
-                      'expected' => 'HTML_QuickForm_Page object',
-                      'paramnum' => 1));
-
+                    'was' => gettype($page),
+                    'expected' => 'HTML_QuickForm_Page object',
+                    'paramnum' => 1));
         } elseif (!is_array($events)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$events',
-                      'was' => gettype($events),
-                      'expected' => 'array',
-                      'paramnum' => 2));
+                    'was' => gettype($events),
+                    'expected' => 'array',
+                    'paramnum' => 2));
         }
         static $all;
         if (!isset($all)) {
-            $all = array('back','next','cancel','reset','apply','help');
+            $all = array('back', 'next', 'cancel', 'reset', 'apply', 'help');
         }
         $buttons = (count($events) == 0) ? $all : $events;
 
         foreach ($buttons as $event) {
-            $group    = $page->getElement('buttons');
+            $group = $page->getElement('buttons');
             $elements = $group->getElements();
             foreach (array_keys($elements) as $key) {
                 if ($group->getElementName($key) == $page->getButtonName($event)) {
-                    $elements[$key]->updateAttributes(array('disabled'=>'false'));
+                    $elements[$key]->updateAttributes(array('disabled' => 'false'));
                 }
             }
         }
@@ -377,42 +371,41 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
      *
      * Buttons [ = events] : back, next, cancel, reset, apply, help
      *
-     * @param      object    $page          Page where you want to activate buttons
-     * @param      array     $events        (optional) List of buttons
+     * @param      object $page Page where you want to activate buttons
+     * @param      array $events (optional) List of buttons
      *
      * @since      1.1
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        enableButton()
      */
-    function disableButton(&$page, $events = array())
+    public function disableButton(&$page, $events = array())
     {
         if (!is_a($page, 'HTML_QuickForm_Page')) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$page',
-                      'was' => gettype($page),
-                      'expected' => 'HTML_QuickForm_Page object',
-                      'paramnum' => 1));
-
+                    'was' => gettype($page),
+                    'expected' => 'HTML_QuickForm_Page object',
+                    'paramnum' => 1));
         } elseif (!is_array($events)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$events',
-                      'was' => gettype($events),
-                      'expected' => 'array',
-                      'paramnum' => 2));
+                    'was' => gettype($events),
+                    'expected' => 'array',
+                    'paramnum' => 2));
         }
         static $all;
         if (!isset($all)) {
-            $all = array('back','next','cancel','reset','apply','help');
+            $all = array('back', 'next', 'cancel', 'reset', 'apply', 'help');
         }
         $buttons = (count($events) == 0) ? $all : $events;
 
         foreach ($buttons as $event) {
-            $group    = $page->getElement('buttons');
+            $group = $page->getElement('buttons');
             $elements = $group->getElements();
             foreach (array_keys($elements) as $key) {
                 if ($group->getElementName($key) == $page->getButtonName($event)) {
-                    $elements[$key]->updateAttributes(array('disabled'=>'true'));
+                    $elements[$key]->updateAttributes(array('disabled' => 'true'));
                 }
             }
         }
@@ -425,7 +418,7 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
      * @since      1.1
      * @access     public
      */
-    function createProgressBar()
+    public function createProgressBar()
     {
         $progress = $this->exportValues();
 
@@ -552,10 +545,8 @@ class HTML_Progress_Generator extends HTML_QuickForm_Controller
                 $structure['string']['color'] = $progress['stringfont']['color'];
             }
             $ui->setStringAttributes($structure['string']);
-
         } // end-if-no-model
 
         return $this->_progress;
     }
 }
-?>

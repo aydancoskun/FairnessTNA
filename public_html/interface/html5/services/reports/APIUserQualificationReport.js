@@ -1,68 +1,67 @@
-var APIUserQualificationReport = ServiceCaller.extend( {
+var APIUserQualificationReport = ServiceCaller.extend({
 
-	key_name: 'UserQualificationReport',
-	className: 'APIUserQualificationReport',
+    key_name: 'UserQualificationReport',
+    className: 'APIUserQualificationReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonUserQualificationReportData: function() {
+    getCommonUserQualificationReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserQualificationReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserQualificationReportData', arguments);
 
-	},
+    },
 
-	getUserQualificationReport: function() {
+    getUserQualificationReport: function () {
 
-		return this.argumentsHandler( this.className, 'getUserQualificationReport', arguments );
+        return this.argumentsHandler(this.className, 'getUserQualificationReport', arguments);
 
-	},
+    },
 
-	setUserQualificationReport: function() {
+    setUserQualificationReport: function () {
 
-		return this.argumentsHandler( this.className, 'setUserQualificationReport', arguments );
+        return this.argumentsHandler(this.className, 'setUserQualificationReport', arguments);
 
-	},
+    },
 
-	getUserQualificationReportDefaultData: function() {
+    getUserQualificationReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserQualificationReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserQualificationReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserQualificationReport: function() {
+    deleteUserQualificationReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserQualificationReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserQualificationReport', arguments);
 
-	},
+    },
 
-	validateUserQualificationReport: function() {
+    validateUserQualificationReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserQualificationReport', arguments );
+        return this.argumentsHandler(this.className, 'validateUserQualificationReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	setCompanyFormConfig: function() {
+    setCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'setCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'setCompanyFormConfig', arguments);
 
-	},
+    },
 
-	getCompanyFormConfig: function() {
+    getCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyFormConfig', arguments);
 
-	}
+    }
 
 
-
-} );
+});

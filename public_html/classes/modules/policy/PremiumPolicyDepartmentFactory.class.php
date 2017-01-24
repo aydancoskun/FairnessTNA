@@ -19,143 +19,177 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class PremiumPolicyDepartmentFactory extends Factory {
-	protected $table = 'premium_policy_department';
-	protected $pk_sequence_name = 'premium_policy_department_id_seq'; //PK Sequence name
+class PremiumPolicyDepartmentFactory extends Factory
+{
+    protected $table = 'premium_policy_department';
+    protected $pk_sequence_name = 'premium_policy_department_id_seq'; //PK Sequence name
 
-	protected $department_obj = NULL;
+    protected $department_obj = null;
 
-	function getDepartmentObject() {
-		if ( is_object($this->department_obj) ) {
-			return $this->department_obj;
-		} else {
-			$lf = TTnew( 'DepartmentListFactory' );
-			$lf->getById( $this->getDepartment() );
-			if ( $lf->getRecordCount() == 1 ) {
-				$this->department_obj = $lf->getCurrent();
-				return $this->department_obj;
-			}
+    public function setPremiumPolicy($id)
+    {
+        $id = trim($id);
 
-			return FALSE;
-		}
-	}
+        if ($id == 0
+            or
+            $this->Validator->isNumeric('premium_policy',
+                $id,
+                TTi18n::gettext('Selected Premium Policy is invalid')
+            /*
+                            $this->Validator->isResultSetWithRows(	'premium_policy',
+                                                                $pplf->getByID($id),
+                                                                TTi18n::gettext('Selected Premium Policy is invalid')
+            */
+            )
+        ) {
+            $this->data['premium_policy_id'] = $id;
 
-	function getPremiumPolicy() {
-		if ( isset($this->data['premium_policy_id']) ) {
-			return (int)$this->data['premium_policy_id'];
-		}
-	}
-	function setPremiumPolicy($id) {
-		$id = trim($id);
+            return true;
+        }
 
-		if (	$id == 0
-				OR
-				$this->Validator->isNumeric(	'premium_policy',
-													$id,
-													TTi18n::gettext('Selected Premium Policy is invalid')
-/*
-				$this->Validator->isResultSetWithRows(	'premium_policy',
-													$pplf->getByID($id),
-													TTi18n::gettext('Selected Premium Policy is invalid')
-*/
-															)
-			) {
+        return false;
+    }
 
-			$this->data['premium_policy_id'] = $id;
+    public function setDepartment($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $dlf = TTnew('DepartmentListFactory');
 
-		return FALSE;
-	}
+        if ($this->Validator->isResultSetWithRows('department',
+            $dlf->getByID($id),
+            TTi18n::gettext('Selected Department is invalid')
+        )
+        ) {
+            $this->data['department_id'] = $id;
 
-	function getDepartment() {
-		if ( isset($this->data['department_id']) ) {
-			return (int)$this->data['department_id'];
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setDepartment($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		$dlf = TTnew( 'DepartmentListFactory' );
+    public function postSave()
+    {
+        $this->removeCache('premium_policy-' . $this->getPremiumPolicy());
+        return true;
+    }
 
-		if ( $this->Validator->isResultSetWithRows(	'department',
-													$dlf->getByID($id),
-													TTi18n::gettext('Selected Department is invalid')
-													) ) {
-			$this->data['department_id'] = $id;
+    public function getPremiumPolicy()
+    {
+        if (isset($this->data['premium_policy_id'])) {
+            return (int)$this->data['premium_policy_id'];
+        }
+    }
 
-			return TRUE;
-		}
+    public function getDeleted()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
 
-	function postSave() {
-		$this->removeCache( 'premium_policy-'. $this->getPremiumPolicy() );
-		return TRUE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+    public function getCreatedDate()
+    {
+        return false;
+    }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getCreatedBy()
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
 
-	function addLog( $log_action ) {
-		$obj = $this->getDepartmentObject();
-		if ( is_object($obj) ) {
-			return TTLog::addEntry( $this->getPremiumPolicy(), $log_action, TTi18n::getText('Department').': '. $obj->getName(), NULL, $this->getTable() );
-		}
-	}
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
+
+    public function addLog($log_action)
+    {
+        $obj = $this->getDepartmentObject();
+        if (is_object($obj)) {
+            return TTLog::addEntry($this->getPremiumPolicy(), $log_action, TTi18n::getText('Department') . ': ' . $obj->getName(), null, $this->getTable());
+        }
+    }
+
+    public function getDepartmentObject()
+    {
+        if (is_object($this->department_obj)) {
+            return $this->department_obj;
+        } else {
+            $lf = TTnew('DepartmentListFactory');
+            $lf->getById($this->getDepartment());
+            if ($lf->getRecordCount() == 1) {
+                $this->department_obj = $lf->getCurrent();
+                return $this->department_obj;
+            }
+
+            return false;
+        }
+    }
+
+    public function getDepartment()
+    {
+        if (isset($this->data['department_id'])) {
+            return (int)$this->data['department_id'];
+        }
+
+        return false;
+    }
 }
-?>

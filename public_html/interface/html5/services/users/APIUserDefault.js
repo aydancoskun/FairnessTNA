@@ -1,43 +1,43 @@
-var APIUserDefault = ServiceCaller.extend( {
+var APIUserDefault = ServiceCaller.extend({
 
 
-	key_name: 'UserDefault',
-	className: 'APIUserDefault',
+    key_name: 'UserDefault',
+    className: 'APIUserDefault',
 
-	getUserDefaultDefaultData: function() {
-		return this.argumentsHandler( this.className, 'getUserDefaultDefaultData', arguments );
+    getUserDefaultDefaultData: function () {
+        return this.argumentsHandler(this.className, 'getUserDefaultDefaultData', arguments);
 
-	},
+    },
 
-	getUserDefault: function() {
-		return this.argumentsHandler( this.className, 'getUserDefault', arguments );
+    getUserDefault: function () {
+        return this.argumentsHandler(this.className, 'getUserDefault', arguments);
 
-	},
+    },
 
-	getCommonUserDefaultData: function() {
-		return this.argumentsHandler( this.className, 'getCommonUserDefaultData', arguments );
+    getCommonUserDefaultData: function () {
+        return this.argumentsHandler(this.className, 'getCommonUserDefaultData', arguments);
 
-	},
+    },
 
-	validateUserDefault: function() {
-		return this.argumentsHandler( this.className, 'validateUserDefault', arguments );
+    validateUserDefault: function () {
+        return this.argumentsHandler(this.className, 'validateUserDefault', arguments);
 
-	},
+    },
 
-	setUserDefault: function() {
-		return this.argumentsHandler( this.className, 'setUserDefault', arguments );
+    setUserDefault: function () {
+        return this.argumentsHandler(this.className, 'setUserDefault', arguments);
 
-	},
+    },
 
-	deleteUserDefault: function() {
-		return this.argumentsHandler( this.className, 'deleteUserDefault', arguments );
+    deleteUserDefault: function () {
+        return this.argumentsHandler(this.className, 'deleteUserDefault', arguments);
 
-	},
+    },
 
-	copyUserDefault: function() {
-		return this.argumentsHandler( this.className, 'copyUserDefault', arguments );
+    copyUserDefault: function () {
+        return this.argumentsHandler(this.className, 'copyUserDefault', arguments);
 
-	}
+    }
 
 
-} );
+});

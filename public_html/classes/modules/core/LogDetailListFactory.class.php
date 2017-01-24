@@ -19,147 +19,150 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class LogDetailListFactory extends LogDetailFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class LogDetailListFactory extends LogDetailFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndCompanyId($id, $company_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByIdAndCompanyId($id, $company_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $company_id == '') {
-			return FALSE;
-		}
+        if ($company_id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
-		$lf = new LogFactory();
+        $uf = new UserFactory();
+        $lf = new LogFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'id' => (int)$id,
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-						LEFT JOIN  '. $lf->getTable() .' as lf on a.system_log_id = lf.id
-						LEFT JOIN  '. $uf->getTable() .' as uf on lf.user_id = uf.id
+					from	' . $this->getTable() . ' as a
+						LEFT JOIN  ' . $lf->getTable() . ' as lf on a.system_log_id = lf.id
+						LEFT JOIN  ' . $uf->getTable() . ' as uf on lf.user_id = uf.id
 					where	a.id = ?
 						AND uf.company_id = ?';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
-		$lf = new LogFactory();
+        $uf = new UserFactory();
+        $lf = new LogFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-						LEFT JOIN  '. $lf->getTable() .' as lf on a.system_log_id = lf.id
-						LEFT JOIN  '. $uf->getTable() .' as uf on lf.user_id = uf.id
+					from	' . $this->getTable() . ' as a
+						LEFT JOIN  ' . $lf->getTable() . ' as lf on a.system_log_id = lf.id
+						LEFT JOIN  ' . $uf->getTable() . ' as uf on lf.user_id = uf.id
 					where	uf.company_id = ?
 						AND ( uf.deleted = 0 )';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getBySystemLogIdAndCompanyId($id, $company_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getBySystemLogIdAndCompanyId($id, $company_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $company_id == '') {
-			return FALSE;
-		}
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'a.field' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($order == null) {
+            $order = array('a.field' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-		$uf = new UserFactory();
-		$lf = new LogFactory();
+        $uf = new UserFactory();
+        $lf = new LogFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'id' => (int)$id,
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-						LEFT JOIN  '. $lf->getTable() .' as lf on a.system_log_id = lf.id
-						LEFT JOIN  '. $uf->getTable() .' as uf on lf.user_id = uf.id
+					from	' . $this->getTable() . ' as a
+						LEFT JOIN  ' . $lf->getTable() . ' as lf on a.system_log_id = lf.id
+						LEFT JOIN  ' . $uf->getTable() . ' as uf on lf.user_id = uf.id
 					where	a.system_log_id = ?
 						AND uf.company_id = ?';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
-
+        return $this;
+    }
 }
-?>

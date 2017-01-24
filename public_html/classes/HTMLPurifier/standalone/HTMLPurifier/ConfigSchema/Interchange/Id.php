@@ -20,6 +20,15 @@ class HTMLPurifier_ConfigSchema_Interchange_Id
     }
 
     /**
+     * @param string $id
+     * @return HTMLPurifier_ConfigSchema_Interchange_Id
+     */
+    public static function make($id)
+    {
+        return new HTMLPurifier_ConfigSchema_Interchange_Id($id);
+    }
+
+    /**
      * @return string
      * @warning This is NOT magic, to ensure that people don't abuse SPL and
      *          cause problems for PHP 5.0 support.
@@ -43,15 +52,6 @@ class HTMLPurifier_ConfigSchema_Interchange_Id
     public function getDirective()
     {
         return substr($this->key, strpos($this->key, ".") + 1);
-    }
-
-    /**
-     * @param string $id
-     * @return HTMLPurifier_ConfigSchema_Interchange_Id
-     */
-    public static function make($id)
-    {
-        return new HTMLPurifier_ConfigSchema_Interchange_Id($id);
     }
 }
 

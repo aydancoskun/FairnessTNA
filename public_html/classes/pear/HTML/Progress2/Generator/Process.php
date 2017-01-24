@@ -41,20 +41,19 @@
  * @version    Release: 2.0.0
  * @link       http://pear.php.net/package/HTML_Progress2
  */
-
 class ActionProcess extends HTML_QuickForm_Action
 {
     /**
      * Performs an action on a page of the controller (wizard)
      *
-     * @param      string    $page          current page displayed by the controller
-     * @param      string    $actionName    page action asked
+     * @param      string $page current page displayed by the controller
+     * @param      string $actionName page action asked
      *
      * @return     void
      * @since      2.0.0
      * @access     public
      */
-    function perform(&$page, $actionName)
+    public function perform(&$page, $actionName)
     {
         if ($actionName == 'cancel') {
             echo '<h1>Progress2 Generator Task was canceled</h1>';
@@ -88,30 +87,53 @@ class ActionProcess extends HTML_QuickForm_Action
     /**
      * Returns a formatted string of the progress meter stylesheet
      *
-     * @param      object    $pBar          progress meter object reference
-     * @param      boolean   $raw           (optional) decides whether to put html tags or not
+     * @param      object $pBar progress meter object reference
+     * @param      boolean $raw (optional) decides whether to put html tags or not
      *
      * @return     string
      * @since      2.0.0
      * @access     public
      */
-    function sprintCSS(&$pBar, $raw = false)
+    public function sprintCSS(&$pBar, $raw = false)
     {
         return $pBar->getStyle($raw);
     }
 
     /**
+     * Prints a string to standard output, with http headers if necessary
+     *
+     * @param      string $str string to print
+     * @param      string $mime (optional) mime description
+     * @param      boolean $raw (optional) charset to use
+     *
+     * @return     void
+     * @since      2.0.0
+     * @access     public
+     */
+    public function exportOutput($str, $mime = 'text/plain', $charset = 'iso-8859-1')
+    {
+        if (!headers_sent()) {
+            header("Expires: Tue, 1 Jan 1980 12:00:00 GMT");
+            header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+            header("Cache-Control: no-cache");
+            header("Pragma: no-cache");
+            header("Content-Type: $mime; charset=$charset");
+        }
+        print $str;
+    }
+
+    /**
      * Returns a formatted string of the progress meter php code
      *
-     * @param      object    $pBar          progress meter object reference
-     * @param      boolean   $cssCode       returns css source code
-     * @param      boolean   $raw           (optional) decides whether to put php tags or not
+     * @param      object $pBar progress meter object reference
+     * @param      boolean $cssCode returns css source code
+     * @param      boolean $raw (optional) decides whether to put php tags or not
      *
      * @return     string
      * @since      2.0.0
      * @access     public
      */
-    function sprintPHP(&$pBar, $cssCode, $raw = false)
+    public function sprintPHP(&$pBar, $cssCode, $raw = false)
     {
         $structure = $pBar->toArray();
 
@@ -165,11 +187,11 @@ class ActionProcess extends HTML_QuickForm_Action
         /* Page 4: Label attributes *****************************************************/
         foreach ($structure['label'] as $name => $data) {
             if ($data['type'] == HTML_PROGRESS2_LABEL_TEXT) {
-                $strPHP .= '$pb->addLabel(HTML_PROGRESS2_LABEL_TEXT, \''. $name .'\');';
+                $strPHP .= '$pb->addLabel(HTML_PROGRESS2_LABEL_TEXT, \'' . $name . '\');';
                 $strPHP .= PHP_EOL;
             }
             unset($data['type']);
-            $strPHP .= $this->_attributesArray('$pb->setLabelAttributes(\''.$name.'\', ', $data);
+            $strPHP .= $this->_attributesArray('$pb->setLabelAttributes(\'' . $name . '\', ', $data);
             $strPHP .= PHP_EOL;
         }
 
@@ -197,39 +219,16 @@ class ActionProcess extends HTML_QuickForm_Action
     }
 
     /**
-     * Prints a string to standard output, with http headers if necessary
-     *
-     * @param      string    $str           string to print
-     * @param      string    $mime          (optional) mime description
-     * @param      boolean   $raw           (optional) charset to use
-     *
-     * @return     void
-     * @since      2.0.0
-     * @access     public
-     */
-    function exportOutput($str, $mime = 'text/plain', $charset = 'iso-8859-1')
-    {
-        if (!headers_sent()) {
-            header("Expires: Tue, 1 Jan 1980 12:00:00 GMT");
-            header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-            header("Cache-Control: no-cache");
-            header("Pragma: no-cache");
-            header("Content-Type: $mime; charset=$charset");
-        }
-        print $str;
-    }
-
-    /**
      * Complete a php function arguments line with appropriate attributes
      *
-     * @param      string    $str           php function to complete
-     * @param      array     $attributes    function arguments list of values
+     * @param      string $str php function to complete
+     * @param      array $attributes function arguments list of values
      *
      * @return     string
      * @since      2.0.0
      * @access     private
      */
-    function _attributesArray($str, $attributes)
+    public function _attributesArray($str, $attributes)
     {
         $strPHP = $str . 'array(';
         foreach ($attributes as $attr => $val) {
@@ -246,4 +245,3 @@ class ActionProcess extends HTML_QuickForm_Action
         return $strPHP;
     }
 }
-?>

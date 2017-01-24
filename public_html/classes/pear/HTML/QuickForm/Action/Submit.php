@@ -22,36 +22,34 @@ require_once 'HTML/QuickForm/Action.php';
 
 /**
  * The action for a 'submit' button.
- * 
+ *
  * @author  Alexey Borzov <avb@php.net>
  * @package HTML_QuickForm_Controller
  * @version $Revision: 1.2 $
  */
 class HTML_QuickForm_Action_Submit extends HTML_QuickForm_Action
 {
-    function perform(&$page, $actionName)
+    public function perform(&$page, $actionName)
     {
         // save the form values and validation status to the session
         $page->isFormBuilt() or $page->buildForm();
-        $pageName =  $page->getAttribute('id');
-        $data     = $page->controller->container();
+        $pageName = $page->getAttribute('id');
+        $data = $page->controller->container();
         $data['values'][$pageName] = $page->exportValues();
-        $data['valid'][$pageName]  = $page->validate();
+        $data['valid'][$pageName] = $page->validate();
 
         // All pages are valid, process
         if ($page->controller->isValid()) {
             $page->handle('process');
 
-        // Current page is invalid, display it
+            // Current page is invalid, display it
         } elseif (!$data['valid'][$pageName]) {
             $page->handle('display');
 
-        // Some other page is invalid, redirect to it
+            // Some other page is invalid, redirect to it
         } else {
             $target = $page->controller->getPage($page->controller->findInvalid());
             $target->handle('jump');
         }
     }
 }
-
-?>

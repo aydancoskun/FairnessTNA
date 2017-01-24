@@ -1,62 +1,61 @@
-var APIUserReportData = ServiceCaller.extend( {
+var APIUserReportData = ServiceCaller.extend({
 
-	key_name: 'UserReportData',
-	className: 'APIUserReportData',
+    key_name: 'UserReportData',
+    className: 'APIUserReportData',
 
-	shareUserReportData: function() {
+    shareUserReportData: function () {
 
-		return this.argumentsHandler( this.className, 'shareUserReportData', arguments );
+        return this.argumentsHandler(this.className, 'shareUserReportData', arguments);
 
-	},
+    },
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonUserReportDataData: function() {
+    getCommonUserReportDataData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserReportDataData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserReportDataData', arguments);
 
-	},
+    },
 
-	getUserReportData: function() {
+    getUserReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserReportData', arguments );
+        return this.argumentsHandler(this.className, 'getUserReportData', arguments);
 
-	},
+    },
 
-	setUserReportData: function() {
+    setUserReportData: function () {
 
-		return this.argumentsHandler( this.className, 'setUserReportData', arguments );
+        return this.argumentsHandler(this.className, 'setUserReportData', arguments);
 
-	},
+    },
 
-	getUserReportDataDefaultData: function() {
+    getUserReportDataDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserReportDataDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserReportDataDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserReportData: function() {
+    deleteUserReportData: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserReportData', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserReportData', arguments);
 
-	},
+    },
 
-	validateUserReportData: function() {
+    validateUserReportData: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserReportData', arguments );
+        return this.argumentsHandler(this.className, 'validateUserReportData', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

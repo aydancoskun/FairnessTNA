@@ -97,6 +97,131 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
     }
 
     /**
+     * Renders a row describing the allowed children of an element
+     * @param HTMLPurifier_ChildDef $def HTMLPurifier_ChildDef of pertinent element
+     * @return string
+     */
+    protected function renderChildren($def)
+    {
+        $context = new HTMLPurifier_Context();
+        $ret = '';
+        $ret .= $this->start('tr');
+        $elements = array();
+        $attr = array();
+        if (isset($def->elements)) {
+            if ($def->type == 'strictblockquote') {
+                $def->validateChildren(array(), $this->config, $context);
+            }
+            $elements = $def->elements;
+        }
+        if ($def->type == 'chameleon') {
+            $attr['rowspan'] = 2;
+        } elseif ($def->type == 'empty') {
+            $elements = array();
+        } elseif ($def->type == 'table') {
+            $elements = array_flip(
+                array(
+                    'col',
+                    'caption',
+                    'colgroup',
+                    'thead',
+                    'tfoot',
+                    'tbody',
+                    'tr'
+                )
+            );
+        }
+        $ret .= $this->element('th', 'Allowed children', $attr);
+
+        if ($def->type == 'chameleon') {
+            $ret .= $this->element(
+                'td',
+                '<em>Block</em>: ' .
+                $this->escape($this->listifyTagLookup($def->block->elements)),
+                null,
+                0
+            );
+            $ret .= $this->end('tr');
+            $ret .= $this->start('tr');
+            $ret .= $this->element(
+                'td',
+                '<em>Inline</em>: ' .
+                $this->escape($this->listifyTagLookup($def->inline->elements)),
+                null,
+                0
+            );
+        } elseif ($def->type == 'custom') {
+            $ret .= $this->element(
+                'td',
+                '<em>' . ucfirst($def->type) . '</em>: ' .
+                $def->dtd_regex
+            );
+        } else {
+            $ret .= $this->element(
+                'td',
+                '<em>' . ucfirst($def->type) . '</em>: ' .
+                $this->escape($this->listifyTagLookup($elements)),
+                null,
+                0
+            );
+        }
+        $ret .= $this->end('tr');
+        return $ret;
+    }
+
+    /**
+     * Listifies a tag lookup table.
+     * @param array $array Tag lookup array in form of array('tagname' => true)
+     * @return string
+     */
+    protected function listifyTagLookup($array)
+    {
+        ksort($array);
+        $list = array();
+        foreach ($array as $name => $discard) {
+            if ($name !== '#PCDATA' && !isset($this->def->info[$name])) {
+                continue;
+            }
+            $list[] = $name;
+        }
+        return $this->listify($list);
+    }
+
+    /**
+     * Listifies a hash of attributes to AttrDef classes
+     * @param array $array Array hash in form of array('attrname' => HTMLPurifier_AttrDef)
+     * @return string
+     */
+    protected function listifyAttr($array)
+    {
+        ksort($array);
+        $list = array();
+        foreach ($array as $name => $obj) {
+            if ($obj === false) {
+                continue;
+            }
+            $list[] = "$name&nbsp;=&nbsp;<i>" . $this->getClass($obj, 'AttrDef_') . '</i>';
+        }
+        return $this->listify($list);
+    }
+
+    /**
+     * Listifies a list of objects by retrieving class names and internal state
+     * @param array $array List of objects
+     * @return string
+     * @todo Also add information about internal state
+     */
+    protected function listifyObjectList($array)
+    {
+        ksort($array);
+        $list = array();
+        foreach ($array as $obj) {
+            $list[] = $this->getClass($obj, 'AttrTransform_');
+        }
+        return $this->listify($list);
+    }
+
+    /**
      * Renders the Content Sets table
      * @return string
      */
@@ -112,6 +237,21 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
             $ret .= $this->end('tr');
         }
         $ret .= $this->end('table');
+        return $ret;
+    }
+
+    /**
+     * Creates a heavy header row
+     * @param string $text
+     * @param int $num
+     * @return string
+     */
+    protected function heavyHeader($text, $num = 1)
+    {
+        $ret = '';
+        $ret .= $this->start('tr');
+        $ret .= $this->element('th', $text, array('colspan' => $num, 'class' => 'heavy'));
+        $ret .= $this->end('tr');
         return $ret;
     }
 
@@ -173,150 +313,6 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
             $ret .= $this->renderChildren($def->child);
         }
         $ret .= $this->end('table');
-        return $ret;
-    }
-
-    /**
-     * Renders a row describing the allowed children of an element
-     * @param HTMLPurifier_ChildDef $def HTMLPurifier_ChildDef of pertinent element
-     * @return string
-     */
-    protected function renderChildren($def)
-    {
-        $context = new HTMLPurifier_Context();
-        $ret = '';
-        $ret .= $this->start('tr');
-        $elements = array();
-        $attr = array();
-        if (isset($def->elements)) {
-            if ($def->type == 'strictblockquote') {
-                $def->validateChildren(array(), $this->config, $context);
-            }
-            $elements = $def->elements;
-        }
-        if ($def->type == 'chameleon') {
-            $attr['rowspan'] = 2;
-        } elseif ($def->type == 'empty') {
-            $elements = array();
-        } elseif ($def->type == 'table') {
-            $elements = array_flip(
-                array(
-                    'col',
-                    'caption',
-                    'colgroup',
-                    'thead',
-                    'tfoot',
-                    'tbody',
-                    'tr'
-                )
-            );
-        }
-        $ret .= $this->element('th', 'Allowed children', $attr);
-
-        if ($def->type == 'chameleon') {
-
-            $ret .= $this->element(
-                'td',
-                '<em>Block</em>: ' .
-                $this->escape($this->listifyTagLookup($def->block->elements)),
-                null,
-                0
-            );
-            $ret .= $this->end('tr');
-            $ret .= $this->start('tr');
-            $ret .= $this->element(
-                'td',
-                '<em>Inline</em>: ' .
-                $this->escape($this->listifyTagLookup($def->inline->elements)),
-                null,
-                0
-            );
-
-        } elseif ($def->type == 'custom') {
-
-            $ret .= $this->element(
-                'td',
-                '<em>' . ucfirst($def->type) . '</em>: ' .
-                $def->dtd_regex
-            );
-
-        } else {
-            $ret .= $this->element(
-                'td',
-                '<em>' . ucfirst($def->type) . '</em>: ' .
-                $this->escape($this->listifyTagLookup($elements)),
-                null,
-                0
-            );
-        }
-        $ret .= $this->end('tr');
-        return $ret;
-    }
-
-    /**
-     * Listifies a tag lookup table.
-     * @param array $array Tag lookup array in form of array('tagname' => true)
-     * @return string
-     */
-    protected function listifyTagLookup($array)
-    {
-        ksort($array);
-        $list = array();
-        foreach ($array as $name => $discard) {
-            if ($name !== '#PCDATA' && !isset($this->def->info[$name])) {
-                continue;
-            }
-            $list[] = $name;
-        }
-        return $this->listify($list);
-    }
-
-    /**
-     * Listifies a list of objects by retrieving class names and internal state
-     * @param array $array List of objects
-     * @return string
-     * @todo Also add information about internal state
-     */
-    protected function listifyObjectList($array)
-    {
-        ksort($array);
-        $list = array();
-        foreach ($array as $obj) {
-            $list[] = $this->getClass($obj, 'AttrTransform_');
-        }
-        return $this->listify($list);
-    }
-
-    /**
-     * Listifies a hash of attributes to AttrDef classes
-     * @param array $array Array hash in form of array('attrname' => HTMLPurifier_AttrDef)
-     * @return string
-     */
-    protected function listifyAttr($array)
-    {
-        ksort($array);
-        $list = array();
-        foreach ($array as $name => $obj) {
-            if ($obj === false) {
-                continue;
-            }
-            $list[] = "$name&nbsp;=&nbsp;<i>" . $this->getClass($obj, 'AttrDef_') . '</i>';
-        }
-        return $this->listify($list);
-    }
-
-    /**
-     * Creates a heavy header row
-     * @param string $text
-     * @param int $num
-     * @return string
-     */
-    protected function heavyHeader($text, $num = 1)
-    {
-        $ret = '';
-        $ret .= $this->start('tr');
-        $ret .= $this->element('th', $text, array('colspan' => $num, 'class' => 'heavy'));
-        $ret .= $this->end('tr');
         return $ret;
     }
 }

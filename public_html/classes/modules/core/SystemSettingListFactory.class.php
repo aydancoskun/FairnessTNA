@@ -19,98 +19,101 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class SystemSettingListFactory extends SystemSettingFactory implements IteratorAggregate {
+class SystemSettingListFactory extends SystemSettingFactory implements IteratorAggregate
+{
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+        $ph = array(
+            'id' => (int)$id,
+        );
+
+
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
-					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
-
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
-
-		return $this;
-	}
-
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
-
-		$ph = array(
-					'id' => (int)$id,
-					);
-
-
-		$query = '
-					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByName($name, $where = NULL, $order = NULL) {
-		if ( $name == '') {
-			return FALSE;
-		}
+    public function getByName($name, $where = null, $order = null)
+    {
+        if ($name == '') {
+            return false;
+        }
 
-		$ph = array(
-					'name' => $name,
-					);
+        $ph = array(
+            'name' => $name,
+        );
 
-		$this->rs = $this->getCache($name);
-		if ( $this->rs === FALSE ) {
-			$query = '
+        $this->rs = $this->getCache($name);
+        if ($this->rs === false) {
+            $query = '
 						select	*
-						from	'. $this->getTable() .'
+						from	' . $this->getTable() . '
 						where	name = ?
 						';
-			$query .= $this->getWhereSQL( $where );
-			$query .= $this->getSortSQL( $order );
+            $query .= $this->getWhereSQL($where);
+            $query .= $this->getSortSQL($order);
 
-			$this->ExecuteSQL( $query, $ph );
+            $this->ExecuteSQL($query, $ph);
 
-			$this->saveCache($this->rs, $name);
-		}
-		
-		return $this;
-	}
+            $this->saveCache($this->rs, $name);
+        }
 
-	function getAllArray() {
-		$id = 'all';
+        return $this;
+    }
 
-		$retarr = $this->getCache($id);
-		if ( $retarr === FALSE ) {
-			$sslf = new SystemSettingListFactory();
-			$sslf->getAll();
-			if ( $sslf->getRecordCount() > 0 ) {
-				foreach( $sslf as $ss_obj ) {
-					$retarr[$ss_obj->getName()] = $ss_obj->getValue();
-				}
+    public function getAllArray()
+    {
+        $id = 'all';
 
-				$this->saveCache($retarr, $id);
+        $retarr = $this->getCache($id);
+        if ($retarr === false) {
+            $sslf = new SystemSettingListFactory();
+            $sslf->getAll();
+            if ($sslf->getRecordCount() > 0) {
+                foreach ($sslf as $ss_obj) {
+                    $retarr[$ss_obj->getName()] = $ss_obj->getValue();
+                }
 
-				return $retarr;
-			} else {
-				return FALSE;
-			}
-		}
+                $this->saveCache($retarr, $id);
 
-		return $retarr;
-	}
+                return $retarr;
+            } else {
+                return false;
+            }
+        }
+
+        return $retarr;
+    }
+
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
+					select	*
+					from	' . $this->getTable() . '
+					';
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
+
+        $this->ExecuteSQL($query, null, $limit, $page);
+
+        return $this;
+    }
 }
-?>

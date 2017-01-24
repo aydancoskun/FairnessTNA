@@ -38,21 +38,21 @@ class Payment_Process_Type_CreditCard extends Payment_Process_Type
      *
      * @var string $_type
      */
-    var $_type = 'CreditCard';
+    public $_type = 'CreditCard';
 
     /**
      * Credit card type
      *
      * @var int $type one of PAYMENT_PROCESS_CC_* constant
      */
-    var $type;
+    public $type;
 
     /**
      * Credit card number
      *
      * @var string $cardNumber
      */
-    var $cardNumber;
+    public $cardNumber;
 
     /**
      * Card Verification Value
@@ -61,24 +61,24 @@ class Payment_Process_Type_CreditCard extends Payment_Process_Type
      *
      * @var int $cvv
      */
-    var $cvv;
+    public $cvv;
 
     /**
      * Card expiry date
      *
      * @var string $expDate expiry date in MM/YYYY format
      */
-    var $expDate;
+    public $expDate;
 
-    function __construct()
+    public function Payment_Process_Type_CreditCard()
+    {
+        $this->__construct();
+    }
+
+    public function __construct()
     {
         require_once 'Validate/Finance/CreditCard.php';
         parent::__construct();
-    }
-
-    function Payment_Process_Type_CreditCard()
-    {
-        $this->__construct();
     }
 
     /**
@@ -91,13 +91,44 @@ class Payment_Process_Type_CreditCard extends Payment_Process_Type
      * @see Payment_Process_Type_CreditCard::_getValidateTypeMap()
      * @see Validate_Finance_CreditCard
      */
-    function _validateCardNumber()
+    public function _validateCardNumber()
     {
         if (!Validate_Finance_CreditCard::number($this->cardNumber, $this->_mapType())) {
             return PEAR::raiseError('Invalid credit card number');
         }
 
         return true;
+    }
+
+    /**
+     * Maps a PAYMENT_PROCESS_CC_* constant with a with a value suitable
+     * to Validate_Finance_CreditCard package
+     *
+     * @return string|boolean card type name or FALSE on error
+     * @access private
+     */
+    public function _mapType()
+    {
+        switch ($this->type) {
+            case PAYMENT_PROCESS_CC_MASTERCARD:
+                return 'MasterCard';
+            case PAYMENT_PROCESS_CC_VISA:
+                return 'Visa';
+            case PAYMENT_PROCESS_CC_AMEX:
+                return 'Amex';
+            case PAYMENT_PROCESS_CC_DISCOVER:
+                return 'Discover';
+            case PAYMENT_PROCESS_CC_JCB:
+                return 'JCB';
+            case PAYMENT_PROCESS_CC_DINERS:
+                return 'Diners';
+            case PAYMENT_PROCESS_CC_ENROUTE:
+                return 'EnRoute';
+            case PAYMENT_PROCESS_CC_CARTEBLANCHE:
+                return 'CarteBlanche';
+            default:
+                return false;
+        }
     }
 
     /**
@@ -110,7 +141,7 @@ class Payment_Process_Type_CreditCard extends Payment_Process_Type
      * @see Payment_Process_Type_CreditCard::_getValidateTypeMap()
      * @see Validate_Finance_CreditCard
      */
-    function _validateType()
+    public function _validateType()
     {
         if (!($type = $this->_mapType())) {
             return PEAR::raiseError('Invalid type map provided in driver');
@@ -129,7 +160,7 @@ class Payment_Process_Type_CreditCard extends Payment_Process_Type
      * @return bool PEAR_Error is CVV was set and is not valid, TRUE otherwise
      * @access protected
      */
-    function _validateCvv()
+    public function _validateCvv()
     {
         if (strlen($this->cvv) == 0) {
             return true;
@@ -154,62 +185,31 @@ class Payment_Process_Type_CreditCard extends Payment_Process_Type
      * @author Joe Stump <joe@joestump.net>
      * @todo Fix YxK issues; an expyear of '99' will come up as valid.
      */
-    function _validateExpDate()
+    public function _validateExpDate()
     {
         list($month, $year) = explode('/', $this->expDate);
         if (!is_numeric($month) || !is_numeric($year)) {
             return PEAR::raiseError('Invalid expiration date provided');
         }
 
-        $monthOptions = array('min'     => 1,
-                              'max'     => 12,
-                              'decimal' => false);
+        $monthOptions = array('min' => 1,
+            'max' => 12,
+            'decimal' => false);
         $date = getdate();
 
-        $yearOptions  = array('min'     => $date['year'],
-                              'decimal' => false);
+        $yearOptions = array('min' => $date['year'],
+            'decimal' => false);
 
         if (Validate::number($month, $monthOptions) &&
-            Validate::number($year, $yearOptions)) {
+            Validate::number($year, $yearOptions)
+        ) {
             if (($month >= $date['mon'] && $year == $date['year']) ||
-                ($year > $date['year'])) {
+                ($year > $date['year'])
+            ) {
                 return true;
             }
         }
-    
+
         return PEAR::raiseError('Invalid expiration date provided');
     }
-
-    /**
-     * Maps a PAYMENT_PROCESS_CC_* constant with a with a value suitable
-     * to Validate_Finance_CreditCard package
-     *
-     * @return string|boolean card type name or FALSE on error
-     * @access private
-     */
-    function _mapType()
-    {
-        switch ($this->type) {
-            case PAYMENT_PROCESS_CC_MASTERCARD:
-                return 'MasterCard';
-            case PAYMENT_PROCESS_CC_VISA:
-                return 'Visa';
-            case PAYMENT_PROCESS_CC_AMEX:
-                return 'Amex';
-            case PAYMENT_PROCESS_CC_DISCOVER:
-                return 'Discover';
-            case PAYMENT_PROCESS_CC_JCB:
-                return 'JCB';
-            case PAYMENT_PROCESS_CC_DINERS:
-                return 'Diners';
-            case PAYMENT_PROCESS_CC_ENROUTE:
-                return 'EnRoute';
-            case PAYMENT_PROCESS_CC_CARTEBLANCHE:
-                return 'CarteBlanche';
-            default:
-                return false;
-        }
-    }
 }
-
-?>

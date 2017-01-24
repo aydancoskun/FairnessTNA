@@ -43,13 +43,12 @@ require_once 'HTML/Template/Sigma.php';
  * @version    Release: 2.0.0
  * @link       http://pear.php.net/package/HTML_Progress2
  */
-
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {
-    function _renderForm(&$page) 
+    public function _renderForm(&$page)
     {
         $pageName = $page->getAttribute('name');
-        $tabPreview = array_slice ($page->controller->_tabs, -2, 1);
+        $tabPreview = array_slice($page->controller->_tabs, -2, 1);
 
         // can use either HTML_Template_Sigma or HTML_Template_ITX
         $tpl = new HTML_Template_Sigma('.', 'cache/');
@@ -61,8 +60,8 @@ class ActionDisplay extends HTML_QuickForm_Action_Display
             $pb = $page->controller->createProgressBar();
 
             $tpl->setVariable(array(
-                'qf_style'  => $pb->getStyle(),
-                'qf_script' => $pb->getScript()
+                    'qf_style' => $pb->getStyle(),
+                    'qf_script' => $pb->getScript()
                 )
             );
 
@@ -72,7 +71,7 @@ class ActionDisplay extends HTML_QuickForm_Action_Display
 
         $renderer = new HTML_QuickForm_Renderer_ITDynamic($tpl);
         $renderer->setElementBlock(array(
-            'buttons'     => 'qf_buttons'
+            'buttons' => 'qf_buttons'
         ));
 
         $page->accept($renderer);
@@ -80,4 +79,3 @@ class ActionDisplay extends HTML_QuickForm_Action_Display
         $tpl->show();
     }
 }
-?>

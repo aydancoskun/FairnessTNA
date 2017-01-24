@@ -1,60 +1,59 @@
-var APIQualification = ServiceCaller.extend( {
+var APIQualification = ServiceCaller.extend({
 
-	key_name: 'Qualification',
-	className: 'APIQualification',
+    key_name: 'Qualification',
+    className: 'APIQualification',
 
-	getCommonQualificationData: function() {
+    getCommonQualificationData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonQualificationData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonQualificationData', arguments);
 
-	},
+    },
 
-	getQualification: function() {
+    getQualification: function () {
 
-		return this.argumentsHandler( this.className, 'getQualification', arguments );
+        return this.argumentsHandler(this.className, 'getQualification', arguments);
 
-	},
+    },
 
-	setQualification: function() {
+    setQualification: function () {
 
-		return this.argumentsHandler( this.className, 'setQualification', arguments );
+        return this.argumentsHandler(this.className, 'setQualification', arguments);
 
-	},
+    },
 
-	getQualificationDefaultData: function() {
+    getQualificationDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getQualificationDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getQualificationDefaultData', arguments);
 
-	},
+    },
 
-	deleteQualification: function() {
+    deleteQualification: function () {
 
-		return this.argumentsHandler( this.className, 'deleteQualification', arguments );
+        return this.argumentsHandler(this.className, 'deleteQualification', arguments);
 
-	},
+    },
 
-	validateQualification: function() {
+    validateQualification: function () {
 
-		return this.argumentsHandler( this.className, 'validateQualification', arguments );
+        return this.argumentsHandler(this.className, 'validateQualification', arguments);
 
-	},
+    },
 
-	copyQualification: function() {
+    copyQualification: function () {
 
-		return this.argumentsHandler( this.className, 'copyQualification', arguments );
+        return this.argumentsHandler(this.className, 'copyQualification', arguments);
 
-	},
+    },
 
-	exportQualification: function() {
-		return this.argumentsHandler( this.className, 'exportQualification', arguments );
-	},
+    exportQualification: function () {
+        return this.argumentsHandler(this.className, 'exportQualification', arguments);
+    },
 
-	generateInvoices: function() {
+    generateInvoices: function () {
 
-		return this.argumentsHandler( this.className, 'generateInvoices', arguments );
+        return this.argumentsHandler(this.className, 'generateInvoices', arguments);
 
-	}
+    }
 
 
-
-} );
+});

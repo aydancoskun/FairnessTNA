@@ -1,56 +1,55 @@
-var APITimesheetDetailReport = ServiceCaller.extend( {
+var APITimesheetDetailReport = ServiceCaller.extend({
 
-	key_name: 'TimesheetDetailReport',
-	className: 'APITimesheetDetailReport',
+    key_name: 'TimesheetDetailReport',
+    className: 'APITimesheetDetailReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonTimesheetDetailReportData: function() {
+    getCommonTimesheetDetailReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonTimesheetDetailReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonTimesheetDetailReportData', arguments);
 
-	},
+    },
 
-	getTimesheetDetailReport: function() {
+    getTimesheetDetailReport: function () {
 
-		return this.argumentsHandler( this.className, 'getTimesheetDetailReport', arguments );
+        return this.argumentsHandler(this.className, 'getTimesheetDetailReport', arguments);
 
-	},
+    },
 
-	setTimesheetDetailReport: function() {
+    setTimesheetDetailReport: function () {
 
-		return this.argumentsHandler( this.className, 'setTimesheetDetailReport', arguments );
+        return this.argumentsHandler(this.className, 'setTimesheetDetailReport', arguments);
 
-	},
+    },
 
-	getTimesheetDetailReportDefaultData: function() {
+    getTimesheetDetailReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getTimesheetDetailReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getTimesheetDetailReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteTimesheetDetailReport: function() {
+    deleteTimesheetDetailReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteTimesheetDetailReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteTimesheetDetailReport', arguments);
 
-	},
+    },
 
-	validateTimesheetDetailReport: function() {
+    validateTimesheetDetailReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateTimesheetDetailReport', arguments );
+        return this.argumentsHandler(this.className, 'validateTimesheetDetailReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

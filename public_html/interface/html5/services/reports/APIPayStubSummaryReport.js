@@ -1,56 +1,55 @@
-var APIPayStubSummaryReport = ServiceCaller.extend( {
+var APIPayStubSummaryReport = ServiceCaller.extend({
 
-	key_name: 'PayStubSummaryReport',
-	className: 'APIPayStubSummaryReport',
+    key_name: 'PayStubSummaryReport',
+    className: 'APIPayStubSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonPayStubSummaryReportData: function() {
+    getCommonPayStubSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayStubSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayStubSummaryReportData', arguments);
 
-	},
+    },
 
-	getPayStubSummaryReport: function() {
+    getPayStubSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubSummaryReport', arguments);
 
-	},
+    },
 
-	setPayStubSummaryReport: function() {
+    setPayStubSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setPayStubSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setPayStubSummaryReport', arguments);
 
-	},
+    },
 
-	getPayStubSummaryReportDefaultData: function() {
+    getPayStubSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deletePayStubSummaryReport: function() {
+    deletePayStubSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayStubSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deletePayStubSummaryReport', arguments);
 
-	},
+    },
 
-	validatePayStubSummaryReport: function() {
+    validatePayStubSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayStubSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validatePayStubSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

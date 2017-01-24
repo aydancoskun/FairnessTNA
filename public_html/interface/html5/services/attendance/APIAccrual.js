@@ -1,58 +1,58 @@
-var APIAccrual = ServiceCaller.extend( {
+var APIAccrual = ServiceCaller.extend({
 
-	key_name: 'Accrual',
-	className: 'APIAccrual',
+    key_name: 'Accrual',
+    className: 'APIAccrual',
 
-	getCommonAccrualData: function() {
+    getCommonAccrualData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonAccrualData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonAccrualData', arguments);
 
-	},
+    },
 
-	getAccrual: function() {
+    getAccrual: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrual', arguments );
+        return this.argumentsHandler(this.className, 'getAccrual', arguments);
 
-	},
+    },
 
-	setAccrual: function() {
+    setAccrual: function () {
 
-		return this.argumentsHandler( this.className, 'setAccrual', arguments );
+        return this.argumentsHandler(this.className, 'setAccrual', arguments);
 
-	},
+    },
 
-	getAccrualDefaultData: function() {
+    getAccrualDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualDefaultData', arguments);
 
-	},
+    },
 
-	deleteAccrual: function() {
+    deleteAccrual: function () {
 
-		return this.argumentsHandler( this.className, 'deleteAccrual', arguments );
+        return this.argumentsHandler(this.className, 'deleteAccrual', arguments);
 
-	},
+    },
 
-	validateAccrual: function() {
+    validateAccrual: function () {
 
-		return this.argumentsHandler( this.className, 'validateAccrual', arguments );
+        return this.argumentsHandler(this.className, 'validateAccrual', arguments);
 
-	},
+    },
 
-	copyAccrual: function() {
+    copyAccrual: function () {
 
-		return this.argumentsHandler( this.className, 'copyAccrual', arguments );
+        return this.argumentsHandler(this.className, 'copyAccrual', arguments);
 
-	},
+    },
 
-	generateInvoices: function() {
+    generateInvoices: function () {
 
-		return this.argumentsHandler( this.className, 'generateInvoices', arguments );
+        return this.argumentsHandler(this.className, 'generateInvoices', arguments);
 
-	},
+    },
 
-	exportAccrual: function(){
-		return this.argumentsHandler( this.className, 'exportAccrual', arguments );
-	}
+    exportAccrual: function () {
+        return this.argumentsHandler(this.className, 'exportAccrual', arguments);
+    }
 
-} );
+});

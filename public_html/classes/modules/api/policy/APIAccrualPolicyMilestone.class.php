@@ -19,287 +19,299 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Policy
  */
-class APIAccrualPolicyMilestone extends APIFactory {
-	protected $main_class = 'AccrualPolicyMilestoneFactory';
+class APIAccrualPolicyMilestone extends APIFactory
+{
+    protected $main_class = 'AccrualPolicyMilestoneFactory';
 
-	public function __construct() {
-		parent::__construct(); //Make sure parent constructor is always called.
+    public function __construct()
+    {
+        parent::__construct(); //Make sure parent constructor is always called.
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	/**
-	 * Get options for dropdown boxes.
-	 * @param string $name Name of options to return, ie: 'columns', 'type', 'status'
-	 * @param mixed $parent Parent name/ID of options to return if data is in hierarchical format. (ie: Province)
-	 * @return array
-	 */
-	function getOptions( $name = FALSE, $parent = NULL ) {
-		if ( $name == 'columns'
-				AND ( !$this->getPermissionObject()->Check('accrual_policy', 'enabled')
-					OR !( $this->getPermissionObject()->Check('accrual_policy', 'view') OR $this->getPermissionObject()->Check('accrual_policy', 'view_own') OR $this->getPermissionObject()->Check('accrual_policy', 'view_child') ) ) ) {
-			$name = 'list_columns';
-		}
+    /**
+     * Get options for dropdown boxes.
+     * @param string $name Name of options to return, ie: 'columns', 'type', 'status'
+     * @param mixed $parent Parent name/ID of options to return if data is in hierarchical format. (ie: Province)
+     * @return array
+     */
+    public function getOptions($name = false, $parent = null)
+    {
+        if ($name == 'columns'
+            and (!$this->getPermissionObject()->Check('accrual_policy', 'enabled')
+                or !($this->getPermissionObject()->Check('accrual_policy', 'view') or $this->getPermissionObject()->Check('accrual_policy', 'view_own') or $this->getPermissionObject()->Check('accrual_policy', 'view_child')))
+        ) {
+            $name = 'list_columns';
+        }
 
-		return parent::getOptions( $name, $parent );
-	}
+        return parent::getOptions($name, $parent);
+    }
 
-	/**
-	 * Get default accrual_policy data for creating new accrual_policyes.
-	 * @return array
-	 */
-	function getAccrualPolicyMilestoneDefaultData() {
+    /**
+     * Get default accrual_policy data for creating new accrual_policyes.
+     * @return array
+     */
+    public function getAccrualPolicyMilestoneDefaultData()
+    {
+        Debug::Text('Getting accrual_policy default data...', __FILE__, __LINE__, __METHOD__, 10);
 
-		Debug::Text('Getting accrual_policy default data...', __FILE__, __LINE__, __METHOD__, 10);
+        $data = array(
+            'length_of_service' => 0,
+            'accrual_rate' => 0,
+            'minimum_time' => 0,
+            'maximum_time' => 0,
+        );
 
-		$data = array(
-						'length_of_service' => 0,
-						'accrual_rate' => 0,
-						'minimum_time' => 0,
-						'maximum_time' => 0,
-					);
+        return $this->returnHandler($data);
+    }
 
-		return $this->returnHandler( $data );
-	}
+    /**
+     * Get only the fields that are common across all records in the search criteria. Used for Mass Editing of records.
+     * @param array $data filter data
+     * @return array
+     */
+    public function getCommonAccrualPolicyMilestoneData($data)
+    {
+        return Misc::arrayIntersectByRow($this->stripReturnHandler($this->getAccrualPolicyMilestone($data, true)));
+    }
 
-	/**
-	 * Get accrual_policy data for one or more accrual_policyes.
-	 * @param array $data filter data
-	 * @return array
-	 */
-	function getAccrualPolicyMilestone( $data = NULL, $disable_paging = FALSE ) {
-		if ( !$this->getPermissionObject()->Check('accrual_policy', 'enabled')
-				OR !( $this->getPermissionObject()->Check('accrual_policy', 'view') OR $this->getPermissionObject()->Check('accrual_policy', 'view_own') OR $this->getPermissionObject()->Check('accrual_policy', 'view_child')	 ) ) {
-			return $this->getPermissionObject()->PermissionDenied();
-		}
-		$data = $this->initializeFilterAndPager( $data, $disable_paging );
+    /**
+     * Get accrual_policy data for one or more accrual_policyes.
+     * @param array $data filter data
+     * @return array
+     */
+    public function getAccrualPolicyMilestone($data = null, $disable_paging = false)
+    {
+        if (!$this->getPermissionObject()->Check('accrual_policy', 'enabled')
+            or !($this->getPermissionObject()->Check('accrual_policy', 'view') or $this->getPermissionObject()->Check('accrual_policy', 'view_own') or $this->getPermissionObject()->Check('accrual_policy', 'view_child'))
+        ) {
+            return $this->getPermissionObject()->PermissionDenied();
+        }
+        $data = $this->initializeFilterAndPager($data, $disable_paging);
 
-		$data['filter_data']['permission_children_ids'] = $this->getPermissionObject()->getPermissionChildren( 'accrual_policy', 'view' );
+        $data['filter_data']['permission_children_ids'] = $this->getPermissionObject()->getPermissionChildren('accrual_policy', 'view');
 
-		$blf = TTnew( 'AccrualPolicyMilestoneListFactory' );
-		$blf->getAPISearchByCompanyIdAndArrayCriteria( $this->getCurrentCompanyObject()->getId(), $data['filter_data'], $data['filter_items_per_page'], $data['filter_page'], NULL, $data['filter_sort'] );
-		Debug::Text('Record Count: '. $blf->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
-		if ( $blf->getRecordCount() > 0 ) {
-			$this->setPagerObject( $blf );
+        $blf = TTnew('AccrualPolicyMilestoneListFactory');
+        $blf->getAPISearchByCompanyIdAndArrayCriteria($this->getCurrentCompanyObject()->getId(), $data['filter_data'], $data['filter_items_per_page'], $data['filter_page'], null, $data['filter_sort']);
+        Debug::Text('Record Count: ' . $blf->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
+        if ($blf->getRecordCount() > 0) {
+            $this->setPagerObject($blf);
 
-			$retarr = array();
-			foreach( $blf as $b_obj ) {
-				$retarr[] = $b_obj->getObjectAsArray( $data['filter_columns'] );
-			}
+            $retarr = array();
+            foreach ($blf as $b_obj) {
+                $retarr[] = $b_obj->getObjectAsArray($data['filter_columns']);
+            }
 
-			return $this->returnHandler( $retarr );
-		}
+            return $this->returnHandler($retarr);
+        }
 
-		return $this->returnHandler( TRUE ); //No records returned.
-	}
+        return $this->returnHandler(true); //No records returned.
+    }
 
-	/**
-	 * Get only the fields that are common across all records in the search criteria. Used for Mass Editing of records.
-	 * @param array $data filter data
-	 * @return array
-	 */
-	function getCommonAccrualPolicyMilestoneData( $data ) {
-		return Misc::arrayIntersectByRow( $this->stripReturnHandler( $this->getAccrualPolicyMilestone( $data, TRUE ) ) );
-	}
+    /**
+     * Validate accrual_policy data for one or more accrual_policyes.
+     * @param array $data accrual_policy data
+     * @return array
+     */
+    public function validateAccrualPolicyMilestone($data)
+    {
+        return $this->setAccrualPolicyMilestone($data, true);
+    }
 
-	/**
-	 * Validate accrual_policy data for one or more accrual_policyes.
-	 * @param array $data accrual_policy data
-	 * @return array
-	 */
-	function validateAccrualPolicyMilestone( $data ) {
-		return $this->setAccrualPolicyMilestone( $data, TRUE );
-	}
+    /**
+     * Set accrual_policy data for one or more accrual_policyes.
+     * @param array $data accrual_policy data
+     * @return array
+     */
+    public function setAccrualPolicyMilestone($data, $validate_only = false, $ignore_warning = true)
+    {
+        $validate_only = (bool)$validate_only;
+        $ignore_warning = (bool)$ignore_warning;
 
-	/**
-	 * Set accrual_policy data for one or more accrual_policyes.
-	 * @param array $data accrual_policy data
-	 * @return array
-	 */
-	function setAccrualPolicyMilestone( $data, $validate_only = FALSE, $ignore_warning = TRUE ) {
-		$validate_only = (bool)$validate_only;
-		$ignore_warning = (bool)$ignore_warning;
+        if (!is_array($data)) {
+            return $this->returnHandler(false);
+        }
 
-		if ( !is_array($data) ) {
-			return $this->returnHandler( FALSE );
-		}
+        if (!$this->getPermissionObject()->Check('accrual_policy', 'enabled')
+            or !($this->getPermissionObject()->Check('accrual_policy', 'edit') or $this->getPermissionObject()->Check('accrual_policy', 'edit_own') or $this->getPermissionObject()->Check('accrual_policy', 'edit_child') or $this->getPermissionObject()->Check('accrual_policy', 'add'))
+        ) {
+            return $this->getPermissionObject()->PermissionDenied();
+        }
 
-		if ( !$this->getPermissionObject()->Check('accrual_policy', 'enabled')
-				OR !( $this->getPermissionObject()->Check('accrual_policy', 'edit') OR $this->getPermissionObject()->Check('accrual_policy', 'edit_own') OR $this->getPermissionObject()->Check('accrual_policy', 'edit_child') OR $this->getPermissionObject()->Check('accrual_policy', 'add') ) ) {
-			return	$this->getPermissionObject()->PermissionDenied();
-		}
+        if ($validate_only == true) {
+            Debug::Text('Validating Only!', __FILE__, __LINE__, __METHOD__, 10);
+        }
 
-		if ( $validate_only == TRUE ) {
-			Debug::Text('Validating Only!', __FILE__, __LINE__, __METHOD__, 10);
-		}
+        extract($this->convertToMultipleRecords($data));
+        Debug::Text('Received data for: ' . $total_records . ' AccrualPolicyMilestones', __FILE__, __LINE__, __METHOD__, 10);
+        Debug::Arr($data, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		extract( $this->convertToMultipleRecords($data) );
-		Debug::Text('Received data for: '. $total_records .' AccrualPolicyMilestones', __FILE__, __LINE__, __METHOD__, 10);
-		Debug::Arr($data, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
+        $validator_stats = array('total_records' => $total_records, 'valid_records' => 0);
+        $validator = $save_result = false;
+        if (is_array($data) and $total_records > 0) {
+            foreach ($data as $key => $row) {
+                $primary_validator = new Validator();
+                $lf = TTnew('AccrualPolicyMilestoneListFactory');
+                $lf->StartTransaction();
+                if (isset($row['id']) and $row['id'] > 0) {
+                    //Modifying existing object.
+                    //Get accrual_policy object, so we can only modify just changed data for specific records if needed.
+                    $lf->getByIdAndCompanyId($row['id'], $this->getCurrentCompanyObject()->getId());
+                    if ($lf->getRecordCount() == 1) {
+                        //Object exists, check edit permissions
+                        if (
+                            $validate_only == true
+                            or
+                            (
+                                $this->getPermissionObject()->Check('accrual_policy', 'edit')
+                                or ($this->getPermissionObject()->Check('accrual_policy', 'edit_own') and $this->getPermissionObject()->isOwner($lf->getCurrent()->getCreatedBy(), $lf->getCurrent()->getID()) === true)
+                            )
+                        ) {
+                            Debug::Text('Row Exists, getting current data: ', $row['id'], __FILE__, __LINE__, __METHOD__, 10);
+                            $lf = $lf->getCurrent();
+                            $row = array_merge($lf->getObjectAsArray(), $row);
+                        } else {
+                            $primary_validator->isTrue('permission', false, TTi18n::gettext('Edit permission denied'));
+                        }
+                    } else {
+                        //Object doesn't exist.
+                        $primary_validator->isTrue('id', false, TTi18n::gettext('Edit permission denied, record does not exist'));
+                    }
+                } else {
+                    //Adding new object, check ADD permissions.
+                    $primary_validator->isTrue('permission', $this->getPermissionObject()->Check('accrual_policy', 'add'), TTi18n::gettext('Add permission denied'));
+                }
+                Debug::Arr($row, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$validator_stats = array('total_records' => $total_records, 'valid_records' => 0 );
-		$validator = $save_result = FALSE;
-		if ( is_array($data) AND $total_records > 0 ) {
-			foreach( $data as $key => $row ) {
-				$primary_validator = new Validator();
-				$lf = TTnew( 'AccrualPolicyMilestoneListFactory' );
-				$lf->StartTransaction();
-				if ( isset($row['id']) AND $row['id'] > 0 ) {
-					//Modifying existing object.
-					//Get accrual_policy object, so we can only modify just changed data for specific records if needed.
-					$lf->getByIdAndCompanyId( $row['id'], $this->getCurrentCompanyObject()->getId() );
-					if ( $lf->getRecordCount() == 1 ) {
-						//Object exists, check edit permissions
-						if (
-							$validate_only == TRUE
-							OR
-								(
-								$this->getPermissionObject()->Check('accrual_policy', 'edit')
-									OR ( $this->getPermissionObject()->Check('accrual_policy', 'edit_own') AND $this->getPermissionObject()->isOwner( $lf->getCurrent()->getCreatedBy(), $lf->getCurrent()->getID() ) === TRUE )
-								) ) {
+                $is_valid = $primary_validator->isValid($ignore_warning);
+                if ($is_valid == true) { //Check to see if all permission checks passed before trying to save data.
+                    Debug::Text('Setting object data...', __FILE__, __LINE__, __METHOD__, 10);
 
-							Debug::Text('Row Exists, getting current data: ', $row['id'], __FILE__, __LINE__, __METHOD__, 10);
-							$lf = $lf->getCurrent();
-							$row = array_merge( $lf->getObjectAsArray(), $row );
-						} else {
-							$primary_validator->isTrue( 'permission', FALSE, TTi18n::gettext('Edit permission denied') );
-						}
-					} else {
-						//Object doesn't exist.
-						$primary_validator->isTrue( 'id', FALSE, TTi18n::gettext('Edit permission denied, record does not exist') );
-					}
-				} else {
-					//Adding new object, check ADD permissions.
-					$primary_validator->isTrue( 'permission', $this->getPermissionObject()->Check('accrual_policy', 'add'), TTi18n::gettext('Add permission denied') );
-				}
-				Debug::Arr($row, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
+                    $lf->setObjectFromArray($row);
 
-				$is_valid = $primary_validator->isValid( $ignore_warning );
-				if ( $is_valid == TRUE ) { //Check to see if all permission checks passed before trying to save data.
-					Debug::Text('Setting object data...', __FILE__, __LINE__, __METHOD__, 10);
+                    $lf->Validator->setValidateOnly($validate_only);
 
-					$lf->setObjectFromArray( $row );
+                    $is_valid = $lf->isValid($ignore_warning);
+                    if ($is_valid == true) {
+                        Debug::Text('Saving data...', __FILE__, __LINE__, __METHOD__, 10);
+                        if ($validate_only == true) {
+                            $save_result[$key] = true;
+                        } else {
+                            $save_result[$key] = $lf->Save();
+                        }
+                        $validator_stats['valid_records']++;
+                    }
+                }
 
-					$lf->Validator->setValidateOnly( $validate_only );
+                if ($is_valid == false) {
+                    Debug::Text('Data is Invalid...', __FILE__, __LINE__, __METHOD__, 10);
 
-					$is_valid = $lf->isValid( $ignore_warning );
-					if ( $is_valid == TRUE ) {
-						Debug::Text('Saving data...', __FILE__, __LINE__, __METHOD__, 10);
-						if ( $validate_only == TRUE ) {
-							$save_result[$key] = TRUE;
-						} else {
-							$save_result[$key] = $lf->Save();
-						}
-						$validator_stats['valid_records']++;
-					}
-				}
+                    $lf->FailTransaction(); //Just rollback this single record, continue on to the rest.
 
-				if ( $is_valid == FALSE ) {
-					Debug::Text('Data is Invalid...', __FILE__, __LINE__, __METHOD__, 10);
+                    $validator[$key] = $this->setValidationArray($primary_validator, $lf);
+                } elseif ($validate_only == true) {
+                    $lf->FailTransaction();
+                }
 
-					$lf->FailTransaction(); //Just rollback this single record, continue on to the rest.
+                $lf->CommitTransaction();
+            }
 
-					$validator[$key] = $this->setValidationArray( $primary_validator, $lf );
-				} elseif ( $validate_only == TRUE ) {
-					$lf->FailTransaction();
-				}
+            return $this->handleRecordValidationResults($validator, $validator_stats, $key, $save_result);
+        }
 
-				$lf->CommitTransaction();
-			}
+        return $this->returnHandler(false);
+    }
 
-			return $this->handleRecordValidationResults( $validator, $validator_stats, $key, $save_result );
-		}
+    /**
+     * Delete one or more accrual_policys.
+     * @param array $data accrual_policy data
+     * @return array
+     */
+    public function deleteAccrualPolicyMilestone($data)
+    {
+        if (is_numeric($data)) {
+            $data = array($data);
+        }
 
-		return $this->returnHandler( FALSE );
-	}
+        if (!is_array($data)) {
+            return $this->returnHandler(false);
+        }
 
-	/**
-	 * Delete one or more accrual_policys.
-	 * @param array $data accrual_policy data
-	 * @return array
-	 */
-	function deleteAccrualPolicyMilestone( $data ) {
-		if ( is_numeric($data) ) {
-			$data = array($data);
-		}
+        if (!$this->getPermissionObject()->Check('accrual_policy', 'enabled')
+            or !($this->getPermissionObject()->Check('accrual_policy', 'delete') or $this->getPermissionObject()->Check('accrual_policy', 'delete_own') or $this->getPermissionObject()->Check('accrual_policy', 'delete_child'))
+        ) {
+            return $this->getPermissionObject()->PermissionDenied();
+        }
 
-		if ( !is_array($data) ) {
-			return $this->returnHandler( FALSE );
-		}
+        Debug::Text('Received data for: ' . count($data) . ' AccrualPolicyMilestones', __FILE__, __LINE__, __METHOD__, 10);
+        Debug::Arr($data, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( !$this->getPermissionObject()->Check('accrual_policy', 'enabled')
-				OR !( $this->getPermissionObject()->Check('accrual_policy', 'delete') OR $this->getPermissionObject()->Check('accrual_policy', 'delete_own') OR $this->getPermissionObject()->Check('accrual_policy', 'delete_child') ) ) {
-			return	$this->getPermissionObject()->PermissionDenied();
-		}
+        $total_records = count($data);
+        $validator = $save_result = false;
+        $validator_stats = array('total_records' => $total_records, 'valid_records' => 0);
+        if (is_array($data) and $total_records > 0) {
+            foreach ($data as $key => $id) {
+                $primary_validator = new Validator();
+                $lf = TTnew('AccrualPolicyMilestoneListFactory');
+                $lf->StartTransaction();
+                if (is_numeric($id)) {
+                    //Modifying existing object.
+                    //Get accrual_policy object, so we can only modify just changed data for specific records if needed.
+                    $lf->getByIdAndCompanyId($id, $this->getCurrentCompanyObject()->getId());
+                    if ($lf->getRecordCount() == 1) {
+                        //Object exists, check edit permissions
+                        if ($this->getPermissionObject()->Check('accrual_policy', 'delete')
+                            or ($this->getPermissionObject()->Check('accrual_policy', 'delete_own') and $this->getPermissionObject()->isOwner($lf->getCurrent()->getCreatedBy(), $lf->getCurrent()->getID()) === true)
+                        ) {
+                            Debug::Text('Record Exists, deleting record: ', $id, __FILE__, __LINE__, __METHOD__, 10);
+                            $lf = $lf->getCurrent();
+                        } else {
+                            $primary_validator->isTrue('permission', false, TTi18n::gettext('Delete permission denied'));
+                        }
+                    } else {
+                        //Object doesn't exist.
+                        $primary_validator->isTrue('id', false, TTi18n::gettext('Delete permission denied, record does not exist'));
+                    }
+                } else {
+                    $primary_validator->isTrue('id', false, TTi18n::gettext('Delete permission denied, record does not exist'));
+                }
 
-		Debug::Text('Received data for: '. count($data) .' AccrualPolicyMilestones', __FILE__, __LINE__, __METHOD__, 10);
-		Debug::Arr($data, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
+                //Debug::Arr($lf, 'AData: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$total_records = count($data);
-		$validator = $save_result = FALSE;
-		$validator_stats = array('total_records' => $total_records, 'valid_records' => 0 );
-		if ( is_array($data) AND $total_records > 0 ) {
-			foreach( $data as $key => $id ) {
-				$primary_validator = new Validator();
-				$lf = TTnew( 'AccrualPolicyMilestoneListFactory' );
-				$lf->StartTransaction();
-				if ( is_numeric($id) ) {
-					//Modifying existing object.
-					//Get accrual_policy object, so we can only modify just changed data for specific records if needed.
-					$lf->getByIdAndCompanyId( $id, $this->getCurrentCompanyObject()->getId() );
-					if ( $lf->getRecordCount() == 1 ) {
-						//Object exists, check edit permissions
-						if ( $this->getPermissionObject()->Check('accrual_policy', 'delete')
-								OR ( $this->getPermissionObject()->Check('accrual_policy', 'delete_own') AND $this->getPermissionObject()->isOwner( $lf->getCurrent()->getCreatedBy(), $lf->getCurrent()->getID() ) === TRUE ) ) {
-							Debug::Text('Record Exists, deleting record: ', $id, __FILE__, __LINE__, __METHOD__, 10);
-							$lf = $lf->getCurrent();
-						} else {
-							$primary_validator->isTrue( 'permission', FALSE, TTi18n::gettext('Delete permission denied') );
-						}
-					} else {
-						//Object doesn't exist.
-						$primary_validator->isTrue( 'id', FALSE, TTi18n::gettext('Delete permission denied, record does not exist') );
-					}
-				} else {
-					$primary_validator->isTrue( 'id', FALSE, TTi18n::gettext('Delete permission denied, record does not exist') );
-				}
+                $is_valid = $primary_validator->isValid();
+                if ($is_valid == true) { //Check to see if all permission checks passed before trying to save data.
+                    Debug::Text('Attempting to delete record...', __FILE__, __LINE__, __METHOD__, 10);
+                    $lf->setDeleted(true);
 
-				//Debug::Arr($lf, 'AData: ', __FILE__, __LINE__, __METHOD__, 10);
+                    $is_valid = $lf->isValid();
+                    if ($is_valid == true) {
+                        Debug::Text('Record Deleted...', __FILE__, __LINE__, __METHOD__, 10);
+                        $save_result[$key] = $lf->Save();
+                        $validator_stats['valid_records']++;
+                    }
+                }
 
-				$is_valid = $primary_validator->isValid();
-				if ( $is_valid == TRUE ) { //Check to see if all permission checks passed before trying to save data.
-					Debug::Text('Attempting to delete record...', __FILE__, __LINE__, __METHOD__, 10);
-					$lf->setDeleted(TRUE);
+                if ($is_valid == false) {
+                    Debug::Text('Data is Invalid...', __FILE__, __LINE__, __METHOD__, 10);
 
-					$is_valid = $lf->isValid();
-					if ( $is_valid == TRUE ) {
-						Debug::Text('Record Deleted...', __FILE__, __LINE__, __METHOD__, 10);
-						$save_result[$key] = $lf->Save();
-						$validator_stats['valid_records']++;
-					}
-				}
+                    $lf->FailTransaction(); //Just rollback this single record, continue on to the rest.
 
-				if ( $is_valid == FALSE ) {
-					Debug::Text('Data is Invalid...', __FILE__, __LINE__, __METHOD__, 10);
+                    $validator[$key] = $this->setValidationArray($primary_validator, $lf);
+                }
 
-					$lf->FailTransaction(); //Just rollback this single record, continue on to the rest.
+                $lf->CommitTransaction();
+            }
 
-					$validator[$key] = $this->setValidationArray( $primary_validator, $lf );
-				}
+            return $this->handleRecordValidationResults($validator, $validator_stats, $key, $save_result);
+        }
 
-				$lf->CommitTransaction();
-			}
-
-			return $this->handleRecordValidationResults( $validator, $validator_stats, $key, $save_result );
-		}
-
-		return $this->returnHandler( FALSE );
-	}
+        return $this->returnHandler(false);
+    }
 }
-?>

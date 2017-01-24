@@ -1,68 +1,67 @@
-var APIForm940Report = ServiceCaller.extend( {
+var APIForm940Report = ServiceCaller.extend({
 
-	key_name: 'Form940Report',
-	className: 'APIForm940Report',
+    key_name: 'Form940Report',
+    className: 'APIForm940Report',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonForm940ReportData: function() {
+    getCommonForm940ReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonForm940ReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonForm940ReportData', arguments);
 
-	},
+    },
 
-	getForm940Report: function() {
+    getForm940Report: function () {
 
-		return this.argumentsHandler( this.className, 'getForm940Report', arguments );
+        return this.argumentsHandler(this.className, 'getForm940Report', arguments);
 
-	},
+    },
 
-	setForm940Report: function() {
+    setForm940Report: function () {
 
-		return this.argumentsHandler( this.className, 'setForm940Report', arguments );
+        return this.argumentsHandler(this.className, 'setForm940Report', arguments);
 
-	},
+    },
 
-	getForm940ReportDefaultData: function() {
+    getForm940ReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getForm940ReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getForm940ReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteForm940Report: function() {
+    deleteForm940Report: function () {
 
-		return this.argumentsHandler( this.className, 'deleteForm940Report', arguments );
+        return this.argumentsHandler(this.className, 'deleteForm940Report', arguments);
 
-	},
+    },
 
-	validateForm940Report: function() {
+    validateForm940Report: function () {
 
-		return this.argumentsHandler( this.className, 'validateForm940Report', arguments );
+        return this.argumentsHandler(this.className, 'validateForm940Report', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	setCompanyFormConfig: function() {
+    setCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'setCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'setCompanyFormConfig', arguments);
 
-	},
+    },
 
-	getCompanyFormConfig: function() {
+    getCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyFormConfig', arguments);
 
-	}
+    }
 
 
-
-} );
+});

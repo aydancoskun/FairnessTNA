@@ -49,7 +49,8 @@
  * @package Mail
  * @version $Revision$
  */
-class Mail_null extends Mail {
+class Mail_null extends Mail
+{
 
     /**
      * Implements Mail_null::send() function. Silently discards all
@@ -79,5 +80,4 @@ class Mail_null extends Mail {
     {
         return true;
     }
-
 }

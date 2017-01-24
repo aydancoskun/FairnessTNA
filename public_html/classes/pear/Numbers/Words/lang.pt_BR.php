@@ -49,46 +49,46 @@ class Numbers_Words_pt_BR extends Numbers_Words
      * @var string
      * @access public
      */
-    var $locale      = 'pt_BR';
+    public $locale = 'pt_BR';
 
     /**
      * Language name in English
      * @var string
      * @access public
      */
-    var $lang        = 'Brazilian Portuguese';
+    public $lang = 'Brazilian Portuguese';
 
     /**
      * Native language name
      * @var string
      * @access public
      */
-    var $lang_native = 'Português Brasileiro';
+    public $lang_native = 'Portuguï¿½s Brasileiro';
 
     /**
      * The word for the minus sign
      * @var string
      * @access private
      */
-    var $_minus = 'menos';
+    public $_minus = 'menos';
 
     /**
      * The word separator
      * @var string
      * @access private
      */
-    var $_sep = ' ';
+    public $_sep = ' ';
 
     /**
      * The array containing the digits (indexed by the digits themselves).
      * @var array
      * @access private
      */
-    var $_unidade = array(
+    public $_unidade = array(
         '',
         'um',
         'dois',
-        'três',
+        'trï¿½s',
         'quatro',
         'cinco',
         'seis',
@@ -102,7 +102,7 @@ class Numbers_Words_pt_BR extends Numbers_Words
      * @var array
      * @access private
      */
-    var $_dezena10 = array(
+    public $_dezena10 = array(
         'dez',
         'onze',
         'doze',
@@ -120,7 +120,7 @@ class Numbers_Words_pt_BR extends Numbers_Words
      * @var array
      * @access private
      */
-    var $_dezena = array(
+    public $_dezena = array(
         '',
         'dez',
         'vinte',
@@ -138,7 +138,7 @@ class Numbers_Words_pt_BR extends Numbers_Words
      * @var array
      * @access private
      */
-    var $_centena = array(
+    public $_centena = array(
         '',
         'cem',
         'duzentos',
@@ -156,26 +156,26 @@ class Numbers_Words_pt_BR extends Numbers_Words
      * @var array
      * @access private
      */
-    var $_expoente = array(
+    public $_expoente = array(
         '',
         'mil',
-        'milhão',
-        'bilhão',
-        'trilhão',
-        'quatrilhão',
-        'quintilhão',
-        'sextilhão',
-        'setilhão',
-        'octilhão',
-        'nonilhão',
-        'decilhão',
-        'undecilhão',
-        'dodecilhão',
-        'tredecilhão',
-        'quatuordecilhão',
-        'quindecilhão',
-        'sedecilhão',
-        'septendecilhão'
+        'milhï¿½o',
+        'bilhï¿½o',
+        'trilhï¿½o',
+        'quatrilhï¿½o',
+        'quintilhï¿½o',
+        'sextilhï¿½o',
+        'setilhï¿½o',
+        'octilhï¿½o',
+        'nonilhï¿½o',
+        'decilhï¿½o',
+        'undecilhï¿½o',
+        'dodecilhï¿½o',
+        'tredecilhï¿½o',
+        'quatuordecilhï¿½o',
+        'quindecilhï¿½o',
+        'sedecilhï¿½o',
+        'septendecilhï¿½o'
     );
 
     /**
@@ -188,23 +188,96 @@ class Numbers_Words_pt_BR extends Numbers_Words
      * @link http://www.shoestring.co.kr/world/p.visa/change.htm Currency names in English
      * @access private
      */
-    var $_currency_names = array(
-        'BRL' => array(array('rea'), array('centavo')) );
+    public $_currency_names = array(
+        'BRL' => array(array('rea'), array('centavo')));
 
     /**
      * The default currency name
      * @var string
      * @access public
      */
-    var $def_currency = 'BRL'; // Real
+    public $def_currency = 'BRL'; // Real
 
     // {{{ toWords()
+
+    /**
+     * Converts a currency value to its word representation
+     * (with monetary units) in Portuguese language
+     *
+     * @param  integer $int_curr An international currency symbol
+     *                 as defined by the ISO 4217 standard (three characters)
+     * @param  integer $decimal A money total amount without fraction part (e.g. amount of dollars)
+     * @param  integer $fraction Fractional part of the money amount (e.g.  amount of cents)
+     *                 Optional. Defaults to false.
+     * @param  integer $convert_fraction Convert fraction to words (left as numeric if set to false).
+     *                 Optional. Defaults to true.
+     *
+     * @return string  The corresponding word representation for the currency
+     *
+     * @access public
+     * @author Mario H.C.T. <mariolinux@mitus.com.br>
+     * @since  Numbers_Words 0.10.1
+     */
+    public function toCurrencyWords($int_curr, $decimal, $fraction = false, $convert_fraction = true)
+    {
+        $int_curr = strtoupper($int_curr);
+        if (!isset($this->_currency_name[$int_curr])) {
+            $int_curr = $this->def_currency;
+        }
+        $curr_names = $this->_currency_names[$int_curr];
+        $ret = trim($this->toWords($decimal));
+        $lev = ($decimal == 1) ? 0 : 1;
+        if ($lev > 0) {
+            if (count($curr_names[0]) > 1) {
+                $ret .= $this->_sep . $curr_names[0][$lev];
+            } else {
+                if ($int_curr == "BRL") {
+                    $ret .= $this->_sep . $curr_names[0][0] . 'is';
+                } else {
+                    $ret .= $this->_sep . $curr_names[0][0] . 's';
+                }
+            }
+        } else {
+            if ($int_curr == "BRL") {
+                $ret .= $this->_sep . $curr_names[0][0] . 'l';
+            } else {
+                $ret .= $this->_sep . $curr_names[0][0];
+            }
+        }
+
+        if ($fraction !== false) {
+            if ($int_curr == "BRL") {
+                $ret .= $this->_sep . 'e';
+            }
+
+            if ($convert_fraction) {
+                $ret .= $this->_sep . trim($this->toWords($fraction));
+            } else {
+                $ret .= $this->_sep . $fraction;
+            }
+            $lev = ($fraction == 1) ? 0 : 1;
+            if ($lev > 0) {
+                if (count($curr_names[1]) > 1) {
+                    $ret .= $this->_sep . $curr_names[1][$lev];
+                } else {
+                    $ret .= $this->_sep . $curr_names[1][0] . 's';
+                }
+            } else {
+                $ret .= $this->_sep . $curr_names[1][0];
+            }
+        }
+
+        return $ret;
+    }
+
+    // }}}
+    // {{{ toCurrencyWords()
 
     /**
      * Converts a number to its word representation
      * in Brazilian Portuguese language
      *
-     * @param  integer $num   An integer between -infinity and infinity inclusive :)
+     * @param  integer $num An integer between -infinity and infinity inclusive :)
      *                        that need to be converted to words
      *
      * @return string  The corresponding word representation
@@ -213,8 +286,8 @@ class Numbers_Words_pt_BR extends Numbers_Words
      * @author Marcelo Subtil Marcal <jason@conectiva.com.br>
      * @since  PHP 4.2.3
      */
-    function toWords($num) {
-
+    public function toWords($num)
+    {
         $ret = '';
 
         $num = trim($num);
@@ -226,7 +299,7 @@ class Numbers_Words_pt_BR extends Numbers_Words
 
         // strip excessive zero signs and spaces
         $num = trim($num);
-        $num = preg_replace('/^0+/','',$num);
+        $num = preg_replace('/^0+/', '', $num);
 
         while (strlen($num) % 3 != 0) {
             $num = "0" . $num;
@@ -242,90 +315,17 @@ class Numbers_Words_pt_BR extends Numbers_Words
             $ret .= ($inteiro[$i][0] && ($inteiro[$i][1] || $inteiro[$i][2])) ? " e " : "";
             $ret .= ($inteiro[$i][1] < 2) ? "" : $this->_dezena[$inteiro[$i][1]];
             $ret .= (($inteiro[$i][1] > 1) && ($inteiro[$i][2])) ? " e " : "";
-            $ret .= ($inteiro > 0) ? ( ($inteiro[$i][1] == 1) ? $this->_dezena10[$inteiro[$i][2]] : $this->_unidade[$inteiro[$i][2]] ) : "";
-            $ret .= $inteiro[$i] > 0 ? " " . ($inteiro[$i] > 1 ? str_replace("ão", "ões", $this->_expoente[count($inteiro)-1-$i]) : $this->_expoente[count($inteiro)-1-$i]) : "";
+            $ret .= ($inteiro > 0) ? (($inteiro[$i][1] == 1) ? $this->_dezena10[$inteiro[$i][2]] : $this->_unidade[$inteiro[$i][2]]) : "";
+            $ret .= $inteiro[$i] > 0 ? " " . ($inteiro[$i] > 1 ? str_replace("ï¿½o", "ï¿½es", $this->_expoente[count($inteiro) - 1 - $i]) : $this->_expoente[count($inteiro) - 1 - $i]) : "";
 
-            if ($ret && (isset($inteiro[$i+1]))) {
-                if ($inteiro[$i+1] != "000") {
-                    $ret .= ($i+1) == (count($inteiro)-1) ? " e " : ", ";
+            if ($ret && (isset($inteiro[$i + 1]))) {
+                if ($inteiro[$i + 1] != "000") {
+                    $ret .= ($i + 1) == (count($inteiro) - 1) ? " e " : ", ";
                 }
             }
-
         }
 
         return $ret ? " $ret" : " zero";
-
-    }
-
-    // }}}
-    // {{{ toCurrencyWords()
-
-    /**
-     * Converts a currency value to its word representation
-     * (with monetary units) in Portuguese language
-     *
-     * @param  integer $int_curr An international currency symbol
-     *                 as defined by the ISO 4217 standard (three characters)
-     * @param  integer $decimal A money total amount without fraction part (e.g. amount of dollars)
-     * @param  integer $fraction Fractional part of the money amount (e.g.  amount of cents)
-     *                 Optional. Defaults to false. 
-     * @param  integer $convert_fraction Convert fraction to words (left as numeric if set to false).
-     *                 Optional. Defaults to true.
-     *
-     * @return string  The corresponding word representation for the currency
-     *
-     * @access public
-     * @author Mario H.C.T. <mariolinux@mitus.com.br>
-     * @since  Numbers_Words 0.10.1
-     */
-    function toCurrencyWords($int_curr, $decimal, $fraction = false, $convert_fraction = true) {
-        $int_curr = strtoupper($int_curr);
-        if (!isset($this->_currency_name[$int_curr])){
-            $int_curr = $this->def_currency;
-        }
-        $curr_names = $this->_currency_names[$int_curr];
-        $ret  = trim($this->toWords($decimal));
-        $lev  = ($decimal == 1) ? 0 : 1;
-        if ($lev > 0) {
-            if (count($curr_names[0]) > 1) {
-                $ret .= $this->_sep . $curr_names[0][$lev];
-            } else {
-                if ($int_curr == "BRL")
-                    $ret .= $this->_sep . $curr_names[0][0] . 'is';
-                else
-                    $ret .= $this->_sep . $curr_names[0][0] . 's';
-            }
-        } else {
-            if ($int_curr == "BRL")
-                $ret .= $this->_sep . $curr_names[0][0] . 'l';
-            else
-                $ret .= $this->_sep . $curr_names[0][0];
-        }
-                  
-        if ($fraction !== false) {
-            if ($int_curr == "BRL")
-                $ret .= $this->_sep . 'e';
-               
-            if ($convert_fraction) {
-                $ret .= $this->_sep . trim($this->toWords($fraction));
-            } else {
-                $ret .= $this->_sep . $fraction;
-            }
-            $lev  = ($fraction == 1) ? 0 : 1;
-            if ($lev > 0) {
-                if (count($curr_names[1]) > 1) {
-                    $ret .= $this->_sep . $curr_names[1][$lev];
-                } else {
-                    $ret .= $this->_sep . $curr_names[1][0] . 's';
-                }
-            } else {
-                $ret .= $this->_sep . $curr_names[1][0];
-            }
-       }
-
-       return $ret;
     }
     // }}}
 }
-
-?>

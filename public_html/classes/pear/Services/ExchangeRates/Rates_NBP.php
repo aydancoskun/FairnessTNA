@@ -49,43 +49,44 @@ require_once 'Services/ExchangeRates/Common.php';
  *
  * @package Services_ExchangeRates
  */
-class Services_ExchangeRates_Rates_NBP extends Services_ExchangeRates_Common {
+class Services_ExchangeRates_Rates_NBP extends Services_ExchangeRates_Common
+{
 
-   /**
-    * URL of XML feed
-    * @var string
-    */
-    var $feedXMLUrl;
-    
-   /**
-    * URL of HTML page where the XML feed URL is given
-    * @var string
-    */
-    var $feedHTMLUrl = 'http://www.nbp.pl/Kursy/KursyA.html';
+    /**
+     * URL of XML feed
+     * @var string
+     */
+    public $feedXMLUrl;
 
-   /**
-    * Directory in which the XML file is located
-    * @var string
-    */
-    var $feedDir = 'http://www.nbp.pl/Kursy/';
+    /**
+     * URL of HTML page where the XML feed URL is given
+     * @var string
+     */
+    public $feedHTMLUrl = 'http://www.nbp.pl/Kursy/KursyA.html';
 
-   /**
-    * Downloads exchange rates in terms of the PLN from the National Bank of
-    * Poland (NBP). This information is updated daily, and is cached by default for 1 hour.
-    *
-    * Returns a multi-dimensional array containing:
-    * 'rates' => associative array of currency codes to exchange rates
-    * 'source' => URL of feed
-    * 'date' => date feed last updated, pulled from the feed (more reliable than file mod time)
-    *
-    * @link http://www.nbp.pl/Kursy/RatesA.html English HTML version
-    * @link http://www.nbp.pl/Kursy/KursyA.html Polish HTML version (with link to XML)
-    *
-    * @param int Length of time to cache (in seconds)
-    * @return array 
-    */
-    function retrieve($cacheLength, $cacheDir) {
+    /**
+     * Directory in which the XML file is located
+     * @var string
+     */
+    public $feedDir = 'http://www.nbp.pl/Kursy/';
 
+    /**
+     * Downloads exchange rates in terms of the PLN from the National Bank of
+     * Poland (NBP). This information is updated daily, and is cached by default for 1 hour.
+     *
+     * Returns a multi-dimensional array containing:
+     * 'rates' => associative array of currency codes to exchange rates
+     * 'source' => URL of feed
+     * 'date' => date feed last updated, pulled from the feed (more reliable than file mod time)
+     *
+     * @link http://www.nbp.pl/Kursy/RatesA.html English HTML version
+     * @link http://www.nbp.pl/Kursy/KursyA.html Polish HTML version (with link to XML)
+     *
+     * @param int Length of time to cache (in seconds)
+     * @return array
+     */
+    public function retrieve($cacheLength, $cacheDir)
+    {
         $return['rates'] = array('PLN' => 1.0);
 
         // retrieve XML address
@@ -93,10 +94,9 @@ class Services_ExchangeRates_Rates_NBP extends Services_ExchangeRates_Common {
 
         // Example line is:
         // <div class="file"><a href="xml/a055z020319.xml">powysza tabela w formacie .xml</a></div>
-        if (!preg_match('#href="(xml/a\d+z\d+\.xml)"#', $htmlpage, $match))
-        {
-           Services_ExchangeRates::raiseError("Retrieved url " . $this->feedHTMLUrl . " has no link to XML page", SERVICES_EXCHANGERATES_RETRIEVAL_FAILED);
-           return false;
+        if (!preg_match('#href="(xml/a\d+z\d+\.xml)"#', $htmlpage, $match)) {
+            Services_ExchangeRates::raiseError("Retrieved url " . $this->feedHTMLUrl . " has no link to XML page", SERVICES_EXCHANGERATES_RETRIEVAL_FAILED);
+            return false;
         }
         $this->feedXMLUrl = $this->feedDir . $match[1];
 
@@ -107,23 +107,17 @@ class Services_ExchangeRates_Rates_NBP extends Services_ExchangeRates_Common {
 
         // get down to array of exchange rates
         foreach ($root->children as $rateinfo) {
-            if ($rateinfo->name == 'pozycja')
-            {
+            if ($rateinfo->name == 'pozycja') {
                 $rateinfo->children[4]->content = strtr($rateinfo->children[4]->content, ',', '.');
                 $value = $rateinfo->children[2]->content  // przelicznik (conversion rate)
-                       / $rateinfo->children[4]->content; // currency rate
+                    / $rateinfo->children[4]->content; // currency rate
                 $return['rates'][$rateinfo->children[3]->content] = $value;
-            } elseif ($rateinfo->name == 'data_publikacji')
-            {
+            } elseif ($rateinfo->name == 'data_publikacji') {
                 // set date published
                 $return['date'] = $rateinfo->content;
             }
         }
-        
-        return $return; 
 
+        return $return;
     }
-
 }
-
-?>

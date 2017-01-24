@@ -19,376 +19,389 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\KPI
  */
-class KPIGroupFactory extends Factory {
-	protected $table = 'kpi_group';
-	protected $pk_sequence_name = 'kpi_group_id_seq'; //PK Sequence name
+class KPIGroupFactory extends Factory
+{
+    protected $table = 'kpi_group';
+    protected $pk_sequence_name = 'kpi_group_id_seq'; //PK Sequence name
 
-	protected $fasttree_obj = NULL;
+    protected $fasttree_obj = null;
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'columns':
+                $retval = array(
+                    '-1030-name' => TTi18n::gettext('Name'),
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'columns':
-				$retval = array(
-										'-1030-name' => TTi18n::gettext('Name'),
+                    '-2000-created_by' => TTi18n::gettext('Created By'),
+                    '-2010-created_date' => TTi18n::gettext('Created Date'),
+                    '-2020-updated_by' => TTi18n::gettext('Updated By'),
+                    '-2030-updated_date' => TTi18n::gettext('Updated Date'),
+                );
+                break;
+            case 'unique_columns': //Columns that are displayed by default.
+                $retval = array(
+                    'name',
+                );
+                break;
+            case 'list_columns':
+                $retval = Misc::arrayIntersectByKey($this->getOptions('default_display_columns'), Misc::trimSortPrefix($this->getOptions('columns')));
+                break;
+            case 'default_display_columns': //Columns that are displayed by default.
+                $retval = array(
+                    'name',
+                );
+                break;
+        }
 
-										'-2000-created_by' => TTi18n::gettext('Created By'),
-										'-2010-created_date' => TTi18n::gettext('Created Date'),
-										'-2020-updated_by' => TTi18n::gettext('Updated By'),
-										'-2030-updated_date' => TTi18n::gettext('Updated Date'),
-							);
-				break;
-			case 'unique_columns': //Columns that are displayed by default.
-				$retval = array(
-								'name',
-								);
-				break;
-			case 'list_columns':
-				$retval = Misc::arrayIntersectByKey( $this->getOptions('default_display_columns'), Misc::trimSortPrefix( $this->getOptions('columns') ) );
-				break;
-			case 'default_display_columns': //Columns that are displayed by default.
-				$retval = array(
-								'name',
-								);
-				break;
-		}
+        return $retval;
+    }
 
-		return $retval;
-	}
+    public function _getVariableToFunctionMap($data)
+    {
+        $variable_function_map = array(
+            'id' => 'ID',
+            'company_id' => 'Company',
+            'parent_id' => 'Parent',
+            'name' => 'Name',
+            'deleted' => 'Deleted',
+        );
+        return $variable_function_map;
+    }
 
-	function _getVariableToFunctionMap( $data ) {
-		$variable_function_map = array(
-										'id' => 'ID',
-										'company_id' => 'Company',
-										'parent_id' => 'Parent',
-										'name' => 'Name',
-										'deleted' => 'Deleted',
-										);
-		return $variable_function_map;
-	}
+    public function setCompany($id)
+    {
+        $id = trim($id);
 
-	function getFastTreeObject() {
+        $clf = TTnew('CompanyListFactory');
 
-		if ( is_object($this->fasttree_obj) ) {
-			return $this->fasttree_obj;
-		} else {
-			global $fast_tree_kpi_group_options;
-			$this->fasttree_obj = new FastTree($fast_tree_kpi_group_options);
+        if ($id == 0
+            or $this->Validator->isResultSetWithRows('company_id',
+                $clf->getByID($id),
+                TTi18n::gettext('Company is invalid')
+            )
+        ) {
+            $this->data['company_id'] = $id;
 
-			return $this->fasttree_obj;
-		}
-	}
+            return true;
+        }
 
-	function getCompany() {
-		if( isset( $this->data['company_id'] ) ) {
-			return (int)$this->data['company_id'];
-		}
-		return FALSE;
-	}
-	function setCompany($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		$clf = TTnew( 'CompanyListFactory' );
+    public function getPreviousParent()
+    {
+        if (isset($this->tmp_data['previous_parent_id'])) {
+            return $this->tmp_data['previous_parent_id'];
+        }
 
-		if ( $id == 0
-				OR $this->Validator->isResultSetWithRows(	'company_id',
-															$clf->getByID($id),
-															TTi18n::gettext('Company is invalid')
-															) ) {
-			$this->data['company_id'] = $id;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setPreviousParent($id)
+    {
+        $this->tmp_data['previous_parent_id'] = $id;
 
-		return FALSE;
-	}
+        return true;
+    }
 
-	//Use this for completly editing a row in the tree
-	//Basically "old_id".
-	function getPreviousParent() {
-		if ( isset($this->tmp_data['previous_parent_id']) ) {
-			return $this->tmp_data['previous_parent_id'];
-		}
+    //Use this for completly editing a row in the tree
+    //Basically "old_id".
 
-		return FALSE;
-	}
-	function setPreviousParent($id) {
+    public function setParent($id)
+    {
+        $this->tmp_data['parent_id'] = (int)$id;
 
-		$this->tmp_data['previous_parent_id'] = $id;
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function getName()
+    {
+        if (isset($this->data['name'])) {
+            return $this->data['name'];
+        }
+        return false;
+    }
 
-	function getParent() {
-		if ( isset($this->tmp_data['parent_id']) ) {
-			return $this->tmp_data['parent_id'];
-		}
+    public function setName($name)
+    {
+        $name = trim($name);
 
-		return FALSE;
-	}
-	function setParent($id) {
+        if ($this->Validator->isLength('name',
+                $name,
+                TTi18n::gettext('Name is too short or too long'),
+                2,
+                100)
+            and
+            $this->Validator->isTrue('name',
+                $this->isUniqueName($name),
+                TTi18n::gettext('Group already exists'))
 
-		$this->tmp_data['parent_id'] = (int)$id;
+        ) {
+            $this->data['name'] = $name;
 
-		return TRUE;
-	}
+            return true;
+        }
 
-	function isUniqueName($name) {
-		$name = trim($name);
-		if ( $name == '' ) {
-			return FALSE;
-		}
+        return false;
+    }
 
-		$ph = array(
-					'company_id' => (int)$this->getCompany(),
-					'name' => TTi18n::strtolower($name),
-					);
+    public function isUniqueName($name)
+    {
+        $name = trim($name);
+        if ($name == '') {
+            return false;
+        }
 
-		$query = 'select id from '. $this->table .'
+        $ph = array(
+            'company_id' => (int)$this->getCompany(),
+            'name' => TTi18n::strtolower($name),
+        );
+
+        $query = 'select id from ' . $this->table . '
 					where company_id = ?
 						AND lower(name) = ?
 						AND deleted = 0';
-		$name_id = $this->db->GetOne($query, $ph);
-		Debug::Arr($name_id, 'Unique Name: '. $name, __FILE__, __LINE__, __METHOD__, 10);
+        $name_id = $this->db->GetOne($query, $ph);
+        Debug::Arr($name_id, 'Unique Name: ' . $name, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $name_id === FALSE ) {
-			return TRUE;
-		} else {
-			if ($name_id == $this->getId() ) {
-				return TRUE;
-			}
-		}
+        if ($name_id === false) {
+            return true;
+        } else {
+            if ($name_id == $this->getId()) {
+                return true;
+            }
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getName() {
-		if ( isset( $this->data['name'] ) ) {
-			return $this->data['name'];
-		}
-		return FALSE;
-	}
-	function setName($name) {
-		$name = trim($name);
+    public function getCompany()
+    {
+        if (isset($this->data['company_id'])) {
+            return (int)$this->data['company_id'];
+        }
+        return false;
+    }
 
-		if	(	$this->Validator->isLength(		'name',
-												$name,
-												TTi18n::gettext('Name is too short or too long'),
-												2,
-												100)
-					AND
-						$this->Validator->isTrue(		'name',
-														$this->isUniqueName($name),
-														TTi18n::gettext('Group already exists'))
+    public function Validate($ignore_warning = true)
+    {
+        if ($this->isNew() == false
+            and $this->getId() == $this->getParent()
+        ) {
+            $this->Validator->isTrue('parent',
+                false,
+                TTi18n::gettext('Cannot re-parent group to itself')
+            );
+        } else {
+            if ($this->isNew() == false) {
+                $this->getFastTreeObject()->setTree($this->getCompany());
+                //$children_ids = array_keys( $this->getFastTreeObject()->getAllChildren( $this->getID(), 'RECURSE' ) );
 
-												) {
+                $children_ids = $this->getFastTreeObject()->getAllChildren($this->getID(), 'RECURSE');
+                if (is_array($children_ids)) {
+                    $children_ids = array_keys($children_ids);
+                }
 
-			$this->data['name'] = $name;
+                if (is_array($children_ids) and in_array($this->getParent(), $children_ids) == true) {
+                    Debug::Text(' Objects cant be re-parented to their own children...', __FILE__, __LINE__, __METHOD__, 10);
+                    $this->Validator->isTrue('parent',
+                        false,
+                        TTi18n::gettext('Unable to change parent to a child of itself')
+                    );
+                }
+            }
+        }
 
-			return TRUE;
-		}
+        return true;
+    }
 
-		return FALSE;
-	}
+    public function getParent()
+    {
+        if (isset($this->tmp_data['parent_id'])) {
+            return $this->tmp_data['parent_id'];
+        }
 
-	function Validate( $ignore_warning = TRUE ) {
+        return false;
+    }
 
-		if ( $this->isNew() == FALSE
-				AND $this->getId() == $this->getParent() ) {
-				$this->Validator->isTrue(	'parent',
-											FALSE,
-											TTi18n::gettext('Cannot re-parent group to itself')
-											);
-		} else {
-			if ( $this->isNew() == FALSE ) {
-				$this->getFastTreeObject()->setTree( $this->getCompany() );
-				//$children_ids = array_keys( $this->getFastTreeObject()->getAllChildren( $this->getID(), 'RECURSE' ) );
+    public function getFastTreeObject()
+    {
+        if (is_object($this->fasttree_obj)) {
+            return $this->fasttree_obj;
+        } else {
+            global $fast_tree_kpi_group_options;
+            $this->fasttree_obj = new FastTree($fast_tree_kpi_group_options);
 
-				$children_ids = $this->getFastTreeObject()->getAllChildren( $this->getID(), 'RECURSE' );
-				if ( is_array($children_ids) ) {
-					$children_ids = array_keys( $children_ids );
-				}
+            return $this->fasttree_obj;
+        }
+    }
 
-				if ( is_array($children_ids) AND in_array( $this->getParent(), $children_ids) == TRUE ) {
-					Debug::Text(' Objects cant be re-parented to their own children...', __FILE__, __LINE__, __METHOD__, 10);
-					$this->Validator->isTrue(	'parent',
-												FALSE,
-												TTi18n::gettext('Unable to change parent to a child of itself')
-												);
-				}
-			}
-		}
+    public function preSave()
+    {
+        if ($this->isNew()) {
+            Debug::Text(' Setting Insert Tree TRUE ', __FILE__, __LINE__, __METHOD__, 10);
+            $this->insert_tree = true;
+        } else {
+            Debug::Text(' Setting Insert Tree FALSE ', __FILE__, __LINE__, __METHOD__, 10);
+            $this->insert_tree = false;
+        }
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	function preSave() {
+    //Must be postSave because we need the ID of the object.
+    public function postSave()
+    {
+        $this->StartTransaction();
 
-		if ( $this->isNew() ) {
-			Debug::Text(' Setting Insert Tree TRUE ', __FILE__, __LINE__, __METHOD__, 10);
-			$this->insert_tree = TRUE;
-		} else {
-			Debug::Text(' Setting Insert Tree FALSE ', __FILE__, __LINE__, __METHOD__, 10);
-			$this->insert_tree = FALSE;
-		}
+        $this->getFastTreeObject()->setTree($this->getCompany());
+        if ($this->getDeleted() == true) {
+            //FIXME: Get parent of this object, and re-parent all groups to it.
+            $parent_id = $this->getFastTreeObject()->getParentId($this->getId());
+            //Get items by group id.
+            $klf = TTnew('KPIListFactory');
+            $cgmlf = TTnew('CompanyGenericMapListFactory');
+            $cgmf = TTnew('CompanyGenericMapFactory');
+            $klf->getByCompanyIdAndGroupId($this->getCompany(), $this->getId());
+            $ids = array();
+            if ($klf->getRecordCount() > 0) {
+                foreach ($klf as $obj) {
+                    Debug::Text(' Re-Grouping Item: ' . $obj->getId(), __FILE__, __LINE__, __METHOD__, 10);
+                    $ids[] = $obj->getId();
+                    //$obj->setGroup($parent_id);
+                    //$obj->Save();
+                }
+            }
+            $this->getFastTreeObject()->delete($this->getId());
+            $cgmlf->getByCompanyIDAndObjectTypeAndMapID($this->getCompany(), 2010, $this->getID());
+            if ($cgmlf->getRecordCount() > 0) {
+                foreach ($cgmlf as $cgm_obj) {
+                    Debug::text('Deleteing from Company Generic Map: ' . $cgm_obj->getID(), __FILE__, __LINE__, __METHOD__, 10);
+                    $cgm_obj->Delete();
+                }
+            }
+            if (empty($ids) == false) {
+                foreach ($ids as $id) {
+                    if ($parent_id > 0) {
+                        $cgmlf->getByCompanyIDAndObjectTypeAndObjectIDAndMapID($this->getCompany(), 2020, $id, $parent_id);
+                        if ($cgmlf->getRecordCount() == 0) {
+                            $cgmf->setCompany($this->getCompany());
+                            $cgmf->setObjectType(2020);
+                            $cgmf->setObjectID($id);
+                            $cgmf->setMapId($parent_id);
+                            $cgmf->Save();
+                        }
+                    }
+                    $cgmlf->getByCompanyIDAndObjectTypeAndObjectIDAndMapID($this->getCompany(), 2020, $id, $this->getId());
+                    if ($cgmlf->getRecordCount() > 0) {
+                        foreach ($cgmlf as $cgm_obj) {
+                            Debug::text('Deleteing from Company Generic Map: ' . $cgm_obj->getID(), __FILE__, __LINE__, __METHOD__, 10);
+                            $cgm_obj->Delete();
+                        }
+                    }
+                    //$query = 'delete from ' . $cgmf->getTable() . ' where map_id = ' . $this->getId() . ' and object_id = ' . $id . ' and company_id = ' . $this->getCompany() . ' and object_type_id = 2020 ';
+                    //$this->db->Execute($query);
+                }
+            }
+            $this->CommitTransaction();
+            return true;
+        } else {
+            $retval = true;
+            //if ( $this->getId() === FALSE ) {
 
-		return TRUE;
-	}
+            if ($this->insert_tree === true) {
+                Debug::Text(' Adding Node ', __FILE__, __LINE__, __METHOD__, 10);
 
-	//Must be postSave because we need the ID of the object.
-	function postSave() {
+                //echo "Current ID: ".	$this->getID() ."<br>\n";
+                //echo "Parent ID: ".  $this->getParent() ."<br>\n";
 
-		$this->StartTransaction();
+                //Add node to tree
+                if ($this->getFastTreeObject()->add($this->getID(), $this->getParent()) === false) {
+                    Debug::Text(' Failed adding Node ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->getFastTreeObject()->setTree( $this->getCompany() );
-		if ( $this->getDeleted() == TRUE ) {
-			//FIXME: Get parent of this object, and re-parent all groups to it.
-			$parent_id = $this->getFastTreeObject()->getParentId( $this->getId() );
-			//Get items by group id.
-			$klf = TTnew( 'KPIListFactory' );
-			$cgmlf = TTnew( 'CompanyGenericMapListFactory' );
-			$cgmf = TTnew( 'CompanyGenericMapFactory' );
-			$klf->getByCompanyIdAndGroupId( $this->getCompany(), $this->getId() );
-			$ids = array();
-			if ( $klf->getRecordCount() > 0 ) {
-				foreach( $klf as $obj ) {
-					Debug::Text(' Re-Grouping Item: '. $obj->getId(), __FILE__, __LINE__, __METHOD__, 10);
-					$ids[] = $obj->getId();
-					//$obj->setGroup($parent_id);
-					//$obj->Save();
-				}
-			}
-			$this->getFastTreeObject()->delete( $this->getId() );
-			$cgmlf->getByCompanyIDAndObjectTypeAndMapID( $this->getCompany(), 2010, $this->getID() );
-			if ( $cgmlf->getRecordCount() > 0 ) {
-				foreach( $cgmlf as $cgm_obj ) {
-					Debug::text('Deleteing from Company Generic Map: '. $cgm_obj->getID(), __FILE__, __LINE__, __METHOD__, 10);
-					$cgm_obj->Delete();
-				}
-			}
-			if ( empty($ids) == FALSE ) {
-				foreach( $ids as $id ) {
-					if ( $parent_id > 0 ) {
-						$cgmlf->getByCompanyIDAndObjectTypeAndObjectIDAndMapID( $this->getCompany(), 2020, $id, $parent_id );
-						if ( $cgmlf->getRecordCount() == 0 ) {
-							$cgmf->setCompany( $this->getCompany() );
-							$cgmf->setObjectType( 2020 );
-							$cgmf->setObjectID( $id );
-							$cgmf->setMapId( $parent_id );
-							$cgmf->Save();
-						}
-					}
-					$cgmlf->getByCompanyIDAndObjectTypeAndObjectIDAndMapID($this->getCompany(), 2020, $id, $this->getId());
-					if ( $cgmlf->getRecordCount() > 0 ) {
-						foreach( $cgmlf as $cgm_obj ) {
-							Debug::text('Deleteing from Company Generic Map: '. $cgm_obj->getID(), __FILE__, __LINE__, __METHOD__, 10);
-							$cgm_obj->Delete();
-						}
-					}
-					//$query = 'delete from ' . $cgmf->getTable() . ' where map_id = ' . $this->getId() . ' and object_id = ' . $id . ' and company_id = ' . $this->getCompany() . ' and object_type_id = 2020 ';
-					//$this->db->Execute($query);
-				}
-			}
-			$this->CommitTransaction();
-			return TRUE;
-		} else {
+                    $this->Validator->isTrue('name',
+                        false,
+                        TTi18n::gettext('Name is already in use')
+                    );
+                    $retval = false;
+                }
+            } else {
+                Debug::Text(' Editing Node ', __FILE__, __LINE__, __METHOD__, 10);
 
-			$retval = TRUE;
-			//if ( $this->getId() === FALSE ) {
+                //Edit node.
+                $retval = $this->getFastTreeObject()->move($this->getID(), $this->getParent());
+            }
 
-			if ( $this->insert_tree === TRUE ) {
-				Debug::Text(' Adding Node ', __FILE__, __LINE__, __METHOD__, 10);
+            if ($retval === true) {
+                $this->CommitTransaction();
+            } else {
+                $this->FailTransaction();
+            }
 
-				//echo "Current ID: ".	$this->getID() ."<br>\n";
-				//echo "Parent ID: ".  $this->getParent() ."<br>\n";
+            return $retval;
+        }
+    }
 
-				//Add node to tree
-				if ( $this->getFastTreeObject()->add( $this->getID(), $this->getParent() ) === FALSE ) {
-					Debug::Text(' Failed adding Node ', __FILE__, __LINE__, __METHOD__, 10);
+    public function setObjectFromArray($data)
+    {
+        if (is_array($data)) {
+            $variable_function_map = $this->getVariableToFunctionMap();
+            foreach ($variable_function_map as $key => $function) {
+                if (isset($data[$key])) {
+                    $function = 'set' . $function;
+                    switch ($key) {
+                        default:
+                            if (method_exists($this, $function)) {
+                                $this->$function($data[$key]);
+                            }
+                            break;
+                    }
+                }
+            }
 
-					$this->Validator->isTrue(	'name',
-												FALSE,
-												TTi18n::gettext('Name is already in use')
-												);
-					$retval = FALSE;
-				}
-			} else {
-				Debug::Text(' Editing Node ', __FILE__, __LINE__, __METHOD__, 10);
+            $this->setCreatedAndUpdatedColumns($data);
 
-				//Edit node.
-				$retval = $this->getFastTreeObject()->move( $this->getID(), $this->getParent() );
-			}
+            return true;
+        }
 
-			if ( $retval === TRUE ) {
-				$this->CommitTransaction();
-			} else {
-				$this->FailTransaction();
-			}
+        return false;
+    }
 
-			return $retval;
-		}
-	}
+    public function getObjectAsArray($include_columns = null, $permission_children_ids = false)
+    {
+        $data = array();
+        $variable_function_map = $this->getVariableToFunctionMap();
+        if (is_array($variable_function_map)) {
+            foreach ($variable_function_map as $variable => $function_stub) {
+                if ($include_columns == null or (isset($include_columns[$variable]) and $include_columns[$variable] == true)) {
+                    $function = 'get' . $function_stub;
+                    switch ($variable) {
+                        default:
+                            if (method_exists($this, $function)) {
+                                $data[$variable] = $this->$function();
+                            }
+                            break;
+                    }
+                }
+            }
+            $this->getPermissionColumns($data, $this->getCreatedBy(), false, $permission_children_ids, $include_columns);
 
-	function setObjectFromArray( $data ) {
-		if ( is_array( $data ) ) {
-			$variable_function_map = $this->getVariableToFunctionMap();
-			foreach( $variable_function_map as $key => $function ) {
-				if ( isset($data[$key]) ) {
+            $this->getCreatedAndUpdatedColumns($data, $include_columns);
+        }
 
-					$function = 'set'.$function;
-					switch( $key ) {
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$this->$function( $data[$key] );
-							}
-							break;
-					}
-				}
-			}
+        return $data;
+    }
 
-			$this->setCreatedAndUpdatedColumns( $data );
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function getObjectAsArray( $include_columns = NULL, $permission_children_ids = FALSE   ) {
-		$data = array();
-		$variable_function_map = $this->getVariableToFunctionMap();
-		if ( is_array( $variable_function_map ) ) {
-			foreach( $variable_function_map as $variable => $function_stub ) {
-				if ( $include_columns == NULL OR ( isset($include_columns[$variable]) AND $include_columns[$variable] == TRUE ) ) {
-
-					$function = 'get'.$function_stub;
-					switch( $variable ) {
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$data[$variable] = $this->$function();
-							}
-							break;
-					}
-
-				}
-			}
-			$this->getPermissionColumns( $data, $this->getCreatedBy(), FALSE, $permission_children_ids, $include_columns );
-
-			$this->getCreatedAndUpdatedColumns( $data, $include_columns );
-		}
-
-		return $data;
-	}
-
-	function addLog( $log_action ) {
-		return TTLog::addEntry( $this->getId(), $log_action, TTi18n::getText('KPI Group'), NULL, $this->getTable(), $this );
-	}
+    public function addLog($log_action)
+    {
+        return TTLog::addEntry($this->getId(), $log_action, TTi18n::getText('KPI Group'), null, $this->getTable(), $this);
+    }
 }
-?>

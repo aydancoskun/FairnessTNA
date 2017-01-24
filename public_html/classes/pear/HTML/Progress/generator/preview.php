@@ -42,16 +42,15 @@
  * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  */
-
 class ActionPreview extends HTML_QuickForm_Action
 {
-    function perform(&$page, $actionName)
+    public function perform(&$page, $actionName)
     {
         // like in Action_Next
         $page->isFormBuilt() or $page->buildForm();
         $page->handle('display');
 
-        $strings = $page->controller->exportValue('page4','strings');
+        $strings = $page->controller->exportValue('page4', 'strings');
         $bar = $page->controller->createProgressBar();
 
         do {
@@ -60,11 +59,11 @@ class ActionPreview extends HTML_QuickForm_Action
                 if (substr($strings, -1) == ";") {
                     $str = explode(";", $strings);
                 } else {
-                    $str = explode(";", $strings.";");
+                    $str = explode(";", $strings . ";");
                 }
-                for ($i=0; $i<count($str)-1; $i++) {
-                    list ($p, $s) = explode(",", $str[$i]);
-                    if ($percent == floatval($p)/100) {
+                for ($i = 0; $i < count($str) - 1; $i++) {
+                    list($p, $s) = explode(",", $str[$i]);
+                    if ($percent == floatval($p) / 100) {
                         $bar->setString(trim($s));
                     }
                 }
@@ -75,7 +74,6 @@ class ActionPreview extends HTML_QuickForm_Action
             }
             $bar->sleep();
             $bar->incValue();
-        } while(1);
+        } while (1);
     }
 }
-?>

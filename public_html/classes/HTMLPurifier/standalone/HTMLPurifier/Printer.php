@@ -43,46 +43,6 @@ class HTMLPurifier_Printer
     // function render() {}
 
     /**
-     * Returns a start tag
-     * @param string $tag Tag name
-     * @param array $attr Attribute array
-     * @return string
-     */
-    protected function start($tag, $attr = array())
-    {
-        return $this->generator->generateFromToken(
-            new HTMLPurifier_Token_Start($tag, $attr ? $attr : array())
-        );
-    }
-
-    /**
-     * Returns an end tag
-     * @param string $tag Tag name
-     * @return string
-     */
-    protected function end($tag)
-    {
-        return $this->generator->generateFromToken(
-            new HTMLPurifier_Token_End($tag)
-        );
-    }
-
-    /**
-     * Prints a complete element with content inside
-     * @param string $tag Tag name
-     * @param string $contents Element contents
-     * @param array $attr Tag attributes
-     * @param bool $escape whether or not to escape contents
-     * @return string
-     */
-    protected function element($tag, $contents, $attr = array(), $escape = true)
-    {
-        return $this->start($tag, $attr) .
-            ($escape ? $this->escape($contents) : $contents) .
-            $this->end($tag);
-    }
-
-    /**
      * @param string $tag
      * @param array $attr
      * @return string
@@ -124,6 +84,34 @@ class HTMLPurifier_Printer
     }
 
     /**
+     * Returns a start tag
+     * @param string $tag Tag name
+     * @param array $attr Attribute array
+     * @return string
+     */
+    protected function start($tag, $attr = array())
+    {
+        return $this->generator->generateFromToken(
+            new HTMLPurifier_Token_Start($tag, $attr ? $attr : array())
+        );
+    }
+
+    /**
+     * Prints a complete element with content inside
+     * @param string $tag Tag name
+     * @param string $contents Element contents
+     * @param array $attr Tag attributes
+     * @param bool $escape whether or not to escape contents
+     * @return string
+     */
+    protected function element($tag, $contents, $attr = array(), $escape = true)
+    {
+        return $this->start($tag, $attr) .
+            ($escape ? $this->escape($contents) : $contents) .
+            $this->end($tag);
+    }
+
+    /**
      * Escapes a string for HTML output.
      * @param string $string String to escape
      * @return string
@@ -133,6 +121,18 @@ class HTMLPurifier_Printer
         $string = HTMLPurifier_Encoder::cleanUTF8($string);
         $string = htmlspecialchars($string, ENT_COMPAT, 'UTF-8');
         return $string;
+    }
+
+    /**
+     * Returns an end tag
+     * @param string $tag Tag name
+     * @return string
+     */
+    protected function end($tag)
+    {
+        return $this->generator->generateFromToken(
+            new HTMLPurifier_Token_End($tag)
+        );
     }
 
     /**

@@ -17,7 +17,7 @@ html, body {
     user-select: none;
 }
 
-.dataError{
+.dataError {
     -webkit-touch-callout: text;
     -webkit-user-select: text;
     -khtml-user-select: text;
@@ -438,20 +438,20 @@ progress::-moz-progress-bar {
 }
 
 .message-container .top-bar-title {
-    position:absolute;
-    top:-2.0em;
-    color:#fff;
-    font-weight:bold;
+    position: absolute;
+    top: -2.0em;
+    color: #fff;
+    font-weight: bold;
 }
 
 .message-container .user-contact-details {
-    width:100%;
-    text-align:left;
-    padding-left:2.0em
+    width: 100%;
+    text-align: left;
+    padding-left: 2.0em
 }
 
 .message-container .row {
-    line-height:2.0em;
+    line-height: 2.0em;
 }
 
 .message-container .contact-notice-text {
@@ -605,7 +605,7 @@ progress::-moz-progress-bar {
 }
 
 .t-text-input,
-.t-color-picker, .cp-HEX{
+.t-color-picker, .cp-HEX {
     width: 156px;
     line-height: 20px;
     outline: none;
@@ -630,10 +630,10 @@ progress::-moz-progress-bar {
 .widget-h-box-mapIcon {
     height: 20px;
     vertical-align: middle;
-    margin-right:0.7em;
+    margin-right: 0.7em;
 }
 
-.widget-h-box-mapLocationWrapper{
+.widget-h-box-mapLocationWrapper {
     display: inline-block;
 }
 
@@ -2628,6 +2628,7 @@ progress::-moz-progress-bar {
 #nano-bar {
     top: 166px !important;
 }
+
 .google-map {
     height: calc(100% - 20px);
     width: 100% !important;
@@ -2671,7 +2672,8 @@ progress::-moz-progress-bar {
 .t-color-picker, .cp-HEX {
     max-width: 50%;
 }
-.flashBackground{
+
+.flashBackground {
     animation-name: flashBackground;
     animation-duration: 2.5s;
     -webkit-animation-name: flashBackground; /* Chrome, Safari, Opera */

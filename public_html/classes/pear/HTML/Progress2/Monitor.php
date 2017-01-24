@@ -66,7 +66,6 @@ require_once 'HTML/QuickForm.php';
  * @link       http://pear.php.net/package/HTML_Progress2
  * @since      Class available since Release 2.0.0RC1
  */
-
 class HTML_Progress2_Monitor
 {
     /**
@@ -76,7 +75,7 @@ class HTML_Progress2_Monitor
      * @since      2.0.0
      * @access     private
      */
-    var $_id;
+    public $_id;
 
     /**#@+
      * Attributes of monitor form.
@@ -85,10 +84,10 @@ class HTML_Progress2_Monitor
      * @since      2.0.0
      * @access     public
      */
-    var $windowname;
-    var $buttonStart;
-    var $buttonCancel;
-    var $autorun;
+    public $windowname;
+    public $buttonStart;
+    public $buttonCancel;
+    public $autorun;
     /**#@-*/
 
     /**
@@ -98,7 +97,7 @@ class HTML_Progress2_Monitor
      * @since      2.0.0
      * @access     public
      */
-    var $caption = array();
+    public $caption = array();
 
     /**
      * The progress object renders into this monitor.
@@ -107,7 +106,7 @@ class HTML_Progress2_Monitor
      * @since      2.0.0
      * @access     private
      */
-    var $_progress;
+    public $_progress;
 
     /**
      * The quickform object that allows the presentation.
@@ -116,7 +115,7 @@ class HTML_Progress2_Monitor
      * @since      2.0.0
      * @access     private
      */
-    var $_form;
+    public $_form;
 
     /**
      * Stores the event dispatcher which handles notifications
@@ -125,7 +124,7 @@ class HTML_Progress2_Monitor
      * @since      2.0.0RC2
      * @access     protected
      */
-    var $dispatcher;
+    public $dispatcher;
 
     /**
      * Count the number of observer registered.
@@ -136,7 +135,7 @@ class HTML_Progress2_Monitor
      * @since      2.0.0RC2
      * @access     private
      */
-    var $_observerCount;
+    public $_observerCount;
 
 
     /**
@@ -145,8 +144,8 @@ class HTML_Progress2_Monitor
      * @since      2.0.0
      * @access     public
      */
-    function HTML_Progress2_Monitor($formName = 'ProgressMonitor', $attributes = array(),
-                                    $errorPrefs = array())
+    public function HTML_Progress2_Monitor($formName = 'ProgressMonitor', $attributes = array(),
+                                           $errorPrefs = array())
     {
         $this->__construct($formName, $attributes, $errorPrefs);
     }
@@ -173,33 +172,31 @@ class HTML_Progress2_Monitor
      *   $monitor = new HTML_Progress2_Monitor($formName, $attributes);
      *   </code>
      *
-     * @param      string    $formName      (optional) Name of monitor dialog box (QuickForm)
-     * @param      array     $attributes    (optional) List of renderer options
-     * @param      array     $errorPrefs    (optional) Hash of params to configure error handler
+     * @param      string $formName (optional) Name of monitor dialog box (QuickForm)
+     * @param      array $attributes (optional) List of renderer options
+     * @param      array $errorPrefs (optional) Hash of params to configure error handler
      *
      * @since      2.0.0
      * @access     protected
      * @throws     HTML_PROGRESS2_ERROR_INVALID_INPUT
      */
-    function __construct($formName = 'ProgressMonitor', $attributes = array(),
-                         $errorPrefs = array())
+    public function __construct($formName = 'ProgressMonitor', $attributes = array(),
+                                $errorPrefs = array())
     {
         $this->_progress = new HTML_Progress2($errorPrefs);
 
         if (!is_string($formName)) {
             return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$formName',
-                      'was' => gettype($formName),
-                      'expected' => 'string',
-                      'paramnum' => 1));
-
+                    'was' => gettype($formName),
+                    'expected' => 'string',
+                    'paramnum' => 1));
         } elseif (!is_array($attributes)) {
             return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$attributes',
-                      'was' => gettype($attributes),
-                      'expected' => 'array',
-                      'paramnum' => 2));
-
+                    'was' => gettype($attributes),
+                    'expected' => 'array',
+                    'paramnum' => 2));
         }
 
         $this->_id = md5(microtime());
@@ -210,12 +207,12 @@ class HTML_Progress2_Monitor
 
         $captionAttr = array('id' => 'monitorStatus', 'valign' => 'bottom', 'left' => 0);
 
-        $this->windowname   = isset($attributes['title'])  ? $attributes['title']  : 'In progress ...';
-        $this->buttonStart  = isset($attributes['start'])  ? $attributes['start']  : 'Start';
+        $this->windowname = isset($attributes['title']) ? $attributes['title'] : 'In progress ...';
+        $this->buttonStart = isset($attributes['start']) ? $attributes['start'] : 'Start';
         $this->buttonCancel = isset($attributes['cancel']) ? $attributes['cancel'] : 'Cancel';
-        $buttonAttr         = isset($attributes['button']) ? $attributes['button'] : '';
-        $this->autorun      = isset($attributes['autorun'])? $attributes['autorun']: false;
-        $this->caption      = isset($attributes['caption'])? $attributes['caption']: $captionAttr;
+        $buttonAttr = isset($attributes['button']) ? $attributes['button'] : '';
+        $this->autorun = isset($attributes['autorun']) ? $attributes['autorun'] : false;
+        $this->caption = isset($attributes['caption']) ? $attributes['caption'] : $captionAttr;
 
         $this->_progress->addLabel(HTML_PROGRESS2_LABEL_TEXT, $this->caption['id']);
         $captionAttr = $this->caption;
@@ -227,12 +224,12 @@ class HTML_Progress2_Monitor
         $this->_form->addElement('static', 'progressBar');
 
         if ($this->isStarted()) {
-            $style = array('disabled'=>'true');
+            $style = array('disabled' => 'true');
         } else {
             $style = null;
         }
 
-        $buttons[] = $this->_form->createElement('submit', 'start',  $this->buttonStart, $style);
+        $buttons[] = $this->_form->createElement('submit', 'start', $this->buttonStart, $style);
         $buttons[] = $this->_form->createElement('submit', 'cancel', $this->buttonCancel);
 
         $buttons[0]->updateAttributes($buttonAttr);
@@ -245,12 +242,56 @@ class HTML_Progress2_Monitor
     }
 
     /**
+     * Detect if progress monitor is started.
+     *
+     * This function returns TRUE if progress monitor was started by user,
+     * FALSE otherwise.
+     *
+     * @return     bool
+     * @since      2.0.0
+     * @access     public
+     */
+    public function isStarted()
+    {
+        $action = $this->_form->getSubmitValues();
+        return (isset($action['start']) || $this->autorun);
+    }
+
+    /**
+     * Links a progress bar to this monitor.
+     *
+     * This function allow to define a complete progress bar from scratch.
+     *
+     * @param      object $bar a html_progress2 instance
+     *
+     * @return     void
+     * @since      2.0.0
+     * @access     public
+     * @throws     HTML_PROGRESS2_ERROR_INVALID_INPUT
+     * @see        getProgressElement()
+     */
+    public function setProgressElement(&$bar)
+    {
+        if (!is_a($bar, 'HTML_Progress2')) {
+            return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$bar',
+                    'was' => gettype($bar),
+                    'expected' => 'HTML_Progress2 object',
+                    'paramnum' => 1));
+        }
+        $this->_progress = $bar;
+
+        $bar = $this->_form->getElement('progressBar');
+        $bar->setText($this->_progress->toHtml());
+    }
+
+    /**
      * Adds a new observer.
      *
      * Adds a new observer to the Event Dispatcher that will listen
      * for all messages emitted by this HTML_Progress2 instance.
      *
-     * @param      mixed     $callback      PHP callback that will act as listener
+     * @param      mixed $callback PHP callback that will act as listener
      *
      * @return     void
      * @since      2.0.0
@@ -258,14 +299,14 @@ class HTML_Progress2_Monitor
      * @throws     HTML_PROGRESS2_ERROR_INVALID_CALLBACK
      * @see        removeListener()
      */
-    function addListener($callback)
+    public function addListener($callback)
     {
         if (!is_callable($callback)) {
             return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_CALLBACK, 'exception',
                 array('var' => '$callback',
-                      'element' => 'valid Class-Method/Function',
-                      'was' => 'callback',
-                      'paramnum' => 1));
+                    'element' => 'valid Class-Method/Function',
+                    'was' => 'callback',
+                    'paramnum' => 1));
         }
 
         $this->dispatcher = Event_Dispatcher::getInstance();
@@ -279,7 +320,7 @@ class HTML_Progress2_Monitor
      * This function removes a registered observer, and if there are no more
      * observer, remove the event dispatcher interface too.
      *
-     * @param      mixed     $callback      PHP callback that act as listener
+     * @param      mixed $callback PHP callback that act as listener
      *
      * @return     bool                     True if observer was removed, false otherwise
      * @since      2.0.0
@@ -287,14 +328,14 @@ class HTML_Progress2_Monitor
      * @throws     HTML_PROGRESS2_ERROR_INVALID_CALLBACK
      * @see        addListener()
      */
-    function removeListener($callback)
+    public function removeListener($callback)
     {
         if (!is_callable($callback)) {
             return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_CALLBACK, 'exception',
                 array('var' => '$callback',
-                      'element' => 'valid Class-Method/Function',
-                      'was' => 'callback',
-                      'paramnum' => 1));
+                    'element' => 'valid Class-Method/Function',
+                    'was' => 'callback',
+                    'paramnum' => 1));
         }
 
         $result = $this->dispatcher->removeObserver($callback);
@@ -306,38 +347,6 @@ class HTML_Progress2_Monitor
             }
         }
         return $result;
-    }
-
-    /**
-     * Detect if progress monitor is started.
-     *
-     * This function returns TRUE if progress monitor was started by user,
-     * FALSE otherwise.
-     *
-     * @return     bool
-     * @since      2.0.0
-     * @access     public
-     */
-    function isStarted()
-    {
-        $action = $this->_form->getSubmitValues();
-        return (isset($action['start']) || $this->autorun);
-    }
-
-    /**
-     * Detect if progress monitor is stopped.
-     *
-     * This function returns TRUE if progress monitor was canceled by user,
-     * FALSE otherwise.
-     *
-     * @return     bool
-     * @since      2.0.0
-     * @access     public
-     */
-    function isCanceled()
-    {
-        $action = $this->_form->getSubmitValues();
-        return (isset($action['cancel']));
     }
 
     /**
@@ -353,7 +362,7 @@ class HTML_Progress2_Monitor
      * @since      2.0.0
      * @access     public
      */
-    function run()
+    public function run()
     {
         if ($this->isCanceled()) {
             $this->_postNotification('onCancel',
@@ -371,31 +380,41 @@ class HTML_Progress2_Monitor
     }
 
     /**
-     * Links a progress bar to this monitor.
+     * Detect if progress monitor is stopped.
      *
-     * This function allow to define a complete progress bar from scratch.
+     * This function returns TRUE if progress monitor was canceled by user,
+     * FALSE otherwise.
      *
-     * @param      object    $bar           a html_progress2 instance
-     *
-     * @return     void
+     * @return     bool
      * @since      2.0.0
      * @access     public
-     * @throws     HTML_PROGRESS2_ERROR_INVALID_INPUT
-     * @see        getProgressElement()
      */
-    function setProgressElement(&$bar)
+    public function isCanceled()
     {
-        if (!is_a($bar, 'HTML_Progress2')) {
-            return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
-                array('var' => '$bar',
-                      'was' => gettype($bar),
-                      'expected' => 'HTML_Progress2 object',
-                      'paramnum' => 1));
-        }
-        $this->_progress = $bar;
+        $action = $this->_form->getSubmitValues();
+        return (isset($action['cancel']));
+    }
 
-        $bar = $this->_form->getElement('progressBar');
-        $bar->setText( $this->_progress->toHtml() );
+    /**
+     * Post a new notification to all observers registered.
+     *
+     * This notification occured only if a dispatcher exists. That means if
+     * at least one observer was registered.
+     *
+     * @param      string $event Name of the notification handler
+     * @param      array $info (optional) Additional information about the notification
+     *
+     * @return     void
+     * @since      2.0.0RC2
+     * @access     private
+     */
+    public function _postNotification($event, $info = array())
+    {
+        if (isset($this->dispatcher)) {
+            $info['sender'] = get_class($this);
+            $info['time'] = microtime();
+            $this->dispatcher->post($this, $event, $info);
+        }
     }
 
     /**
@@ -409,7 +428,7 @@ class HTML_Progress2_Monitor
      * @access     public
      * @see        setProgressElement()
      */
-    function &getProgressElement()
+    public function &getProgressElement()
     {
         return $this->_progress;
     }
@@ -426,14 +445,14 @@ class HTML_Progress2_Monitor
      * @access     public
      * @throws     HTML_PROGRESS2_ERROR_INVALID_INPUT
      */
-    function getStyle($raw = true)
+    public function getStyle($raw = true)
     {
         if (!is_bool($raw)) {
             return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$raw',
-                      'was' => gettype($raw),
-                      'expected' => 'boolean',
-                      'paramnum' => 1));
+                    'was' => gettype($raw),
+                    'expected' => 'boolean',
+                    'paramnum' => 1));
         }
 
         return $this->_progress->getStyle($raw);
@@ -452,45 +471,17 @@ class HTML_Progress2_Monitor
      * @throws     HTML_PROGRESS2_ERROR_INVALID_INPUT
      * @access     public
      */
-    function getScript($raw = true)
+    public function getScript($raw = true)
     {
         if (!is_bool($raw)) {
             return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$raw',
-                      'was' => gettype($raw),
-                      'expected' => 'boolean',
-                      'paramnum' => 1));
+                    'was' => gettype($raw),
+                    'expected' => 'boolean',
+                    'paramnum' => 1));
         }
 
         return $this->_progress->getScript($raw);
-    }
-
-    /**
-     * Returns the progress monitor structure as HTML.
-     *
-     * Get html code required to display the progress monitor in any html document.
-     *
-     * @return     string
-     * @since      2.0.0
-     * @access     public
-     */
-    function toHtml()
-    {
-        $barAttr = $this->_progress->getProgressAttributes();
-        $width = $barAttr['width'] + 70;
-
-        $formTpl = "\n<form{attributes}>"
-                 . "\n<div>"
-                 . "\n{hidden}"
-                 . "<table width=\"{$width}\" border=\"0\">"
-                 . "\n{content}"
-                 . "\n</table>"
-                 . "\n</div>"
-                 . "\n</form>";
-        $renderer = $this->_form->defaultRenderer();
-        $renderer->setFormTemplate($formTpl);
-
-        return $this->_form->toHtml();
     }
 
     /**
@@ -504,9 +495,37 @@ class HTML_Progress2_Monitor
      * @since      2.0.0RC2
      * @access     public
      */
-    function display()
+    public function display()
     {
         echo $this->toHtml();
+    }
+
+    /**
+     * Returns the progress monitor structure as HTML.
+     *
+     * Get html code required to display the progress monitor in any html document.
+     *
+     * @return     string
+     * @since      2.0.0
+     * @access     public
+     */
+    public function toHtml()
+    {
+        $barAttr = $this->_progress->getProgressAttributes();
+        $width = $barAttr['width'] + 70;
+
+        $formTpl = "\n<form{attributes}>"
+            . "\n<div>"
+            . "\n{hidden}"
+            . "<table width=\"{$width}\" border=\"0\">"
+            . "\n{content}"
+            . "\n</table>"
+            . "\n</div>"
+            . "\n</form>";
+        $renderer = $this->_form->defaultRenderer();
+        $renderer->setFormTemplate($formTpl);
+
+        return $this->_form->toHtml();
     }
 
     /**
@@ -514,20 +533,20 @@ class HTML_Progress2_Monitor
      *
      * Accepts a QF renderer for design pattern.
      *
-     * @param      object    $renderer      An HTML_QuickForm_Renderer object
+     * @param      object $renderer An HTML_QuickForm_Renderer object
      *
      * @return     void
      * @since      2.0.0
      * @access     public
      */
-    function accept(&$renderer)
+    public function accept(&$renderer)
     {
         if (!is_a($renderer, 'HTML_QuickForm_Renderer')) {
             return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$renderer',
-                      'was' => gettype($renderer),
-                      'expected' => 'HTML_QuickForm_Renderer object',
-                      'paramnum' => 1));
+                    'was' => gettype($renderer),
+                    'expected' => 'HTML_QuickForm_Renderer object',
+                    'paramnum' => 1));
         }
         $this->_form->accept($renderer);
     }
@@ -546,55 +565,31 @@ class HTML_Progress2_Monitor
      *
      * Variables should simply be surrounded by % as in %varname%
      *
-     * @param      string    $caption       (optional) message template
-     * @param      array     $args          (optional) associative array of
+     * @param      string $caption (optional) message template
+     * @param      array $args (optional) associative array of
      *                                      template var -> message text
      * @since      2.0.0
      * @access     public
      */
-    function setCaption($caption = '&nbsp;', $args = array())
+    public function setCaption($caption = '&nbsp;', $args = array())
     {
         if (!is_string($caption)) {
             return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$caption',
-                      'was' => gettype($caption),
-                      'expected' => 'string',
-                      'paramnum' => 1));
-
+                    'was' => gettype($caption),
+                    'expected' => 'string',
+                    'paramnum' => 1));
         } elseif (!is_array($args)) {
             return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$args',
-                      'was' => gettype($args),
-                      'expected' => 'array',
-                      'paramnum' => 2));
+                    'was' => gettype($args),
+                    'expected' => 'array',
+                    'paramnum' => 2));
         }
 
-        foreach($args as $name => $value) {
+        foreach ($args as $name => $value) {
             $caption = str_replace("%$name%", $value, $caption);
         }
         $this->_progress->setLabelAttributes($this->caption['id'], array('value' => $caption));
     }
-
-    /**
-     * Post a new notification to all observers registered.
-     *
-     * This notification occured only if a dispatcher exists. That means if
-     * at least one observer was registered.
-     *
-     * @param      string    $event         Name of the notification handler
-     * @param      array     $info          (optional) Additional information about the notification
-     *
-     * @return     void
-     * @since      2.0.0RC2
-     * @access     private
-     */
-    function _postNotification($event, $info = array())
-    {
-        if (isset($this->dispatcher)) {
-            $info['sender'] = get_class($this);
-            $info['time']   = microtime();
-            $this->dispatcher->post($this, $event, $info);
-        }
-    }
 }
-?>

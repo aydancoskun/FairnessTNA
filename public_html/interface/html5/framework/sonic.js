@@ -9,9 +9,10 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://sam.zoy.org/wtfpl/COPYING for more details. */
 
-(function(){
+(function () {
 
-    var emptyFn = function(){};
+    var emptyFn = function () {
+    };
 
     function Sonic(d) {
 
@@ -37,7 +38,7 @@
 
         this.stepMethod = typeof d.step == 'string' ?
             stepMethods[d.step] :
-        d.step || stepMethods.square;
+            d.step || stepMethods.square;
 
         this._setup = d.setup || emptyFn;
         this._teardown = d.teardown || emptyFn;
@@ -67,18 +68,18 @@
     var argSignatures = Sonic.argSignatures = {
         arc: [1, 1, 3, 2, 2, 0],
         bezier: [1, 1, 1, 1, 1, 1, 1, 1],
-        line: [1,1,1,1]
+        line: [1, 1, 1, 1]
     };
 
     var pathMethods = Sonic.pathMethods = {
-        bezier: function(t, p0x, p0y, p1x, p1y, c0x, c0y, c1x, c1y) {
+        bezier: function (t, p0x, p0y, p1x, p1y, c0x, c0y, c1x, c1y) {
 
-            t = 1-t;
+            t = 1 - t;
 
-            var i = 1-t,
-                x = t*t,
-                y = i*i,
-                a = x*t,
+            var i = 1 - t,
+                x = t * t,
+                y = i * i,
+                a = x * t,
                 b = 3 * x * i,
                 c = 3 * t * y,
                 d = y * i;
@@ -89,7 +90,7 @@
             ]
 
         },
-        arc: function(t, cx, cy, radius, start, end) {
+        arc: function (t, cx, cy, radius, start, end) {
 
             var point = (end - start) * t + start;
 
@@ -104,7 +105,7 @@
             return ret;
 
         },
-        line: function(t, sx, sy, ex, ey) {
+        line: function (t, sx, sy, ex, ey) {
             return [
                 (ex - sx) * t + sx,
                 (ey - sy) * t + sy
@@ -114,11 +115,11 @@
 
     var stepMethods = Sonic.stepMethods = {
 
-        square: function(point, i, f, color, alpha) {
+        square: function (point, i, f, color, alpha) {
             this._.fillRect(point.x - 3, point.y - 3, 6, 6);
         },
 
-        fader: function(point, i, f, color, alpha) {
+        fader: function (point, i, f, color, alpha) {
 
             this._.beginPath();
 
@@ -138,7 +139,7 @@
 
     Sonic.prototype = {
 
-        calculatePixelRatio: function(){
+        calculatePixelRatio: function () {
 
             var devicePixelRatio = window.devicePixelRatio || 1;
             var backingStoreRatio = this._.webkitBackingStorePixelRatio
@@ -151,7 +152,7 @@
             return devicePixelRatio / backingStoreRatio;
         },
 
-        setup: function() {
+        setup: function () {
 
             var args,
                 type,
@@ -162,26 +163,26 @@
             this.canvas = document.createElement('canvas');
             this._ = this.canvas.getContext('2d');
 
-            if(this.pixelRatio == null){
+            if (this.pixelRatio == null) {
                 this.pixelRatio = this.calculatePixelRatio();
             }
 
             this.canvas.className = this.domClass;
 
-            if(this.pixelRatio != 1){
+            if (this.pixelRatio != 1) {
 
                 this.canvas.style.height = this.fullHeight + 'px';
                 this.canvas.style.width = this.fullWidth + 'px';
 
                 this.fullHeight *= this.pixelRatio;
-                this.fullWidth  *= this.pixelRatio;
+                this.fullWidth *= this.pixelRatio;
 
                 this.canvas.height = this.fullHeight;
                 this.canvas.width = this.fullWidth;
 
                 this._.scale(this.pixelRatio, this.pixelRatio);
 
-            }   else{
+            } else {
 
                 this.canvas.height = this.fullHeight;
                 this.canvas.width = this.fullWidth;
@@ -209,9 +210,10 @@
                             value += this.padding;
                             break;
                         case argTypes.DEGREE:
-                            value *= Math.PI/180;
+                            value *= Math.PI / 180;
                             break;
-                    };
+                    }
+                    ;
 
                     args[a] = value;
 
@@ -222,7 +224,7 @@
                 for (var r, pd = this.pointDistance, t = pd; t <= 1; t += pd) {
 
                     // Avoid crap like 0.15000000000000002
-                    t = Math.round(t*1/pd) / (1/pd);
+                    t = Math.round(t * 1 / pd) / (1 / pd);
 
                     args[0] = t;
 
@@ -246,7 +248,7 @@
 
         },
 
-        prep: function(frame) {
+        prep: function (frame) {
 
             if (frame in this.imageData) {
                 return;
@@ -265,7 +267,7 @@
 
             this._setup();
 
-            for (var i = -1, l = pointsLength*this.trailLength; ++i < l && !this.stopped;) {
+            for (var i = -1, l = pointsLength * this.trailLength; ++i < l && !this.stopped;) {
 
                 index = frame + i;
 
@@ -273,7 +275,7 @@
 
                 if (!point) continue;
 
-                this.alpha = Math.round(1000*(i/(l-1)))/1000;
+                this.alpha = Math.round(1000 * (i / (l - 1))) / 1000;
 
                 this._.globalAlpha = this.alpha;
 
@@ -284,8 +286,8 @@
                     this._.strokeStyle = this.strokeColor;
                 }
 
-                frameD = frame/(this.points.length-1);
-                indexD = i/(l-1);
+                frameD = frame / (this.points.length - 1);
+                indexD = i / (l - 1);
 
                 this._preStep(point, indexD, frameD);
                 this.stepMethod(point, indexD, frameD);
@@ -302,7 +304,7 @@
 
         },
 
-        draw: function() {
+        draw: function () {
 
             if (!this.prep(this.frame)) {
 
@@ -328,7 +330,7 @@
 
         },
 
-        iterateFrame: function() {
+        iterateFrame: function () {
 
             this.frame += this.stepsPerFrame;
 
@@ -341,18 +343,18 @@
 
         },
 
-        play: function() {
+        play: function () {
 
             this.stopped = false;
 
             var hoc = this;
 
-            this.timer = setInterval(function(){
+            this.timer = setInterval(function () {
                 hoc.draw();
             }, 1000 / this.fps);
 
         },
-        stop: function() {
+        stop: function () {
 
             this.stopped = true;
             this.timer && clearInterval(this.timer);

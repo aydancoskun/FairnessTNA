@@ -1,68 +1,67 @@
-var APIRemittanceSummaryReport = ServiceCaller.extend( {
+var APIRemittanceSummaryReport = ServiceCaller.extend({
 
-	key_name: 'RemittanceSummaryReport',
-	className: 'APIRemittanceSummaryReport',
+    key_name: 'RemittanceSummaryReport',
+    className: 'APIRemittanceSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonRemittanceSummaryReportData: function() {
+    getCommonRemittanceSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonRemittanceSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonRemittanceSummaryReportData', arguments);
 
-	},
+    },
 
-	getRemittanceSummaryReport: function() {
+    getRemittanceSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getRemittanceSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getRemittanceSummaryReport', arguments);
 
-	},
+    },
 
-	setRemittanceSummaryReport: function() {
+    setRemittanceSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setRemittanceSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setRemittanceSummaryReport', arguments);
 
-	},
+    },
 
-	getRemittanceSummaryReportDefaultData: function() {
+    getRemittanceSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getRemittanceSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getRemittanceSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteRemittanceSummaryReport: function() {
+    deleteRemittanceSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteRemittanceSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteRemittanceSummaryReport', arguments);
 
-	},
+    },
 
-	validateRemittanceSummaryReport: function() {
+    validateRemittanceSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateRemittanceSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validateRemittanceSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	setCompanyFormConfig: function() {
+    setCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'setCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'setCompanyFormConfig', arguments);
 
-	},
+    },
 
-	getCompanyFormConfig: function() {
+    getCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyFormConfig', arguments);
 
-	}
+    }
 
 
-
-} );
+});

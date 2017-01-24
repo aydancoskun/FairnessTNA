@@ -19,55 +19,56 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1061A extends InstallSchema_Base {
+class InstallSchema_1061A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        //Go through each permission group, and enable schedule, view_open for for anyone who has schedule, view
+        $clf = TTnew('CompanyListFactory');
+        $clf->getAll();
+        if ($clf->getRecordCount() > 0) {
+            foreach ($clf as $c_obj) {
+                Debug::text('Company: ' . $c_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
+                if ($c_obj->getStatus() != 30) {
+                    $pclf = TTnew('PermissionControlListFactory');
+                    $pclf->getByCompanyId($c_obj->getId(), null, null, null, array('name' => 'asc')); //Force order to prevent references to columns that haven't been created yet.
+                    if ($pclf->getRecordCount() > 0) {
+                        foreach ($pclf as $pc_obj) {
+                            Debug::text('Permission Group: ' . $pc_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
+                            $plf = TTnew('PermissionListFactory');
+                            $plf->getByCompanyIdAndPermissionControlIdAndSectionAndNameAndValue($c_obj->getId(), $pc_obj->getId(), 'schedule', 'view', 1);
+                            if ($plf->getRecordCount() > 0) {
+                                Debug::text('Found permission group with schedule, view enabled: ' . $plf->getCurrent()->getValue(), __FILE__, __LINE__, __METHOD__, 9);
+                                $pc_obj->setPermission(
+                                    array('schedule' => array(
+                                        'view_open' => true,
+                                    )
+                                    )
+                                );
+                            } else {
+                                Debug::text('Permission group does NOT have schedule, view_open enabled...', __FILE__, __LINE__, __METHOD__, 9);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-		//Go through each permission group, and enable schedule, view_open for for anyone who has schedule, view
-		$clf = TTnew( 'CompanyListFactory' );
-		$clf->getAll();
-		if ( $clf->getRecordCount() > 0 ) {
-			foreach( $clf as $c_obj ) {
-				Debug::text('Company: '. $c_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
-				if ( $c_obj->getStatus() != 30 ) {
-					$pclf = TTnew( 'PermissionControlListFactory' );
-					$pclf->getByCompanyId( $c_obj->getId(), NULL, NULL, NULL, array( 'name' => 'asc' ) ); //Force order to prevent references to columns that haven't been created yet.
-					if ( $pclf->getRecordCount() > 0 ) {
-						foreach( $pclf as $pc_obj ) {
-							Debug::text('Permission Group: '. $pc_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
-							$plf = TTnew( 'PermissionListFactory' );
-							$plf->getByCompanyIdAndPermissionControlIdAndSectionAndNameAndValue( $c_obj->getId(), $pc_obj->getId(), 'schedule', 'view', 1 );
-							if ( $plf->getRecordCount() > 0 ) {
-								Debug::text('Found permission group with schedule, view enabled: '. $plf->getCurrent()->getValue(), __FILE__, __LINE__, __METHOD__, 9);
-								$pc_obj->setPermission(
-														array(	'schedule' => array(
-																					'view_open' => TRUE,
-																				)
-															)
-														);
-							} else {
-								Debug::text('Permission group does NOT have schedule, view_open enabled...', __FILE__, __LINE__, __METHOD__, 9);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

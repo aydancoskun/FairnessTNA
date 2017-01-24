@@ -1,30 +1,30 @@
-var APIImport = ServiceCaller.extend( {
+var APIImport = ServiceCaller.extend({
 
-	key_name: 'Import',
-	className: 'APIImport',
+    key_name: 'Import',
+    className: 'APIImport',
 
-	getImportObjects: function() {
+    getImportObjects: function () {
 
-		return this.argumentsHandler( this.className, 'getImportObjects', arguments );
+        return this.argumentsHandler(this.className, 'getImportObjects', arguments);
 
-	},
+    },
 
-	getRawData: function() {
+    getRawData: function () {
 
-		return this.argumentsHandler( this.className, 'getRawData', arguments );
+        return this.argumentsHandler(this.className, 'getRawData', arguments);
 
-	},
+    },
 
-	generateColumnMap: function() {
+    generateColumnMap: function () {
 
-		return this.argumentsHandler( this.className, 'generateColumnMap', arguments );
+        return this.argumentsHandler(this.className, 'generateColumnMap', arguments);
 
-	},
+    },
 
-	import: function() {
+    import: function () {
 
-		return this.argumentsHandler( this.className, 'Import', arguments );
+        return this.argumentsHandler(this.className, 'Import', arguments);
 
-	}
+    }
 
-} );
+});

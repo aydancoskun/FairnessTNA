@@ -1,56 +1,55 @@
-var APIUserSummaryReport = ServiceCaller.extend( {
+var APIUserSummaryReport = ServiceCaller.extend({
 
-	key_name: 'UserSummaryReport',
-	className: 'APIUserSummaryReport',
+    key_name: 'UserSummaryReport',
+    className: 'APIUserSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonUserSummaryReportData: function() {
+    getCommonUserSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserSummaryReportData', arguments);
 
-	},
+    },
 
-	getUserSummaryReport: function() {
+    getUserSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getUserSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getUserSummaryReport', arguments);
 
-	},
+    },
 
-	setUserSummaryReport: function() {
+    setUserSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setUserSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setUserSummaryReport', arguments);
 
-	},
+    },
 
-	getUserSummaryReportDefaultData: function() {
+    getUserSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserSummaryReport: function() {
+    deleteUserSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserSummaryReport', arguments);
 
-	},
+    },
 
-	validateUserSummaryReport: function() {
+    validateUserSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validateUserSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

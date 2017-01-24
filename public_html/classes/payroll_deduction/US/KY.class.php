@@ -19,135 +19,136 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package PayrollDeduction\US
  */
-class PayrollDeduction_US_KY extends PayrollDeduction_US {
+class PayrollDeduction_US_KY extends PayrollDeduction_US
+{
+    public $state_income_tax_rate_options = array(
+        20060101 => array(
+            0 => array(
+                array('income' => 3000, 'rate' => 2, 'constant' => 0),
+                array('income' => 4000, 'rate' => 3, 'constant' => 60),
+                array('income' => 5000, 'rate' => 4, 'constant' => 90),
+                array('income' => 8000, 'rate' => 5, 'constant' => 130),
+                array('income' => 75000, 'rate' => 5.8, 'constant' => 280),
+                array('income' => 75000, 'rate' => 6, 'constant' => 4166),
+            ),
+        ),
+    );
 
-	var $state_income_tax_rate_options = array(
-												20060101 => array(
-															0 => array(
-																	array( 'income' => 3000,	'rate' => 2,	'constant' => 0 ),
-																	array( 'income' => 4000,	'rate' => 3,	'constant' => 60 ),
-																	array( 'income' => 5000,	'rate' => 4,	'constant' => 90 ),
-																	array( 'income' => 8000,	'rate' => 5,	'constant' => 130 ),
-																	array( 'income' => 75000,	'rate' => 5.8,	'constant' => 280 ),
-																	array( 'income' => 75000,	'rate' => 6,	'constant' => 4166 ),
-																),
-															),
-												);
 
+    public $state_options = array(
+        20170101 => array( //01-Jan-2017
+            'standard_deduction' => 2480,
+            'allowance' => 10
+        ),
+        20160101 => array( //01-Jan-2016
+            'standard_deduction' => 2460,
+            'allowance' => 20
+        ),
+        20150101 => array( //01-Jan-2015
+            'standard_deduction' => 2440,
+            'allowance' => 20
+        ),
+        20140101 => array( //01-Jan-2014
+            'standard_deduction' => 2400,
+            'allowance' => 20
+        ),
+        20130101 => array( //01-Jan-2013
+            'standard_deduction' => 2360,
+            'allowance' => 20
+        ),
+        //20120101
+        20090101 => array( //01-Jan-2012 **Had the wrong date before, was 2009.
+            'standard_deduction' => 2290,
+            'allowance' => 20
+        ),
+        20090101 => array( //01-Jan-2009
+            'standard_deduction' => 2190,
+            'allowance' => 20
+        ),
+        20080101 => array(
+            'standard_deduction' => 2100,
+            'allowance' => 20
+        ),
+        20070101 => array(
+            'standard_deduction' => 2050,
+            'allowance' => 20
+        ),
+        20060101 => array(
+            'standard_deduction' => 1970,
+            'allowance' => 22
+        )
+    );
 
-	var $state_options = array(
-								20170101 => array( //01-Jan-2017
-													'standard_deduction' => 2480,
-													'allowance' => 10
-													),
-								20160101 => array( //01-Jan-2016
-													'standard_deduction' => 2460,
-													'allowance' => 20
-													),
-								20150101 => array( //01-Jan-2015
-													'standard_deduction' => 2440,
-													'allowance' => 20
-													),
-								20140101 => array( //01-Jan-2014
-													'standard_deduction' => 2400,
-													'allowance' => 20
-													),
-								20130101 => array( //01-Jan-2013
-													'standard_deduction' => 2360,
-													'allowance' => 20
-													),
-								//20120101
-								20090101 => array( //01-Jan-2012 **Had the wrong date before, was 2009.
-													'standard_deduction' => 2290,
-													'allowance' => 20
-													),
-								20090101 => array( //01-Jan-2009
-													'standard_deduction' => 2190,
-													'allowance' => 20
-													),
-								20080101 => array(
-													'standard_deduction' => 2100,
-													'allowance' => 20
-													),
-								20070101 => array(
-													'standard_deduction' => 2050,
-													'allowance' => 20
-													),
-								20060101 => array(
-													'standard_deduction' => 1970,
-													'allowance' => 22
-													)
-								);
+    public function getStateTaxPayable()
+    {
+        $annual_income = $this->getStateAnnualTaxableIncome();
 
-	function getStateAnnualTaxableIncome() {
-		$annual_income = $this->getAnnualTaxableIncome();
-		$standard_deduction = $this->getStateStandardDeduction();
+        $retval = 0;
 
-		$income = bcsub( $annual_income, $standard_deduction );
+        if ($annual_income > 0) {
+            $rate = $this->getData()->getStateRate($annual_income);
+            $prev_income = $this->getData()->getStateRatePreviousIncome($annual_income);
+            $state_constant = $this->getData()->getStateConstant($annual_income);
 
-		Debug::text('State Annual Taxable Income: '. $income, __FILE__, __LINE__, __METHOD__, 10);
+            $retval = bcadd(bcmul(bcsub($annual_income, $prev_income), $rate), $state_constant);
+        }
 
-		return $income;
-	}
+        $retval = bcsub($retval, $this->getStateAllowanceAmount());
 
-	function getStateStandardDeduction() {
-		$retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
-		if ( $retarr == FALSE ) {
-			return FALSE;
+        if ($retval < 0) {
+            $retval = 0;
+        }
 
-		}
+        Debug::text('State Annual Tax Payable: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		$retval = $retarr['standard_deduction'];
+        return $retval;
+    }
 
-		Debug::text('State Standard Deduction Amount: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
+    public function getStateAnnualTaxableIncome()
+    {
+        $annual_income = $this->getAnnualTaxableIncome();
+        $standard_deduction = $this->getStateStandardDeduction();
 
-		return $retval;
-	}
+        $income = bcsub($annual_income, $standard_deduction);
 
-	function getStateAllowanceAmount() {
-		$retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
-		if ( $retarr == FALSE ) {
-			return FALSE;
+        Debug::text('State Annual Taxable Income: ' . $income, __FILE__, __LINE__, __METHOD__, 10);
 
-		}
+        return $income;
+    }
 
-		$allowance_arr = $retarr['allowance'];
+    public function getStateStandardDeduction()
+    {
+        $retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
+        if ($retarr == false) {
+            return false;
+        }
 
-		$retval = bcmul( $this->getStateAllowance(), $allowance_arr );
+        $retval = $retarr['standard_deduction'];
 
-		Debug::text('State Allowance Amount: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
+        Debug::text('State Standard Deduction Amount: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		return $retval;
-	}
+        return $retval;
+    }
 
-	function getStateTaxPayable() {
-		$annual_income = $this->getStateAnnualTaxableIncome();
+    public function getStateAllowanceAmount()
+    {
+        $retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
+        if ($retarr == false) {
+            return false;
+        }
 
-		$retval = 0;
+        $allowance_arr = $retarr['allowance'];
 
-		if ( $annual_income > 0 ) {
-			$rate = $this->getData()->getStateRate($annual_income);
-			$prev_income = $this->getData()->getStateRatePreviousIncome($annual_income);
-			$state_constant = $this->getData()->getStateConstant($annual_income);
+        $retval = bcmul($this->getStateAllowance(), $allowance_arr);
 
-			$retval = bcadd( bcmul( bcsub( $annual_income, $prev_income ), $rate ), $state_constant );
-		}
+        Debug::text('State Allowance Amount: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		$retval = bcsub( $retval, $this->getStateAllowanceAmount() );
-
-		if ( $retval < 0 ) {
-			$retval = 0;
-		}
-
-		Debug::text('State Annual Tax Payable: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
-
-		return $retval;
-	}
+        return $retval;
+    }
 }
-?>

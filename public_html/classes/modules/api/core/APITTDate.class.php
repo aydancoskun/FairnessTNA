@@ -19,13 +19,13 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Core
  */
-class APITTDate extends TTDate {
-	protected $main_class = 'TTDate';
+class APITTDate extends TTDate
+{
+    protected $main_class = 'TTDate';
 }
-?>

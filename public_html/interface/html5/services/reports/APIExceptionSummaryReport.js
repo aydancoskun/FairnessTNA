@@ -1,56 +1,55 @@
-var APIExceptionSummaryReport = ServiceCaller.extend( {
+var APIExceptionSummaryReport = ServiceCaller.extend({
 
-	key_name: 'ExceptionReport',
-	className: 'APIExceptionReport',
+    key_name: 'ExceptionReport',
+    className: 'APIExceptionReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonExceptionReportData: function() {
+    getCommonExceptionReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonExceptionReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonExceptionReportData', arguments);
 
-	},
+    },
 
-	getExceptionReport: function() {
+    getExceptionReport: function () {
 
-		return this.argumentsHandler( this.className, 'getExceptionReport', arguments );
+        return this.argumentsHandler(this.className, 'getExceptionReport', arguments);
 
-	},
+    },
 
-	setExceptionReport: function() {
+    setExceptionReport: function () {
 
-		return this.argumentsHandler( this.className, 'setExceptionReport', arguments );
+        return this.argumentsHandler(this.className, 'setExceptionReport', arguments);
 
-	},
+    },
 
-	getExceptionReportDefaultData: function() {
+    getExceptionReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getExceptionReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getExceptionReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteExceptionReport: function() {
+    deleteExceptionReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteExceptionReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteExceptionReport', arguments);
 
-	},
+    },
 
-	validateExceptionReport: function() {
+    validateExceptionReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateExceptionReport', arguments );
+        return this.argumentsHandler(this.className, 'validateExceptionReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

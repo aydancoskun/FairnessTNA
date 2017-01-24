@@ -1,51 +1,51 @@
-var APIUserTitle = ServiceCaller.extend( {
+var APIUserTitle = ServiceCaller.extend({
 
-	key_name: 'UserTitle',
-	className: 'APIUserTitle',
+    key_name: 'UserTitle',
+    className: 'APIUserTitle',
 
-	getUserTitle: function() {
+    getUserTitle: function () {
 
-		return this.argumentsHandler( this.className, 'getUserTitle', arguments );
+        return this.argumentsHandler(this.className, 'getUserTitle', arguments);
 
-	},
+    },
 
-	getUserTitleDefaultData: function() {
+    getUserTitleDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserTitleDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserTitleDefaultData', arguments);
 
-	},
+    },
 
-	getCommonUserTitleData: function() {
+    getCommonUserTitleData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserTitleData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserTitleData', arguments);
 
-	},
+    },
 
-	setUserTitle: function() {
+    setUserTitle: function () {
 
-		return this.argumentsHandler( this.className, 'setUserTitle', arguments );
+        return this.argumentsHandler(this.className, 'setUserTitle', arguments);
 
-	},
+    },
 
-	deleteUserTitle: function() {
+    deleteUserTitle: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserTitle', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserTitle', arguments);
 
-	},
+    },
 
-	validateUserTitle: function() {
+    validateUserTitle: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserTitle', arguments );
+        return this.argumentsHandler(this.className, 'validateUserTitle', arguments);
 
-	},
+    },
 
-	copyUserTitle: function() {
-		return this.argumentsHandler( this.className, 'copyUserTitle', arguments );
-	},
+    copyUserTitle: function () {
+        return this.argumentsHandler(this.className, 'copyUserTitle', arguments);
+    },
 
-	exportUserTitle: function() {
-		return this.argumentsHandler( this.className, 'exportUserTitle', arguments );
-	},
+    exportUserTitle: function () {
+        return this.argumentsHandler(this.className, 'exportUserTitle', arguments);
+    },
 
 
-} );
+});

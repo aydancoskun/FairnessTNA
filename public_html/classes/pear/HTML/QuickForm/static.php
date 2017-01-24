@@ -23,12 +23,13 @@ require_once("HTML/QuickForm/element.php");
 
 /**
  * HTML class for static data
- * 
+ *
  * @author       Wojciech Gdela <eltehaem@poczta.onet.pl>
  * @access       public
  */
-class HTML_QuickForm_static extends HTML_QuickForm_element {
-    
+class HTML_QuickForm_static extends HTML_QuickForm_element
+{
+
     // {{{ properties
 
     /**
@@ -36,20 +37,20 @@ class HTML_QuickForm_static extends HTML_QuickForm_element {
      * @var       string
      * @access    private
      */
-    static $_text = null;
+    public static $_text = null;
 
     // }}}
     // {{{ constructor
-    
+
     /**
      * Class constructor
-     * 
-     * @param     string    $elementLabel   (optional)Label
-     * @param     string    $text           (optional)Display text
+     *
+     * @param     string $elementLabel (optional)Label
+     * @param     string $text (optional)Display text
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_static($elementName=null, $elementLabel=null, $text=null)
+    public function HTML_QuickForm_static($elementName = null, $elementLabel = null, $text = null)
     {
         //HTML_QuickForm_element::HTML_QuickForm_element($elementName, $elementLabel);
         new HTML_QuickForm_element($elementName, $elementLabel);
@@ -57,32 +58,32 @@ class HTML_QuickForm_static extends HTML_QuickForm_element {
         self::$_type = 'static';
         self::$_text = $text;
     } //end constructor
-    
+
     // }}}
     // {{{ setName()
 
     /**
      * Sets the element name
-     * 
-     * @param     string    $name   Element name
+     *
+     * @param     string $name Element name
      * @access    public
      * @return    void
      */
-    static function setName($name)
+    public static function setName($name)
     {
-        self::updateAttributes(array('name'=>$name));
+        self::updateAttributes(array('name' => $name));
     } //end func setName
-    
+
     // }}}
     // {{{ getName()
 
     /**
      * Returns the element name
-     * 
+     *
      * @access    public
      * @return    string
      */
-    static function getName()
+    public static function getName()
     {
         return self::getAttribute('name');
     } //end func getName
@@ -91,75 +92,45 @@ class HTML_QuickForm_static extends HTML_QuickForm_element {
     // {{{ setText()
 
     /**
-     * Sets the text
+     * Returns the value of field without HTML tags
      *
-     * @param     string    $text
      * @access    public
-     * @return    void
+     * @return    string
      */
-    static function setText($text)
+    public static function getFrozenHtml()
     {
-        self::$_text = $text;
+        return self::toHtml();
     } // end func setText
 
     // }}}
     // {{{ setValue()
 
     /**
-     * Sets the text (uses the standard setValue call to emulate a form element.
-     *
-     * @param     string    $text
-     * @access    public
-     * @return    void
-     */
-    static function setValue($text)
-    {
-        self::setText($text);
-    } // end func setValue
-
-    // }}}    
-    // {{{ toHtml()
-
-    /**
      * Returns the static text element in HTML
-     * 
+     *
      * @access    public
      * @return    string
      */
-    static function toHtml()
+    public static function toHtml()
     {
         return self::_getTabs() . self::$_text;
-    } //end func toHtml
-    
-    // }}}
-    // {{{ getFrozenHtml()
-
-    /**
-     * Returns the value of field without HTML tags
-     * 
-     * @access    public
-     * @return    string
-     */
-    static function getFrozenHtml()
-    {
-        return self::toHtml();
-    } //end func getFrozenHtml
+    } // end func setValue
 
     // }}}
-    // {{{ onQuickFormEvent()
+    // {{{ toHtml()
 
     /**
      * Called by HTML_QuickForm whenever form event is made on this element
      *
-     * @param     string    $event  Name of event
-     * @param     mixed     $arg    event arguments
-     * @param     object    $caller calling object
+     * @param     string $event Name of event
+     * @param     mixed $arg event arguments
+     * @param     object $caller calling object
      * @since     1.0
      * @access    public
      * @return    void
-     * @throws    
+     * @throws
      */
-    static function onQuickFormEvent($event, $arg, &$caller)
+    public static function onQuickFormEvent($event, $arg, &$caller)
     {
         switch ($event) {
             case 'updateValue':
@@ -176,19 +147,48 @@ class HTML_QuickForm_static extends HTML_QuickForm_element {
                 parent::onQuickFormEvent($event, $arg, $caller);
         }
         return true;
+    } //end func toHtml
+
+    // }}}
+    // {{{ getFrozenHtml()
+
+    /**
+     * Sets the text (uses the standard setValue call to emulate a form element.
+     *
+     * @param     string $text
+     * @access    public
+     * @return    void
+     */
+    public static function setValue($text)
+    {
+        self::setText($text);
+    } //end func getFrozenHtml
+
+    // }}}
+    // {{{ onQuickFormEvent()
+
+    /**
+     * Sets the text
+     *
+     * @param     string $text
+     * @access    public
+     * @return    void
+     */
+    public static function setText($text)
+    {
+        self::$_text = $text;
     } // end func onQuickFormEvent
 
     // }}}
     // {{{ exportValue()
 
-   /**
-    * We override this here because we don't want any values from static elements
-    */
-    static function exportValue(&$submitValues, $assoc = false)
+    /**
+     * We override this here because we don't want any values from static elements
+     */
+    public static function exportValue(&$submitValues, $assoc = false)
     {
         return null;
     }
-    
+
     // }}}
-} //end class HTML_QuickForm_static
-?>
+} //end class HTML_QuickForm_static;

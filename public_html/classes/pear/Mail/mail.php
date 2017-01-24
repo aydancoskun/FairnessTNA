@@ -36,7 +36,7 @@
  *
  * @category    Mail
  * @package     Mail
- * @author      Chuck Hagenbuch <chuck@horde.org> 
+ * @author      Chuck Hagenbuch <chuck@horde.org>
  * @copyright   2010 Chuck Hagenbuch
  * @license     http://opensource.org/licenses/bsd-license.php New BSD License
  * @version     CVS: $Id$
@@ -48,13 +48,14 @@
  * @package Mail
  * @version $Revision$
  */
-class Mail_mail extends Mail {
+class Mail_mail extends Mail
+{
 
     /**
      * Any arguments to pass to the mail() function.
      * @var string
      */
-    var $_params = '';
+    public $_params = '';
 
     /**
      * Constructor.
@@ -151,7 +152,7 @@ class Mail_mail extends Mail {
             $result = mail($recipients, $subject, $body, $text_headers);
         } else {
             $result = mail($recipients, $subject, $body, $text_headers,
-                           $this->_params);
+                $this->_params);
         }
 
         // If the mail() function returned failure, we need to create a
@@ -162,5 +163,4 @@ class Mail_mail extends Mail {
 
         return $result;
     }
-
 }

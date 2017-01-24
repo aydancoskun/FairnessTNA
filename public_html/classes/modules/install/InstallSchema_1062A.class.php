@@ -19,35 +19,36 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1062A extends InstallSchema_Base {
+class InstallSchema_1062A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        //Enable AutoUpgrade maintenance job to occur after MiscDaily (backup) has completed.
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('AutoUpgrade');
+        $cjf->setMinute(rand(0, 59)); //Random time once a day for load balancing
+        $cjf->setHour(rand(2, 4)); //Random time once a day for load balancing
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand('AutoUpgrade.php');
+        $cjf->Save();
 
-		//Enable AutoUpgrade maintenance job to occur after MiscDaily (backup) has completed.
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('AutoUpgrade');
-		$cjf->setMinute( rand(0, 59) ); //Random time once a day for load balancing
-		$cjf->setHour( rand(2, 4) ); //Random time once a day for load balancing
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand('AutoUpgrade.php');
-		$cjf->Save();
-
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

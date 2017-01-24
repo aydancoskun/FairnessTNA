@@ -19,114 +19,143 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 /*
 CREATE TABLE department_branch (
-	id serial NOT NULL,
-	branch_id integer DEFAULT 0 NOT NULL,
-	department_id integer DEFAULT 0 NOT NULL
+    id serial NOT NULL,
+    branch_id integer DEFAULT 0 NOT NULL,
+    department_id integer DEFAULT 0 NOT NULL
 ) WITHOUT OIDS;
 */
 
 /**
  * @package Modules\Department
  */
-class DepartmentBranchFactory extends Factory {
-	protected $table = 'department_branch';
-	protected $pk_sequence_name = 'department_branch_id_seq'; //PK Sequence name
-	function getDepartment() {
-		return (int)$this->data['department_id'];
-	}
-	function setDepartment($id) {
-		$id = trim($id);
-		
-		$dlf = TTnew( 'DepartmentListFactory' );
-		
-		if ( $id != 0
-				OR $this->Validator->isResultSetWithRows(	'company',
-															$dlf->getByID($id),
-															TTi18n::gettext('Company is invalid')
-															) ) {
-			$this->data['department_id'] = $id;
-		
-			return TRUE;
-		}
+class DepartmentBranchFactory extends Factory
+{
+    protected $table = 'department_branch';
+    protected $pk_sequence_name = 'department_branch_id_seq'; //PK Sequence name
 
-		return FALSE;
-	}
+    public function getDepartment()
+    {
+        return (int)$this->data['department_id'];
+    }
 
-	function getBranch() {
-		return (int)$this->data['branch_id'];
-	}
-	function setBranch($id) {
-		$id = trim($id);
-		
-		$blf = TTnew( 'BranchListFactory' );
-		
-		if ( $id != 0
-				OR $this->Validator->isResultSetWithRows(	'company',
-															$blf->getByID($id),
-															TTi18n::gettext('Company is invalid')
-															) ) {
-			$this->data['branch_id'] = $id;
-		
-			return TRUE;
-		}
+    public function setDepartment($id)
+    {
+        $id = trim($id);
 
-		return FALSE;
-	}
-	
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {		
-		return FALSE;
-	}
-	
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;		
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;		
-	}
+        $dlf = TTnew('DepartmentListFactory');
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;		
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;	
-	}
+        if ($id != 0
+            or $this->Validator->isResultSetWithRows('company',
+                $dlf->getByID($id),
+                TTi18n::gettext('Company is invalid')
+            )
+        ) {
+            $this->data['department_id'] = $id;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getBranch()
+    {
+        return (int)$this->data['branch_id'];
+    }
+
+    public function setBranch($id)
+    {
+        $id = trim($id);
+
+        $blf = TTnew('BranchListFactory');
+
+        if ($id != 0
+            or $this->Validator->isResultSetWithRows('company',
+                $blf->getByID($id),
+                TTi18n::gettext('Company is invalid')
+            )
+        ) {
+            $this->data['branch_id'] = $id;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    //This table doesn't have any of these columns, so overload the functions.
+    public function getDeleted()
+    {
+        return false;
+    }
+
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedDate()
+    {
+        return false;
+    }
+
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
 
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {		
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {		
-		return FALSE;
-	}
+    public function getDeletedDate()
+    {
+        return false;
+    }
 
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
 
+    public function getDeletedBy()
+    {
+        return false;
+    }
 
-
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 }
-?>

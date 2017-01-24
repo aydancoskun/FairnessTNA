@@ -87,7 +87,7 @@ define('DATE_SPAN_INPUT_FORMAT_NNSV', 1);
  *
  * @global string
  */
-$GLOBALS['_DATE_SPAN_FORMAT']  = '%C';
+$GLOBALS['_DATE_SPAN_FORMAT'] = '%C';
 
 /**
  * Default time format when converting from a string.
@@ -118,22 +118,22 @@ class Date_Span
     /**
      * @var int
      */
-    var $day;
+    public $day;
 
     /**
      * @var int
      */
-    var $hour;
+    public $hour;
 
     /**
      * @var int
      */
-    var $minute;
+    public $minute;
 
     /**
      * @var int
      */
-    var $second;
+    public $second;
 
     // }}}
     // {{{ Constructor
@@ -143,14 +143,14 @@ class Date_Span
      *
      * Creates the time span object calling the set() method.
      *
-     * @param  mixed $time   Time span expression.
+     * @param  mixed $time Time span expression.
      * @param  mixed $format Format string to set it from a string or the
      *                       second date set it from a date diff.
      *
      * @see    set()
      * @access public
      */
-    function Date_Span($time = 0, $format = null)
+    public function Date_Span($time = 0, $format = null)
     {
         $this->set($time, $format);
     }
@@ -164,7 +164,7 @@ class Date_Span
      * Sets the time span depending on the argument types, calling
      * to the appropriate setFromXxx() method.
      *
-     * @param  mixed $time   Time span expression.
+     * @param  mixed $time Time span expression.
      * @param  mixed $format Format string to set it from a string or the
      *                       second date set it from a date diff.
      *
@@ -177,7 +177,7 @@ class Date_Span
      * @see    setFromDateDiff()
      * @access public
      */
-    function set($time = 0, $format = null)
+    public function set($time = 0, $format = null)
     {
         if (is_a($time, 'date_span')) {
             return $this->copy($time);
@@ -198,6 +198,98 @@ class Date_Span
     // {{{ setFromArray()
 
     /**
+     * Set the time span from another time object.
+     *
+     * @param  object Date_Span $time Source time span object.
+     *
+     * @return bool   True on success.
+     *
+     * @access public
+     */
+    public function copy($time)
+    {
+        if (is_a($time, 'date_span')) {
+            $this->second = $time->second;
+            $this->minute = $time->minute;
+            $this->hour = $time->hour;
+            $this->day = $time->day;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // }}}
+    // {{{ setFromString()
+
+    /**
+     * Set the span from the elapsed time between two dates.
+     *
+     * Set the span from the elapsed time between two dates. The time span
+     * is allways positive, so the date's order is not important.
+     *
+     * @param  object Date $date1 First Date.
+     * @param  object Date $date2 Second Date.
+     *
+     * @return bool  True on success.
+     *
+     * @access public
+     */
+    public function setFromDateDiff($date1, $date2)
+    {
+        if (!is_a($date1, 'date') or !is_a($date2, 'date')) {
+            return false;
+        }
+        $date1->toUTC();
+        $date2->toUTC();
+        if ($date1->after($date2)) {
+            list($date1, $date2) = array($date2, $date1);
+        }
+        $days = Date_Calc::dateDiff(
+            $date1->getDay(), $date1->getMonth(), $date1->getYear(),
+            $date2->getDay(), $date2->getMonth(), $date2->getYear()
+        );
+        $hours = $date2->getHour() - $date1->getHour();
+        $mins = $date2->getMinute() - $date1->getMinute();
+        $secs = $date2->getSecond() - $date1->getSecond();
+        $this->setFromSeconds(
+            $days * 86400 + $hours * 3600 + $mins * 60 + $secs
+        );
+        return true;
+    }
+
+    // }}}
+    // {{{ setFromSeconds()
+
+    /**
+     * Set the time span from a total number of seconds.
+     *
+     * @param  int $seconds Total number of seconds.
+     *
+     * @return bool True on success.
+     *
+     * @access public
+     */
+    public function setFromSeconds($seconds)
+    {
+        if ($seconds < 0) {
+            return false;
+        }
+        $sec = intval($seconds);
+        $min = floor($sec / 60);
+        $hour = floor($min / 60);
+        $day = intval(floor($hour / 24));
+        $this->second = $sec % 60;
+        $this->minute = $min % 60;
+        $this->hour = $hour % 24;
+        $this->day = $day;
+        return true;
+    }
+
+    // }}}
+    // {{{ setFromMinutes()
+
+    /**
      * Set the time span from an array.
      *
      * Set the time span from an array. Any value can be a float (but it
@@ -214,7 +306,7 @@ class Date_Span
      *
      * @access public
      */
-    function setFromArray($time)
+    public function setFromArray($time)
     {
         if (!is_array($time)) {
             return false;
@@ -240,7 +332,91 @@ class Date_Span
     }
 
     // }}}
-    // {{{ setFromString()
+    // {{{ setFromHours()
+
+    /**
+     * Set the time span from a total number of minutes.
+     *
+     * @param  float $minutes Total number of minutes.
+     *
+     * @return bool  True on success.
+     *
+     * @access public
+     */
+    public function setFromMinutes($minutes)
+    {
+        return $this->setFromSeconds(round($minutes * 60));
+    }
+
+    // }}}
+    // {{{ setFromDays()
+
+    /**
+     * Adds a time span.
+     *
+     * @param  object Date_Span $time Time span to add.
+     *
+     * @access public
+     */
+    public function add($time)
+    {
+        return $this->setFromSeconds(
+            $this->toSeconds() + $time->toSeconds()
+        );
+    }
+
+    // }}}
+    // {{{ setFromDateDiff()
+
+    /**
+     * Convert time span to seconds.
+     *
+     * @return int Time span as an integer number of seconds.
+     *
+     * @access public
+     */
+    public function toSeconds()
+    {
+        return $this->day * 86400 + $this->hour * 3600 +
+            $this->minute * 60 + $this->second;
+    }
+
+    // }}}
+    // {{{ copy()
+
+    /**
+     * Set the time span from a total number of hours.
+     *
+     * @param  float $hours Total number of hours.
+     *
+     * @return bool  True on success.
+     *
+     * @access public
+     */
+    public function setFromHours($hours)
+    {
+        return $this->setFromSeconds(round($hours * 3600));
+    }
+
+    // }}}
+    // {{{ format()
+
+    /**
+     * Set the time span from a total number of days.
+     *
+     * @param  float $days Total number of days.
+     *
+     * @return bool  True on success.
+     *
+     * @access public
+     */
+    public function setFromDays($days)
+    {
+        return $this->setFromSeconds(round($days * 86400));
+    }
+
+    // }}}
+    // {{{ toSeconds()
 
     /**
      * Set the time span from a string based on an input format.
@@ -284,7 +460,7 @@ class Date_Span
      *  <code>%T</code> Current time equivalent, same as "%H:%M:%S".<br>
      *  <code>%%</code> Literal '%'.<br>
      *
-     * @param  string $time   String from where to get the time span
+     * @param  string $time String from where to get the time span
      *                        information.
      * @param  string $format Format string.
      *
@@ -292,7 +468,7 @@ class Date_Span
      *
      * @access public
      */
-    function setFromString($time, $format = null)
+    public function setFromString($time, $format = null)
     {
         if (is_null($format)) {
             $format = $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
@@ -408,8 +584,8 @@ class Date_Span
                 return false;
             }
             $this->setFromArray(array($day, $hour, $minute, $second));
-        // If format is a integer, it uses a predefined format
-        // detection method.
+            // If format is a integer, it uses a predefined format
+            // detection method.
         } elseif (is_integer($format)) {
             switch ($format) {
                 case DATE_SPAN_INPUT_FORMAT_NNSV:
@@ -437,150 +613,7 @@ class Date_Span
     }
 
     // }}}
-    // {{{ setFromSeconds()
-
-    /**
-     * Set the time span from a total number of seconds.
-     *
-     * @param  int  $seconds Total number of seconds.
-     *
-     * @return bool True on success.
-     *
-     * @access public
-     */
-    function setFromSeconds($seconds)
-    {
-        if ($seconds < 0) {
-            return false;
-        }
-        $sec  = intval($seconds);
-        $min  = floor($sec / 60);
-        $hour = floor($min / 60);
-        $day  = intval(floor($hour / 24));
-        $this->second = $sec % 60;
-        $this->minute = $min % 60;
-        $this->hour   = $hour % 24;
-        $this->day    = $day;
-        return true;
-    }
-
-    // }}}
-    // {{{ setFromMinutes()
-
-    /**
-     * Set the time span from a total number of minutes.
-     *
-     * @param  float $minutes Total number of minutes.
-     *
-     * @return bool  True on success.
-     *
-     * @access public
-     */
-    function setFromMinutes($minutes)
-    {
-        return $this->setFromSeconds(round($minutes * 60));
-    }
-
-    // }}}
-    // {{{ setFromHours()
-
-    /**
-     * Set the time span from a total number of hours.
-     *
-     * @param  float $hours Total number of hours.
-     *
-     * @return bool  True on success.
-     *
-     * @access public
-     */
-    function setFromHours($hours)
-    {
-        return $this->setFromSeconds(round($hours * 3600));
-    }
-
-    // }}}
-    // {{{ setFromDays()
-
-    /**
-     * Set the time span from a total number of days.
-     *
-     * @param  float $days Total number of days.
-     *
-     * @return bool  True on success.
-     *
-     * @access public
-     */
-    function setFromDays($days)
-    {
-        return $this->setFromSeconds(round($days * 86400));
-    }
-
-    // }}}
-    // {{{ setFromDateDiff()
-
-    /**
-     * Set the span from the elapsed time between two dates.
-     *
-     * Set the span from the elapsed time between two dates. The time span
-     * is allways positive, so the date's order is not important.
-     *
-     * @param  object Date $date1 First Date.
-     * @param  object Date $date2 Second Date.
-     *
-     * @return bool  True on success.
-     *
-     * @access public
-     */
-    function setFromDateDiff($date1, $date2)
-    {
-        if (!is_a($date1, 'date') or !is_a($date2, 'date')) {
-            return false;
-        }
-        $date1->toUTC();
-        $date2->toUTC();
-        if ($date1->after($date2)) {
-            list($date1, $date2) = array($date2, $date1);
-        }
-        $days = Date_Calc::dateDiff(
-            $date1->getDay(), $date1->getMonth(), $date1->getYear(),
-            $date2->getDay(), $date2->getMonth(), $date2->getYear()
-        );
-        $hours = $date2->getHour() - $date1->getHour();
-        $mins  = $date2->getMinute() - $date1->getMinute();
-        $secs  = $date2->getSecond() - $date1->getSecond();
-        $this->setFromSeconds(
-            $days * 86400 + $hours * 3600 + $mins * 60 + $secs
-        );
-        return true;
-    }
-
-    // }}}
-    // {{{ copy()
-
-    /**
-     * Set the time span from another time object.
-     *
-     * @param  object Date_Span $time Source time span object.
-     *
-     * @return bool   True on success.
-     *
-     * @access public
-     */
-    function copy($time)
-    {
-        if (is_a($time, 'date_span')) {
-            $this->second = $time->second;
-            $this->minute = $time->minute;
-            $this->hour   = $time->hour;
-            $this->day    = $time->day;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // }}}
-    // {{{ format()
+    // {{{ toMinutes()
 
     /**
      * Time span pretty printing (similar to Date::format()).
@@ -628,7 +661,7 @@ class Date_Span
      *
      * @access public
      */
-    function format($format = null)
+    public function format($format = null)
     {
         if (is_null($format)) {
             $format = $GLOBALS['_DATE_SPAN_FORMAT'];
@@ -678,22 +711,22 @@ class Date_Span
                     case 'i':
                         $hour =
                             ($this->hour + 1) > 12 ?
-                            $this->hour - 12 :
-                            $this->hour;
+                                $this->hour - 12 :
+                                $this->hour;
                         $output .= ($hour == 0) ? 12 : $hour;
                         break;
                     case 'I':
                         $hour =
                             ($this->hour + 1) > 12 ?
-                            $this->hour - 12 :
-                            $this->hour;
-                        $output .= sprintf('%02d', $hour==0 ? 12 : $hour);
+                                $this->hour - 12 :
+                                $this->hour;
+                        $output .= sprintf('%02d', $hour == 0 ? 12 : $hour);
                         break;
                     case 'm':
                         $output .= $this->minute;
                         break;
                     case 'M':
-                        $output .= sprintf('%02d',$this->minute);
+                        $output .= sprintf('%02d', $this->minute);
                         break;
                     case 'n':
                         $output .= "\n";
@@ -707,11 +740,11 @@ class Date_Span
                     case 'r':
                         $hour =
                             ($this->hour + 1) > 12 ?
-                            $this->hour - 12 :
-                            $this->hour;
+                                $this->hour - 12 :
+                                $this->hour;
                         $output .= sprintf(
                             '%02d:%02d:%02d %s',
-                            $hour==0 ?  12 : $hour,
+                            $hour == 0 ? 12 : $hour,
                             $this->minute,
                             $this->second,
                             $this->hour >= 12 ? 'pm' : 'am'
@@ -751,55 +784,7 @@ class Date_Span
     }
 
     // }}}
-    // {{{ toSeconds()
-
-    /**
-     * Convert time span to seconds.
-     *
-     * @return int Time span as an integer number of seconds.
-     *
-     * @access public
-     */
-    function toSeconds()
-    {
-        return $this->day * 86400 + $this->hour * 3600 +
-            $this->minute * 60 + $this->second;
-    }
-
-    // }}}
-    // {{{ toMinutes()
-
-    /**
-     * Convert time span to minutes.
-     *
-     * @return float Time span as a decimal number of minutes.
-     *
-     * @access public
-     */
-    function toMinutes()
-    {
-        return $this->day * 1440 + $this->hour * 60 + $this->minute +
-            $this->second / 60;
-    }
-
-    // }}}
     // {{{ toHours()
-
-    /**
-     * Convert time span to hours.
-     *
-     * @return float Time span as a decimal number of hours.
-     *
-     * @access public
-     */
-    function toHours()
-    {
-        return $this->day * 24 + $this->hour + $this->minute / 60 +
-            $this->second / 3600;
-    }
-
-    // }}}
-    // {{{ toDays()
 
     /**
      * Convert time span to days.
@@ -808,27 +793,42 @@ class Date_Span
      *
      * @access public
      */
-    function toDays()
+    public function toDays()
     {
         return $this->day + $this->hour / 24 + $this->minute / 1440 +
             $this->second / 86400;
     }
 
     // }}}
-    // {{{ add()
+    // {{{ toDays()
 
     /**
-     * Adds a time span.
+     * Convert time span to hours.
      *
-     * @param  object Date_Span $time Time span to add.
+     * @return float Time span as a decimal number of hours.
      *
      * @access public
      */
-    function add($time)
+    public function toHours()
     {
-        return $this->setFromSeconds(
-            $this->toSeconds() + $time->toSeconds()
-        );
+        return $this->day * 24 + $this->hour + $this->minute / 60 +
+            $this->second / 3600;
+    }
+
+    // }}}
+    // {{{ add()
+
+    /**
+     * Convert time span to minutes.
+     *
+     * @return float Time span as a decimal number of minutes.
+     *
+     * @access public
+     */
+    public function toMinutes()
+    {
+        return $this->day * 1440 + $this->hour * 60 + $this->minute +
+            $this->second / 60;
     }
 
     // }}}
@@ -845,7 +845,7 @@ class Date_Span
      *
      * @access public
      */
-    function subtract($time)
+    public function subtract($time)
     {
         $sub = $this->toSeconds() - $time->toSeconds();
         if ($sub < 0) {
@@ -867,7 +867,7 @@ class Date_Span
      *
      * @access public
      */
-    function equal($time)
+    public function equal($time)
     {
         return $this->toSeconds() == $time->toSeconds();
     }
@@ -884,7 +884,7 @@ class Date_Span
      *
      * @access public
      */
-    function greaterEqual($time)
+    public function greaterEqual($time)
     {
         return $this->toSeconds() >= $time->toSeconds();
     }
@@ -901,7 +901,7 @@ class Date_Span
      *
      * @access public
      */
-    function lowerEqual($time)
+    public function lowerEqual($time)
     {
         return $this->toSeconds() <= $time->toSeconds();
     }
@@ -918,7 +918,7 @@ class Date_Span
      *
      * @access public
      */
-    function greater($time)
+    public function greater($time)
     {
         return $this->toSeconds() > $time->toSeconds();
     }
@@ -935,7 +935,7 @@ class Date_Span
      *
      * @access public
      */
-    function lower($time)
+    public function lower($time)
     {
         return $this->toSeconds() < $time->toSeconds();
     }
@@ -957,7 +957,7 @@ class Date_Span
      * @static
      * @access public
      */
-    function compare($time1, $time2)
+    public function compare($time1, $time2)
     {
         if ($time1->equal($time2)) {
             return 0;
@@ -976,7 +976,7 @@ class Date_Span
      *
      * @return bool True is it's empty.
      */
-    function isEmpty()
+    public function isEmpty()
     {
         return !$this->day && !$this->hour && !$this->minute && !$this->second;
     }
@@ -993,7 +993,7 @@ class Date_Span
      *
      * @static
      */
-    function setDefaultInputFormat($format)
+    public function setDefaultInputFormat($format)
     {
         $old = $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
         $GLOBALS['_DATE_SPAN_INPUT_FORMAT'] = $format;
@@ -1010,7 +1010,7 @@ class Date_Span
      *
      * @static
      */
-    function getDefaultInputFormat()
+    public function getDefaultInputFormat()
     {
         return $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
     }
@@ -1027,7 +1027,7 @@ class Date_Span
      *
      * @static
      */
-    function setDefaultFormat($format)
+    public function setDefaultFormat($format)
     {
         $old = $GLOBALS['_DATE_SPAN_FORMAT'];
         $GLOBALS['_DATE_SPAN_FORMAT'] = $format;
@@ -1044,7 +1044,7 @@ class Date_Span
      *
      * @static
      */
-    function getDefaultFormat()
+    public function getDefaultFormat()
     {
         return $GLOBALS['_DATE_SPAN_FORMAT'];
     }
@@ -1057,11 +1057,12 @@ class Date_Span
      *
      * @return object Date_Span Copy of the object.
      */
-    function __clone() {
+    public function __clone()
+    {
         $c = get_class($this);
         $s = new $c;
-        $s->day    = $this->day;
-        $s->hour   = $this->hour;
+        $s->day = $this->day;
+        $s->hour = $this->hour;
         $s->minute = $this->minute;
         $s->second = $this->second;
         return $s;
@@ -1079,5 +1080,4 @@ class Date_Span
  * c-basic-offset: 4
  * c-hanging-comment-ender-p: nil
  * End:
- */
-?>
+ */;

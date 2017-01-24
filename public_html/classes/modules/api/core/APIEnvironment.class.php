@@ -19,33 +19,38 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Core
  */
-class APIEnvironment {
-	protected $main_class = '';
+class APIEnvironment
+{
+    protected $main_class = '';
 
-	public function __construct() {
-		return TRUE;
-	}
+    public function __construct()
+    {
+        return true;
+    }
 
-	function getBaseURL() {
-		return Environment::getBaseURL();
-	}
+    public function getBaseURL()
+    {
+        return Environment::getBaseURL();
+    }
 
-	function getAPIBaseURL( $api = NULL ) {
-		return Environment::getAPIBaseURL( $api );
-	}
+    public function getAPIBaseURL($api = null)
+    {
+        return Environment::getAPIBaseURL($api);
+    }
 
-	function getAPIURL( $api = NULL ) {
-		return Environment::getAPIURL( $api );
-	}
+    public function getAPIURL($api = null)
+    {
+        return Environment::getAPIURL($api);
+    }
 
-	function getImagesURL() {
-		return Environment::getImagesURL();
-	}
+    public function getImagesURL()
+    {
+        return Environment::getImagesURL();
+    }
 }
-?>

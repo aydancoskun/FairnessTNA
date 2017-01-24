@@ -19,54 +19,54 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1056A extends InstallSchema_Base {
+class InstallSchema_1056A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        //Make sure Medicare Employer uses the same include/exclude accounts as Medicare Employee.
+        $clf = TTnew('CompanyListFactory');
+        $clf->getAll();
+        if ($clf->getRecordCount() > 0) {
+            foreach ($clf as $c_obj) {
+                Debug::text('Company: ' . $c_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
+                if ($c_obj->getStatus() != 30) {
+                    $ppslf = TTNew('PayPeriodScheduleListFactory');
+                    $ppslf->getByCompanyID($c_obj->getId());
+                    if ($ppslf->getRecordCount() > 0) {
+                        $minimum_time_between_shifts = $ppslf->getCurrent()->getNewDayTriggerTime();
+                    }
 
-		//Make sure Medicare Employer uses the same include/exclude accounts as Medicare Employee.
-		$clf = TTnew( 'CompanyListFactory' );
-		$clf->getAll();
-		if ( $clf->getRecordCount() > 0 ) {
-			foreach( $clf as $c_obj ) {
-				Debug::text('Company: '. $c_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
-				if ( $c_obj->getStatus() != 30 ) {
-					$ppslf = TTNew('PayPeriodScheduleListFactory');
-					$ppslf->getByCompanyID( $c_obj->getId() );
-					if ( $ppslf->getRecordCount() > 0 ) {
-						$minimum_time_between_shifts = $ppslf->getCurrent()->getNewDayTriggerTime();
-					}
+                    if (isset($minimum_time_between_shifts)) {
+                        $pplf = TTNew('PremiumPolicyListFactory');
+                        $pplf->getAPISearchByCompanyIdAndArrayCriteria($c_obj->getID(), array('type_id' => 50));
+                        if ($pplf->getRecordCount() > 0) {
+                            foreach ($pplf as $pp_obj) {
+                                $pp_obj->setMinimumTimeBetweenShift($minimum_time_between_shifts);
+                                if ($pp_obj->isValid()) {
+                                    $pp_obj->Save();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-					if ( isset($minimum_time_between_shifts) ) {
-						$pplf = TTNew('PremiumPolicyListFactory');
-						$pplf->getAPISearchByCompanyIdAndArrayCriteria( $c_obj->getID(), array('type_id' => 50) );
-						if ( $pplf->getRecordCount() > 0 ) {
-							foreach( $pplf as $pp_obj ) {
-								$pp_obj->setMinimumTimeBetweenShift( $minimum_time_between_shifts );
-								if ( $pp_obj->isValid() ) {
-									$pp_obj->Save();
-								}
-							}
-
-						}
-					}
-				}
-			}
-		}
-
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

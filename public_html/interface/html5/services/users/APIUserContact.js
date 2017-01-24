@@ -1,48 +1,48 @@
-var APIUserContact = ServiceCaller.extend( {
+var APIUserContact = ServiceCaller.extend({
 
-	key_name: 'UserContact',
-	className: 'APIUserContact',
+    key_name: 'UserContact',
+    className: 'APIUserContact',
 
-	getUserContactDefaultData: function() {
-		return this.argumentsHandler( this.className, 'getUserContactDefaultData', arguments );
+    getUserContactDefaultData: function () {
+        return this.argumentsHandler(this.className, 'getUserContactDefaultData', arguments);
 
-	},
+    },
 
-	getUserContact: function() {
-		return this.argumentsHandler( this.className, 'getUserContact', arguments );
-	},
+    getUserContact: function () {
+        return this.argumentsHandler(this.className, 'getUserContact', arguments);
+    },
 
-	getCommonUserContactData: function() {
+    getCommonUserContactData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserContactData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserContactData', arguments);
 
-	},
+    },
 
-	validateUserContact: function() {
+    validateUserContact: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserContact', arguments );
+        return this.argumentsHandler(this.className, 'validateUserContact', arguments);
 
-	},
+    },
 
-	setUserContact: function() {
+    setUserContact: function () {
 
-		return this.argumentsHandler( this.className, 'setUserContact', arguments );
+        return this.argumentsHandler(this.className, 'setUserContact', arguments);
 
-	},
+    },
 
-	deleteUserContact: function() {
+    deleteUserContact: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserContact', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserContact', arguments);
 
-	},
+    },
 
-	copyUserContact: function() {
+    copyUserContact: function () {
 
-		return this.argumentsHandler( this.className, 'copyUserContact', arguments );
+        return this.argumentsHandler(this.className, 'copyUserContact', arguments);
 
-	},
+    },
 
-	exportUserContact: function() {
-		return this.argumentsHandler( this.className, 'exportUserContact', arguments );
-	}
-} );
+    exportUserContact: function () {
+        return this.argumentsHandler(this.className, 'exportUserContact', arguments);
+    }
+});

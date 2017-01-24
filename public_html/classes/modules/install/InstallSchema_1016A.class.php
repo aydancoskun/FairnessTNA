@@ -19,50 +19,51 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1016A extends InstallSchema_Base {
+class InstallSchema_1016A extends InstallSchema_Base
+{
+    protected $station_users = array();
 
-	protected $station_users = array();
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        // @codingStandardsIgnoreStart
+        global $cache;
+        //assumed needed elsewhere
+        // @codingStandardsIgnoreEnd
 
-	function postInstall() {
-		// @codingStandardsIgnoreStart
-		global $cache;
-		//assumed needed elsewhere
-		// @codingStandardsIgnoreEnd
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        Debug::text('l: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-		Debug::text('l: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        $cjlf = TTnew('CronJobListFactory');
+        $cjlf->getAll();
+        if ($cjlf->getRecordCount() > 0) {
+            foreach ($cjlf as $cj_obj) {
+                Debug::text('Original Command: ' . $cj_obj->getCommand(), __FILE__, __LINE__, __METHOD__, 9);
+                preg_match('/([A-Za-z0-9]+\.php)/i', $cj_obj->getCommand(), $matches);
 
-		$cjlf = TTnew( 'CronJobListFactory' );
-		$cjlf->getAll();
-		if ( $cjlf->getRecordCount() > 0 ) {
-			foreach( $cjlf as $cj_obj ) {
-				Debug::text('Original Command: '.  $cj_obj->getCommand(), __FILE__, __LINE__, __METHOD__, 9);
-				preg_match('/([A-Za-z0-9]+\.php)/i', $cj_obj->getCommand(), $matches );
+                if (isset($matches[0]) and $matches[0] != '') {
+                    Debug::text('New Command: ' . $matches[0], __FILE__, __LINE__, __METHOD__, 9);
+                    $cj_obj->setCommand($matches[0]);
+                    if ($cj_obj->isValid()) {
+                        $cj_obj->Save();
+                    }
+                }
+            }
+        }
 
-				if ( isset($matches[0]) AND $matches[0] != '' ) {
-					Debug::text('New Command: '. $matches[0], __FILE__, __LINE__, __METHOD__, 9);
-					$cj_obj->setCommand( $matches[0] );
-					if ( $cj_obj->isValid() ) {
-						$cj_obj->Save();
-					}
-				}
-			}
-		}
-
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

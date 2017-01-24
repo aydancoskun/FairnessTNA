@@ -19,25 +19,27 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Core
  */
-class APIMisc extends APIFactory {
-	protected $main_class = '';
+class APIMisc extends APIFactory
+{
+    protected $main_class = '';
 
-	public function __construct() {
-		parent::__construct(); //Make sure parent constructor is always called.
+    public function __construct()
+    {
+        parent::__construct(); //Make sure parent constructor is always called.
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	//Ping function is also in APIMisc for when the session timesout is valid.
-	//Flex calls this after session is timedout so it can get the proper validation error and display the correct message to the user.
-	function Ping() {
-		return TRUE;
-	}
+    //Ping function is also in APIMisc for when the session timesout is valid.
+    //Flex calls this after session is timedout so it can get the proper validation error and display the correct message to the user.
+    public function Ping()
+    {
+        return true;
+    }
 }
-?>

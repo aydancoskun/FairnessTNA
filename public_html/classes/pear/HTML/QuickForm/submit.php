@@ -23,7 +23,7 @@ require_once("HTML/QuickForm/input.php");
 
 /**
  * HTML class for a submit type element
- * 
+ *
  * @author       Adam Daniel <adaniel1@eesus.jnj.com>
  * @author       Bertrand Mansion <bmansion@mamasam.com>
  * @version      1.0
@@ -36,7 +36,7 @@ class HTML_QuickForm_submit extends HTML_QuickForm_input
 
     /**
      * Class constructor
-     * 
+     *
      * @param     string    Input field name attribute
      * @param     string    Input field value
      * @param     mixed     Either a typical HTML attribute string or an associative array
@@ -44,24 +44,24 @@ class HTML_QuickForm_submit extends HTML_QuickForm_input
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_submit($elementName=null, $value=null, $attributes=null)
+    public function HTML_QuickForm_submit($elementName = null, $value = null, $attributes = null)
     {
         //HTML_QuickForm_input::HTML_QuickForm_input($elementName, null, $attributes);
         new HTML_QuickForm_input($elementName, null, $attributes);
         self::setValue($value);
         self::setType('submit');
     } //end constructor
-    
+
     // }}}
     // {{{ freeze()
 
     /**
      * Freeze the element so that only its value is returned
-     * 
+     *
      * @access    public
      * @return    void
      */
-    static function freeze()
+    public static function freeze()
     {
         return false;
     } //end func freeze
@@ -69,15 +69,14 @@ class HTML_QuickForm_submit extends HTML_QuickForm_input
     // }}}
     // {{{ exportValue()
 
-   /**
-    * Only return the value if it is found within $submitValues (i.e. if
-    * this particular submit button was clicked)
-    */
-    static function exportValue(&$submitValues, $assoc = false)
+    /**
+     * Only return the value if it is found within $submitValues (i.e. if
+     * this particular submit button was clicked)
+     */
+    public static function exportValue(&$submitValues, $assoc = false)
     {
         return self::_prepareValue(self::_findValue($submitValues), $assoc);
     }
 
     // }}}
-} //end class HTML_QuickForm_submit
-?>
+} //end class HTML_QuickForm_submit;

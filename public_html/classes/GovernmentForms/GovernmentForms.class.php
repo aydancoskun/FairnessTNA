@@ -19,186 +19,192 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package GovernmentForms
  */
-class GovernmentForms {
-	var $objs = NULL;
+class GovernmentForms
+{
+    public $objs = null;
 
-	var $tcpdf_dir = '../tcpdf/'; //TCPDF class directory.
-	var $fpdi_dir = '../fpdi/'; //FPDI class directory.
+    public $tcpdf_dir = '../tcpdf/'; //TCPDF class directory.
+    public $fpdi_dir = '../fpdi/'; //FPDI class directory.
 
-	function __construct() {
-		return TRUE;
-	}
+    public function __construct()
+    {
+        return true;
+    }
 
-	function getFormObject( $form, $country = NULL, $province = NULL, $district = NULL ) {
-		$class_name = 'GovernmentForms';
-		$class_directory = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'country';
-		if ( $country != '' ) {
-			$class_name .= '_' . strtoupper( $country );
-			$class_directory .= DIRECTORY_SEPARATOR . strtolower($country);
-		}
-		if ( $province != '' ) {
-			$class_name .= '_' . strtoupper( $province );
-			$class_directory .= DIRECTORY_SEPARATOR . strtolower($province);
-		}
-		if ( $district != '' ) {
-			$class_name .= '_' . strtoupper( $district );
-			$class_directory .= DIRECTORY_SEPARATOR . strtolower($district);
-		}
-		$class_name .= '_'.$form;
+    public function getFormObject($form, $country = null, $province = null, $district = null)
+    {
+        $class_name = 'GovernmentForms';
+        $class_directory = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'country';
+        if ($country != '') {
+            $class_name .= '_' . strtoupper($country);
+            $class_directory .= DIRECTORY_SEPARATOR . strtolower($country);
+        }
+        if ($province != '') {
+            $class_name .= '_' . strtoupper($province);
+            $class_directory .= DIRECTORY_SEPARATOR . strtolower($province);
+        }
+        if ($district != '') {
+            $class_name .= '_' . strtoupper($district);
+            $class_directory .= DIRECTORY_SEPARATOR . strtolower($district);
+        }
+        $class_name .= '_' . $form;
 
-		$class_file_name = $class_directory . DIRECTORY_SEPARATOR . strtolower($form) .'.class.php';
-		Debug::text('Class Directory: '. $class_directory, __FILE__, __LINE__, __METHOD__, 10);
-		Debug::text('Class File Name: '. $class_file_name, __FILE__, __LINE__, __METHOD__, 10);
-		Debug::text('Class Name: '. $class_name, __FILE__, __LINE__, __METHOD__, 10);
+        $class_file_name = $class_directory . DIRECTORY_SEPARATOR . strtolower($form) . '.class.php';
+        Debug::text('Class Directory: ' . $class_directory, __FILE__, __LINE__, __METHOD__, 10);
+        Debug::text('Class File Name: ' . $class_file_name, __FILE__, __LINE__, __METHOD__, 10);
+        Debug::text('Class Name: ' . $class_name, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( file_exists( $class_file_name ) ) {
-			include_once( $class_file_name );
+        if (file_exists($class_file_name)) {
+            include_once($class_file_name);
 
-			$obj = new $class_name;
-			$obj->setClassDirectory( $class_directory );
+            $obj = new $class_name;
+            $obj->setClassDirectory($class_directory);
 
-			return $obj;
-		} else {
-			Debug::text('Class File does not exist!', __FILE__, __LINE__, __METHOD__, 10);
-		}
+            return $obj;
+        } else {
+            Debug::text('Class File does not exist!', __FILE__, __LINE__, __METHOD__, 10);
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function addForm( $obj ) {
-		if ( is_object( $obj ) ) {
-			$this->objs[] = $obj;
+    public function addForm($obj)
+    {
+        if (is_object($obj)) {
+            $this->objs[] = $obj;
 
-			return TRUE;
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function clearForms() {
-		$this->objs = NULL;
-		return TRUE;
-	}
+    public function clearForms()
+    {
+        $this->objs = null;
+        return true;
+    }
 
-	function validateXML( $xml, $schema_file ) {
-		Debug::text('Schema File: '. $schema_file, __FILE__, __LINE__, __METHOD__, 10);
-		if ( class_exists( 'DomDocument' ) AND file_exists($schema_file) ) {
-			libxml_use_internal_errors( TRUE );
+    public function Output($type)
+    {
+        if (!is_array($this->objs)) {
+            Debug::Text('ERROR! No objects to output!', __FILE__, __LINE__, __METHOD__, 10);
+            return false;
+        }
 
-			$dom = new DomDocument;
-			$dom->loadXML( $xml );
+        $type = strtolower($type);
 
-			if ( $dom->schemaValidate( $schema_file ) ) {
-				Debug::Text('Schema is valid!', __FILE__, __LINE__, __METHOD__, 10);
-				return TRUE;
-			} else {
-				Debug::Text('Schema is NOT valid!', __FILE__, __LINE__, __METHOD__, 10);
+        //Initialize PDF object so all subclasses can access it.
+        //Loop through all objects and combine the output from each into a single document.
+        if ($type == 'pdf') {
+            if (!class_exists('tcpdf')) {
+                require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . $this->tcpdf_dir . DIRECTORY_SEPARATOR . 'tcpdf.php');
+            }
 
-				$error_msg = '';
-				$errors = libxml_get_errors();
-				$i = 1;
-				foreach ( $errors as $error ) {
-					Debug::Text('XML Error (Line: '. $error->line.'): '. $error->message, __FILE__, __LINE__, __METHOD__, 10);
-					$error_msg .= $i .': '. $error->message ."<br>\n";
-					$i++;
-				}
-				unset($errors, $error);
-				
-				return array(
-								'api_retval' => FALSE,
-								//'api_request'
-								//'api_pager'
-								'api_details' => array(
-												'code' => 'VALIDATION',
-												'description' => $error_msg,
-												)
-								);				
-			}
-		} else {
-			Debug::Text('DomDocument not available!', __FILE__, __LINE__, __METHOD__, 10);
-			return TRUE;
-		}
+            if (!class_exists('fpdi')) {
+                require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . $this->fpdi_dir . DIRECTORY_SEPARATOR . 'fpdi.php');
+            }
 
-		return FALSE;
-	}
+            $pdf = new FPDI('P', 'pt');
+            $pdf->setMargins(0, 0, 0, 0);
+            $pdf->SetAutoPageBreak(false);
+            $pdf->setFontSubsetting(false);
 
-	function Output( $type ) {
-		if ( !is_array($this->objs) ) {
-			Debug::Text('ERROR! No objects to output!', __FILE__, __LINE__, __METHOD__, 10);
-			return FALSE;
-		}
+            foreach ($this->objs as $obj) {
+                $obj->setPDFObject($pdf);
+                $obj->Output($type);
+            }
 
-		$type = strtolower($type);
+            return $pdf->Output('', 'S');
+        } elseif ($type == 'efile') {
+            foreach ($this->objs as $obj) {
+                return $obj->Output($type);
+            }
+        } elseif ($type == 'xml') {
+            //Since multiple XML sections may need to be joined together,
+            //We must pass the XML object between each form and  build the entire XML object completely
+            //then output it all at once at the end.
+            $xml = null;
+            $xml_schema = null;
+            foreach ($this->objs as $obj) {
+                if (is_object($xml)) {
+                    $obj->setXMLObject($xml);
+                }
 
-		//Initialize PDF object so all subclasses can access it.
-		//Loop through all objects and combine the output from each into a single document.
-		if ( $type == 'pdf' ) {
-			if ( !class_exists( 'tcpdf' ) ) {
-				require_once( dirname(__FILE__). DIRECTORY_SEPARATOR . $this->tcpdf_dir . DIRECTORY_SEPARATOR .'tcpdf.php');
-			}
+                $obj->Output($type);
+                if (isset($obj->xml_schema)) {
+                    $xml_schema = $obj->getClassDirectory() . DIRECTORY_SEPARATOR . 'schema' . DIRECTORY_SEPARATOR . $obj->xml_schema;
+                }
 
-			if ( !class_exists( 'fpdi' ) ) {
-				require_once( dirname(__FILE__). DIRECTORY_SEPARATOR . $this->fpdi_dir . DIRECTORY_SEPARATOR .'fpdi.php');
-			}
+                if ($xml == null and is_object($obj->getXMLObject())) {
+                    $xml = $obj->getXMLObject();
+                }
+            }
 
-			$pdf = new FPDI( 'P', 'pt' );
-			$pdf->setMargins(0, 0, 0, 0);
-			$pdf->SetAutoPageBreak(FALSE);
-			$pdf->setFontSubsetting(FALSE);
+            if (is_object($xml)) {
+                $output = $xml->asXML();
 
-			foreach( $this->objs as $obj ) {
-				$obj->setPDFObject( $pdf );
-				$obj->Output( $type );
-			}
+                $xml_validation_retval = $this->validateXML($output, $xml_schema);
+                if ($xml_validation_retval !== true) {
+                    Debug::text('XML Schema is invalid! Malformed XML!', __FILE__, __LINE__, __METHOD__, 10);
+                    //$output = FALSE;
+                    $output = $xml_validation_retval;
+                }
+            } else {
+                Debug::text('No XML object!', __FILE__, __LINE__, __METHOD__, 10);
+                $output = false;
+            }
 
-			return $pdf->Output('', 'S');
-		} elseif ( $type == 'efile' ) {
-			foreach( $this->objs as $obj ) {
-				return $obj->Output( $type );
-			}
-		} elseif ( $type == 'xml' ) {
-			//Since multiple XML sections may need to be joined together,
-			//We must pass the XML object between each form and  build the entire XML object completely
-			//then output it all at once at the end.
-			$xml = NULL;
-			$xml_schema = NULL;
-			foreach( $this->objs as $obj ) {
-				if ( is_object( $xml ) ) {
-					$obj->setXMLObject($xml);
-				}
+            return $output;
+        }
+    }
 
-				$obj->Output( $type );
-				if ( isset($obj->xml_schema) ) {
-					$xml_schema = $obj->getClassDirectory() . DIRECTORY_SEPARATOR . 'schema' . DIRECTORY_SEPARATOR . $obj->xml_schema;
-				}
+    public function validateXML($xml, $schema_file)
+    {
+        Debug::text('Schema File: ' . $schema_file, __FILE__, __LINE__, __METHOD__, 10);
+        if (class_exists('DomDocument') and file_exists($schema_file)) {
+            libxml_use_internal_errors(true);
 
-				if ( $xml == NULL AND is_object( $obj->getXMLObject() ) ) {
-					$xml = $obj->getXMLObject();
-				}
-			}
+            $dom = new DomDocument;
+            $dom->loadXML($xml);
 
-			if ( is_object( $xml ) ) {
-				$output = $xml->asXML();
+            if ($dom->schemaValidate($schema_file)) {
+                Debug::Text('Schema is valid!', __FILE__, __LINE__, __METHOD__, 10);
+                return true;
+            } else {
+                Debug::Text('Schema is NOT valid!', __FILE__, __LINE__, __METHOD__, 10);
 
-				$xml_validation_retval = $this->validateXML( $output, $xml_schema );
-				if ( $xml_validation_retval !== TRUE ) {					
-					Debug::text('XML Schema is invalid! Malformed XML!', __FILE__, __LINE__, __METHOD__, 10);
-					//$output = FALSE;
-					$output = $xml_validation_retval;
-				}
-			} else {
-				Debug::text('No XML object!', __FILE__, __LINE__, __METHOD__, 10);
-				$output = FALSE;
-			}
+                $error_msg = '';
+                $errors = libxml_get_errors();
+                $i = 1;
+                foreach ($errors as $error) {
+                    Debug::Text('XML Error (Line: ' . $error->line . '): ' . $error->message, __FILE__, __LINE__, __METHOD__, 10);
+                    $error_msg .= $i . ': ' . $error->message . "<br>\n";
+                    $i++;
+                }
+                unset($errors, $error);
 
-			return $output;
-		}
-	}
+                return array(
+                    'api_retval' => false,
+                    //'api_request'
+                    //'api_pager'
+                    'api_details' => array(
+                        'code' => 'VALIDATION',
+                        'description' => $error_msg,
+                    )
+                );
+            }
+        } else {
+            Debug::Text('DomDocument not available!', __FILE__, __LINE__, __METHOD__, 10);
+            return true;
+        }
+
+        return false;
+    }
 }
-?>

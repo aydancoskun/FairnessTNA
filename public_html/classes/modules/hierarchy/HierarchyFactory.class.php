@@ -19,280 +19,318 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Hierarchy
  */
-class HierarchyFactory extends Factory {
+class HierarchyFactory extends Factory
+{
+    protected $table = 'hierarchy'; //Used for caching purposes only.
 
-	protected $table = 'hierarchy'; //Used for caching purposes only.
+    protected $fasttree_obj = null;
 
-	protected $fasttree_obj = NULL;
-	//protected $tmp_data = array(); //Tmp data.
-	function getFastTreeObject() {
+    //protected $tmp_data = array(); //Tmp data.
 
-		if ( is_object($this->fasttree_obj) ) {
-			return $this->fasttree_obj;
-		} else {
-			global $fast_tree_options;
-			$this->fasttree_obj = new FastTree($fast_tree_options);
+    public function setId($id)
+    {
+        $this->data['id'] = $id;
 
-			return $this->fasttree_obj;
-		}
-	}
+        return true;
+    }
 
-	function getId() {
-		if ( isset($this->data['id']) ) {
-			return $this->data['id'];
-		}
+    public function setHierarchyControl($id)
+    {
+        $this->data['hierarchy_control_id'] = $id;
 
-		return FALSE;
-	}
-	function setId($id) {
+        return true;
+    }
 
-		$this->data['id'] = $id;
+    public function setPreviousUser($id)
+    {
+        $this->data['previous_user_id'] = $id;
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	function getHierarchyControl() {
-		if ( isset($this->data['hierarchy_control_id']) ) {
-			return (int)$this->data['hierarchy_control_id'];
-		}
+    public function setParent($id)
+    {
+        $this->data['parent_user_id'] = $id;
 
-		return FALSE;
-	}
-	function setHierarchyControl($id) {
+        return true;
+    }
 
-		$this->data['hierarchy_control_id'] = $id;
+    public function setUser($id)
+    {
+        $this->data['user_id'] = $id;
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	//Use this for completly editing a row in the tree
-	//Basically "old_id".
-	function getPreviousUser() {
-		if ( isset($this->data['previous_user_id']) ) {
-			return (int)$this->data['previous_user_id'];
-		}
+    //Use this for completly editing a row in the tree
+    //Basically "old_id".
 
-		return FALSE;
-	}
-	function setPreviousUser($id) {
+    public function getShared()
+    {
+        if (isset($this->data['shared'])) {
+            return $this->fromBool($this->data['shared']);
+        }
 
-		$this->data['previous_user_id'] = $id;
+        return false;
+    }
 
-		return TRUE;
-	}
+    public function setShared($bool)
+    {
+        $this->data['shared'] = $this->toBool($bool);
 
-	function getParent() {
-		if ( isset($this->data['parent_user_id']) ) {
-			return (int)$this->data['parent_user_id'];
-		}
+        return true;
+    }
 
-		return FALSE;
-	}
-	function setParent($id) {
+    public function Validate($ignore_warning = true)
+    {
+        if ($this->getUser() == $this->getParent()) {
+            $this->Validator->isTrue('parent',
+                false,
+                TTi18n::gettext('User is the same as parent')
+            );
+        }
 
-		$this->data['parent_user_id'] = $id;
+        //Make sure both user and parent belong to the same company
+        $ulf = TTnew('UserListFactory');
+        $ulf->getById($this->getUser());
+        $user = $ulf->getIterator()->current();
+        unset($ulf);
 
-		return TRUE;
-	}
-
-	function getUser() {
-		if ( isset($this->data['user_id']) ) {
-			return (int)$this->data['user_id'];
-		}
-
-		return FALSE;
-	}
-	function setUser($id) {
-
-		$this->data['user_id'] = $id;
-
-		return TRUE;
-	}
-
-	function getShared() {
-		if ( isset( $this->data['shared'] ) ) {
-			return $this->fromBool( $this->data['shared'] );
-		}
-
-		return FALSE;
-	}
-	function setShared($bool) {
-		$this->data['shared'] = $this->toBool($bool);
-
-		return TRUE;
-	}
+        $ulf = TTnew('UserListFactory');
+        $ulf->getById($this->getParent());
+        $parent = $ulf->getIterator()->current();
+        unset($ulf);
 
 
-	function Validate( $ignore_warning = TRUE ) {
+        if ($this->getUser() == 0 and $this->getParent() == 0) {
+            $parent_company_id = 0;
+            $user_company_id = 0;
+        } elseif ($this->getUser() == 0) {
+            $parent_company_id = $parent->getCompany();
+            $user_company_id = $parent->getCompany();
+        } elseif ($this->getParent() == 0) {
+            $parent_company_id = $user->getCompany();
+            $user_company_id = $user->getCompany();
+        } else {
+            $parent_company_id = $parent->getCompany();
+            $user_company_id = $user->getCompany();
+        }
 
-		if ( $this->getUser() == $this->getParent() ) {
-				$this->Validator->isTrue(	'parent',
-											FALSE,
-											TTi18n::gettext('User is the same as parent')
-											);
-		}
+        if ($user_company_id > 0 and $parent_company_id > 0) {
+            Debug::Text(' User Company: ' . $user_company_id . ' Parent Company: ' . $parent_company_id, __FILE__, __LINE__, __METHOD__, 10);
+            if ($user_company_id != $parent_company_id) {
+                $this->Validator->isTrue('parent',
+                    false,
+                    TTi18n::gettext('User or parent has incorrect company')
+                );
+            }
 
-		//Make sure both user and parent belong to the same company
-		$ulf = TTnew( 'UserListFactory' );
-		$ulf->getById( $this->getUser() );
-		$user = $ulf->getIterator()->current();
-		unset($ulf);
+            $this->getFastTreeObject()->setTree($this->getHierarchyControl());
+            $children_arr = $this->getFastTreeObject()->getAllChildren($this->getUser(), 'RECURSE');
+            if (is_array($children_arr)) {
+                $children_ids = array_keys($children_arr);
 
-		$ulf = TTnew( 'UserListFactory' );
-		$ulf->getById( $this->getParent() );
-		$parent = $ulf->getIterator()->current();
-		unset($ulf);
+                if (isset($children_ids) and is_array($children_ids) and in_array($this->getParent(), $children_ids) == true) {
+                    Debug::Text(' Objects cant be re-parented to their own children...', __FILE__, __LINE__, __METHOD__, 10);
+                    $this->Validator->isTrue('parent',
+                        false,
+                        TTi18n::gettext('Unable to change parent to a child of itself')
+                    );
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function getUser()
+    {
+        if (isset($this->data['user_id'])) {
+            return (int)$this->data['user_id'];
+        }
+
+        return false;
+    }
+
+    public function getParent()
+    {
+        if (isset($this->data['parent_user_id'])) {
+            return (int)$this->data['parent_user_id'];
+        }
+
+        return false;
+    }
+
+    public function getFastTreeObject()
+    {
+        if (is_object($this->fasttree_obj)) {
+            return $this->fasttree_obj;
+        } else {
+            global $fast_tree_options;
+            $this->fasttree_obj = new FastTree($fast_tree_options);
+
+            return $this->fasttree_obj;
+        }
+    }
+
+    public function getHierarchyControl()
+    {
+        if (isset($this->data['hierarchy_control_id'])) {
+            return (int)$this->data['hierarchy_control_id'];
+        }
+
+        return false;
+    }
+
+    public function Save($reset_data = true, $force_lookup = false)
+    {
+        $this->StartTransaction();
+
+        $this->getFastTreeObject()->setTree($this->getHierarchyControl());
+
+        $retval = true;
+        if ($this->getId() === false) {
+            Debug::Text(' Adding Node ', __FILE__, __LINE__, __METHOD__, 10);
+            $log_action = 10;
+
+            //Add node to tree
+            if ($this->getFastTreeObject()->add($this->getUser(), $this->getParent()) === false) {
+                Debug::Text(' Failed adding Node ', __FILE__, __LINE__, __METHOD__, 10);
+
+                $this->Validator->isTrue('user',
+                    false,
+                    TTi18n::gettext('Employee is already assigned to this hierarchy')
+                );
+                $retval = false;
+            }
+        } else {
+            Debug::Text(' Editing Node ', __FILE__, __LINE__, __METHOD__, 10);
+            $log_action = 20;
+
+            //Edit node.
+            if ($this->getFastTreeObject()->edit($this->getPreviousUser(), $this->getUser()) === true) {
+                $retval = $this->getFastTreeObject()->move($this->getUser(), $this->getParent());
+            } else {
+                Debug::Text(' Failed editing Node ', __FILE__, __LINE__, __METHOD__, 10);
+
+                //$retval = FALSE;
+                $retval = true;
+            }
+        }
+
+        TTLog::addEntry($this->getUser(), $log_action, TTi18n::getText('Hierarchy Tree - Control ID') . ': ' . $this->getHierarchyControl(), null, $this->getTable());
+
+        $this->CommitTransaction();
+        //$this->FailTransaction();
+
+        $cache_id = $this->getHierarchyControl() . $this->getParent();
+        $this->removeCache($cache_id);
+
+        return $retval;
+    }
+
+    public function getId()
+    {
+        if (isset($this->data['id'])) {
+            return $this->data['id'];
+        }
+
+        return false;
+    }
+
+    public function getPreviousUser()
+    {
+        if (isset($this->data['previous_user_id'])) {
+            return (int)$this->data['previous_user_id'];
+        }
+
+        return false;
+    }
+
+    public function Delete()
+    {
+        if ($this->getUser() !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //This table doesn't have any of these columns, so overload the functions.
+    public function getDeleted()
+    {
+        return false;
+    }
+
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedDate()
+    {
+        return false;
+    }
+
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
 
 
-		if ( $this->getUser() == 0 AND $this->getParent() == 0 ) {
-			$parent_company_id = 0;
-			$user_company_id = 0;
-		} elseif ( $this->getUser() == 0 ) {
-			$parent_company_id = $parent->getCompany();
-			$user_company_id = $parent->getCompany();
-		} elseif ( $this->getParent() == 0 ) {
-			$parent_company_id = $user->getCompany();
-			$user_company_id = $user->getCompany();
-		} else {
-			$parent_company_id = $parent->getCompany();
-			$user_company_id = $user->getCompany();
-		}
+    public function getDeletedDate()
+    {
+        return false;
+    }
 
-		if ( $user_company_id > 0 AND $parent_company_id > 0 ) {
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
 
-			Debug::Text(' User Company: '. $user_company_id .' Parent Company: '. $parent_company_id, __FILE__, __LINE__, __METHOD__, 10);
-			if ( $user_company_id != $parent_company_id ) {
-					$this->Validator->isTrue(	'parent',
-												FALSE,
-												TTi18n::gettext('User or parent has incorrect company')
-												);
-			}
+    public function getDeletedBy()
+    {
+        return false;
+    }
 
-			$this->getFastTreeObject()->setTree( $this->getHierarchyControl() );
-			$children_arr = $this->getFastTreeObject()->getAllChildren( $this->getUser(), 'RECURSE' );
-			if ( is_array($children_arr) ) {
-				$children_ids = array_keys( $children_arr );
-
-				if ( isset($children_ids) AND is_array($children_ids) AND in_array( $this->getParent(), $children_ids) == TRUE ) {
-					Debug::Text(' Objects cant be re-parented to their own children...', __FILE__, __LINE__, __METHOD__, 10);
-					$this->Validator->isTrue(	'parent',
-												FALSE,
-												TTi18n::gettext('Unable to change parent to a child of itself')
-												);
-				}
-			}
-		}
-
-		return TRUE;
-	}
-
-	function Save( $reset_data = TRUE, $force_lookup = FALSE ) {
-		$this->StartTransaction();
-
-		$this->getFastTreeObject()->setTree( $this->getHierarchyControl() );
-
-		$retval = TRUE;
-		if ( $this->getId() === FALSE ) {
-			Debug::Text(' Adding Node ', __FILE__, __LINE__, __METHOD__, 10);
-			$log_action = 10;
-
-			//Add node to tree
-			if ( $this->getFastTreeObject()->add( $this->getUser(), $this->getParent() ) === FALSE ) {
-				Debug::Text(' Failed adding Node ', __FILE__, __LINE__, __METHOD__, 10);
-
-				$this->Validator->isTrue(	'user',
-											FALSE,
-											TTi18n::gettext('Employee is already assigned to this hierarchy')
-											);
-				$retval = FALSE;
-			}
-		} else {
-			Debug::Text(' Editing Node ', __FILE__, __LINE__, __METHOD__, 10);
-			$log_action = 20;
-
-			//Edit node.
-			if ( $this->getFastTreeObject()->edit( $this->getPreviousUser(), $this->getUser() ) === TRUE ) {
-				$retval = $this->getFastTreeObject()->move( $this->getUser(), $this->getParent() );
-			} else {
-				Debug::Text(' Failed editing Node ', __FILE__, __LINE__, __METHOD__, 10);
-
-				//$retval = FALSE;
-				$retval = TRUE;
-			}
-		}
-
-		TTLog::addEntry( $this->getUser(), $log_action, TTi18n::getText('Hierarchy Tree - Control ID').': '.$this->getHierarchyControl(), NULL, $this->getTable() );
-
-		$this->CommitTransaction();
-		//$this->FailTransaction();
-
-		$cache_id = $this->getHierarchyControl().$this->getParent();
-		$this->removeCache( $cache_id );
-
-		return $retval;
-	}
-
-	function Delete() {
-		if ( $this->getUser() !== FALSE ) {
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
-
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
-
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
-
-
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
-
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 }
-?>

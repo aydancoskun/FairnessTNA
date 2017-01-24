@@ -1,56 +1,55 @@
-var APIScheduleSummaryReport = ServiceCaller.extend( {
+var APIScheduleSummaryReport = ServiceCaller.extend({
 
-	key_name: 'ScheduleSummaryReport',
-	className: 'APIScheduleSummaryReport',
+    key_name: 'ScheduleSummaryReport',
+    className: 'APIScheduleSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonScheduleSummaryReportData: function() {
+    getCommonScheduleSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonScheduleSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonScheduleSummaryReportData', arguments);
 
-	},
+    },
 
-	getScheduleSummaryReport: function() {
+    getScheduleSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getScheduleSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getScheduleSummaryReport', arguments);
 
-	},
+    },
 
-	setScheduleSummaryReport: function() {
+    setScheduleSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setScheduleSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setScheduleSummaryReport', arguments);
 
-	},
+    },
 
-	getScheduleSummaryReportDefaultData: function() {
+    getScheduleSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getScheduleSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getScheduleSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteScheduleSummaryReport: function() {
+    deleteScheduleSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteScheduleSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteScheduleSummaryReport', arguments);
 
-	},
+    },
 
-	validateScheduleSummaryReport: function() {
+    validateScheduleSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateScheduleSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validateScheduleSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

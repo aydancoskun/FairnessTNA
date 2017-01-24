@@ -8,96 +8,99 @@ $FAIRNESS_PASSWORD = '';
 
 //Build URL given a Class and Method to call.
 //Format is: http://HOSTNAME/api/json/api.php?Class=<CLASS>&Method=<METHOD>&SessionID=<SessionID>
-function buildURL( $class, $method, $session_id = FALSE ) {
-	global $FAIRNESS_URL, $FAIRNESS_SESSION_ID;
-	$url = $FAIRNESS_URL.'?Class='.$class.'&Method='.$method;
-	if ( $session_id != '' OR $FAIRNESS_SESSION_ID != '' ) {
-		if ( $session_id == '' ) {
-			$session_id = $FAIRNESS_SESSION_ID;
-		}
-		$url .= '&SessionID='.$session_id;
-	}
+function buildURL($class, $method, $session_id = false)
+{
+    global $FAIRNESS_URL, $FAIRNESS_SESSION_ID;
+    $url = $FAIRNESS_URL . '?Class=' . $class . '&Method=' . $method;
+    if ($session_id != '' or $FAIRNESS_SESSION_ID != '') {
+        if ($session_id == '') {
+            $session_id = $FAIRNESS_SESSION_ID;
+        }
+        $url .= '&SessionID=' . $session_id;
+    }
 
-	return $url;
+    return $url;
 }
 
 //Handle complex result.
-function handleResult( $result, $raw = FALSE ) {
-	if ( is_array($result) AND isset($result['api_retval'])) {
-		if ( $raw === TRUE ) {
-			return $result;
-		} else {
-			if ( $result['api_retval'] === FALSE ) {
-				//Display any error messages that might be returned.
-				$output[] = '  Returned:';
-				$output[] = ( $result['api_retval'] === TRUE ) ? '    IsValid: YES' : '    IsValid: NO';
-				if ( $result['api_retval'] === TRUE ) {
-					$output[] = '    Return Value: '. $result['api_retval'];
-				} else {
-					$output[] = '    Code: '. $result['api_details']['code'];
-					$output[] = '    Description: '. $result['api_details']['description'];
-					$output[] = '    Details: ';
+function handleResult($result, $raw = false)
+{
+    if (is_array($result) and isset($result['api_retval'])) {
+        if ($raw === true) {
+            return $result;
+        } else {
+            if ($result['api_retval'] === false) {
+                //Display any error messages that might be returned.
+                $output[] = '  Returned:';
+                $output[] = ($result['api_retval'] === true) ? '    IsValid: YES' : '    IsValid: NO';
+                if ($result['api_retval'] === true) {
+                    $output[] = '    Return Value: ' . $result['api_retval'];
+                } else {
+                    $output[] = '    Code: ' . $result['api_details']['code'];
+                    $output[] = '    Description: ' . $result['api_details']['description'];
+                    $output[] = '    Details: ';
 
-					$details = $result['api_details']['details'];
-					if ( is_array($details) ) {
-						foreach( $details as $row => $detail ) {
-							$output[] = '      Row: '. $row;
-							foreach( $detail as $field => $msgs ) {
-								$output[] = '      --Field: '. $field;
-								foreach( $msgs as $key => $msg ) {
-									$output[] = '      ----Message: '. $msg;
-								}
-							}
-						}
-					}
-				}
-				$output[] = '==============================================================';
-				$output[] = '';
+                    $details = $result['api_details']['details'];
+                    if (is_array($details)) {
+                        foreach ($details as $row => $detail) {
+                            $output[] = '      Row: ' . $row;
+                            foreach ($detail as $field => $msgs) {
+                                $output[] = '      --Field: ' . $field;
+                                foreach ($msgs as $key => $msg) {
+                                    $output[] = '      ----Message: ' . $msg;
+                                }
+                            }
+                        }
+                    }
+                }
+                $output[] = '==============================================================';
+                $output[] = '';
 
-				echo implode( "\n", $output );
-			}
+                echo implode("\n", $output);
+            }
 
-			return $result['api_retval'];
-		}
-	}
+            return $result['api_retval'];
+        }
+    }
 
-	return $result;
+    return $result;
 }
 
 //Post data (array of arguments) to URL
-function postToURL( $url, $data, $raw_result = FALSE ) {
-	$curl_connection = curl_init( $url );
-	curl_setopt($curl_connection, CURLOPT_CONNECTTIMEOUT, 600 );
-	curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, TRUE );
-	curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, FALSE );
-	curl_setopt($curl_connection, CURLOPT_FOLLOWLOCATION, 1 );
-	curl_setopt($curl_connection, CURLOPT_REFERER, $url ); //Referred is required is CSRF checks are enabled on the server.
-	//When sending JSON data to POST, it must be sent as JSON=<JSON DATA>
-	//<JSON DATA> should be an associative array with the first level being the number of arguments, where each argument can be of mixed type. ie:
-	// array(
-	//       0 => <ARG1>,
-	//		 1 => <ARG2>,
-	//		 2 => <ARG3>,
-	//       ...
-	//      )
-	$post_data = 'json='.urlencode( json_encode($data) );
-	curl_setopt($curl_connection, CURLOPT_POSTFIELDS, $post_data );
+function postToURL($url, $data, $raw_result = false)
+{
+    $curl_connection = curl_init($url);
+    curl_setopt($curl_connection, CURLOPT_CONNECTTIMEOUT, 600);
+    curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl_connection, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl_connection, CURLOPT_REFERER, $url); //Referred is required is CSRF checks are enabled on the server.
+    //When sending JSON data to POST, it must be sent as JSON=<JSON DATA>
+    //<JSON DATA> should be an associative array with the first level being the number of arguments, where each argument can be of mixed type. ie:
+    // array(
+    //       0 => <ARG1>,
+    //		 1 => <ARG2>,
+    //		 2 => <ARG3>,
+    //       ...
+    //      )
+    $post_data = 'json=' . urlencode(json_encode($data));
+    curl_setopt($curl_connection, CURLOPT_POSTFIELDS, $post_data);
 
-	echo "==============================================================\n";
-	echo "Posting data to URL: ". $url ."\n";
-	echo "  POST Data: ". $post_data ."\n";
-	echo "--------------------------------------------------------------\n";
-	$result = curl_exec($curl_connection);
-	curl_close($curl_connection);
+    echo "==============================================================\n";
+    echo "Posting data to URL: " . $url . "\n";
+    echo "  POST Data: " . $post_data . "\n";
+    echo "--------------------------------------------------------------\n";
+    $result = curl_exec($curl_connection);
+    curl_close($curl_connection);
 
-	return handleResult( json_decode($result, TRUE ), $raw_result );
+    return handleResult(json_decode($result, true), $raw_result);
 }
 
-$arguments = array('user_name' => $FAIRNESS_USERNAME, 'password' => $FAIRNESS_PASSWORD );
-$FAIRNESS_SESSION_ID = postToURL( buildURL( 'APIAuthentication', 'Login' ), $arguments );
-if ( $FAIRNESS_SESSION_ID == FALSE ) {
-	echo "Login Failed!<br>\n";
-	exit;
+$arguments = array('user_name' => $FAIRNESS_USERNAME, 'password' => $FAIRNESS_PASSWORD);
+$FAIRNESS_SESSION_ID = postToURL(buildURL('APIAuthentication', 'Login'), $arguments);
+if ($FAIRNESS_SESSION_ID == false) {
+    echo "Login Failed!<br>\n";
+    exit;
 }
 echo "Session ID: $FAIRNESS_SESSION_ID<br>\n";
 
@@ -105,12 +108,12 @@ echo "Session ID: $FAIRNESS_SESSION_ID<br>\n";
 //Get data for two employees by primary key/ID.
 // - Many other filter methods can be used, such as branch, department, user_name, province, state, etc...
 //
-$arguments = array( 'filter_data' => array(
-													//'id' => array(1023,11353)
-													'user_name' => 'john.doe567',
-											)
-					);
-$user_data = postToURL( buildURL( 'APIUser', 'getUser' ), array( $arguments ) );
+$arguments = array('filter_data' => array(
+    //'id' => array(1023,11353)
+    'user_name' => 'john.doe567',
+)
+);
+$user_data = postToURL(buildURL('APIUser', 'getUser'), array($arguments));
 //var_dump( $user_data );
 /* //Example returned data: )
 Array
@@ -238,17 +241,17 @@ Array
 //
 //Update data for the second employee, mark their status as Terminated and update Termination Date
 //
-if ( isset($user_data[1]) ) {
-	$user_data[1]['status_id'] = 20; //Terminated
-	$user_data[1]['termination_date'] = '01-Jul-09';
+if (isset($user_data[1])) {
+    $user_data[1]['status_id'] = 20; //Terminated
+    $user_data[1]['termination_date'] = '01-Jul-09';
 
-	$result = postToURL( buildURL( 'APIUser', 'setUser' ), array( $user_data[1] ) );
-	if ( $result === TRUE ) {
-		echo "Employee data saved successfully.<br>\n";
-	} else {
-		echo "Employee save failed.<br>\n";
-		print $result; //Show error messages
-	}
+    $result = postToURL(buildURL('APIUser', 'setUser'), array($user_data[1]));
+    if ($result === true) {
+        echo "Employee data saved successfully.<br>\n";
+    } else {
+        echo "Employee save failed.<br>\n";
+        print $result; //Show error messages
+    }
 }
 
 
@@ -256,16 +259,16 @@ if ( isset($user_data[1]) ) {
 //Update employee record in a single operation. Several records can be updated in a single operation as well.
 //
 $user_data = array(
-					'id' => 11353,
-					'termination_date' => '02-Jul-09'
-					);
+    'id' => 11353,
+    'termination_date' => '02-Jul-09'
+);
 
-$result = postToURL( buildURL( 'APIUser', 'setUser' ), array( $user_data ) );
-if ( $result === TRUE ) {
-	echo "Employee data saved successfully.<br>\n";
+$result = postToURL(buildURL('APIUser', 'setUser'), array($user_data));
+if ($result === true) {
+    echo "Employee data saved successfully.<br>\n";
 } else {
-	echo "Employee save failed.<br>\n";
-	print $result; //Show error messages
+    echo "Employee save failed.<br>\n";
+    print $result; //Show error messages
 }
 
 
@@ -273,23 +276,23 @@ if ( $result === TRUE ) {
 //Add new employee, several new employees can be added in a single operation as well.
 //
 $user_data = array(
-					'status_id' => 10, //Active
-					'first_name' => 'Michael',
-					'last_name' => 'Jackson',
-					'employee_number' => rand(10000, 99999),
-					'user_name' => 'mjackson_'. rand(10000, 99999),
-					'password' => 'whiteglove123',
-					'hire_date' => '01-Oct-09',
-					'currency_id' => 3,
-					);
+    'status_id' => 10, //Active
+    'first_name' => 'Michael',
+    'last_name' => 'Jackson',
+    'employee_number' => rand(10000, 99999),
+    'user_name' => 'mjackson_' . rand(10000, 99999),
+    'password' => 'whiteglove123',
+    'hire_date' => '01-Oct-09',
+    'currency_id' => 3,
+);
 
-$result = postToURL( buildURL( 'APIUser', 'setUser' ), array( $user_data ) );
-if ( $result !== FALSE ) {
-	echo "Employee added successfully.<br>\n";
-	$insert_id = $result; //Get employees new ID on success.
+$result = postToURL(buildURL('APIUser', 'setUser'), array($user_data));
+if ($result !== false) {
+    echo "Employee added successfully.<br>\n";
+    $insert_id = $result; //Get employees new ID on success.
 } else {
-	echo "Employee save failed.<br>\n";
-	print $result; //Show error messages
+    echo "Employee save failed.<br>\n";
+    print $result; //Show error messages
 }
 
 
@@ -297,34 +300,33 @@ if ( $result !== FALSE ) {
 //Add new punch for a specific employee
 //
 $punch_data = array(
-					'user_id' => 1023,
+    'user_id' => 1023,
 
-					'type_id' => 10, //Normal
-					'status_id' => 20, //In
+    'type_id' => 10, //Normal
+    'status_id' => 20, //In
 
-					'time_stamp' => strtotime('19-Aug-2013 5:50PM'),
+    'time_stamp' => strtotime('19-Aug-2013 5:50PM'),
 
-					'branch_id' => 296, //Branch
-					'department_id' => 896, //Department
-					'job_id' => 610, //Job
-					'job_item_id' => 9, //Task
-					);
+    'branch_id' => 296, //Branch
+    'department_id' => 896, //Department
+    'job_id' => 610, //Job
+    'job_item_id' => 9, //Task
+);
 
-$result = postToURL( buildURL( 'APIPunch', 'setPunch' ), array( $punch_data ) );
-if ( $result !== FALSE ) {
-	echo "Punch added successfully.<br>\n";
-	$insert_id = $result; //Get employees new ID on success.
+$result = postToURL(buildURL('APIPunch', 'setPunch'), array($punch_data));
+if ($result !== false) {
+    echo "Punch added successfully.<br>\n";
+    $insert_id = $result; //Get employees new ID on success.
 } else {
-	echo "Punch save failed.<br>\n";
-	print $result; //Show error messages
+    echo "Punch save failed.<br>\n";
+    print $result; //Show error messages
 }
 
 
 //
 //Get TimeSheet Summary report data in raw PHP native array format. 'csv' and 'pdf' are also valid formats.
 //
-$config = postToURL( buildURL( 'APITimesheetSummaryReport', 'getTemplate' ), array( 'by_employee+regular+overtime+premium+absence' ) );
-$result = postToURL( buildURL( 'APITimesheetSummaryReport', 'getTimesheetSummaryReport' ), array( $config, 'raw' ) );
+$config = postToURL(buildURL('APITimesheetSummaryReport', 'getTemplate'), array('by_employee+regular+overtime+premium+absence'));
+$result = postToURL(buildURL('APITimesheetSummaryReport', 'getTimesheetSummaryReport'), array($config, 'raw'));
 echo "Report Data: <br>\n";
 var_dump($result);
-?>

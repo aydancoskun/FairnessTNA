@@ -20,13 +20,13 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 /*
  * File Contributed By: Open Source Consulting, S.A.   San Jose, Costa Rica.
  * http://osc.co.cr
  */
 
-// creates the locale directories for use with gettext 
+// creates the locale directories for use with gettext
 // and also initializes each with a messages.po file.
 // Must be run from the i18n tools directory
 //
@@ -37,7 +37,7 @@ $locales = array(
 
 //	'af_ZA',
 //	'am_ET',
-	'ar_EG',
+    'ar_EG',
 //	'as_IN',
 //	'az_AZ',
 //	'be_BY',
@@ -51,19 +51,19 @@ $locales = array(
 //	'co_FR',
 //	'cs_CZ',
 //	'cy_GB',
-	'da_DK',
-	'de_DE',
+    'da_DK',
+    'de_DE',
 //	'dz_BT',
 //	'el_GR',
-	'en_US',
-	'es_ES',
+    'en_US',
+    'es_ES',
 //	'et_EE',
 //	'fa_IR',
 //	'fi_FI',
 //	'fj_FJ',
 //	'fo_FO',
-	'fr_FR',
-	'fr_CA',
+    'fr_FR',
+    'fr_CA',
 //	'ga_IE',
 //	'gd_GB',
 //	'gu_IN',
@@ -72,9 +72,9 @@ $locales = array(
 //	'hr_HR',
 //	'hu_HU',
 //	'hy_AM',
-	'id_ID',
+    'id_ID',
 // 'is_IS',
-	'it_IT',
+    'it_IT',
 //	'ja_JP',
 //	'jv_ID',
 //	'ka_GE',
@@ -107,8 +107,8 @@ $locales = array(
 //	'pa_IN',
 //	'pl_PL',
 //	'ps_AF',
-	'pt_PT',
-	'pt_BR',
+    'pt_PT',
+    'pt_BR',
 //	'rm_CH',
 //	'rn_BI',
 //	'ro_RO',
@@ -137,17 +137,17 @@ $locales = array(
 //	'wa_BE',
 //	'wen_DE',
 //	'lp_SG',
-	'zh_ZH',
-	'yi_US',
+    'zh_ZH',
+    'yi_US',
 );
 
 $dir = $depth . '/interface/locale';
-chdir( $dir );
+chdir($dir);
 
-foreach( $locales as $locale ) {
-	if ( !is_dir( './' . $locale ) ) {
-		$cmd = "mkdir $locale && mkdir $locale/LC_MESSAGES && msginit --no-translator -l $locale -o $locale/LC_MESSAGES/messages.po -i messages.pot";
-		shell_exec( $cmd );
-	}
+foreach ($locales as $locale) {
+    if (!is_dir('./' . $locale)) {
+        $cmd = "mkdir $locale && mkdir $locale/LC_MESSAGES && msginit --no-translator -l $locale -o $locale/LC_MESSAGES/messages.po -i messages.pot";
+        shell_exec($cmd);
+    }
 }
 ?>

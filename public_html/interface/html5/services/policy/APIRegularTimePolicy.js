@@ -1,51 +1,51 @@
-var APIRegularTimePolicy = ServiceCaller.extend( {
+var APIRegularTimePolicy = ServiceCaller.extend({
 
-	key_name: 'RegularTimePolicy',
-	className: 'APIRegularTimePolicy',
+    key_name: 'RegularTimePolicy',
+    className: 'APIRegularTimePolicy',
 
-	getRegularTimePolicyDefaultData: function() {
+    getRegularTimePolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getRegularTimePolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getRegularTimePolicyDefaultData', arguments);
 
-	},
+    },
 
-	getRegularTimePolicy: function() {
+    getRegularTimePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getRegularTimePolicy', arguments );
+        return this.argumentsHandler(this.className, 'getRegularTimePolicy', arguments);
 
-	},
+    },
 
-	getCommonRegularTimePolicyData: function() {
+    getCommonRegularTimePolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonRegularTimePolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonRegularTimePolicyData', arguments);
 
-	},
+    },
 
-	validateRegularTimePolicy: function() {
+    validateRegularTimePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateRegularTimePolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateRegularTimePolicy', arguments);
 
-	},
+    },
 
-	setRegularTimePolicy: function() {
+    setRegularTimePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setRegularTimePolicy', arguments );
+        return this.argumentsHandler(this.className, 'setRegularTimePolicy', arguments);
 
-	},
+    },
 
-	deleteRegularTimePolicy: function() {
+    deleteRegularTimePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteRegularTimePolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteRegularTimePolicy', arguments);
 
-	},
+    },
 
-	copyRegularTimePolicy: function() {
-		return this.argumentsHandler( this.className, 'copyRegularTimePolicy', arguments );
-	},
+    copyRegularTimePolicy: function () {
+        return this.argumentsHandler(this.className, 'copyRegularTimePolicy', arguments);
+    },
 
-	exportRegularTimePolicy: function() {
-		return this.argumentsHandler( this.className, 'exportRegularTimePolicy', arguments );
-	}
+    exportRegularTimePolicy: function () {
+        return this.argumentsHandler(this.className, 'exportRegularTimePolicy', arguments);
+    }
 
 
-} );
+});

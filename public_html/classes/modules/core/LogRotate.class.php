@@ -19,190 +19,199 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-
 /*
  - Example config array:
 
  $log_rotate_config[] = array(
-							'directory' => '/var/log/fairness',
-							'recurse' => TRUE,
-							'file' => '*',
-							'frequency' => 'DAILY',
-							'history' =>  5 );
+                            'directory' => '/var/log/fairness',
+                            'recurse' => TRUE,
+                            'file' => '*',
+                            'frequency' => 'DAILY',
+                            'history' =>  5 );
 */
-class LogRotate {
 
-	private $config_arr = array();
+class LogRotate
+{
+    private $config_arr = array();
 
-	function __construct( $config_arr = NULL ) {
-		$this->config_arr = $config_arr;
-		return TRUE;
-	}
+    public function __construct($config_arr = null)
+    {
+        $this->config_arr = $config_arr;
+        return true;
+    }
 
-	function addConfig( $arr ) {
-		$this->config_arr[] = $arr;
-		return TRUE;
-	}
+    public function addConfig($arr)
+    {
+        $this->config_arr[] = $arr;
+        return true;
+    }
 
-	function getFileList( $start_dir, $regex_filter = NULL, $recurse = FALSE ) {
-		return Misc::getFileList( $start_dir, $regex_filter, $recurse );
-	}
+    public function Rotate()
+    {
+        //Loop through config entries
+        if (is_array($this->config_arr) and isset($this->config_arr[0])) {
+            foreach ($this->config_arr as $rotate_config) {
+                //Debug::Arr($rotate_config, ' Log Rotate Config: ', __FILE__, __LINE__, __METHOD__, 10);
+                if (isset($rotate_config['directory']) and $rotate_config['directory'] != '') {
+                    Debug::Text(' Rotating Logs: Dir: ' . $rotate_config['directory'] . ' File: ' . $rotate_config['file'], __FILE__, __LINE__, __METHOD__, 10);
 
-	function isFileReadyToRotate( $file, $frequency = 'daily' ) {
-		$retval = FALSE;
+                    $files = $this->getFileList($rotate_config['directory'], $rotate_config['file'], $rotate_config['recurse']);
+                    //Debug::Arr( $files, 'Matching files: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( file_exists( $file ) ) {
-			//Linux doesnt store when the file was created, so we have to base this on when we last ran.
-			//$file_created_time = filectime( $file );
-			//Debug::Text(' File: '. $file .' was created: '. date('r', $file_created_time), __FILE__, __LINE__, __METHOD__, 10);
+                    if (is_array($files) and count($files) > 0) {
+                        $this->_rotate($files, $rotate_config);
+                    } else {
+                        Debug::Text(' No files to rotate...', __FILE__, __LINE__, __METHOD__, 10);
+                    }
+                }
+            }
+        } else {
+            Debug::Text(' No config loaded!', __FILE__, __LINE__, __METHOD__, 10);
+        }
 
-			switch( strtolower($frequency) ) {
-				case 'always':
-					$retval = TRUE;
-					break;
-				case 'daily':
-					$retval = TRUE;
-					break;
-			}
-		}
+        return true;
+    }
 
-		return $retval;
-	}
+    public function getFileList($start_dir, $regex_filter = null, $recurse = false)
+    {
+        return Misc::getFileList($start_dir, $regex_filter, $recurse);
+    }
 
-	//Checks to see if the file has a numeric extension signifying that it is not a primary file and has already been rotated.
-	function isFileRotatable( $file ) {
-		$extension = pathinfo( $file, PATHINFO_EXTENSION );
-		//Debug::Text(' File:  '. $file .' Extension: '. $extension, __FILE__, __LINE__, __METHOD__, 10);
+    //Checks to see if the file has a numeric extension signifying that it is not a primary file and has already been rotated.
 
-		//Only rotate if the file size is greater then 0 bytes.
-		if ( !is_numeric( $extension ) AND file_exists($file) AND filesize( $file ) > 0 ) {
-			return TRUE;
-		}
+    public function _rotate($files, $rotate_config)
+    {
+        if (is_array($files)) {
+            foreach ($files as $filename) {
+                if ($this->isFileRotatable($filename) == true) {
+                    Debug::Text(' File IS a primary log file: ' . $filename, __FILE__, __LINE__, __METHOD__, 10);
 
-		return FALSE;
-	}
+                    if ($this->isFileReadyToRotate($filename, $rotate_config['frequency']) == true) {
+                        Debug::Text(' File is old enough to be rotated: ' . $filename, __FILE__, __LINE__, __METHOD__, 10);
 
-	function getRotatedHistoryFiles( $files, $primary_file ) {
-		$retarr = array();
-		if ( is_array($files) ) {
-			foreach( $files as $filename ) {
-				$pattern = '/'. str_replace( array('/', '\\'), array('\\', '\\\\'), $primary_file) .'\.[0-9]{1,2}/i';
-				//Debug::Text(' Pattern: '. $pattern, __FILE__, __LINE__, __METHOD__, 10);
-				if ( preg_match( $pattern, $filename) == 1 ) {
-					$retarr[] = $filename;
-				}
-			}
-		}
+                        $this->handleHistoryFiles($this->getRotatedHistoryFiles($files, $filename), $rotate_config['history']);
 
-		if ( empty($retarr) == FALSE ) {
-			return $retarr;
-		}
+                        //Rename primary log file
+                        $new_file = $filename . '.' . $this->padExtension(1, $rotate_config['history']);
+                        if (file_exists($filename) and !file_exists($new_file)) {
+                            Debug::Text(' Renaming primary log file: ' . $filename . ' To: ' . $new_file, __FILE__, __LINE__, __METHOD__, 10);
+                            if (@rename($filename, $new_file) == false) {
+                                Debug::Text('   ERROR: Rename failed, possibly due to permissions?', __FILE__, __LINE__, __METHOD__, 10);
+                            }
+                        } else {
+                            Debug::Text(' NOT Renaming primary log file: ' . $filename, __FILE__, __LINE__, __METHOD__, 10);
+                        }
+                        unset($new_file);
+                    } else {
+                        Debug::Text(' File does not need to be rotated yet: ' . $filename, __FILE__, __LINE__, __METHOD__, 10);
+                    }
+                } else {
+                    Debug::Text(' File is not a primary log file: ' . $filename, __FILE__, __LINE__, __METHOD__, 10);
+                }
+            }
+        }
 
-		return FALSE;
-	}
+        return true;
+    }
 
-	function padExtension( $extension, $history ) {
-		if ( strlen($history) < 2 ) {
-			$pad_length = 2;
-		} else {
-			$pad_length = strlen($history);
-		}
-		return str_pad( $extension, $pad_length, '0', STR_PAD_LEFT );
-	}
+    public function isFileRotatable($file)
+    {
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        //Debug::Text(' File:  '. $file .' Extension: '. $extension, __FILE__, __LINE__, __METHOD__, 10);
 
-	function handleHistoryFiles( $files, $history = 0 ) {
-		if ( is_array($files) ) {
-			rsort($files);
-			foreach( $files as $filename ) {
-				$path_info = pathinfo( $filename );
+        //Only rotate if the file size is greater then 0 bytes.
+        if (!is_numeric($extension) and file_exists($file) and filesize($file) > 0) {
+            return true;
+        }
 
-				$new_extension = $this->padExtension( ((int)$path_info['extension'] + 1), $history );
-				$new_file = $path_info['dirname'] . DIRECTORY_SEPARATOR . $path_info['filename'] . '.' . $new_extension;
+        return false;
+    }
 
-				if ( $new_extension > $history AND is_writable( $filename ) ) {
-					Debug::Text(' Found last file in history, delete rather then rename: '. $filename, __FILE__, __LINE__, __METHOD__, 10);
-					unlink( $filename );
-				} else {
-					if ( file_exists( $filename ) AND !file_exists( $new_file ) ) {
-						Debug::Text(' Renaming: '. $filename .' To: '. $new_file, __FILE__, __LINE__, __METHOD__, 10);
+    public function isFileReadyToRotate($file, $frequency = 'daily')
+    {
+        $retval = false;
 
-						rename( $filename, $new_file );
-					} else {
-						Debug::Text(' Unable to rename file, file does not exist or new name does exist or we do not have permission: '. $new_file, __FILE__, __LINE__, __METHOD__, 10);
-					}
-				}
-			}
+        if (file_exists($file)) {
+            //Linux doesnt store when the file was created, so we have to base this on when we last ran.
+            //$file_created_time = filectime( $file );
+            //Debug::Text(' File: '. $file .' was created: '. date('r', $file_created_time), __FILE__, __LINE__, __METHOD__, 10);
 
-			return TRUE;
-		}
+            switch (strtolower($frequency)) {
+                case 'always':
+                    $retval = true;
+                    break;
+                case 'daily':
+                    $retval = true;
+                    break;
+            }
+        }
 
-		return FALSE;
-	}
+        return $retval;
+    }
 
-	function _rotate( $files, $rotate_config ) {
-		if ( is_array($files) ) {
-			foreach( $files as $filename ) {
-				if ( $this->isFileRotatable( $filename ) == TRUE ) {
-					Debug::Text(' File IS a primary log file: '. $filename, __FILE__, __LINE__, __METHOD__, 10);
+    public function handleHistoryFiles($files, $history = 0)
+    {
+        if (is_array($files)) {
+            rsort($files);
+            foreach ($files as $filename) {
+                $path_info = pathinfo($filename);
 
-					if ( $this->isFileReadyToRotate( $filename, $rotate_config['frequency']) == TRUE ) {
-						Debug::Text(' File is old enough to be rotated: '. $filename, __FILE__, __LINE__, __METHOD__, 10);
+                $new_extension = $this->padExtension(((int)$path_info['extension'] + 1), $history);
+                $new_file = $path_info['dirname'] . DIRECTORY_SEPARATOR . $path_info['filename'] . '.' . $new_extension;
 
-						$this->handleHistoryFiles( $this->getRotatedHistoryFiles( $files, $filename ), $rotate_config['history'] );
+                if ($new_extension > $history and is_writable($filename)) {
+                    Debug::Text(' Found last file in history, delete rather then rename: ' . $filename, __FILE__, __LINE__, __METHOD__, 10);
+                    unlink($filename);
+                } else {
+                    if (file_exists($filename) and !file_exists($new_file)) {
+                        Debug::Text(' Renaming: ' . $filename . ' To: ' . $new_file, __FILE__, __LINE__, __METHOD__, 10);
 
-						//Rename primary log file
-						$new_file = $filename . '.' . $this->padExtension( 1, $rotate_config['history'] );
-						if ( file_exists( $filename ) AND !file_exists( $new_file ) ) {
-							Debug::Text(' Renaming primary log file: '. $filename .' To: '. $new_file, __FILE__, __LINE__, __METHOD__, 10);
-							if ( @rename( $filename, $new_file) == FALSE ) {
-								Debug::Text('   ERROR: Rename failed, possibly due to permissions?', __FILE__, __LINE__, __METHOD__, 10);
-							}
-						} else {
-							Debug::Text(' NOT Renaming primary log file: '. $filename, __FILE__, __LINE__, __METHOD__, 10);
-						}
-						unset($new_file);
+                        rename($filename, $new_file);
+                    } else {
+                        Debug::Text(' Unable to rename file, file does not exist or new name does exist or we do not have permission: ' . $new_file, __FILE__, __LINE__, __METHOD__, 10);
+                    }
+                }
+            }
 
-					} else {
-						Debug::Text(' File does not need to be rotated yet: '. $filename, __FILE__, __LINE__, __METHOD__, 10);
-					}
-				} else {
-					Debug::Text(' File is not a primary log file: '. $filename, __FILE__, __LINE__, __METHOD__, 10);
-				}
-			}
-		}
+            return true;
+        }
 
-		return TRUE;
-	}
+        return false;
+    }
 
-	function Rotate() {
-		//Loop through config entries
-		if ( is_array($this->config_arr) AND isset($this->config_arr[0]) ) {
-			foreach( $this->config_arr as $rotate_config ) {
-				//Debug::Arr($rotate_config, ' Log Rotate Config: ', __FILE__, __LINE__, __METHOD__, 10);
-				if ( isset($rotate_config['directory']) AND $rotate_config['directory'] != '' ) {
-					Debug::Text(' Rotating Logs: Dir: '. $rotate_config['directory'] .' File: '. $rotate_config['file'], __FILE__, __LINE__, __METHOD__, 10);
+    public function padExtension($extension, $history)
+    {
+        if (strlen($history) < 2) {
+            $pad_length = 2;
+        } else {
+            $pad_length = strlen($history);
+        }
+        return str_pad($extension, $pad_length, '0', STR_PAD_LEFT);
+    }
 
-					$files = $this->getFileList( $rotate_config['directory'], $rotate_config['file'], $rotate_config['recurse']);
-					//Debug::Arr( $files, 'Matching files: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function getRotatedHistoryFiles($files, $primary_file)
+    {
+        $retarr = array();
+        if (is_array($files)) {
+            foreach ($files as $filename) {
+                $pattern = '/' . str_replace(array('/', '\\'), array('\\', '\\\\'), $primary_file) . '\.[0-9]{1,2}/i';
+                //Debug::Text(' Pattern: '. $pattern, __FILE__, __LINE__, __METHOD__, 10);
+                if (preg_match($pattern, $filename) == 1) {
+                    $retarr[] = $filename;
+                }
+            }
+        }
 
-					if ( is_array( $files ) AND count($files) > 0 ) {
-						$this->_rotate( $files, $rotate_config );
-					} else {
-						Debug::Text(' No files to rotate...', __FILE__, __LINE__, __METHOD__, 10);
-					}
-				}
-			}
-		} else {
-			Debug::Text(' No config loaded!', __FILE__, __LINE__, __METHOD__, 10);
-		}
+        if (empty($retarr) == false) {
+            return $retarr;
+        }
 
-		return TRUE;
-	}
+        return false;
+    }
 }
-?>

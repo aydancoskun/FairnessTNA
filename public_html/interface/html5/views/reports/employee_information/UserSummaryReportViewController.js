@@ -1,141 +1,141 @@
-UserSummaryReportViewController = ReportBaseViewController.extend( {
+UserSummaryReportViewController = ReportBaseViewController.extend({
 
-	initialize: function( options ) {
-		this.__super( 'initialize', options );
-		this.script_name = 'UserSummaryReport';
-		this.viewId = 'UserSummaryReport';
-		this.context_menu_name = $.i18n._( 'Employee Information' );
-		this.navigation_label = $.i18n._( 'Saved Report' ) +':';
-		this.view_file = 'UserSummaryReportView.html';
-		this.api = new (APIFactory.getAPIClass( 'APIUserSummaryReport' ))();
-		this.buildContextMenu();
+    initialize: function (options) {
+        this.__super('initialize', options);
+        this.script_name = 'UserSummaryReport';
+        this.viewId = 'UserSummaryReport';
+        this.context_menu_name = $.i18n._('Employee Information');
+        this.navigation_label = $.i18n._('Saved Report') + ':';
+        this.view_file = 'UserSummaryReportView.html';
+        this.api = new (APIFactory.getAPIClass('APIUserSummaryReport'))();
+        this.buildContextMenu();
 
-	},
+    },
 
-	buildContextMenuModels: function() {
+    buildContextMenuModels: function () {
 
-		//Context Menu
-		var menu = new RibbonMenu( {
-			label: this.context_menu_name,
-			id: this.viewId + 'ContextMenu',
-			sub_menu_groups: []
-		} );
+        //Context Menu
+        var menu = new RibbonMenu({
+            label: this.context_menu_name,
+            id: this.viewId + 'ContextMenu',
+            sub_menu_groups: []
+        });
 
-		//menu group
-		var editor_group = new RibbonSubMenuGroup( {
-			label: $.i18n._( 'Editor' ),
-			id: this.viewId + 'Editor',
-			ribbon_menu: menu,
-			sub_menus: []
-		} );
+        //menu group
+        var editor_group = new RibbonSubMenuGroup({
+            label: $.i18n._('Editor'),
+            id: this.viewId + 'Editor',
+            ribbon_menu: menu,
+            sub_menus: []
+        });
 
-		//menu group
-		var saved_report_group = new RibbonSubMenuGroup( {
-			label: $.i18n._( 'Saved Report' ),
-			id: this.viewId + 'SavedReport',
-			ribbon_menu: menu,
-			sub_menus: []
-		} );
+        //menu group
+        var saved_report_group = new RibbonSubMenuGroup({
+            label: $.i18n._('Saved Report'),
+            id: this.viewId + 'SavedReport',
+            ribbon_menu: menu,
+            sub_menus: []
+        });
 
-		var view_html = new RibbonSubMenu( {
-			label: $.i18n._( 'View' ),
-			id: ContextMenuIconName.view_html,
-			group: editor_group,
-			icon: Icons.view,
-			permission_result: true,
-			permission: null
-		} );
+        var view_html = new RibbonSubMenu({
+            label: $.i18n._('View'),
+            id: ContextMenuIconName.view_html,
+            group: editor_group,
+            icon: Icons.view,
+            permission_result: true,
+            permission: null
+        });
 
-		var view_pdf = new RibbonSubMenu( {
-			label: $.i18n._( 'PDF' ),
-			id: ContextMenuIconName.view,
-			group: editor_group,
-			icon: Icons.print,
-			permission_result: true,
-			permission: null
-		} );
+        var view_pdf = new RibbonSubMenu({
+            label: $.i18n._('PDF'),
+            id: ContextMenuIconName.view,
+            group: editor_group,
+            icon: Icons.print,
+            permission_result: true,
+            permission: null
+        });
 
-		var excel = new RibbonSubMenu( {
-			label: $.i18n._( 'Excel' ),
-			id: ContextMenuIconName.export_excel,
-			group: editor_group,
-			icon: Icons.export_excel,
-			permission_result: true,
-			permission: null
-		} );
+        var excel = new RibbonSubMenu({
+            label: $.i18n._('Excel'),
+            id: ContextMenuIconName.export_excel,
+            group: editor_group,
+            icon: Icons.export_excel,
+            permission_result: true,
+            permission: null
+        });
 
-		var cancel = new RibbonSubMenu( {
-			label: $.i18n._( 'Cancel' ),
-			id: ContextMenuIconName.cancel,
-			group: editor_group,
-			icon: Icons.cancel,
-			permission_result: true,
-			permission: null
-		} );
+        var cancel = new RibbonSubMenu({
+            label: $.i18n._('Cancel'),
+            id: ContextMenuIconName.cancel,
+            group: editor_group,
+            icon: Icons.cancel,
+            permission_result: true,
+            permission: null
+        });
 
-		var save_existed_report = new RibbonSubMenu( {
-			label: $.i18n._( 'Save' ),
-			id: ContextMenuIconName.save_existed_report,
-			group: saved_report_group,
-			icon: Icons.save,
-			permission_result: true,
-			permission: null
-		} );
+        var save_existed_report = new RibbonSubMenu({
+            label: $.i18n._('Save'),
+            id: ContextMenuIconName.save_existed_report,
+            group: saved_report_group,
+            icon: Icons.save,
+            permission_result: true,
+            permission: null
+        });
 
-		var save_new_report = new RibbonSubMenu( {
-			label: $.i18n._( 'Save as New' ),
-			id: ContextMenuIconName.save_new_report,
-			group: saved_report_group,
-			icon: Icons.save_and_new,
-			permission_result: true,
-			permission: null
-		} );
+        var save_new_report = new RibbonSubMenu({
+            label: $.i18n._('Save as New'),
+            id: ContextMenuIconName.save_new_report,
+            group: saved_report_group,
+            icon: Icons.save_and_new,
+            permission_result: true,
+            permission: null
+        });
 
-		return [menu];
+        return [menu];
 
-	},
+    },
 
-	onContextMenuClick: function( context_btn, menu_name ) {
-		var id;
-		if ( Global.isSet( menu_name ) ) {
-			id = menu_name;
-		} else {
-			context_btn = $( context_btn );
+    onContextMenuClick: function (context_btn, menu_name) {
+        var id;
+        if (Global.isSet(menu_name)) {
+            id = menu_name;
+        } else {
+            context_btn = $(context_btn);
 
-			id = $( context_btn.find( '.ribbon-sub-menu-icon' ) ).attr( 'id' );
+            id = $(context_btn.find('.ribbon-sub-menu-icon')).attr('id');
 
-			if ( context_btn.hasClass( 'disable-image' ) ) {
-				return;
-			}
-		}
+            if (context_btn.hasClass('disable-image')) {
+                return;
+            }
+        }
 
-		switch ( id ) {
-			case ContextMenuIconName.view:
-				this.onViewClick();
-				break;
-			case ContextMenuIconName.view_html:
+        switch (id) {
+            case ContextMenuIconName.view:
+                this.onViewClick();
+                break;
+            case ContextMenuIconName.view_html:
 
-				this.onViewClick('html');
-				break;
-			case ContextMenuIconName.view_html_new_window:
-				this.onViewClick('html', true);
-				break;
-			case ContextMenuIconName.export_excel:
-				this.onViewExcelClick();
-				break;
-			case ContextMenuIconName.cancel:
-				this.onCancelClick();
-				break;
-			case ContextMenuIconName.save_existed_report: //All report view
-				this.onSaveExistedReportClick();
-				break;
-			case ContextMenuIconName.save_new_report: //All report view
-				this.onSaveNewReportClick();
-				break;
-			case ContextMenuIconName.save_setup: //All report view
-				this.onSaveSetup();
-				break;
-		}
-	}
+                this.onViewClick('html');
+                break;
+            case ContextMenuIconName.view_html_new_window:
+                this.onViewClick('html', true);
+                break;
+            case ContextMenuIconName.export_excel:
+                this.onViewExcelClick();
+                break;
+            case ContextMenuIconName.cancel:
+                this.onCancelClick();
+                break;
+            case ContextMenuIconName.save_existed_report: //All report view
+                this.onSaveExistedReportClick();
+                break;
+            case ContextMenuIconName.save_new_report: //All report view
+                this.onSaveNewReportClick();
+                break;
+            case ContextMenuIconName.save_setup: //All report view
+                this.onSaveSetup();
+                break;
+        }
+    }
 
-} );
+});

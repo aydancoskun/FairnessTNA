@@ -1,53 +1,53 @@
-var APIDepartment = ServiceCaller.extend( {
+var APIDepartment = ServiceCaller.extend({
 
-	key_name: 'Department',
-	className: 'APIDepartment',
+    key_name: 'Department',
+    className: 'APIDepartment',
 
-	getDepartment: function() {
+    getDepartment: function () {
 
-		return this.argumentsHandler( this.className, 'getDepartment', arguments );
+        return this.argumentsHandler(this.className, 'getDepartment', arguments);
 
-	},
+    },
 
-	getDepartmentDefaultData: function() {
+    getDepartmentDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getDepartmentDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getDepartmentDefaultData', arguments);
 
-	},
+    },
 
-	getCommonDepartmentData: function() {
+    getCommonDepartmentData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonDepartmentData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonDepartmentData', arguments);
 
-	},
+    },
 
-	validateDepartment: function() {
+    validateDepartment: function () {
 
-		return this.argumentsHandler( this.className, 'validateDepartment', arguments );
+        return this.argumentsHandler(this.className, 'validateDepartment', arguments);
 
-	},
+    },
 
-	setDepartment: function() {
+    setDepartment: function () {
 
-		return this.argumentsHandler( this.className, 'setDepartment', arguments );
+        return this.argumentsHandler(this.className, 'setDepartment', arguments);
 
-	},
+    },
 
-	deleteDepartment: function() {
+    deleteDepartment: function () {
 
-		return this.argumentsHandler( this.className, 'deleteDepartment', arguments );
+        return this.argumentsHandler(this.className, 'deleteDepartment', arguments);
 
-	},
+    },
 
-	copyDepartment: function() {
+    copyDepartment: function () {
 
-		return this.argumentsHandler( this.className, 'copyDepartment', arguments );
+        return this.argumentsHandler(this.className, 'copyDepartment', arguments);
 
-	},
+    },
 
-	exportDepartment: function() {
-		return this.argumentsHandler( this.className, 'exportDepartment', arguments );
-	}
+    exportDepartment: function () {
+        return this.argumentsHandler(this.className, 'exportDepartment', arguments);
+    }
 
 
-} );
+});

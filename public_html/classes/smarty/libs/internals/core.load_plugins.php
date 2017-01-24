@@ -15,7 +15,6 @@
 
 function smarty_core_load_plugins($params, &$smarty)
 {
-
     foreach ($params['plugins'] as $_plugin_info) {
         list($_type, $_name, $_tpl_file, $_tpl_line, $_delayed_loading) = $_plugin_info;
         $_plugin = &$smarty->_plugins[$_type][$_name];
@@ -38,11 +37,13 @@ function smarty_core_load_plugins($params, &$smarty)
                     $_plugin[1] = $_tpl_file;
                     $_plugin[2] = $_tpl_line;
                     $_plugin[3] = true;
-                    if (!isset($_plugin[4])) $_plugin[4] = true; /* cacheable */
+                    if (!isset($_plugin[4])) {
+                        $_plugin[4] = true;
+                    } /* cacheable */
                 }
             }
             continue;
-        } else if ($_type == 'insert') {
+        } elseif ($_type == 'insert') {
             /*
              * For backwards compatibility, we check for insert functions in
              * the symbol table before trying to load them as a plugin.
@@ -56,7 +57,7 @@ function smarty_core_load_plugins($params, &$smarty)
 
         $_plugin_file = $smarty->_get_plugin_filepath($_type, $_name);
 
-        if (! $_found = ($_plugin_file != false)) {
+        if (!$_found = ($_plugin_file != false)) {
             $_message = "could not load plugin file '$_type.$_name.php'\n";
         }
 
@@ -73,12 +74,11 @@ function smarty_core_load_plugins($params, &$smarty)
                 $smarty->_trigger_fatal_error("[plugin] function $_plugin_func() not found in $_plugin_file", $_tpl_file, $_tpl_line, __FILE__, __LINE__);
                 continue;
             }
-        }
-        /*
+        } /*
          * In case of insert plugins, their code may be loaded later via
          * 'script' attribute.
          */
-        else if ($_type == 'insert' && $_delayed_loading) {
+        elseif ($_type == 'insert' && $_delayed_loading) {
             $_plugin_func = 'smarty_' . $_type . '_' . $_name;
             $_found = true;
         }
@@ -103,7 +103,7 @@ function smarty_core_load_plugins($params, &$smarty)
                         $_found = true;
                     }
                 }
-            } else if ($_type == 'function') {
+            } elseif ($_type == 'function') {
                 /*
                  * This is a catch-all situation.
                  */
@@ -120,6 +120,4 @@ function smarty_core_load_plugins($params, &$smarty)
     }
 }
 
-/* vim: set expandtab: */
-
-?>
+/* vim: set expandtab: */;

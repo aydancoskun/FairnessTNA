@@ -1,55 +1,55 @@
-var APIPayPeriodTimeSheetVerify = ServiceCaller.extend( {
+var APIPayPeriodTimeSheetVerify = ServiceCaller.extend({
 
-	key_name: 'PayPeriodTimeSheetVerify',
-	className: 'APIPayPeriodTimeSheetVerify',
+    key_name: 'PayPeriodTimeSheetVerify',
+    className: 'APIPayPeriodTimeSheetVerify',
 
-	getPayPeriodTimeSheetVerifyDefaultData: function() {
+    getPayPeriodTimeSheetVerifyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayPeriodTimeSheetVerifyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayPeriodTimeSheetVerifyDefaultData', arguments);
 
-	},
+    },
 
-	getHierarchyLevelOptions: function() {
+    getHierarchyLevelOptions: function () {
 
-		return this.argumentsHandler( this.className, 'getHierarchyLevelOptions', arguments );
+        return this.argumentsHandler(this.className, 'getHierarchyLevelOptions', arguments);
 
-	},
+    },
 
-	getPayPeriodTimeSheetVerify: function() {
+    getPayPeriodTimeSheetVerify: function () {
 
-		return this.argumentsHandler( this.className, 'getPayPeriodTimeSheetVerify', arguments );
+        return this.argumentsHandler(this.className, 'getPayPeriodTimeSheetVerify', arguments);
 
-	},
+    },
 
-	getCommonPayPeriodTimeSheetVerifyData: function() {
+    getCommonPayPeriodTimeSheetVerifyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayPeriodTimeSheetVerifyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayPeriodTimeSheetVerifyData', arguments);
 
-	},
+    },
 
-	validatePayPeriodTimeSheetVerify: function() {
+    validatePayPeriodTimeSheetVerify: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayPeriodTimeSheetVerify', arguments );
+        return this.argumentsHandler(this.className, 'validatePayPeriodTimeSheetVerify', arguments);
 
-	},
+    },
 
-	setPayPeriodTimeSheetVerify: function() {
+    setPayPeriodTimeSheetVerify: function () {
 
-		return this.argumentsHandler( this.className, 'setPayPeriodTimeSheetVerify', arguments );
+        return this.argumentsHandler(this.className, 'setPayPeriodTimeSheetVerify', arguments);
 
-	},
+    },
 
-	deletePayPeriodTimeSheetVerify: function() {
-		return this.argumentsHandler( this.className, 'deletePayPeriodTimeSheetVerify', arguments );
-	},
+    deletePayPeriodTimeSheetVerify: function () {
+        return this.argumentsHandler(this.className, 'deletePayPeriodTimeSheetVerify', arguments);
+    },
 
-	copyPayPeriodTimeSheetVerify: function() {
-		return this.argumentsHandler( this.className, 'copyPayPeriodTimeSheetVerify', arguments );
-	},
+    copyPayPeriodTimeSheetVerify: function () {
+        return this.argumentsHandler(this.className, 'copyPayPeriodTimeSheetVerify', arguments);
+    },
 
-	exportPayPeriodTimeSheetVerify: function() {
-		return this.argumentsHandler( this.className, 'exportPayPeriodTimeSheetVerify', arguments );
-	}
+    exportPayPeriodTimeSheetVerify: function () {
+        return this.argumentsHandler(this.className, 'exportPayPeriodTimeSheetVerify', arguments);
+    }
 
 
-} );
+});

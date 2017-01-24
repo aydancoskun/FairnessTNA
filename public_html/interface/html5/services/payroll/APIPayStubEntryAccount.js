@@ -1,58 +1,58 @@
-var APIPayStubEntryAccount = ServiceCaller.extend( {
+var APIPayStubEntryAccount = ServiceCaller.extend({
 
-	key_name: 'PayStubEntryAccount',
-	className: 'APIPayStubEntryAccount',
+    key_name: 'PayStubEntryAccount',
+    className: 'APIPayStubEntryAccount',
 
-	migratePayStubEntryAccount: function() {
+    migratePayStubEntryAccount: function () {
 
-		return this.argumentsHandler( this.className, 'migratePayStubEntryAccount', arguments );
+        return this.argumentsHandler(this.className, 'migratePayStubEntryAccount', arguments);
 
-	},
+    },
 
-	getPayStubEntryAccount: function() {
+    getPayStubEntryAccount: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubEntryAccount', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubEntryAccount', arguments);
 
-	},
+    },
 
-	getPayStubEntryAccountDefaultData: function() {
+    getPayStubEntryAccountDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubEntryAccountDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubEntryAccountDefaultData', arguments);
 
-	},
+    },
 
-	getCommonPayStubEntryAccountData: function() {
+    getCommonPayStubEntryAccountData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayStubEntryAccountData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayStubEntryAccountData', arguments);
 
-	},
+    },
 
-	validatePayStubEntryAccount: function() {
+    validatePayStubEntryAccount: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayStubEntryAccount', arguments );
+        return this.argumentsHandler(this.className, 'validatePayStubEntryAccount', arguments);
 
-	},
+    },
 
-	setPayStubEntryAccount: function() {
+    setPayStubEntryAccount: function () {
 
-		return this.argumentsHandler( this.className, 'setPayStubEntryAccount', arguments );
+        return this.argumentsHandler(this.className, 'setPayStubEntryAccount', arguments);
 
-	},
+    },
 
-	deletePayStubEntryAccount: function() {
+    deletePayStubEntryAccount: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayStubEntryAccount', arguments );
+        return this.argumentsHandler(this.className, 'deletePayStubEntryAccount', arguments);
 
-	},
+    },
 
-	copyPayStubEntryAccount: function() {
+    copyPayStubEntryAccount: function () {
 
-		return this.argumentsHandler( this.className, 'copyPayStubEntryAccount', arguments );
+        return this.argumentsHandler(this.className, 'copyPayStubEntryAccount', arguments);
 
-	},
+    },
 
-	exportPayStubEntryAccount: function() {
-		return this.argumentsHandler( this.className, 'exportPayStubEntryAccount', arguments );
-	}
+    exportPayStubEntryAccount: function () {
+        return this.argumentsHandler(this.className, 'exportPayStubEntryAccount', arguments);
+    }
 
-} );
+});

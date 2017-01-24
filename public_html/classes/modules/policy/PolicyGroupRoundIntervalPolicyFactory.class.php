@@ -19,110 +19,141 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class PolicyGroupRoundIntervalPolicyFactory extends Factory {
-	protected $table = 'policy_group_round_interval_policy';
-	protected $pk_sequence_name = 'policy_group_round_interval_policy_id_seq'; //PK Sequence name
-	function getPolicyGroup() {
-		if ( isset($this->data['policy_group_id']) ) {
-			return (int)$this->data['policy_group_id'];
-		}
+class PolicyGroupRoundIntervalPolicyFactory extends Factory
+{
+    protected $table = 'policy_group_round_interval_policy';
+    protected $pk_sequence_name = 'policy_group_round_interval_policy_id_seq'; //PK Sequence name
 
-		return FALSE;
-	}
-	function setPolicyGroup($id) {
-		$id = trim($id);
+    public function getPolicyGroup()
+    {
+        if (isset($this->data['policy_group_id'])) {
+            return (int)$this->data['policy_group_id'];
+        }
 
-		$pglf = TTnew( 'PolicyGroupListFactory' );
+        return false;
+    }
 
-		if ( $this->Validator->isResultSetWithRows(	'policy_group',
-															$pglf->getByID($id),
-															TTi18n::gettext('Policy Group is invalid')
-															) ) {
-			$this->data['policy_group_id'] = $id;
+    public function setPolicyGroup($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $pglf = TTnew('PolicyGroupListFactory');
 
-		return FALSE;
-	}
+        if ($this->Validator->isResultSetWithRows('policy_group',
+            $pglf->getByID($id),
+            TTi18n::gettext('Policy Group is invalid')
+        )
+        ) {
+            $this->data['policy_group_id'] = $id;
 
-	function getRoundIntervalPolicy() {
-		if ( isset($this->data['round_interval_policy_id']) ) {
-			return (int)$this->data['round_interval_policy_id'];
-		}
-	}
-	function setRoundInterValPolicy($id) {
-		$id = trim($id);
+            return true;
+        }
 
-		$riplf = TTnew( 'RoundIntervalPolicyListFactory' );
+        return false;
+    }
 
-		if ( $id == 0
-				OR
-				$this->Validator->isResultSetWithRows(	'round_inteval_policy',
-													$riplf->getByID($id),
-													TTi18n::gettext('Selected Interval Rounding Policy is invalid')
-															)
-			) {
+    public function getRoundIntervalPolicy()
+    {
+        if (isset($this->data['round_interval_policy_id'])) {
+            return (int)$this->data['round_interval_policy_id'];
+        }
+    }
 
-			$this->data['round_interval_policy_id'] = $id;
+    public function setRoundInterValPolicy($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $riplf = TTnew('RoundIntervalPolicyListFactory');
 
-		return FALSE;
-	}
+        if ($id == 0
+            or
+            $this->Validator->isResultSetWithRows('round_inteval_policy',
+                $riplf->getByID($id),
+                TTi18n::gettext('Selected Interval Rounding Policy is invalid')
+            )
+        ) {
+            $this->data['round_interval_policy_id'] = $id;
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+            return true;
+        }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
+    public function getDeleted()
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedDate()
+    {
+        return false;
+    }
+
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 }
-?>

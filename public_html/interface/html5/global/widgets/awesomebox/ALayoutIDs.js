@@ -1,4 +1,4 @@
-var ALayoutIDs = function() {
+var ALayoutIDs = function () {
 
 }
 
@@ -225,7 +225,7 @@ ALayoutIDs.MESSAGE_USER = 'global_message_user';
 
 ALayoutIDs.PAYMENT_GATEWAY = 'global_payment_gateway';
 
-var ALayoutType = function() {
+var ALayoutType = function () {
 
 }
 

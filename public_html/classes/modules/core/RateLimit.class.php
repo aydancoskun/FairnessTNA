@@ -19,145 +19,161 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
+class RateLimit
+{
+    protected $sleep = false; //When rate limit is reached, do we sleep or return FALSE?
 
-class RateLimit {
-	protected $sleep = FALSE; //When rate limit is reached, do we sleep or return FALSE?
+    protected $id = 1;
+    protected $group = 'rate_limit';
 
-	protected $id = 1;
-	protected $group = 'rate_limit';
+    protected $allowed_calls = 25;
+    protected $time_frame = 60; //1 minute.
 
-	protected $allowed_calls = 25;
-	protected $time_frame = 60; //1 minute.
+    protected $memory = null;
 
-	protected $memory = NULL;
+    public function __construct()
+    {
+        try {
+            $this->memory = new SharedMemory();
+            return true;
+        } catch (Exception $e) {
+            Debug::text('ERROR: Caught Exception: ' . $e->getMessage(), __FILE__, __LINE__, __METHOD__, 9);
+            return false;
+        }
+    }
 
-	function __construct() {
-		try {
-			$this->memory = new SharedMemory();
-			return TRUE;
-		} catch ( Exception $e ) {
-			Debug::text('ERROR: Caught Exception: '. $e->getMessage(), __FILE__, __LINE__, __METHOD__, 9);
-			return FALSE;
-		}
-	}
+    public function getAttempts()
+    {
+        $rate_data = $this->getRateData();
+        if (isset($rate_data['attempts'])) {
+            return $rate_data['attempts'];
+        }
 
-	function getID() {
-		return $this->id;
-	}
-	function setID($value) {
-		if ( $value != '' ) {
-			$this->id = $value;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function getRateData()
+    {
+        if (is_object($this->memory)) {
+            try {
+                return $this->memory->get($this->group . $this->getID());
+            } catch (Exception $e) {
+                Debug::text('ERROR: Caught Exception: ' . $e->getMessage(), __FILE__, __LINE__, __METHOD__, 9);
+                return false;
+            }
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	//Define the number of calls to check() allowed over a given time frame.
-	function getAllowedCalls() {
-		return $this->allowed_calls;
-	}
-	function setAllowedCalls($value) {
-		if ( $value != '' ) {
-			$this->allowed_calls = $value;
+    //Define the number of calls to check() allowed over a given time frame.
 
-			return TRUE;
-		}
+    public function getID()
+    {
+        return $this->id;
+    }
 
-		return FALSE;
-	}
+    public function setID($value)
+    {
+        if ($value != '') {
+            $this->id = $value;
 
-	function getTimeFrame() {
-		return $this->time_frame;
-	}
-	function setTimeFrame($value) {
-		if ( $value != '' ) {
-			$this->time_frame = $value;
+            return true;
+        }
 
-			return TRUE;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function check()
+    {
+        if ($this->getID() != '') {
+            $rate_data = $this->getRateData();
+            //Debug::Arr($rate_data, 'Failed Attempt Data: ', __FILE__, __LINE__, __METHOD__, 10);
+            if (!isset($rate_data['attempts'])) {
+                $rate_data = array(
+                    'attempts' => 0,
+                    'first_date' => microtime(true),
+                );
+            } elseif (isset($rate_data['attempts'])) {
+                if ($rate_data['attempts'] > $this->getAllowedCalls() and $rate_data['first_date'] >= (microtime(true) - $this->getTimeFrame())) {
+                    return false;
+                } elseif ($rate_data['first_date'] < (microtime(true) - $this->getTimeFrame())) {
+                    $rate_data['attempts'] = 0;
+                    $rate_data['first_date'] = microtime(true);
+                }
+            }
 
-	function setRateData( $data ) {
-		if ( is_object($this->memory) ) {
-			try {
-				return $this->memory->set( $this->group.$this->getID(), $data );
-			} catch ( Exception $e ) {
-				Debug::text('ERROR: Caught Exception: '. $e->getMessage(), __FILE__, __LINE__, __METHOD__, 9);
-				return FALSE;
-			}
-		}
+            $rate_data['attempts']++;
+            $this->setRateData($rate_data);
+            return true; //Don't return result of setRateData() so if it can't write the data to shared memory it fails "OPEN".
+        }
 
-		return FALSE;
-	}
-	function getRateData() {
-		if ( is_object($this->memory) ) {
-			try {
-				return $this->memory->get( $this->group.$this->getID() );
-			} catch ( Exception $e ) {
-				Debug::text('ERROR: Caught Exception: '. $e->getMessage(), __FILE__, __LINE__, __METHOD__, 9);
-				return FALSE;
-			}
-		}
-		
-		return FALSE;
-	}
+        return true; //Return TRUE is no ID is specified, so it fails "OPEN".
+    }
 
-	function getAttempts() {
-		$rate_data = $this->getRateData();
-		if ( isset($rate_data['attempts']) ) {
-			return $rate_data['attempts'];
-		}
+    public function getAllowedCalls()
+    {
+        return $this->allowed_calls;
+    }
 
-		return FALSE;
-	}
+    public function setAllowedCalls($value)
+    {
+        if ($value != '') {
+            $this->allowed_calls = $value;
 
-	function check() {
-		if ( $this->getID() != '' ) {
-			$rate_data = $this->getRateData();
-			//Debug::Arr($rate_data, 'Failed Attempt Data: ', __FILE__, __LINE__, __METHOD__, 10);
-			if ( !isset($rate_data['attempts']) ) {
-				$rate_data = array(
-											'attempts' => 0,
-											'first_date' => microtime(TRUE),
-											);
-			} elseif ( isset($rate_data['attempts']) ) {
-				if ( $rate_data['attempts'] > $this->getAllowedCalls() AND $rate_data['first_date'] >= ( microtime(TRUE) - $this->getTimeFrame() ) ) {
-					return FALSE;
-				} elseif ( $rate_data['first_date'] < ( microtime(TRUE) - $this->getTimeFrame() ) ) {
-					$rate_data['attempts'] = 0;
-					$rate_data['first_date'] = microtime(TRUE);
-				}
-			}
+            return true;
+        }
 
-			$rate_data['attempts']++;
-			$this->setRateData( $rate_data );
-			return TRUE; //Don't return result of setRateData() so if it can't write the data to shared memory it fails "OPEN".
-		}
+        return false;
+    }
 
-		return TRUE; //Return TRUE is no ID is specified, so it fails "OPEN".
-	}
+    public function getTimeFrame()
+    {
+        return $this->time_frame;
+    }
 
-	function delete() {
-		if ( is_object($this->memory) ) {
-			try {
-				return $this->memory->delete( $this->group.$this->getID() );
-			} catch ( Exception $e ) {
-				Debug::text('ERROR: Caught Exception: '. $e->getMessage(), __FILE__, __LINE__, __METHOD__, 9);
-				return FALSE;
-			}
-		}
+    public function setTimeFrame($value)
+    {
+        if ($value != '') {
+            $this->time_frame = $value;
 
-		return FALSE;
-	}
+            return true;
+        }
+
+        return false;
+    }
+
+    public function setRateData($data)
+    {
+        if (is_object($this->memory)) {
+            try {
+                return $this->memory->set($this->group . $this->getID(), $data);
+            } catch (Exception $e) {
+                Debug::text('ERROR: Caught Exception: ' . $e->getMessage(), __FILE__, __LINE__, __METHOD__, 9);
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public function delete()
+    {
+        if (is_object($this->memory)) {
+            try {
+                return $this->memory->delete($this->group . $this->getID());
+            } catch (Exception $e) {
+                Debug::text('ERROR: Caught Exception: ' . $e->getMessage(), __FILE__, __LINE__, __METHOD__, 9);
+                return false;
+            }
+        }
+
+        return false;
+    }
 }
-?>

@@ -46,31 +46,30 @@ require_once 'Smarty.class.php';
  * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  */
-
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {
-    function _renderForm(&$page)
+    public function _renderForm(&$page)
     {
         $pageName = $page->getAttribute('name');
-        $tabPreview = array_slice ($page->controller->_tabs, -2, 1);
+        $tabPreview = array_slice($page->controller->_tabs, -2, 1);
 
         // setup a template object
         $tpl = new Smarty();
         $tpl->template_dir = './templates';
-        $tpl->compile_dir  = './templates_c';
+        $tpl->compile_dir = './templates_c';
 
         // on preview tab, add progress bar javascript and stylesheet
         if ($pageName == $tabPreview[0][0]) {
             $bar = $page->controller->createProgressBar();
 
             $tpl->assign(array(
-                'qf_style'  => $bar->getStyle(),
-                'qf_script' => $bar->getScript()
+                    'qf_style' => $bar->getStyle(),
+                    'qf_script' => $bar->getScript()
                 )
             );
 
             $barElement = $page->getElement('progressBar');
-            $barElement->setText( $bar->toHtml() );
+            $barElement->setText($bar->toHtml());
         }
 
         $renderer = new HTML_QuickForm_Renderer_Array(true);
@@ -88,4 +87,3 @@ class ActionDisplay extends HTML_QuickForm_Action_Display
         $tpl->display('smarty-dynamic.tpl');
     }
 }
-?>

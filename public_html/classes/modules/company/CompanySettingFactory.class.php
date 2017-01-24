@@ -19,313 +19,332 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class CompanySettingFactory extends Factory {
-	protected $table = 'company_setting';
-	protected $pk_sequence_name = 'company_setting_id_seq'; //PK Sequence name
+class CompanySettingFactory extends Factory
+{
+    protected $table = 'company_setting';
+    protected $pk_sequence_name = 'company_setting_id_seq'; //PK Sequence name
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+    public static function getCompanySettingArrayByName($company_id, $name)
+    {
+        $cs_obj = self::getCompanySettingObjectByName($company_id, $name);
+        if (is_object($cs_obj)) {
+            return $cs_obj->getObjectAsArray();
+        }
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'type':
-				$retval = array(
-								10 => TTi18n::gettext('Public'),
-								20 => TTi18n::gettext('Private'),
-									);
-				break;
-		}
+        return false;
+    }
 
-		return $retval;
-	}
+    public static function getCompanySettingObjectByName($company_id, $name)
+    {
+        $cslf = new CompanySettingListFactory();
+        $cslf->getByCompanyIdAndName($company_id, $name);
+        if ($cslf->getRecordCount() == 1) {
+            $cs_obj = $cslf->getCurrent();
+            return $cs_obj;
+        }
 
-	function _getVariableToFunctionMap( $data ) {
-		$variable_function_map = array(
-										'id' => 'ID',
-										'company_id' => 'Company',
-										'type_id' => 'Type',
-										'type' => FALSE,
-										'name' => 'Name',
-										'value' => 'Value',
-										'deleted' => 'Deleted',
-										);
-		return $variable_function_map;
-	}
+        return false;
+    }
 
-	function isUniqueName($name) {
-		Debug::Arr($this->getCompany(), 'Company: ', __FILE__, __LINE__, __METHOD__, 10);
-		if ( $this->getCompany() == FALSE ) {
-			return FALSE;
-		}
+    public static function getCompanySettingValueByName($company_id, $name)
+    {
+        $cs_obj = self::getCompanySettingObjectByName($company_id, $name);
+        if (is_object($cs_obj)) {
+            return $cs_obj->getValue();
+        }
 
-		$name = trim($name);
-		if ( $name == '' ) {
-			return FALSE;
-		}
+        return null;
+    }
 
-		$ph = array(
-					'company_id' => (int)$this->getCompany(),
-					'name' => TTi18n::strtolower($name),
-					);
+    public static function setCompanySetting($company_id, $name, $value, $type_id = 10)
+    {
+        $row = array(
+            'company_id' => (int)$company_id,
+            'name' => $name,
+            'value' => $value,
+            'type_id' => $type_id
+        );
+        $cslf = new CompanySettingListFactory();
+        $cslf->getByCompanyIdAndName($company_id, $name);
+        if ($cslf->getRecordCount() == 1) {
+            $csf = $cslf->getCurrent();
+            $row = array_merge($csf->getObjectAsArray(), $row);
+        } else {
+            $csf = new CompanySettingFactory();
+        }
 
-		$query = 'select id from '. $this->getTable() .'
+        Debug::Arr($row, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
+        $csf->setObjectFromArray($row);
+        if ($csf->isValid()) {
+            $csf->Save();
+        }
+
+        return false;
+    }
+
+    public function setObjectFromArray($data)
+    {
+        if (is_array($data)) {
+            $variable_function_map = $this->getVariableToFunctionMap();
+            foreach ($variable_function_map as $key => $function) {
+                if (isset($data[$key])) {
+                    $function = 'set' . $function;
+                    switch ($key) {
+                        default:
+                            if (method_exists($this, $function)) {
+                                $this->$function($data[$key]);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            $this->setCreatedAndUpdatedColumns($data);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function deleteCompanySetting($company_id, $name)
+    {
+        $cslf = new CompanySettingListFactory();
+        $cslf->getByCompanyIdAndName($company_id, $name);
+        if ($cslf->getRecordCount() == 1) {
+            $csf = $cslf->getCurrent();
+            $csf->setDeleted(true);
+            if ($csf->isValid()) {
+                $csf->Save();
+            }
+        }
+
+        return false;
+    }
+
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'type':
+                $retval = array(
+                    10 => TTi18n::gettext('Public'),
+                    20 => TTi18n::gettext('Private'),
+                );
+                break;
+        }
+
+        return $retval;
+    }
+
+    public function _getVariableToFunctionMap($data)
+    {
+        $variable_function_map = array(
+            'id' => 'ID',
+            'company_id' => 'Company',
+            'type_id' => 'Type',
+            'type' => false,
+            'name' => 'Name',
+            'value' => 'Value',
+            'deleted' => 'Deleted',
+        );
+        return $variable_function_map;
+    }
+
+    public function setCompany($id)
+    {
+        $id = trim($id);
+
+        $clf = TTnew('CompanyListFactory');
+
+        if ($id == 0
+            or $this->Validator->isResultSetWithRows('company',
+                $clf->getByID($id),
+                TTi18n::gettext('Company is invalid')
+            )
+        ) {
+            $this->data['company_id'] = $id;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getType()
+    {
+        if (isset($this->data['type_id'])) {
+            return (int)$this->data['type_id'];
+        }
+
+        return false;
+    }
+
+    public function setType($type)
+    {
+        $type = trim($type);
+
+        if ($this->Validator->inArrayKey('type',
+            $type,
+            TTi18n::gettext('Incorrect Type'),
+            $this->getOptions('type'))
+        ) {
+            $this->data['type_id'] = $type;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function setName($value)
+    {
+        $value = trim($value);
+        if ($this->Validator->isLength('name',
+                $value,
+                TTi18n::gettext('Name is too short or too long'),
+                1, 250)
+            and
+            $this->Validator->isTrue('name',
+                $this->isUniqueName($value),
+                TTi18n::gettext('Name already exists')
+            )
+
+        ) {
+            $this->data['name'] = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isUniqueName($name)
+    {
+        Debug::Arr($this->getCompany(), 'Company: ', __FILE__, __LINE__, __METHOD__, 10);
+        if ($this->getCompany() == false) {
+            return false;
+        }
+
+        $name = trim($name);
+        if ($name == '') {
+            return false;
+        }
+
+        $ph = array(
+            'company_id' => (int)$this->getCompany(),
+            'name' => TTi18n::strtolower($name),
+        );
+
+        $query = 'select id from ' . $this->getTable() . '
 					where company_id = ?
 						AND lower(name) = ?
 						AND deleted = 0';
-		$name_id = $this->db->GetOne($query, $ph);
-		Debug::Arr($name_id, 'Unique Name: '. $name, __FILE__, __LINE__, __METHOD__, 10);
+        $name_id = $this->db->GetOne($query, $ph);
+        Debug::Arr($name_id, 'Unique Name: ' . $name, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $name_id === FALSE ) {
-			return TRUE;
-		} else {
-			if ($name_id == $this->getId() ) {
-				return TRUE;
-			}
-		}
+        if ($name_id === false) {
+            return true;
+        } else {
+            if ($name_id == $this->getId()) {
+                return true;
+            }
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getCompany() {
-		if ( isset($this->data['company_id']) ) {
-			return (int)$this->data['company_id'];
-		}
+    public function getCompany()
+    {
+        if (isset($this->data['company_id'])) {
+            return (int)$this->data['company_id'];
+        }
 
-		return FALSE;
-	}
-	function setCompany($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		$clf = TTnew( 'CompanyListFactory' );
+    public function setValue($value)
+    {
+        $value = trim($value);
+        if ($this->Validator->isLength('value',
+            $value,
+            TTi18n::gettext('Value is too short or too long'),
+            1, 4096)
+        ) {
+            $this->data['value'] = $value;
 
-		if ( $id == 0
-				OR $this->Validator->isResultSetWithRows(	'company',
-															$clf->getByID($id),
-															TTi18n::gettext('Company is invalid')
-															) ) {
-			$this->data['company_id'] = $id;
+            return true;
+        }
 
-			return TRUE;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
-	function getType() {
-		if ( isset($this->data['type_id']) ) {
-			return (int)$this->data['type_id'];
-		}
+    public function preSave()
+    {
+        return true;
+    }
 
-		return FALSE;
-	}
-	function setType($type) {
-		$type = trim($type);
+    public function postSave()
+    {
+        $this->removeCache($this->getCompany() . $this->getName());
+        return true;
+    }
 
-		if ( $this->Validator->inArrayKey(	'type',
-											$type,
-											TTi18n::gettext('Incorrect Type'),
-											$this->getOptions('type')) ) {
+    public function getName()
+    {
+        if (isset($this->data['name'])) {
+            return $this->data['name'];
+        }
 
-			$this->data['type_id'] = $type;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function getObjectAsArray($include_columns = null)
+    {
+        $variable_function_map = $this->getVariableToFunctionMap();
+        $data = array();
+        if (is_array($variable_function_map)) {
+            foreach ($variable_function_map as $variable => $function_stub) {
+                if ($include_columns == null or (isset($include_columns[$variable]) and $include_columns[$variable] == true)) {
+                    $function = 'get' . $function_stub;
+                    switch ($variable) {
+                        case 'type':
+                            $function = 'get' . $variable;
+                            if (method_exists($this, $function)) {
+                                $data[$variable] = Option::getByKey($this->$function(), $this->getOptions($variable));
+                            }
+                            break;
+                        default:
+                            if (method_exists($this, $function)) {
+                                $data[$variable] = $this->$function();
+                            }
+                            break;
+                    }
+                }
+            }
+            $this->getCreatedAndUpdatedColumns($data, $include_columns);
+        }
 
-		return FALSE;
-	}
+        return $data;
+    }
 
-	function getName() {
-		if ( isset($this->data['name']) ) {
-			return $this->data['name'];
-		}
+    public function addLog($log_action)
+    {
+        return TTLog::addEntry($this->getId(), $log_action, TTi18n::getText('Company Setting - Name') . ': ' . $this->getName() . ' ' . TTi18n::getText('Value') . ': ' . $this->getValue(), null, $this->getTable());
+    }
 
-		return FALSE;
-	}
-	function setName($value) {
-		$value = trim($value);
-		if (	$this->Validator->isLength(	'name',
-											$value,
-											TTi18n::gettext('Name is too short or too long'),
-											1, 250)
-				AND
-						$this->Validator->isTrue(		'name',
-														$this->isUniqueName($value),
-														TTi18n::gettext('Name already exists')
-														)
+    public function getValue()
+    {
+        if (isset($this->data['value'])) {
+            return $this->data['value'];
+        }
 
-						) {
-
-			$this->data['name'] = $value;
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function getValue() {
-		if ( isset($this->data['value']) ) {
-			return $this->data['value'];
-		}
-
-		return FALSE;
-	}
-	function setValue($value) {
-		$value = trim($value);
-		if (	$this->Validator->isLength(	'value',
-											$value,
-											TTi18n::gettext('Value is too short or too long'),
-											1, 4096)
-						) {
-
-			$this->data['value'] = $value;
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-
-	function preSave() {
-		return TRUE;
-	}
-
-	function postSave() {
-		$this->removeCache( $this->getCompany().$this->getName() );
-		return TRUE;
-	}
-
-	function setObjectFromArray( $data ) {
-		if ( is_array( $data ) ) {
-			$variable_function_map = $this->getVariableToFunctionMap();
-			foreach( $variable_function_map as $key => $function ) {
-				if ( isset($data[$key]) ) {
-
-					$function = 'set'.$function;
-					switch( $key ) {
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$this->$function( $data[$key] );
-							}
-							break;
-					}
-				}
-			}
-
-			$this->setCreatedAndUpdatedColumns( $data );
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function getObjectAsArray( $include_columns = NULL ) {
-		$variable_function_map = $this->getVariableToFunctionMap();
-		$data = array();
-		if ( is_array( $variable_function_map ) ) {
-			foreach( $variable_function_map as $variable => $function_stub ) {
-				if ( $include_columns == NULL OR ( isset($include_columns[$variable]) AND $include_columns[$variable] == TRUE ) ) {
-
-					$function = 'get'.$function_stub;
-					switch( $variable ) {
-						case 'type':
-							$function = 'get'.$variable;
-							if ( method_exists( $this, $function ) ) {
-								$data[$variable] = Option::getByKey( $this->$function(), $this->getOptions( $variable ) );
-							}
-							break;
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$data[$variable] = $this->$function();
-							}
-							break;
-					}
-
-				}
-			}
-			$this->getCreatedAndUpdatedColumns( $data, $include_columns );
-		}
-
-		return $data;
-	}
-
-	function addLog( $log_action ) {
-		return TTLog::addEntry( $this->getId(), $log_action, TTi18n::getText('Company Setting - Name').': '. $this->getName() .' '. TTi18n::getText('Value').': '. $this->getValue(), NULL, $this->getTable() );
-	}
-
-	static function getCompanySettingObjectByName( $company_id, $name ) {
-		$cslf = new CompanySettingListFactory();
-		$cslf->getByCompanyIdAndName( $company_id, $name );
-		if ( $cslf->getRecordCount() == 1 ) {
-			$cs_obj = $cslf->getCurrent();
-			return $cs_obj;
-		}
-
-		return FALSE;
-	}
-
-	static function getCompanySettingArrayByName( $company_id, $name ) {
-		$cs_obj = self::getCompanySettingObjectByName( $company_id, $name );
-		if ( is_object( $cs_obj ) ) {
-			return $cs_obj->getObjectAsArray();
-		}
-
-		return FALSE;
-	}
-
-	static function getCompanySettingValueByName( $company_id, $name ) {
-		$cs_obj = self::getCompanySettingObjectByName( $company_id, $name );
-		if ( is_object( $cs_obj ) ) {
-			return $cs_obj->getValue();
-		}
-
-		return NULL;
-	}
-
-	static function setCompanySetting( $company_id, $name, $value, $type_id = 10 ) {
-		$row = array(
-			'company_id' => (int)$company_id,
-			'name' => $name,
-			'value' => $value,
-			'type_id' => $type_id
-		);
-		$cslf = new CompanySettingListFactory();
-		$cslf->getByCompanyIdAndName( $company_id, $name );
-		if ( $cslf->getRecordCount() == 1 ) {
-			$csf = $cslf->getCurrent();
-			$row = array_merge( $csf->getObjectAsArray(), $row );
-		} else {
-			$csf = new CompanySettingFactory();
-		}
-
-		Debug::Arr($row, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
-		$csf->setObjectFromArray( $row );
-		if ( $csf->isValid() ) {
-			$csf->Save();
-		}
-
-		return FALSE;
-
-	}
-
-	static function deleteCompanySetting( $company_id, $name ) {
-		$cslf = new CompanySettingListFactory();
-		$cslf->getByCompanyIdAndName( $company_id, $name );
-		if ( $cslf->getRecordCount() == 1 ) {
-			$csf = $cslf->getCurrent();
-			$csf->setDeleted(TRUE);
-			if ( $csf->isValid() ) {
-				$csf->Save();
-			}
-		}
-
-		return FALSE;
-	}
+        return false;
+    }
 }
-?>

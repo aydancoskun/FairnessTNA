@@ -19,27 +19,26 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 /*
  * Updates Currency Exchange Rates.
  * This file should run once a day.
  *
  */
-require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'global.inc.php');
-require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'CLI.inc.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'global.inc.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'CLI.inc.php');
 
 //Debug::setVerbosity(11);
 
 $clf = new CompanyListFactory();
-$clf->getByStatusID( array(10,20,23), NULL, array('a.id' => 'asc') );
-if ( $clf->getRecordCount() > 0 ) {
-	foreach ( $clf as $c_obj ) {
-		if ( $c_obj->getStatus() != 30 ) {
-			CurrencyFactory::updateCurrencyRates( $c_obj->getId() );
-		}
-	}
+$clf->getByStatusID(array(10, 20, 23), null, array('a.id' => 'asc'));
+if ($clf->getRecordCount() > 0) {
+    foreach ($clf as $c_obj) {
+        if ($c_obj->getStatus() != 30) {
+            CurrencyFactory::updateCurrencyRates($c_obj->getId());
+        }
+    }
 }
 Debug::writeToLog();
 Debug::Display();
-?>

@@ -19,50 +19,51 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package PayrollDeduction\US
  */
-class PayrollDeduction_US_PA extends PayrollDeduction_US {
+class PayrollDeduction_US_PA extends PayrollDeduction_US
+{
+    public $state_options = array(
+        20060101 => array(
+            'rate' => 3.07,
+        )
+    );
 
-	var $state_options = array(
-								20060101 => array(
-													'rate' => 3.07,
-													)
-								);
+    public function getStateTaxPayable()
+    {
+        $annual_income = $this->getStateAnnualTaxableIncome();
 
-	function getStateAnnualTaxableIncome() {
-		$annual_income = $this->getAnnualTaxableIncome();
+        $retval = 0;
 
-		Debug::text('State Annual Taxable Income: '. $annual_income, __FILE__, __LINE__, __METHOD__, 10);
+        if ($annual_income > 0) {
+            $retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
+            if ($retarr == false) {
+                return false;
+            }
 
-		return $annual_income;
-	}
+            $rate = bcdiv($retarr['rate'], 100);
+            $retval = bcmul($annual_income, $rate);
+        }
 
-	function getStateTaxPayable() {
-		$annual_income = $this->getStateAnnualTaxableIncome();
+        if ($retval < 0) {
+            $retval = 0;
+        }
 
-		$retval = 0;
+        Debug::text('State Annual Tax Payable: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $annual_income > 0 ) {
-			$retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
-			if ( $retarr == FALSE ) {
-				return FALSE;
-			}
+        return $retval;
+    }
 
-			$rate = bcdiv( $retarr['rate'], 100);
-			$retval = bcmul( $annual_income, $rate );
-		}
+    public function getStateAnnualTaxableIncome()
+    {
+        $annual_income = $this->getAnnualTaxableIncome();
 
-		if ( $retval < 0 ) {
-			$retval = 0;
-		}
+        Debug::text('State Annual Taxable Income: ' . $annual_income, __FILE__, __LINE__, __METHOD__, 10);
 
-		Debug::text('State Annual Tax Payable: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
-
-		return $retval;
-	}
+        return $annual_income;
+    }
 }
-?>

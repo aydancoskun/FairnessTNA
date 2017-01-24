@@ -20,28 +20,29 @@
 // $Id: UPS.php,v 0.1dev1 2005/01/26 Ego Exp $
 
 /**
-* UPS Package 2004- by Tim Batz
-*
-* @package   Services_UPS
-* @category  Services
-* @author    Tim Batz <ego at subport.org>
-* @since     December 2004
-* @copyright Copyright &copy; 2004, Tim Batz
-* @version   0.1dev1
-* @license   http://www.php.net/license/3_0.txt
-* @link      http://ec.ups.com/
-*
-* @todo      error handling is for sure not perfect
-* @todo      resolving returned data as easy as possible
-* @todo      lotsa other stuff for sure
-* @todo      all services besides Tracking, Signature Tracking and Address Validation and maybe even those
-*/
+ * UPS Package 2004- by Tim Batz
+ *
+ * @package   Services_UPS
+ * @category  Services
+ * @author    Tim Batz <ego at subport.org>
+ * @since     December 2004
+ * @copyright Copyright &copy; 2004, Tim Batz
+ * @version   0.1dev1
+ * @license   http://www.php.net/license/3_0.txt
+ * @link      http://ec.ups.com/
+ *
+ * @todo      error handling is for sure not perfect
+ * @todo      resolving returned data as easy as possible
+ * @todo      lotsa other stuff for sure
+ * @todo      all services besides Tracking, Signature Tracking and Address Validation and maybe even those
+ */
 
 require_once 'PEAR.php';
 require_once 'XML/Serializer.php';
 require_once 'XML/Unserializer.php';
 
-class UPS {
+class UPS
+{
 
     /**
      * Set the registered UPS username (required)
@@ -51,7 +52,7 @@ class UPS {
      * @access public
      * @var string value of the UPS username
      */
-    var $username;
+    public $username;
 
     /**
      * Set the password for the registered UPS username (required)
@@ -61,7 +62,7 @@ class UPS {
      * @access public
      * @var string value of the UPS password
      */
-    var $userpw;
+    public $userpw;
 
     /**
      * Set the developer key for the registered UPS username (required)
@@ -72,7 +73,7 @@ class UPS {
      * @access public
      * @var string value of the UPS developer key
      */
-    var $devkey;
+    public $devkey;
 
     /**
      * Set the developer key sent by UPS after request (required)
@@ -87,7 +88,7 @@ class UPS {
      * @access public
      * @var boolean TRUE for productive state, FALSE for development state
      */
-    var $devstate;
+    public $devstate;
 
     /**
      * Set the complete path including the filename to
@@ -105,7 +106,7 @@ class UPS {
      * @access public
      * @var string set the path and filename to curl-ca-bundle.crt including the filename
      */
-    var $cacert;
+    public $cacert;
 
     /**
      * Set the proxy host and port (optional)
@@ -114,7 +115,7 @@ class UPS {
      * @access public
      * @var string set the proxy host and port with "host:port"
      */
-    var $proxy_host;
+    public $proxy_host;
 
     /**
      * Set the proxy username (optional)
@@ -123,7 +124,7 @@ class UPS {
      * @access public
      * @var string set the proxy username
      */
-    var $proxy_username;
+    public $proxy_username;
 
     /**
      * Set the proxy password (optional)
@@ -132,7 +133,7 @@ class UPS {
      * @access public
      * @var string set the proxy password
      */
-    var $proxy_userpw;
+    public $proxy_userpw;
 
     /**
      * Contains the response data from UPS
@@ -141,7 +142,7 @@ class UPS {
      * @access protected
      * @var array
      */
-    var $response;
+    public $response;
 
     /**
      * Sets the type of service you want to use
@@ -158,7 +159,7 @@ class UPS {
      * @access private
      * @var string
      */
-    var $_service;
+    public $_service;
 
     /**
      * Contains the request data for UPS
@@ -167,14 +168,14 @@ class UPS {
      * @access private
      * @var string
      */
-    var $_request;
+    public $_request;
 
     /**
      * PHP5 constructor
      *
      * @access private
      */
-    function __construct()
+    public function __construct()
     {
         $this->ups();
     }
@@ -184,46 +185,8 @@ class UPS {
      *
      * @access private
      */
-    function ups()
+    public function ups()
     {
-    }
-
-    /**
-     * Generate XML access data
-     *
-     * @access private
-     * @return string
-     */
-    function _serialize_access()
-    {
-        if (!isset($this->devkey)) {
-            $msg  = 'Property $devkey is not set, but required!';
-        }
-        if (!isset($this->username)) {
-            $msg  = 'Property $username is not set, but required!';
-        }
-        if (!isset($this->userpw)) {
-            $msg  = 'Property $userpw is not set, but required!';
-        }
-        if (isset($msg)) {
-            PEAR::raiseError($msg, 0, PEAR_ERROR_DIE);
-        }
-        $serializer = new XML_Serializer;
-        $xml_array = array(
-            'AccessLicenseNumber'   => $this->devkey,
-            'UserId'                => $this->username,
-            'Password'              => $this->userpw
-        );
-        $options = array(
-            'linebreak'         => '',
-            'addDecl'           => TRUE,
-            'rootName'          => 'AccessRequest',
-            'rootAttributes'    => array('xml:lang' => 'en-US')
-        );
-        $serializer->serialize($xml_array, $options);
-        // return $serializer->getSerializedData();
-        // dirty fix to remove CDATA - help appreciated
-        return preg_replace("/<!\[CDATA\[(.*?)\]\]>/", "\\1", $serializer->getSerializedData());
     }
 
     /**
@@ -231,10 +194,9 @@ class UPS {
      *
      * @access public
      */
-    function request()
+    public function request()
     {
-        switch ($this->_service)
-        {
+        switch ($this->_service) {
             case 'tracking':
                 if ($this->devstate) {
                     $url = 'https://www.ups.com/ups.app/xml/Track';
@@ -277,23 +239,23 @@ class UPS {
                 break;
 
             default:
-                $msg  = 'No service set!';
+                $msg = 'No service set!';
                 PEAR::raiseError($msg, 0, PEAR_ERROR_DIE);
         }
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_USERAGENT, 'PHP CURL');
         curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_HEADER, FALSE);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($curl, CURLOPT_POST, TRUE);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_request);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, TRUE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
         if (isset($this->cacert) && file_exists(realpath($this->cacert))) {
             curl_setopt($curl, CURLOPT_CAINFO, realpath($this->cacert));
         } else {
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-            $msg  = 'Unsecure connection! Usage of property $cacert recommended!';
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            $msg = 'Unsecure connection! Usage of property $cacert recommended!';
             if (!file_exists(realpath($this->cacert))) {
                 $msg .= " File $this->cacert not found!";
             } else {
@@ -305,41 +267,56 @@ class UPS {
             curl_setopt($curl, CURLOPT_PROXY, $this->proxy_host);
         }
         if (isset($this->proxy_username) && isset($this->proxy_userpw)) {
-            curl_setopt($curl, CURLOPT_PROXYUSERPWD, $this->proxy_username.':'.$this->proxy_userpw);
+            curl_setopt($curl, CURLOPT_PROXYUSERPWD, $this->proxy_username . ':' . $this->proxy_userpw);
         }
         $this->response = curl_exec($curl);
-        if (curl_errno($curl)!=0) {
-            return "Curl Error: ".curl_errno($curl)." ".curl_error($curl);
+        if (curl_errno($curl) != 0) {
+            return "Curl Error: " . curl_errno($curl) . " " . curl_error($curl);
         }
         $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            switch ($http_code) {
-                case 200:
-                    // $return = "No Error : Request processed successfully.";
-                    break;
+        switch ($http_code) {
+            case 200:
+                // $return = "No Error : Request processed successfully.";
+                break;
 
-                case 240:
-                    $return  = "Error 240 : ";
-                    $return .= "Request Processed, some warnings exist. Check XML Doc for details.";
-                    break;
+            case 240:
+                $return = "Error 240 : ";
+                $return .= "Request Processed, some warnings exist. Check XML Doc for details.";
+                break;
 
-                case 250:
-                    $return  = "Error 250 : ";
-                    $return .= "Request could not be processed. Check XML Doc for error information.";
-                    break;
+            case 250:
+                $return = "Error 250 : ";
+                $return .= "Request could not be processed. Check XML Doc for error information.";
+                break;
 
-                case 500:
-                    $return  = "Error 500 : ";
-                    $return .= "UPS OnLine Tool unavailable. Try again later.";
-                    break;
-                default:
-                    $return  = "Error ".$http_code." : Unknown Error";
+            case 500:
+                $return = "Error 500 : ";
+                $return .= "UPS OnLine Tool unavailable. Try again later.";
+                break;
+            default:
+                $return = "Error " . $http_code . " : Unknown Error";
         }
         curl_close($curl);
         if (isset($return)) {
-            $this->response = array ('HTTPError' => $return);
+            $this->response = array('HTTPError' => $return);
         } else {
             $this->response = $this->_unserialize_response();
         }
+    }
+
+    /**
+     * Return UPS XML data response as array
+     *
+     * @access private
+     * @return array
+     */
+    public function _unserialize_response()
+    {
+        $unserializer = new XML_Unserializer;
+        $options['complexType'] = 'array';
+        $unserializer->setOptions($options);
+        $unserializer->unserialize($this->response);
+        return $unserializer->getUnserializedData();
     }
 
     /**
@@ -372,11 +349,11 @@ class UPS {
      * @param $option
      * @return string
      */
-    function tracking($number, $method='trackingnumber', $option='')
+    public function tracking($number, $method = 'trackingnumber', $option = '')
     {
         $this->_service = 'tracking';
-        if (!isset($number) || strlen($number)!=18) {
-            $msg  = 'Tracking number was not set or is invalid!';
+        if (!isset($number) || strlen($number) != 18) {
+            $msg = 'Tracking number was not set or is invalid!';
             PEAR::raiseError($msg, 0, PEAR_ERROR_DIE);
         }
         $serializer = new XML_Serializer;
@@ -384,8 +361,8 @@ class UPS {
         $xml_array = array(
             'Request' => array(
                 'TransactionReference' => array(
-                    'CustomerContext'   => $customercontext,
-                    'XpciVersion'       => '1.0001'
+                    'CustomerContext' => $customercontext,
+                    'XpciVersion' => '1.0001'
                 ),
                 'RequestAction' => 'Track'
             )
@@ -408,19 +385,57 @@ class UPS {
                 $xml_array['TrackingNumber'] = $number;
         }
         $options = array(
-            'linebreak'         => '',
-            'addDecl'           => TRUE,
-            'rootName'          => 'TrackRequest',
-            'rootAttributes'    => array('xml:lang' => 'en-US')
+            'linebreak' => '',
+            'addDecl' => true,
+            'rootName' => 'TrackRequest',
+            'rootAttributes' => array('xml:lang' => 'en-US')
         );
         $serializer->serialize($xml_array, $options);
-        $this->_request  = $this->_serialize_access();
+        $this->_request = $this->_serialize_access();
         // $this->_request .= $serializer->getSerializedData();
         // dirty fix to remove CDATA - help appreciated
         $this->_request .= preg_replace("/<!\[CDATA\[(.*?)\]\]>/", "\\1", $serializer->getSerializedData());
     }
 
-    function address_validation($city='', $postalcode='', $stateprovincecode='')
+    /**
+     * Generate XML access data
+     *
+     * @access private
+     * @return string
+     */
+    public function _serialize_access()
+    {
+        if (!isset($this->devkey)) {
+            $msg = 'Property $devkey is not set, but required!';
+        }
+        if (!isset($this->username)) {
+            $msg = 'Property $username is not set, but required!';
+        }
+        if (!isset($this->userpw)) {
+            $msg = 'Property $userpw is not set, but required!';
+        }
+        if (isset($msg)) {
+            PEAR::raiseError($msg, 0, PEAR_ERROR_DIE);
+        }
+        $serializer = new XML_Serializer;
+        $xml_array = array(
+            'AccessLicenseNumber' => $this->devkey,
+            'UserId' => $this->username,
+            'Password' => $this->userpw
+        );
+        $options = array(
+            'linebreak' => '',
+            'addDecl' => true,
+            'rootName' => 'AccessRequest',
+            'rootAttributes' => array('xml:lang' => 'en-US')
+        );
+        $serializer->serialize($xml_array, $options);
+        // return $serializer->getSerializedData();
+        // dirty fix to remove CDATA - help appreciated
+        return preg_replace("/<!\[CDATA\[(.*?)\]\]>/", "\\1", $serializer->getSerializedData());
+    }
+
+    public function address_validation($city = '', $postalcode = '', $stateprovincecode = '')
     {
         $this->_service = 'address validation';
         $serializer = new XML_Serializer;
@@ -428,60 +443,45 @@ class UPS {
         $xml_array = array(
             'Request' => array(
                 'TransactionReference' => array(
-                    'CustomerContext'   => $customercontext,
-                    'XpciVersion'       => '1.0001'
+                    'CustomerContext' => $customercontext,
+                    'XpciVersion' => '1.0001'
                 ),
                 'RequestAction' => 'AV'
             )
         );
-        $check = FALSE;
-        if (!empty($postalcode) && strlen($postalcode)<=9) {
+        $check = false;
+        if (!empty($postalcode) && strlen($postalcode) <= 9) {
             $xml_array['Address']['PostalCode'] = $postalcode;
-            $check = TRUE;
+            $check = true;
         }
-        if (!empty($city) && strlen($city)<=40) {
+        if (!empty($city) && strlen($city) <= 40) {
             $xml_array['Address']['City'] = $city;
-            $check = TRUE;
+            $check = true;
         }
-        if (!empty($stateprovincecode) && strlen($stateprovincecode)<=2) {
+        if (!empty($stateprovincecode) && strlen($stateprovincecode) <= 2) {
             $xml_array['Address']['StateProvinceCode'] = $stateprovincecode;
         }
         if (!$check) {
-            $msg  = 'At least a postalcode or city is needed to validate an address!';
+            $msg = 'At least a postalcode or city is needed to validate an address!';
             PEAR::raiseError($msg, 0, PEAR_ERROR_DIE);
         }
         $options = array(
-            'linebreak'         => '',
-            'addDecl'           => TRUE,
-            'rootName'          => 'AddressValidationRequest',
-            'rootAttributes'    => array('xml:lang' => 'en-US')
+            'linebreak' => '',
+            'addDecl' => true,
+            'rootName' => 'AddressValidationRequest',
+            'rootAttributes' => array('xml:lang' => 'en-US')
         );
         $serializer->serialize($xml_array, $options);
-        $this->_request  = $this->_serialize_access();
+        $this->_request = $this->_serialize_access();
         // $this->_request .= $serializer->getSerializedData();
         // dirty fix to remove CDATA - help appreciated
         $this->_request .= preg_replace("/<!\[CDATA\[(.*?)\]\]>/", "\\1", $serializer->getSerializedData());
     }
 
     /**
-     * Return UPS XML data response as array
-     *
-     * @access private
-     * @return array
-     */
-    function _unserialize_response()
-    {
-        $unserializer = new XML_Unserializer;
-        $options['complexType'] = 'array';
-        $unserializer->setOptions($options);
-        $unserializer->unserialize($this->response);
-        return $unserializer->getUnserializedData();
-    }
-
-    /**
      * TODO Stuff starting here
      */
-    function rates_and_service_selection($shipper_arr, $ship_from_arr, $ship_to_arr, $shipment_arr, $request_option = 'shop' )
+    public function rates_and_service_selection($shipper_arr, $ship_from_arr, $ship_to_arr, $shipment_arr, $request_option = 'shop')
     {
         $this->_service = 'rates and services selection';
         $serializer = new XML_Serializer;
@@ -493,33 +493,35 @@ class UPS {
 
         $xml_array['Request']['RequestOption'] = $request_option; // rate(default) == One Rate or Shop == mulitple rates
 
-		$xml_array['Shipment']['Shipper'] = $shipper_arr;
-		$xml_array['Shipment']['ShipTo'] = $ship_to_arr;
-		$xml_array['Shipment']['ShipFrom'] = $ship_from_arr;
+        $xml_array['Shipment']['Shipper'] = $shipper_arr;
+        $xml_array['Shipment']['ShipTo'] = $ship_to_arr;
+        $xml_array['Shipment']['ShipFrom'] = $ship_from_arr;
 
-		if ( isset($shipment_arr['Package']) ) {
-			$xml_array['Shipment']['Package'] = $shipment_arr['Package'];
+        if (isset($shipment_arr['Package'])) {
+            $xml_array['Shipment']['Package'] = $shipment_arr['Package'];
 
-			if ( isset($xml_array['Shipment']['Package']['Dimensions']['Length'])
-					AND $xml_array['Shipment']['Package']['Dimensions']['Length'] < 1 ) {
-				$xml_array['Shipment']['Package']['Dimensions']['Length'] = 1;
-			}
-			if ( isset($xml_array['Shipment']['Package']['Dimensions']['Width'])
-					AND $xml_array['Shipment']['Package']['Dimensions']['Width'] < 1 ) {
-				$xml_array['Shipment']['Package']['Dimensions']['Width'] = 1;
-			}
-			if ( isset($xml_array['Shipment']['Package']['Dimensions']['Height'])
-					AND $xml_array['Shipment']['Package']['Dimensions']['Height'] < 1 ) {
-				$xml_array['Shipment']['Package']['Dimensions']['Height'] = 1;
-			}
+            if (isset($xml_array['Shipment']['Package']['Dimensions']['Length'])
+                and $xml_array['Shipment']['Package']['Dimensions']['Length'] < 1
+            ) {
+                $xml_array['Shipment']['Package']['Dimensions']['Length'] = 1;
+            }
+            if (isset($xml_array['Shipment']['Package']['Dimensions']['Width'])
+                and $xml_array['Shipment']['Package']['Dimensions']['Width'] < 1
+            ) {
+                $xml_array['Shipment']['Package']['Dimensions']['Width'] = 1;
+            }
+            if (isset($xml_array['Shipment']['Package']['Dimensions']['Height'])
+                and $xml_array['Shipment']['Package']['Dimensions']['Height'] < 1
+            ) {
+                $xml_array['Shipment']['Package']['Dimensions']['Height'] = 1;
+            }
+        }
 
-		}
+        if (isset($shipment_arr['Service'])) {
+            $xml_array['Shipment']['Service'] = $shipment_arr['Service'];
+        }
 
-		if ( isset($shipment_arr['Service']) ) {
-			$xml_array['Shipment']['Service'] = $shipment_arr['Service'];
-		}
-
-		/*
+        /*
         $xml_array['PickupType']['Code'] = '06'; //One time pickup
 
         $xml_array['CustomerClassification']['Code'] = '';
@@ -615,22 +617,22 @@ class UPS {
         $xml_array['Shipment']['HandlingCharge']['FlatRate']['CurrencyCode'] = '';
         $xml_array['Shipment']['HandlingCharge']['FlatRate']['MonetaryValue'] = '';
         $xml_array['Shipment']['HandlingCharge']['Percentage'] = '';
-		*/
+        */
 
         $options = array(
-            'linebreak'         => '',
-            'addDecl'           => TRUE,
-            'rootName'          => 'RatingServiceSelectionRequest',
-            'rootAttributes'    => array('xml:lang' => 'en-US')
+            'linebreak' => '',
+            'addDecl' => true,
+            'rootName' => 'RatingServiceSelectionRequest',
+            'rootAttributes' => array('xml:lang' => 'en-US')
         );
         $serializer->serialize($xml_array, $options);
-        $this->_request  = $this->_serialize_access();
+        $this->_request = $this->_serialize_access();
         // $this->_request .= $serializer->getSerializedData();
         // dirty fix to remove CDATA - help appreciated
         $this->_request .= preg_replace("/<!\[CDATA\[(.*?)\]\]>/", "\\1", $serializer->getSerializedData());
     }
 
-    function time_in_transit()
+    public function time_in_transit()
     {
         $this->service = 'time in transit';
         $serializer = new XML_Serializer;
@@ -681,7 +683,7 @@ class UPS {
         $this->request = $serializer->getSerializedData();
     }
 
-    function shipping()
+    public function shipping()
     {
         $this->service = 'shipping';
 
@@ -689,7 +691,7 @@ class UPS {
         $this->request = $serializer->getSerializedData();
     }
 
-    function quantum_view()
+    public function quantum_view()
     {
         $this->service = 'quantum view';
 
@@ -700,7 +702,7 @@ class UPS {
     /**
      * BETA Stuff starting here
      */
-    function values()
+    public function values()
     {
         // ISO Country Codes - resolved
         $isocountrycode['BN'] = 'Brunei Darussalam';
@@ -1077,23 +1079,23 @@ class UPS {
         $informationlevelcode['P'] = 'Package';
 
         // License Information Codes - not resolved yet
-        $licenseinformationcode['APR']  = 'Items for export or re-export not controlled for nuclear nonproliferation, missile technology or crime control';
-        $licenseinformationcode['AVS']  = 'U.S. aircraft on foreign sojourn into foreign country';
-        $licenseinformationcode['BAG']  = 'Individual or exporting carriers crew members baggage';
-        $licenseinformationcode['CIV']  = 'National security items for civil end users';
-        $licenseinformationcode['CTP']  = 'Computers and computer parts';
-        $licenseinformationcode['ENC']  = 'Encrypted software and hardware – financial institutions';
-        $licenseinformationcode['GBS']  = 'Export or re-export to Country Group B; controlled for national security reasons';
-        $licenseinformationcode['GFT']  = 'Gift shipments; packages to individuals , religious, charitable or educational, donations of basic needs';
-        $licenseinformationcode['GOV']  = 'Government shipments, covers shipments for U.S. government agencies, personnel or of cooperating foreign governments';
-        $licenseinformationcode['KMI']  = 'Encrypted software and hardware';
-        $licenseinformationcode['LVS']  = 'Value of Shipments limited';
-        $licenseinformationcode['NLR']  = 'No license';
-        $licenseinformationcode['RPL']  = 'Servicing and replacement of parts and equipment, one for one replacement parts service or replacement of equipment';
-        $licenseinformationcode['TMP']  = 'Temporary exports, export and re-export of beta test software';
+        $licenseinformationcode['APR'] = 'Items for export or re-export not controlled for nuclear nonproliferation, missile technology or crime control';
+        $licenseinformationcode['AVS'] = 'U.S. aircraft on foreign sojourn into foreign country';
+        $licenseinformationcode['BAG'] = 'Individual or exporting carriers crew members baggage';
+        $licenseinformationcode['CIV'] = 'National security items for civil end users';
+        $licenseinformationcode['CTP'] = 'Computers and computer parts';
+        $licenseinformationcode['ENC'] = 'Encrypted software and hardware – financial institutions';
+        $licenseinformationcode['GBS'] = 'Export or re-export to Country Group B; controlled for national security reasons';
+        $licenseinformationcode['GFT'] = 'Gift shipments; packages to individuals , religious, charitable or educational, donations of basic needs';
+        $licenseinformationcode['GOV'] = 'Government shipments, covers shipments for U.S. government agencies, personnel or of cooperating foreign governments';
+        $licenseinformationcode['KMI'] = 'Encrypted software and hardware';
+        $licenseinformationcode['LVS'] = 'Value of Shipments limited';
+        $licenseinformationcode['NLR'] = 'No license';
+        $licenseinformationcode['RPL'] = 'Servicing and replacement of parts and equipment, one for one replacement parts service or replacement of equipment';
+        $licenseinformationcode['TMP'] = 'Temporary exports, export and re-export of beta test software';
         $licenseinformationcode['TSPA'] = 'Software or technology outside the scope of export regulations';
-        $licenseinformationcode['TSR']  = 'Technology and software, national security reasons, Country Group B';
-        $licenseinformationcode['TSU']  = 'Technology and software shipments, of basic requirements, data supporting prospective or actual bids, ';
+        $licenseinformationcode['TSR'] = 'Technology and software, national security reasons, Country Group B';
+        $licenseinformationcode['TSU'] = 'Technology and software shipments, of basic requirements, data supporting prospective or actual bids, ';
         $licenseinformationcode['TSU'] .= 'offers to sell, lease or supply an item, software update for fixing programs, mass marketed software';
 
         // Parties To Transaction Codes - not resolved yet
@@ -1129,8 +1131,8 @@ class UPS {
         $termsofshipmentcode['FOB'] = 'Free On Board';
 
         // Trade Agreement Type Codes - not resolved yet
-        $tradeagreementtypecode['EEC']   = 'European Economic Community';
-        $tradeagreementtypecode['EFTA']  = 'European Free Trade Agreement';
+        $tradeagreementtypecode['EEC'] = 'European Economic Community';
+        $tradeagreementtypecode['EFTA'] = 'European Free Trade Agreement';
         $tradeagreementtypecode['NAFTA'] = 'North American Free Trade Agreement';
 
         // UPS Returned Data - not resolved yet
@@ -1141,61 +1143,41 @@ class UPS {
         $upsreturneddata['19'] = 'Letter Center';
         $upsreturneddata['20'] = 'Air Service Center';
 
-		//Package delivery services. By originating countries.
-		$this->packagedelivery['US']['01'] = 'Next Day Air';
-		$this->packagedelivery['US']['02'] = 'Second Day Air';
-		$this->packagedelivery['US']['03'] = 'Ground';
-		$this->packagedelivery['US']['07'] = 'Worldwide Express';
-		$this->packagedelivery['US']['08'] = 'Worldwide Expedited';
-		$this->packagedelivery['US']['11'] = 'Standard';
-		$this->packagedelivery['US']['12'] = 'Three-Day Select';
-		$this->packagedelivery['US']['13'] = 'Next Day Air Saver';
-		$this->packagedelivery['US']['14'] = 'Next Day Air Early A.M.';
-		$this->packagedelivery['US']['54'] = 'Worldwide Express Plus';
-		$this->packagedelivery['US']['59'] = 'Second Day Air A.M.';
-		$this->packagedelivery['US']['65'] = 'Saver';
+        //Package delivery services. By originating countries.
+        $this->packagedelivery['US']['01'] = 'Next Day Air';
+        $this->packagedelivery['US']['02'] = 'Second Day Air';
+        $this->packagedelivery['US']['03'] = 'Ground';
+        $this->packagedelivery['US']['07'] = 'Worldwide Express';
+        $this->packagedelivery['US']['08'] = 'Worldwide Expedited';
+        $this->packagedelivery['US']['11'] = 'Standard';
+        $this->packagedelivery['US']['12'] = 'Three-Day Select';
+        $this->packagedelivery['US']['13'] = 'Next Day Air Saver';
+        $this->packagedelivery['US']['14'] = 'Next Day Air Early A.M.';
+        $this->packagedelivery['US']['54'] = 'Worldwide Express Plus';
+        $this->packagedelivery['US']['59'] = 'Second Day Air A.M.';
+        $this->packagedelivery['US']['65'] = 'Saver';
 
-		$this->packagedelivery['CA']['01'] = 'Express';
-		$this->packagedelivery['CA']['02'] = 'Expedited';
-		$this->packagedelivery['CA']['07'] = 'Worldwide Express';
-		$this->packagedelivery['CA']['08'] = 'Worldwide Expedited';
-		$this->packagedelivery['CA']['11'] = 'Standard';
-		$this->packagedelivery['CA']['12'] = 'Three-Day Select';
-		$this->packagedelivery['CA']['13'] = 'Next Day Air Saver';
-		$this->packagedelivery['CA']['14'] = 'Express Early A.M.';
-		$this->packagedelivery['CA']['54'] = 'Worldwide Express Plus';
-		$this->packagedelivery['CA']['65'] = 'Express Saver';
+        $this->packagedelivery['CA']['01'] = 'Express';
+        $this->packagedelivery['CA']['02'] = 'Expedited';
+        $this->packagedelivery['CA']['07'] = 'Worldwide Express';
+        $this->packagedelivery['CA']['08'] = 'Worldwide Expedited';
+        $this->packagedelivery['CA']['11'] = 'Standard';
+        $this->packagedelivery['CA']['12'] = 'Three-Day Select';
+        $this->packagedelivery['CA']['13'] = 'Next Day Air Saver';
+        $this->packagedelivery['CA']['14'] = 'Express Early A.M.';
+        $this->packagedelivery['CA']['54'] = 'Worldwide Express Plus';
+        $this->packagedelivery['CA']['65'] = 'Express Saver';
 
-/*
-		$this->packagedelivery['82'] = 'UPS Today Standard';
-		$this->packagedelivery['83'] = 'UPS Today Dedicated Courrier';
-		$this->packagedelivery['84'] = 'UPS Today Intercity';
-		$this->packagedelivery['85'] = 'UPS Today Express';
-		$this->packagedelivery['86'] = 'UPS Today Express Saver';
-*/
+        /*
+                $this->packagedelivery['82'] = 'UPS Today Standard';
+                $this->packagedelivery['83'] = 'UPS Today Dedicated Courrier';
+                $this->packagedelivery['84'] = 'UPS Today Intercity';
+                $this->packagedelivery['85'] = 'UPS Today Express';
+                $this->packagedelivery['86'] = 'UPS Today Express Saver';
+        */
     }
 
-    /**
-     * output functions for testing purposes only
-     */
-    function output_array($array, $string="")
-    {
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $string .= htmlentities($key).'<br>';
-                $output .= $this->output_array($value, $string);
-            } else {
-                $output .= '<tr>';
-                $output .= '<td><b>'.$string.htmlentities($key).'</b></td>';
-                $output .= '<td width="100%">'.htmlentities($value);
-                $output .= '</td>';
-                $output .= '</tr>';
-            }
-        }
-        return $output;
-    }
-
-    function output_table($array)
+    public function output_table($array)
     {
         $output .= '<table align="center" border="1" width="100%">';
         $output .= '<tr>';
@@ -1208,11 +1190,30 @@ class UPS {
     }
 
     /**
+     * output functions for testing purposes only
+     */
+    public function output_array($array, $string = "")
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $string .= htmlentities($key) . '<br>';
+                $output .= $this->output_array($value, $string);
+            } else {
+                $output .= '<tr>';
+                $output .= '<td><b>' . $string . htmlentities($key) . '</b></td>';
+                $output .= '<td width="100%">' . htmlentities($value);
+                $output .= '</td>';
+                $output .= '</tr>';
+            }
+        }
+        return $output;
+    }
+
+    /**
      * PHP5 destructor
      * @access private
      */
-    function __destruct()
+    public function __destruct()
     {
     }
 }
-?>

@@ -19,16 +19,16 @@
 //
 // $Id: Type.php,v 1.22 2006/01/24 23:21:49 ieure Exp $
 
-define('PAYMENT_PROCESS_CC_VISA',         100);
-define('PAYMENT_PROCESS_CC_MASTERCARD',   101);
-define('PAYMENT_PROCESS_CC_AMEX',         102);
-define('PAYMENT_PROCESS_CC_DISCOVER',     103);
-define('PAYMENT_PROCESS_CC_JCB',          104);
-define('PAYMENT_PROCESS_CC_DINERS',       105);
+define('PAYMENT_PROCESS_CC_VISA', 100);
+define('PAYMENT_PROCESS_CC_MASTERCARD', 101);
+define('PAYMENT_PROCESS_CC_AMEX', 102);
+define('PAYMENT_PROCESS_CC_DISCOVER', 103);
+define('PAYMENT_PROCESS_CC_JCB', 104);
+define('PAYMENT_PROCESS_CC_DINERS', 105);
 define('PAYMENT_PROCESS_CC_CARTEBLANCHE', 106);
-define('PAYMENT_PROCESS_CC_ENROUTE',      107);
+define('PAYMENT_PROCESS_CC_ENROUTE', 107);
 
-define('PAYMENT_PROCESS_CK_SAVINGS',  1000);
+define('PAYMENT_PROCESS_CK_SAVINGS', 1000);
 define('PAYMENT_PROCESS_CK_CHECKING', 1001);
 
 /**
@@ -47,120 +47,99 @@ class Payment_Process_Type
      *
      * @var string $type Type of payment (ie. 'CreditCard' or 'eCheck')
      */
-    var $_type = null;
+    public $_type = null;
 
     /**
      * $firstName
      *
-     * @var string $firstName 
+     * @var string $firstName
      */
-    var $firstName;
+    public $firstName;
 
     /**
      * $lastName
      *
-     * @var string $lastName 
+     * @var string $lastName
      */
-    var $lastName;
+    public $lastName;
 
     /**
      * $company
      *
      * @var string $company
      */
-    var $company;
+    public $company;
 
     /**
      * $address
-     * 
+     *
      * @var string $addres
      */
-    var $address;
+    public $address;
 
     /**
      * $city
      *
      * @var string $city
      */
-    var $city;
+    public $city;
 
     /**
      * $state
      *
      * @var string $state State/Province of customer
      */
-    var $state;
+    public $state;
 
     /**
      * $zip
      *
      * @var string $zip Zip/Postal code of customer
      */
-    var $zip;
+    public $zip;
 
     /**
      * $country
      *
      * @var string $country Country code of customer (ie. US)
      */
-    var $country;
+    public $country;
 
     /**
      * $phone
      *
      * @var string $phone Phone number of customer
      */
-    var $phone;
+    public $phone;
 
     /**
      * $fax
      *
      * @var string $fax Fax number of customer
      */
-    var $fax;
+    public $fax;
 
     /**
      * $city
      *
      * @var string $email Email address of customer
      */
-    var $email;
+    public $email;
 
     /**
      * $ipAddress
      *
      * @var string $ipAddress Remote IP address of customer
      */
-    var $ipAddress;
+    public $ipAddress;
     // }}}
     // {{{ __construct()
-    function __construct()
-    {
 
-    }
-    // }}}
-    // {{{ Payment_Process_Type()
-    function Payment_Process_Type()
+
+    public static function &factory($type)
     {
-        $this->__construct();
-    }
-    // }}}
-    // {{{ &factory($type)
-    /**
-    * factory
-    *
-    * Creates and returns an instance of a payment type. If an error occurs
-    * a PEAR_Error is returned.
-    *
-    * @author Joe Stump <joe@joestump.net>
-    * @param string $type
-    * @return mixed
-    */
-	// static function, avoid PHP strict error.
-    static function &factory($type)
-    {
-        $class = 'Payment_Process_Type_'.$type;
-        $file = 'Payment/Process/Type/'.$type.'.php';
+        $class = 'Payment_Process_Type_' . $type;
+        $file = 'Payment/Process/Type/' . $type . '.php';
         if (include_once($file)) {
             if (class_exists($class)) {
                 $ret = new $class();
@@ -168,30 +147,31 @@ class Payment_Process_Type
             }
         }
 
-        $ret = PEAR::raiseError('Invalid Payment_Process_Type: '.$type);
+        $ret = PEAR::raiseError('Invalid Payment_Process_Type: ' . $type);
         return $ret;
     }
     // }}}
-    // {{{ isValid()
+    // {{{ Payment_Process_Type()
+
     /**
-    * isValid
-    *
-    * Validate a payment type object
-    *
-    * @author Joe Stump <joe@joestump.net>
-    * @access public
-    * @param mixed $obj Type object to validate
-    * @return mixed true on success, PEAR_Error on failure
-    */
-    static function isValid($obj)
+     * isValid
+     *
+     * Validate a payment type object
+     *
+     * @author Joe Stump <joe@joestump.net>
+     * @access public
+     * @param mixed $obj Type object to validate
+     * @return mixed true on success, PEAR_Error on failure
+     */
+    public static function isValid($obj)
     {
-        if (!is_a($obj,'Payment_Process_Type')) {
+        if (!is_a($obj, 'Payment_Process_Type')) {
             return PEAR::raiseError('Not a valid payment type');
         }
 
         $vars = get_object_vars($obj);
         foreach ($vars as $validate => $value) {
-            $method = '_validate'.ucfirst($validate);
+            $method = '_validate' . ucfirst($validate);
             if (method_exists($obj, $method)) {
                 $result = $obj->$method();
                 if (PEAR::isError($result)) {
@@ -203,17 +183,41 @@ class Payment_Process_Type
         return true;
     }
     // }}}
-    // {{{ getType()
+    // {{{ &factory($type)
     /**
-    * getType
-    *
-    * @author Joe Stump <joe@joestump.net>
-    * @access public
-    * @return string
-    */
-    function getType()
+     * factory
+     *
+     * Creates and returns an instance of a payment type. If an error occurs
+     * a PEAR_Error is returned.
+     *
+     * @author Joe Stump <joe@joestump.net>
+     * @param string $type
+     * @return mixed
+     */
+    // static function, avoid PHP strict error.
+    public function Payment_Process_Type()
     {
-      return $this->_type;
+        $this->__construct();
+    }
+    // }}}
+    // {{{ isValid()
+
+    public function __construct()
+    {
+    }
+    // }}}
+    // {{{ getType()
+
+    /**
+     * getType
+     *
+     * @author Joe Stump <joe@joestump.net>
+     * @access public
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->_type;
     }
     // }}}
     // {{{ _validateEmail()
@@ -224,7 +228,7 @@ class Payment_Process_Type
      * @access private
      * @return boolean true on success, false on failure.
      */
-    function _validateEmail()
+    public function _validateEmail()
     {
         if (isset($this->email) && strlen($this->email)) {
             return Validate::email($this->email, false);
@@ -245,16 +249,14 @@ class Payment_Process_Type
      * @return boolean true on success, false otherwise
      * @todo use Validate_*::postalCode() method
      */
-    function _validateZip()
+    public function _validateZip()
     {
         if (isset($this->zip) && strtolower($this->country) == 'us') {
-#            return ereg('^[0-9]{5}(-[0-9]{4})?$', $this->zip);
+            #            return ereg('^[0-9]{5}(-[0-9]{4})?$', $this->zip);
             return preg_match('/^[0-9]{5}(-[0-9]{4})?$/', $this->zip);
         }
 
         return true;
     }
     // }}}
-}  
-
-?>
+}

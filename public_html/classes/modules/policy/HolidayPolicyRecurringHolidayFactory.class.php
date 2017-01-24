@@ -19,140 +19,172 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class HolidayPolicyRecurringHolidayFactory extends Factory {
-	protected $table = 'holiday_policy_recurring_holiday';
-	protected $pk_sequence_name = 'holiday_policy_recurring_holiday_id_seq'; //PK Sequence name
+class HolidayPolicyRecurringHolidayFactory extends Factory
+{
+    protected $table = 'holiday_policy_recurring_holiday';
+    protected $pk_sequence_name = 'holiday_policy_recurring_holiday_id_seq'; //PK Sequence name
 
-	protected $recurring_holiday_obj = NULL;
+    protected $recurring_holiday_obj = null;
 
-	function getRecurringHolidayObject() {
-		if ( is_object($this->recurring_holiday_obj) ) {
-			return $this->recurring_holiday_obj;
-		} else {
-			$lf = TTnew( 'RecurringHolidayListFactory' );
-			$lf->getById( $this->getRecurringHoliday() );
-			if ( $lf->getRecordCount() == 1 ) {
-				$this->recurring_holiday_obj = $lf->getCurrent();
-				return $this->recurring_holiday_obj;
-			}
+    public function setHolidayPolicy($id)
+    {
+        $id = trim($id);
 
-			return FALSE;
-		}
-	}
+        if (
+        $this->Validator->isNumeric('holiday_policy',
+            $id,
+            TTi18n::gettext('Holiday Policy is invalid')
 
-	function getHolidayPolicy() {
-		if ( isset($this->data['holiday_policy_id']) ) {
-			return (int)$this->data['holiday_policy_id'];
-		}
+        /*
+        $this->Validator->isResultSetWithRows(	'holiday_policy',
+                                                $hplf->getByID($id),
+                                                TTi18n::gettext('Holiday Policy is invalid')
+         */
+        )
+        ) {
+            $this->data['holiday_policy_id'] = $id;
 
-		return FALSE;
-	}
-	function setHolidayPolicy($id) {
-		$id = trim($id);
+            return true;
+        }
 
-		if (
-			$this->Validator->isNumeric(	'holiday_policy',
-											$id,
-											TTi18n::gettext('Holiday Policy is invalid')
+        return false;
+    }
 
-			/*
-			$this->Validator->isResultSetWithRows(	'holiday_policy',
-													$hplf->getByID($id),
-													TTi18n::gettext('Holiday Policy is invalid')
-			 */
-															) ) {
-			$this->data['holiday_policy_id'] = $id;
+    public function setRecurringHoliday($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $rhlf = TTnew('RecurringHolidayListFactory');
 
-		return FALSE;
-	}
+        if ($id != 0
+            and $this->Validator->isResultSetWithRows('recurring_holiday',
+                $rhlf->getByID($id),
+                TTi18n::gettext('Selected Recurring Holiday is invalid')
+            )
+        ) {
+            $this->data['recurring_holiday_id'] = $id;
 
-	function getRecurringHoliday() {
-		if ( isset($this->data['recurring_holiday_id']) ) {
-			return (int)$this->data['recurring_holiday_id'];
-		}
-	}
-	function setRecurringHoliday($id) {
-		$id = trim($id);
+            return true;
+        }
 
-		$rhlf = TTnew( 'RecurringHolidayListFactory' );
+        return false;
+    }
 
-		if ( $id != 0
-				AND $this->Validator->isResultSetWithRows(	'recurring_holiday',
-															$rhlf->getByID($id),
-															TTi18n::gettext('Selected Recurring Holiday is invalid')
-															)
-			) {
+    public function getDeleted()
+    {
+        return false;
+    }
 
-			$this->data['recurring_holiday_id'] = $id;
+    public function setDeleted($bool)
+    {
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function getCreatedDate()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getCreatedBy()
+    {
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
 
+    public function getUpdatedDate()
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
 
-	function addLog( $log_action ) {
-		$obj = $this->getRecurringHolidayObject();
-		if ( is_object($obj) ) {
-			return TTLog::addEntry( $this->getHolidayPolicy(), $log_action, TTi18n::getText('Recurring Holiday').': '. $obj->getName(), NULL, $this->getTable() );
-		}
-	}
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
+
+    public function addLog($log_action)
+    {
+        $obj = $this->getRecurringHolidayObject();
+        if (is_object($obj)) {
+            return TTLog::addEntry($this->getHolidayPolicy(), $log_action, TTi18n::getText('Recurring Holiday') . ': ' . $obj->getName(), null, $this->getTable());
+        }
+    }
+
+    public function getRecurringHolidayObject()
+    {
+        if (is_object($this->recurring_holiday_obj)) {
+            return $this->recurring_holiday_obj;
+        } else {
+            $lf = TTnew('RecurringHolidayListFactory');
+            $lf->getById($this->getRecurringHoliday());
+            if ($lf->getRecordCount() == 1) {
+                $this->recurring_holiday_obj = $lf->getCurrent();
+                return $this->recurring_holiday_obj;
+            }
+
+            return false;
+        }
+    }
+
+    public function getRecurringHoliday()
+    {
+        if (isset($this->data['recurring_holiday_id'])) {
+            return (int)$this->data['recurring_holiday_id'];
+        }
+    }
+
+    public function getHolidayPolicy()
+    {
+        if (isset($this->data['holiday_policy_id'])) {
+            return (int)$this->data['holiday_policy_id'];
+        }
+
+        return false;
+    }
 }
-?>

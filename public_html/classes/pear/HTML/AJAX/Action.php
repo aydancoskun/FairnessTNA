@@ -23,8 +23,8 @@ require_once 'HTML/AJAX/Serializer/JSON.php';
  * Helper class to eliminate the need to write javascript functions to deal with data
  *
  * This class creates information that can be properly serialized and used by
- * the haaction serializer which eliminates the need for php users to write 
- * javascript for dealing with the information returned by an ajax method - 
+ * the haaction serializer which eliminates the need for php users to write
+ * javascript for dealing with the information returned by an ajax method -
  * instead the javascript is basically created for them
  *
  * @category  HTML
@@ -47,7 +47,7 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * @var string
      * @access public
      */
-    var $contentType = 'application/html_ajax_action';
+    public $contentType = 'application/html_ajax_action';
 
     /**
      * An array holding all the actions for the class
@@ -58,7 +58,7 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * @var array
      * @access private
      */
-    var $_actions = array();
+    public $_actions = array();
 
     /**
      * Prepends data to the attribute identified by id
@@ -69,14 +69,14 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * $response->prependAttr('myid', 'class', 'red');
      * $response->prependAttr('myid', array('class' => 'red', 'innerHTML' => 'this is an error'));
      *
-     * @param string       $id        id for a specific item on the page <div id="myid"></div>
+     * @param string $id id for a specific item on the page <div id="myid"></div>
      * @param string|array $attribute either an array of attribute/data pairs or a string attribute name
-     * @param mixed        $data      should be NULL if attribute is an array, otherwise data you wish to set the attribute to
+     * @param mixed $data should be NULL if attribute is an array, otherwise data you wish to set the attribute to
      *
      * @return void
      * @access public
      */
-    function prependAttr($id, $attribute, $data = null)
+    public function prependAttr($id, $attribute, $data = null)
     {
         if (!is_null($data)) {
             $attribute = array($attribute => $data);
@@ -99,14 +99,14 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * $response->appendAttr('myid', 'class', 'red');
      * $response->appendAttr('myid', array('class' => 'red', 'innerHTML' => 'this is an error'));
      *
-     * @param string       $id        id for a specific item on the page <div id="myid"></div>
+     * @param string $id id for a specific item on the page <div id="myid"></div>
      * @param string|array $attribute either an array of attribute/data pairs or a string attribute name
-     * @param mixed        $data      should be NULL if attribute is an array, otherwise data you wish to set the attribute to
+     * @param mixed $data should be NULL if attribute is an array, otherwise data you wish to set the attribute to
      *
      * @return void
      * @access public
      */
-    function appendAttr($id, $attribute, $data = null)
+    public function appendAttr($id, $attribute, $data = null)
     {
         if (!is_null($data)) {
             $attribute = array($attribute => $data);
@@ -128,14 +128,14 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * $response->assignAttr('myid', 'class', 'red');
      * $response->assignAttr('myid', array('class' => 'red', 'innerHTML' => 'this is an error'));
      *
-     * @param string       $id        id for a specific item on the page <div id="myid"></div>
+     * @param string $id id for a specific item on the page <div id="myid"></div>
      * @param string|array $attribute either an array of attribute/data pairs or a string attribute name
-     * @param mixed        $data      should be NULL if attribute is an array, otherwise data you wish to set the attribute to
+     * @param mixed $data should be NULL if attribute is an array, otherwise data you wish to set the attribute to
      *
      * @return void
      * @access public
      */
-    function assignAttr($id, $attribute, $data = null)
+    public function assignAttr($id, $attribute, $data = null)
     {
         if (!is_null($data)) {
             $attribute = array($attribute => $data);
@@ -156,13 +156,13 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * $response->clearAttr('myid', 'class');
      * $response->clearAttr('myid', array('class', 'innerHTML'));
      *
-     * @param string       $id        id for a specific item on the page <div id="myid"></div>
+     * @param string $id id for a specific item on the page <div id="myid"></div>
      * @param string|array $attribute either an array of attribute/data pairs or a string attribute name
      *
      * @return void
      * @access public
      */
-    function clearAttr($id, $attribute)
+    public function clearAttr($id, $attribute)
     {
         if (!is_array($attribute)) {
             $attribute = array($attribute);
@@ -199,15 +199,15 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      *   'insertBefore');
      * <code>
      *
-     * @param string $id         id for a specific item on the page <div id="myid"></div>
-     * @param string $tag        html node to create
-     * @param array  $attributes array of attribute -> data to fill the node with
-     * @param string $type       append|prepend|insertBefore|insertAfter default is append
+     * @param string $id id for a specific item on the page <div id="myid"></div>
+     * @param string $tag html node to create
+     * @param array $attributes array of attribute -> data to fill the node with
+     * @param string $type append|prepend|insertBefore|insertAfter default is append
      *
      * @return void
      * @access public
      */
-    function createNode($id, $tag, $attributes, $type = 'append')
+    public function createNode($id, $tag, $attributes, $type = 'append')
     {
         $types = array('append', 'prepend', 'insertBefore', 'insertAfter');
         if (!in_array($type, $types)) {
@@ -234,14 +234,14 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * $response->replaceNode('myid', 'div', array('innerHTML' => 'loading complete'));
      * $response->replaceNode('mydiv', 'form', array('innerHTML' => $form));
      *
-     * @param string $id         id for a specific item on the page <div id="myid"></div>
-     * @param string $tag        html node to create
-     * @param array  $attributes array of attribute -> data to fill the node with
+     * @param string $id id for a specific item on the page <div id="myid"></div>
+     * @param string $tag html node to create
+     * @param array $attributes array of attribute -> data to fill the node with
      *
      * @return void
      * @access public
      */
-    function replaceNode($id, $tag, $attributes)
+    public function replaceNode($id, $tag, $attributes)
     {
         settype($attributes, 'array');
         $this->_actions[] = array(
@@ -264,7 +264,7 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * @return void
      * @access public
      */
-    function removeNode($id)
+    public function removeNode($id)
     {
         $this->_actions[] = array(
             'action' => 'remove',
@@ -285,7 +285,7 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * @return void
      * @access public
      */
-    function insertScript($data)
+    public function insertScript($data)
     {
         $this->_actions[] = array(
             'action' => 'script',
@@ -304,7 +304,7 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * @return void
      * @access public
      */
-    function insertAlert($data)
+    public function insertAlert($data)
     {
         $this->_actions[] = array(
             'action' => 'alert',
@@ -322,7 +322,7 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * @return string serialized response content
      * @access public
      */
-    function getPayload()
+    public function getPayload()
     {
         $serializer = new HTML_AJAX_Serializer_JSON();
         return $serializer->serialize($this->_actions);
@@ -337,7 +337,7 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * @return array
      * @access public
      */
-    function combineActions(&$instance)
+    public function combineActions(&$instance)
     {
         $this->_actions = array_merge($this->_actions, $instance->retrieveActions());
     }
@@ -349,9 +349,8 @@ class HTML_AJAX_Action extends HTML_AJAX_Response
      * @return  array
      * @access public
      */
-    function retrieveActions()
+    public function retrieveActions()
     {
         return $this->_actions;
     }
 }
-?>

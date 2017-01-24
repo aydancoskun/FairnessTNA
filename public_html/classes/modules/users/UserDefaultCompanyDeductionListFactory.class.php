@@ -19,96 +19,99 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Users
  */
-class UserDefaultCompanyDeductionListFactory extends UserDefaultCompanyDeductionFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class UserDefaultCompanyDeductionListFactory extends UserDefaultCompanyDeductionFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable();
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+					from	' . $this->getTable();
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$udf = new UserDefaultFactory();
+        $udf = new UserDefaultFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-					LEFT JOIN '. $udf->getTable() .' as udf ON a.user_default_id = udf.id
+					from	' . $this->getTable() . ' as a
+					LEFT JOIN ' . $udf->getTable() . ' as udf ON a.user_default_id = udf.id
 					where	udf.company_id = ?
 						AND ( udf.deleted = 0 )';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByUserDefaultId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByUserDefaultId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
+					from	' . $this->getTable() . ' as a
 					where
 						a.user_default_id = ?
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 }
-?>

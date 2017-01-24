@@ -19,185 +19,222 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class SystemSettingFactory extends Factory {
-	protected $table = 'system_setting';
-	protected $pk_sequence_name = 'system_setting_id_seq'; //PK Sequence name
-	function isUniqueName($name) {
-		$ph = array(
-					'name' => $name,
-					);
+class SystemSettingFactory extends Factory
+{
+    protected $table = 'system_setting';
+    protected $pk_sequence_name = 'system_setting_id_seq'; //PK Sequence name
 
-		$query = 'select id from '. $this->getTable() .' where name = ?';
-		$name_id = $this->db->GetOne($query, $ph);
-		Debug::Arr($name_id, 'Unique Name: '. $name, __FILE__, __LINE__, __METHOD__, 10);
+    public static function setSystemSetting($key, $value)
+    {
+        $sslf = new SystemSettingListFactory();
+        $sslf->getByName($key);
+        if ($sslf->getRecordCount() == 1) {
+            $obj = $sslf->getCurrent();
+        } else {
+            $obj = new SystemSettingListFactory();
+        }
+        $obj->setName($key);
+        $obj->setValue($value);
+        if ($obj->isValid()) {
+            Debug::Text('Key: ' . $key . ' Value: ' . $value . ' isNew: ' . (int)$obj->isNew(), __FILE__, __LINE__, __METHOD__, 10);
+            return $obj->Save();
+        }
 
-		if ( $name_id === FALSE ) {
-			return TRUE;
-		} else {
-			if ($name_id == $this->getId() ) {
-				return TRUE;
-			}
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
-	function getName() {
-		if ( isset($this->data['name']) ) {
-			return $this->data['name'];
-		}
+    public static function getSystemSettingValueByKey($key)
+    {
+        $sslf = new SystemSettingListFactory();
+        $sslf->getByName($key);
+        if ($sslf->getRecordCount() == 1) {
+            $obj = $sslf->getCurrent();
+            return $obj->getValue();
+        }
 
-		return FALSE;
-	}
-	function setName($value) {
-		$value = trim($value);
-		if (	$this->Validator->isLength(	'name',
-											$value,
-											TTi18n::gettext('Name is too short or too long'),
-											1, 250)
-				AND
-						$this->Validator->isTrue(		'name',
-														$this->isUniqueName($value),
-														TTi18n::gettext('Name already exists')
-														)
+        return false;
+    }
 
-						) {
+    public static function getSystemSettingObjectByKey($key)
+    {
+        $sslf = new SystemSettingListFactory();
+        $sslf->getByName($key);
+        if ($sslf->getRecordCount() == 1) {
+            return $sslf->getCurrent();
+        }
 
-			$this->data['name'] = $value;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setName($value)
+    {
+        $value = trim($value);
+        if ($this->Validator->isLength('name',
+                $value,
+                TTi18n::gettext('Name is too short or too long'),
+                1, 250)
+            and
+            $this->Validator->isTrue('name',
+                $this->isUniqueName($value),
+                TTi18n::gettext('Name already exists')
+            )
 
-		return FALSE;
-	}
+        ) {
+            $this->data['name'] = $value;
 
-	function getValue() {
-		if ( isset($this->data['value']) ) {
-			return $this->data['value'];
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setValue($value) {
-		$value = trim($value);
-		if (	$this->Validator->isLength(	'value',
-											$value,
-											TTi18n::gettext('Value is too short or too long'),
-											1, 4096)
-						) {
+        return false;
+    }
 
-			$this->data['value'] = $value;
+    public function isUniqueName($name)
+    {
+        $ph = array(
+            'name' => $name,
+        );
 
-			return TRUE;
-		}
+        $query = 'select id from ' . $this->getTable() . ' where name = ?';
+        $name_id = $this->db->GetOne($query, $ph);
+        Debug::Arr($name_id, 'Unique Name: ' . $name, __FILE__, __LINE__, __METHOD__, 10);
 
-		return FALSE;
-	}
+        if ($name_id === false) {
+            return true;
+        } else {
+            if ($name_id == $this->getId()) {
+                return true;
+            }
+        }
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setValue($value)
+    {
+        $value = trim($value);
+        if ($this->Validator->isLength('value',
+            $value,
+            TTi18n::gettext('Value is too short or too long'),
+            1, 4096)
+        ) {
+            $this->data['value'] = $value;
 
+            return true;
+        }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+        return false;
+    }
 
-	function preSave() {
-		return TRUE;
-	}
+    public function getDeleted()
+    {
+        return false;
+    }
 
-	function postSave() {
-		$this->removeCache( 'all' );
-		$this->removeCache( $this->getName() );
-		return TRUE;
-	}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
 
-	static function setSystemSetting( $key, $value ) {
-		$sslf = new SystemSettingListFactory();
-		$sslf->getByName( $key );
-		if ( $sslf->getRecordCount() == 1 ) {
-			$obj = $sslf->getCurrent();
-		} else {
-			$obj = new SystemSettingListFactory();
-		}
-		$obj->setName( $key );
-		$obj->setValue( $value );
-		if ( $obj->isValid() ) {
-			Debug::Text('Key: '. $key .' Value: '. $value .' isNew: '. (int)$obj->isNew(), __FILE__, __LINE__, __METHOD__, 10);
-			return $obj->Save();
-		}
+    public function getCreatedDate()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
 
-	static function getSystemSettingValueByKey( $key ) {
-		$sslf = new SystemSettingListFactory();
-		$sslf->getByName( $key );
-		if ( $sslf->getRecordCount() == 1 ) {
-			$obj = $sslf->getCurrent();
-			return $obj->getValue();
-		}
+    public function getCreatedBy()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
 
-	static function getSystemSettingObjectByKey( $key ) {
-		$sslf = new SystemSettingListFactory();
-		$sslf->getByName( $key );
-		if ( $sslf->getRecordCount() == 1 ) {
-			return $sslf->getCurrent();
-		}
+    public function getUpdatedDate()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
-	
-	function addLog( $log_action ) {
-		return TTLog::addEntry( $this->getId(), $log_action, TTi18n::getText('System Setting - Name').': '. $this->getName() .' '. TTi18n::getText('Value').': '. $this->getValue(), NULL, $this->getTable() );
-	}
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
+
+    public function preSave()
+    {
+        return true;
+    }
+
+    public function postSave()
+    {
+        $this->removeCache('all');
+        $this->removeCache($this->getName());
+        return true;
+    }
+
+    public function getName()
+    {
+        if (isset($this->data['name'])) {
+            return $this->data['name'];
+        }
+
+        return false;
+    }
+
+    public function addLog($log_action)
+    {
+        return TTLog::addEntry($this->getId(), $log_action, TTi18n::getText('System Setting - Name') . ': ' . $this->getName() . ' ' . TTi18n::getText('Value') . ': ' . $this->getValue(), null, $this->getTable());
+    }
+
+    public function getValue()
+    {
+        if (isset($this->data['value'])) {
+            return $this->data['value'];
+        }
+
+        return false;
+    }
 }
-?>

@@ -19,45 +19,45 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 require_once('../includes/global.inc.php');
 
 /*
  * Get FORM variables
  */
-extract	(FormVariables::GetVariables(
-										array	(
-												'name',
-												'value',
-												'expires',
-												'redirect',
-												'key'
-												) ) );
+extract(FormVariables::GetVariables(
+    array(
+        'name',
+        'value',
+        'expires',
+        'redirect',
+        'key'
+    )));
 
 //Used to help set cookies across domains. Currently used by Flex
 $authentication = new Authentication();
-if ( $name == '' ) {
-	$name = $authentication->getName();
+if ($name == '') {
+    $name = $authentication->getName();
 }
 
-if ( $expires == '' ) {
-	$expires = ( time() + 7776000 );
+if ($expires == '') {
+    $expires = (time() + 7776000);
 }
 
-setcookie( $name, $value, $expires, Environment::getCookieBaseURL(), NULL, Misc::isSSL( TRUE ) );
+setcookie($name, $value, $expires, Environment::getCookieBaseURL(), null, Misc::isSSL(true));
 
-if ( $redirect != '' ) {
-	//This can result in a phishing attack, if the user is redirected to an outside site.
-	Debug::Text('Attempting Redirect: '. $redirect .' Current hostname: '. Misc::getHostName(), __FILE__, __LINE__, __METHOD__, 10);
+if ($redirect != '') {
+    //This can result in a phishing attack, if the user is redirected to an outside site.
+    Debug::Text('Attempting Redirect: ' . $redirect . ' Current hostname: ' . Misc::getHostName(), __FILE__, __LINE__, __METHOD__, 10);
 
-	if ( str_replace( array('http://', 'https://'), '', $redirect ) == Misc::getHostName()
-			OR strpos( str_replace( array('http://', 'https://'), '', $redirect ), Misc::getHostName().'/' ) === 0 ) { //Make sure we match exactly or with a '/' at the end to prevent ondemand.mydomain.com.phish.com from being accepted.
-		Redirect::Page( $redirect );
-	} else {
-		Debug::Text('ERROR: Unable to redirect to: '. $redirect .' as it does not contain hostname: '. Misc::getHostName(), __FILE__, __LINE__, __METHOD__, 10);
-		echo "ERROR: Unable to redirect...<br>\n";
-	}
+    if (str_replace(array('http://', 'https://'), '', $redirect) == Misc::getHostName()
+        or strpos(str_replace(array('http://', 'https://'), '', $redirect), Misc::getHostName() . '/') === 0
+    ) { //Make sure we match exactly or with a '/' at the end to prevent ondemand.mydomain.com.phish.com from being accepted.
+        Redirect::Page($redirect);
+    } else {
+        Debug::Text('ERROR: Unable to redirect to: ' . $redirect . ' as it does not contain hostname: ' . Misc::getHostName(), __FILE__, __LINE__, __METHOD__, 10);
+        echo "ERROR: Unable to redirect...<br>\n";
+    }
 }
 Debug::writeToLog();
-?>

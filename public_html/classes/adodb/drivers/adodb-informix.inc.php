@@ -1,39 +1,43 @@
 <?php
 /**
-* @version V5.20dev  ??-???-2014  (c) 2000-2014 John Lim (jlim#natsoft.com). All rights reserved.
-* Released under both BSD license and Lesser GPL library license.
-* Whenever there is any discrepancy between the two licenses,
-* the BSD license will take precedence.
-*
-* Set tabs to 4 for best viewing.
-*
-* Latest version is available at http://php.weblogs.com
-*
-* Informix 9 driver that supports SELECT FIRST
-*
-*/
+ * @version V5.20dev  ??-???-2014  (c) 2000-2014 John Lim (jlim#natsoft.com). All rights reserved.
+ * Released under both BSD license and Lesser GPL library license.
+ * Whenever there is any discrepancy between the two licenses,
+ * the BSD license will take precedence.
+ *
+ * Set tabs to 4 for best viewing.
+ *
+ * Latest version is available at http://php.weblogs.com
+ *
+ * Informix 9 driver that supports SELECT FIRST
+ *
+ */
 
 // security - hide paths
-if (!defined('ADODB_DIR')) die();
-
-include_once(ADODB_DIR.'/drivers/adodb-informix72.inc.php');
-
-class ADODB_informix extends ADODB_informix72 {
-	var $databaseType = "informix";
-	var $hasTop = 'FIRST';
-	var $ansiOuter = true;
-
-	function IfNull( $field, $ifNull )
-	{
-		return " NVL($field, $ifNull) "; // if Informix 9.X or 10.X
-	}
+if (!defined('ADODB_DIR')) {
+    die();
 }
 
-class ADORecordset_informix extends ADORecordset_informix72 {
-	var $databaseType = "informix";
+include_once(ADODB_DIR . '/drivers/adodb-informix72.inc.php');
 
-	function ADORecordset_informix($id,$mode=false)
-	{
-		$this->ADORecordset_informix72($id,$mode);
-	}
+class ADODB_informix extends ADODB_informix72
+{
+    public $databaseType = "informix";
+    public $hasTop = 'FIRST';
+    public $ansiOuter = true;
+
+    public function IfNull($field, $ifNull)
+    {
+        return " NVL($field, $ifNull) "; // if Informix 9.X or 10.X
+    }
+}
+
+class ADORecordset_informix extends ADORecordset_informix72
+{
+    public $databaseType = "informix";
+
+    public function ADORecordset_informix($id, $mode = false)
+    {
+        $this->ADORecordset_informix72($id, $mode);
+    }
 }

@@ -19,184 +19,188 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Message
  */
-class MessageRecipientListFactory extends MessageRecipientFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class MessageRecipientListFactory extends MessageRecipientFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
+        $uf = new UserFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					SELECT a.*
-					FROM '. $this->getTable() .' as a
-						LEFT JOIN '. $uf->getTable() .' as b ON a.user_id = b.id
+					FROM ' . $this->getTable() . ' as a
+						LEFT JOIN ' . $uf->getTable() . ' as b ON a.user_id = b.id
 					WHERE
 							b.company_id = ?
 							AND ( a.deleted = 0 AND b.deleted = 0 )
 					';
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndUserIdAndId($company_id, $user_id, $id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndUserIdAndId($company_id, $user_id, $id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $user_id == '') {
-			return FALSE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		if ( $id == '') {
-			return FALSE;
-		}
+        if ($id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
+        $uf = new UserFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'user_id' => (int)$user_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'user_id' => (int)$user_id,
+        );
 
-		$query = '
+        $query = '
 					SELECT a.*
-					FROM '. $this->getTable() .' as a
-						LEFT JOIN '. $uf->getTable() .' as b ON a.user_id = b.id
+					FROM ' . $this->getTable() . ' as a
+						LEFT JOIN ' . $uf->getTable() . ' as b ON a.user_id = b.id
 					WHERE
 							b.company_id = ?
 							AND a.user_id = ?
-							AND a.id in ('. $this->getListSQL( $id, $ph, 'int' ) .')
+							AND a.id in (' . $this->getListSQL($id, $ph, 'int') . ')
 							AND a.deleted = 0
 					';
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndUserIdAndMessageSenderId($company_id, $user_id, $id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndUserIdAndMessageSenderId($company_id, $user_id, $id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $user_id == '') {
-			return FALSE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		if ( $id == '') {
-			return FALSE;
-		}
+        if ($id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
+        $uf = new UserFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'user_id' => (int)$user_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'user_id' => (int)$user_id,
+        );
 
-		$query = '
+        $query = '
 					SELECT a.*
-					FROM '. $this->getTable() .' as a
-						LEFT JOIN '. $uf->getTable() .' as b ON a.user_id = b.id
+					FROM ' . $this->getTable() . ' as a
+						LEFT JOIN ' . $uf->getTable() . ' as b ON a.user_id = b.id
 					WHERE
 							b.company_id = ?
 							AND a.user_id = ?
-							AND a.message_sender_id in ('. $this->getListSQL( $id, $ph, 'int' ) .')
+							AND a.message_sender_id in (' . $this->getListSQL($id, $ph, 'int') . ')
 							AND a.deleted = 0
 					';
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndUserIdAndMessageSenderIdAndStatus($company_id, $user_id, $id, $status_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndUserIdAndMessageSenderIdAndStatus($company_id, $user_id, $id, $status_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $user_id == '') {
-			return FALSE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		if ( $id == '') {
-			return FALSE;
-		}
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $status_id == '') {
-			return FALSE;
-		}
+        if ($status_id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
+        $uf = new UserFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'user_id' => (int)$user_id,
-					'status_id' => (int)$status_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'user_id' => (int)$user_id,
+            'status_id' => (int)$status_id,
+        );
 
-		$query = '
+        $query = '
 					SELECT a.*
-					FROM '. $this->getTable() .' as a
-						LEFT JOIN '. $uf->getTable() .' as b ON a.user_id = b.id
+					FROM ' . $this->getTable() . ' as a
+						LEFT JOIN ' . $uf->getTable() . ' as b ON a.user_id = b.id
 					WHERE
 							b.company_id = ?
 							AND a.user_id = ?
 							AND a.status_id = ?
-							AND a.message_sender_id in ('. $this->getListSQL( $id, $ph, 'int' ) .')
+							AND a.message_sender_id in (' . $this->getListSQL($id, $ph, 'int') . ')
 							AND a.deleted = 0
 					';
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
-
+        return $this;
+    }
 }
-?>

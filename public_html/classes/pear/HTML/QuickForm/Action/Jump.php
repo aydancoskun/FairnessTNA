@@ -22,14 +22,14 @@ require_once 'HTML/QuickForm/Action.php';
 
 /**
  * The action handles the HTTP redirect to a specific page.
- * 
+ *
  * @author  Alexey Borzov <avb@php.net>
  * @package HTML_QuickForm_Controller
  * @version $Revision: 1.3 $
  */
 class HTML_QuickForm_Action_Jump extends HTML_QuickForm_Action
 {
-    function perform(&$page, $actionName)
+    public function perform(&$page, $actionName)
     {
         // check whether the page is valid before trying to go to it
         if ($page->controller->isModal()) {
@@ -41,17 +41,15 @@ class HTML_QuickForm_Action_Jump extends HTML_QuickForm_Action
                 $pageName = $page->controller->findInvalid();
             }
             $current = $page->controller->getPage($pageName);
-
         } else {
             $current = $page;
         }
         // generate the URL for the page 'display' event and redirect to it
         $action = $current->getAttribute('action');
-        $url    = $action . (false === strpos($action, '?')? '?': '&') .
-                  $current->getButtonName('display') . '=true' .
-                  ((!defined('SID') || '' == SID)? '': '&' . SID);
+        $url = $action . (false === strpos($action, '?') ? '?' : '&') .
+            $current->getButtonName('display') . '=true' .
+            ((!defined('SID') || '' == SID) ? '' : '&' . SID);
         header('Location: ' . $url);
         exit;
     }
 }
-?>

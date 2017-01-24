@@ -1,59 +1,58 @@
-var APIUserWage = ServiceCaller.extend( {
+var APIUserWage = ServiceCaller.extend({
 
-	key_name: 'UserWage',
-	className: 'APIUserWage',
+    key_name: 'UserWage',
+    className: 'APIUserWage',
 
-	getHourlyRate: function() {
+    getHourlyRate: function () {
 
-		return this.argumentsHandler( this.className, 'getHourlyRate', arguments );
-	},
+        return this.argumentsHandler(this.className, 'getHourlyRate', arguments);
+    },
 
-	getCommonUserWageData: function() {
+    getCommonUserWageData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserWageData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserWageData', arguments);
 
-	},
+    },
 
-	getUserWage: function() {
+    getUserWage: function () {
 
-		return this.argumentsHandler( this.className, 'getUserWage', arguments );
+        return this.argumentsHandler(this.className, 'getUserWage', arguments);
 
-	},
+    },
 
-	setUserWage: function() {
+    setUserWage: function () {
 
-		return this.argumentsHandler( this.className, 'setUserWage', arguments );
+        return this.argumentsHandler(this.className, 'setUserWage', arguments);
 
-	},
+    },
 
-	copyUserWage: function() {
+    copyUserWage: function () {
 
-		return this.argumentsHandler( this.className, 'copyUserWage', arguments );
+        return this.argumentsHandler(this.className, 'copyUserWage', arguments);
 
-	},
+    },
 
-	getUserWageDefaultData: function() {
+    getUserWageDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserWageDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserWageDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserWage: function() {
+    deleteUserWage: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserWage', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserWage', arguments);
 
-	},
+    },
 
-	validateUserWage: function() {
+    validateUserWage: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserWage', arguments );
+        return this.argumentsHandler(this.className, 'validateUserWage', arguments);
 
-	},
+    },
 
-	exportUserWage: function() {
-		return this.argumentsHandler( this.className, 'exportUserWage', arguments );
-	}
+    exportUserWage: function () {
+        return this.argumentsHandler(this.className, 'exportUserWage', arguments);
+    }
 
 
-
-} );
+});

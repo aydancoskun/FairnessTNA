@@ -1,89 +1,85 @@
-var APICompany = ServiceCaller.extend( {
+var APICompany = ServiceCaller.extend({
 
-	key_name: 'Company',
-	className: 'APICompany',
+    key_name: 'Company',
+    className: 'APICompany',
 
-	createPresets: function() {
+    createPresets: function () {
 
-		return this.argumentsHandler( 'APISetupPresets', 'createPresets', arguments );
+        return this.argumentsHandler('APISetupPresets', 'createPresets', arguments);
 
-	},
+    },
 
-	validateCompany: function() {
+    validateCompany: function () {
 
-		return this.argumentsHandler( this.className, 'validateCompany', arguments );
+        return this.argumentsHandler(this.className, 'validateCompany', arguments);
 
-	},
+    },
 
-	getCompany: function() {
+    getCompany: function () {
 
-		return this.argumentsHandler( this.className, 'getCompany', arguments );
+        return this.argumentsHandler(this.className, 'getCompany', arguments);
 
-	},
+    },
 
-	getCompanyDefaultData: function() {
+    getCompanyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyDefaultData', arguments);
 
-	},
+    },
 
-	getCommonCompanyData: function() {
+    getCommonCompanyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonCompanyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonCompanyData', arguments);
 
-	},
+    },
 
-	setCompany: function() {
+    setCompany: function () {
 
-		return this.argumentsHandler( this.className, 'setCompany', arguments );
+        return this.argumentsHandler(this.className, 'setCompany', arguments);
 
-	},
+    },
 
-	deleteCompany: function() {
+    deleteCompany: function () {
 
-		return this.argumentsHandler( this.className, 'deleteCompany', arguments );
+        return this.argumentsHandler(this.className, 'deleteCompany', arguments);
 
-	},
+    },
 
-	copyCompany: function() {
+    copyCompany: function () {
 
-		return this.argumentsHandler( this.className, 'copyCompany', arguments );
+        return this.argumentsHandler(this.className, 'copyCompany', arguments);
 
-	},
+    },
 
-	getCompanyMinAvgMaxUserCounts: function() {
+    getCompanyMinAvgMaxUserCounts: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyMinAvgMaxUserCounts', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyMinAvgMaxUserCounts', arguments);
 
-	},
+    },
 
-	getCompanyEmailAddresses: function() {
+    getCompanyEmailAddresses: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyEmailAddresses', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyEmailAddresses', arguments);
 
-	},
+    },
 
-	getCompanyPhonePunchData: function() {
+    getCompanyPhonePunchData: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyPhonePunchData', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyPhonePunchData', arguments);
 
-	},
+    },
 
-	isBranchAndDepartmentAndJobAndJobItemEnabled: function() {
+    isBranchAndDepartmentAndJobAndJobItemEnabled: function () {
 
-		return this.argumentsHandler( this.className, 'isBranchAndDepartmentAndJobAndJobItemEnabled', arguments );
+        return this.argumentsHandler(this.className, 'isBranchAndDepartmentAndJobAndJobItemEnabled', arguments);
 
-	},
+    },
 
-	exportCompany: function() {
+    exportCompany: function () {
 
-		return this.argumentsHandler( this.className, 'exportCompany', arguments );
+        return this.argumentsHandler(this.className, 'exportCompany', arguments);
 
-	}
-
-
+    }
 
 
-
-
-} );
+});

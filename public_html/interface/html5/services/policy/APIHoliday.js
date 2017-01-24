@@ -1,47 +1,47 @@
-var APIHoliday = ServiceCaller.extend( {
+var APIHoliday = ServiceCaller.extend({
 
-	key_name: 'Holiday',
-	className: 'APIHoliday',
+    key_name: 'Holiday',
+    className: 'APIHoliday',
 
-	getHolidayDefaultData: function() {
+    getHolidayDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getHolidayDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getHolidayDefaultData', arguments);
 
-	},
+    },
 
-	getHoliday: function() {
+    getHoliday: function () {
 
-		return this.argumentsHandler( this.className, 'getHoliday', arguments );
+        return this.argumentsHandler(this.className, 'getHoliday', arguments);
 
-	},
+    },
 
-	getCommonHolidayData: function() {
+    getCommonHolidayData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonHolidayData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonHolidayData', arguments);
 
-	},
+    },
 
-	validateHoliday: function() {
+    validateHoliday: function () {
 
-		return this.argumentsHandler( this.className, 'validateHoliday', arguments );
+        return this.argumentsHandler(this.className, 'validateHoliday', arguments);
 
-	},
+    },
 
-	setHoliday: function() {
+    setHoliday: function () {
 
-		return this.argumentsHandler( this.className, 'setHoliday', arguments );
+        return this.argumentsHandler(this.className, 'setHoliday', arguments);
 
-	},
+    },
 
-	deleteHoliday: function() {
+    deleteHoliday: function () {
 
-		return this.argumentsHandler( this.className, 'deleteHoliday', arguments );
+        return this.argumentsHandler(this.className, 'deleteHoliday', arguments);
 
-	},
+    },
 
-	copyHoliday: function() {
-		return this.argumentsHandler( this.className, 'copyHoliday', arguments );
-	}
+    copyHoliday: function () {
+        return this.argumentsHandler(this.className, 'copyHoliday', arguments);
+    }
 
 
-} );
+});

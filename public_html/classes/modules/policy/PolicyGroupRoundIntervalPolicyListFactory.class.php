@@ -19,91 +19,94 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class PolicyGroupRoundIntervalPolicyListFactory extends PolicyGroupRoundIntervalPolicyFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class PolicyGroupRoundIntervalPolicyListFactory extends PolicyGroupRoundIntervalPolicyFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable();
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+					from	' . $this->getTable();
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPolicyGroupId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByPolicyGroupIdArray($id)
+    {
+        $pgriplf = new PolicyGroupRoundIntervalPolicyListFactory();
 
-		$pgf = new PolicyGroupFactory();
+        $pgriplf->getByPolicyGroupId($id);
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $list = array();
+        foreach ($pgriplf as $obj) {
+            $list[$obj->getRoundIntervalPolicy()] = null;
+        }
+
+        if (empty($list) == false) {
+            return $list;
+        }
+
+        return array();
+    }
+
+    public function getByPolicyGroupId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
+
+        $pgf = new PolicyGroupFactory();
+
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $pgf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $pgf->getTable() . ' as b
 					where	b.id = a.policy_group_id
 						AND a.policy_group_id = ?
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
-
-	function getByPolicyGroupIdArray($id) {
-		$pgriplf = new PolicyGroupRoundIntervalPolicyListFactory();
-
-		$pgriplf->getByPolicyGroupId($id);
-
-		$list = array();
-		foreach ($pgriplf as $obj) {
-			$list[$obj->getRoundIntervalPolicy()] = NULL;
-		}
-
-		if ( empty($list) == FALSE  ) {
-			return $list;
-		}
-
-		return array();
-	}
+        return $this;
+    }
 }
-?>

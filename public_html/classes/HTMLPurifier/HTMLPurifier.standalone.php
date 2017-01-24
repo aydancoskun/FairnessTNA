@@ -19,7 +19,6 @@
  */
 
 
-
 /*! @mainpage
  *
  * HTML Purifier is an HTML filter that will take an arbitrary snippet of
@@ -75,35 +74,30 @@ class HTMLPurifier
 {
 
     /**
-     * Version of HTML Purifier.
-     * @type string
-     */
-    public $version = '4.6.0';
-
-    /**
      * Constant with version of HTML Purifier.
      */
     const VERSION = '4.6.0';
-
-    /**
-     * Global configuration object.
-     * @type HTMLPurifier_Config
-     */
-    public $config;
-
-    /**
-     * Array of extra filter objects to run on HTML,
-     * for backwards compatibility.
-     * @type HTMLPurifier_Filter[]
-     */
-    private $filters = array();
-
     /**
      * Single instance of HTML Purifier.
      * @type HTMLPurifier
      */
     private static $instance;
-
+    /**
+     * Version of HTML Purifier.
+     * @type string
+     */
+    public $version = '4.6.0';
+    /**
+     * Global configuration object.
+     * @type HTMLPurifier_Config
+     */
+    public $config;
+    /**
+     * Resultant context of last run purification.
+     * Is an array of contexts if the last called method was purifyArray().
+     * @type HTMLPurifier_Context
+     */
+    public $context;
     /**
      * @type HTMLPurifier_Strategy_Core
      */
@@ -113,13 +107,12 @@ class HTMLPurifier
      * @type HTMLPurifier_Generator
      */
     protected $generator;
-
     /**
-     * Resultant context of last run purification.
-     * Is an array of contexts if the last called method was purifyArray().
-     * @type HTMLPurifier_Context
+     * Array of extra filter objects to run on HTML,
+     * for backwards compatibility.
+     * @type HTMLPurifier_Filter[]
      */
-    public $context;
+    private $filters = array();
 
     /**
      * Initializes the purifier.
@@ -138,6 +131,46 @@ class HTMLPurifier
     }
 
     /**
+     * Singleton for enforcing just one HTML Purifier in your system
+     *
+     * @param HTMLPurifier|HTMLPurifier_Config $prototype Optional prototype
+     *                   HTMLPurifier instance to overload singleton with,
+     *                   or HTMLPurifier_Config instance to configure the
+     *                   generated version with.
+     *
+     * @return HTMLPurifier
+     * @note Backwards compatibility, see instance()
+     */
+    public static function getInstance($prototype = null)
+    {
+        return HTMLPurifier::instance($prototype);
+    }
+
+    /**
+     * Singleton for enforcing just one HTML Purifier in your system
+     *
+     * @param HTMLPurifier|HTMLPurifier_Config $prototype Optional prototype
+     *                   HTMLPurifier instance to overload singleton with,
+     *                   or HTMLPurifier_Config instance to configure the
+     *                   generated version with.
+     *
+     * @return HTMLPurifier
+     */
+    public static function instance($prototype = null)
+    {
+        if (!self::$instance || $prototype) {
+            if ($prototype instanceof HTMLPurifier) {
+                self::$instance = $prototype;
+            } elseif ($prototype) {
+                self::$instance = new HTMLPurifier($prototype);
+            } else {
+                self::$instance = new HTMLPurifier();
+            }
+        }
+        return self::$instance;
+    }
+
+    /**
      * Adds a filter to process the output. First come first serve
      *
      * @param HTMLPurifier_Filter $filter HTMLPurifier_Filter object
@@ -150,6 +183,26 @@ class HTMLPurifier
             E_USER_WARNING
         );
         $this->filters[] = $filter;
+    }
+
+    /**
+     * Filters an array of HTML snippets
+     *
+     * @param string[] $array_of_html Array of html snippets
+     * @param HTMLPurifier_Config $config Optional config object for this operation.
+     *                See HTMLPurifier::purify() for more details.
+     *
+     * @return string[] Array of purified HTML
+     */
+    public function purifyArray($array_of_html, $config = null)
+    {
+        $context_array = array();
+        foreach ($array_of_html as $key => $html) {
+            $array_of_html[$key] = $this->purify($html, $config);
+            $context_array[$key] = $this->context;
+        }
+        $this->context = $context_array;
+        return $array_of_html;
     }
 
     /**
@@ -225,11 +278,11 @@ class HTMLPurifier
         // purified HTML
         $html =
             $this->generator->generateFromTokens(
-                // list of tokens
+            // list of tokens
                 $this->strategy->execute(
-                    // list of un-purified tokens
+                // list of un-purified tokens
                     $lexer->tokenizeHTML(
-                        // un-purified HTML
+                    // un-purified HTML
                         $html,
                         $config,
                         $context
@@ -247,70 +300,7 @@ class HTMLPurifier
         $this->context =& $context;
         return $html;
     }
-
-    /**
-     * Filters an array of HTML snippets
-     *
-     * @param string[] $array_of_html Array of html snippets
-     * @param HTMLPurifier_Config $config Optional config object for this operation.
-     *                See HTMLPurifier::purify() for more details.
-     *
-     * @return string[] Array of purified HTML
-     */
-    public function purifyArray($array_of_html, $config = null)
-    {
-        $context_array = array();
-        foreach ($array_of_html as $key => $html) {
-            $array_of_html[$key] = $this->purify($html, $config);
-            $context_array[$key] = $this->context;
-        }
-        $this->context = $context_array;
-        return $array_of_html;
-    }
-
-    /**
-     * Singleton for enforcing just one HTML Purifier in your system
-     *
-     * @param HTMLPurifier|HTMLPurifier_Config $prototype Optional prototype
-     *                   HTMLPurifier instance to overload singleton with,
-     *                   or HTMLPurifier_Config instance to configure the
-     *                   generated version with.
-     *
-     * @return HTMLPurifier
-     */
-    public static function instance($prototype = null)
-    {
-        if (!self::$instance || $prototype) {
-            if ($prototype instanceof HTMLPurifier) {
-                self::$instance = $prototype;
-            } elseif ($prototype) {
-                self::$instance = new HTMLPurifier($prototype);
-            } else {
-                self::$instance = new HTMLPurifier();
-            }
-        }
-        return self::$instance;
-    }
-
-    /**
-     * Singleton for enforcing just one HTML Purifier in your system
-     *
-     * @param HTMLPurifier|HTMLPurifier_Config $prototype Optional prototype
-     *                   HTMLPurifier instance to overload singleton with,
-     *                   or HTMLPurifier_Config instance to configure the
-     *                   generated version with.
-     *
-     * @return HTMLPurifier
-     * @note Backwards compatibility, see instance()
-     */
-    public static function getInstance($prototype = null)
-    {
-        return HTMLPurifier::instance($prototype);
-    }
 }
-
-
-
 
 
 /**
@@ -322,7 +312,8 @@ class HTMLPurifier
  */
 class HTMLPurifier_Arborize
 {
-    public static function arborize($tokens, $config, $context) {
+    public static function arborize($tokens, $config, $context)
+    {
         $definition = $config->getHTMLDefinition();
         $parent = new HTMLPurifier_Token_Start($definition->info_parent);
         $stack = array($parent->toNode());
@@ -340,7 +331,7 @@ class HTMLPurifier_Arborize
                 continue;
             }
             $node = $token->toNode();
-            $stack[count($stack)-1]->children[] = $node;
+            $stack[count($stack) - 1]->children[] = $node;
             if ($token instanceof HTMLPurifier_Token_Start) {
                 $stack[] = $node;
             }
@@ -349,7 +340,8 @@ class HTMLPurifier_Arborize
         return $stack[0];
     }
 
-    public static function flatten($node, $config, $context) {
+    public static function flatten($node, $config, $context)
+    {
         $level = 0;
         $nodes = array($level => new HTMLPurifier_Queue(array($node)));
         $closingTokens = array();
@@ -361,7 +353,7 @@ class HTMLPurifier_Arborize
                 if ($level > 0) {
                     $tokens[] = $start;
                 }
-                if ($end !== NULL) {
+                if ($end !== null) {
                     $closingTokens[$level][] = $end;
                 }
                 if ($node instanceof HTMLPurifier_Node_Element) {
@@ -384,11 +376,9 @@ class HTMLPurifier_Arborize
 }
 
 
-
 /**
  * Defines common attribute collections that modules reference
  */
-
 class HTMLPurifier_AttrCollections
 {
 
@@ -446,7 +436,7 @@ class HTMLPurifier_AttrCollections
             return;
         }
         $merge = $attr[0];
-        $seen  = array(); // recursion guard
+        $seen = array(); // recursion guard
         // loop through all the inclusions
         for ($i = 0; isset($merge[$i]); $i++) {
             if (isset($seen[$merge[$i]])) {
@@ -526,9 +516,6 @@ class HTMLPurifier_AttrCollections
 }
 
 
-
-
-
 /**
  * Base class for all validating attribute definitions.
  *
@@ -538,7 +525,6 @@ class HTMLPurifier_AttrCollections
  * Besides defining (through code) what precisely makes the string valid,
  * subclasses are also responsible for cleaning the code if possible.
  */
-
 abstract class HTMLPurifier_AttrDef
 {
 
@@ -665,9 +651,6 @@ abstract class HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Processes an entire attribute array for corrections needing multiple values.
  *
@@ -681,7 +664,6 @@ abstract class HTMLPurifier_AttrDef
  * HTMLPurifier_AttrDef validation.  See HTMLPurifier_HTMLDefinition for
  * more details.
  */
-
 abstract class HTMLPurifier_AttrTransform
 {
 
@@ -726,9 +708,6 @@ abstract class HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 /**
  * Provides lookup array of attribute types to HTMLPurifier_AttrDef objects
  */
@@ -754,21 +733,21 @@ class HTMLPurifier_AttrTypes
         // definition wouldn't work.
 
         // pseudo-types, must be instantiated via shorthand
-        $this->info['Enum']    = new HTMLPurifier_AttrDef_Enum();
-        $this->info['Bool']    = new HTMLPurifier_AttrDef_HTML_Bool();
+        $this->info['Enum'] = new HTMLPurifier_AttrDef_Enum();
+        $this->info['Bool'] = new HTMLPurifier_AttrDef_HTML_Bool();
 
-        $this->info['CDATA']    = new HTMLPurifier_AttrDef_Text();
-        $this->info['ID']       = new HTMLPurifier_AttrDef_HTML_ID();
-        $this->info['Length']   = new HTMLPurifier_AttrDef_HTML_Length();
+        $this->info['CDATA'] = new HTMLPurifier_AttrDef_Text();
+        $this->info['ID'] = new HTMLPurifier_AttrDef_HTML_ID();
+        $this->info['Length'] = new HTMLPurifier_AttrDef_HTML_Length();
         $this->info['MultiLength'] = new HTMLPurifier_AttrDef_HTML_MultiLength();
         $this->info['NMTOKENS'] = new HTMLPurifier_AttrDef_HTML_Nmtokens();
-        $this->info['Pixels']   = new HTMLPurifier_AttrDef_HTML_Pixels();
-        $this->info['Text']     = new HTMLPurifier_AttrDef_Text();
-        $this->info['URI']      = new HTMLPurifier_AttrDef_URI();
+        $this->info['Pixels'] = new HTMLPurifier_AttrDef_HTML_Pixels();
+        $this->info['Text'] = new HTMLPurifier_AttrDef_Text();
+        $this->info['URI'] = new HTMLPurifier_AttrDef_URI();
         $this->info['LanguageCode'] = new HTMLPurifier_AttrDef_Lang();
-        $this->info['Color']    = new HTMLPurifier_AttrDef_HTML_Color();
-        $this->info['IAlign']   = self::makeEnum('top,middle,bottom,left,right');
-        $this->info['LAlign']   = self::makeEnum('top,bottom,left,right');
+        $this->info['Color'] = new HTMLPurifier_AttrDef_HTML_Color();
+        $this->info['IAlign'] = self::makeEnum('top,middle,bottom,left,right');
+        $this->info['LAlign'] = self::makeEnum('top,bottom,left,right');
         $this->info['FrameTarget'] = new HTMLPurifier_AttrDef_HTML_FrameTarget();
 
         // unimplemented aliases
@@ -782,7 +761,7 @@ class HTMLPurifier_AttrTypes
 
         // number is really a positive integer (one or more digits)
         // FIXME: ^^ not always, see start and value of list items
-        $this->info['Number']   = new HTMLPurifier_AttrDef_Integer(false, false, true);
+        $this->info['Number'] = new HTMLPurifier_AttrDef_Integer(false, false, true);
     }
 
     private static function makeEnum($in)
@@ -821,9 +800,6 @@ class HTMLPurifier_AttrTypes
         $this->info[$type] = $impl;
     }
 }
-
-
-
 
 
 /**
@@ -995,14 +971,8 @@ class HTMLPurifier_AttrValidator
         if (!$current_token) {
             $context->destroy('CurrentToken');
         }
-
     }
-
-
 }
-
-
-
 
 
 // constants are slow, so we use as few as possible
@@ -1092,9 +1062,9 @@ class HTMLPurifier_Bootstrap
                 // prepend flag exists, no need for shenanigans
                 spl_autoload_register($autoload, true, true);
             } else {
-                $buggy  = version_compare(PHP_VERSION, '5.2.11', '<');
+                $buggy = version_compare(PHP_VERSION, '5.2.11', '<');
                 $compat = version_compare(PHP_VERSION, '5.1.2', '<=') &&
-                          version_compare(PHP_VERSION, '5.1.0', '>=');
+                    version_compare(PHP_VERSION, '5.1.0', '>=');
                 foreach ($funcs as $func) {
                     if ($buggy && is_array($func)) {
                         // :TRICKY: There are some compatibility issues and some
@@ -1126,9 +1096,6 @@ class HTMLPurifier_Bootstrap
         }
     }
 }
-
-
-
 
 
 /**
@@ -1163,13 +1130,6 @@ abstract class HTMLPurifier_Definition
     public $type;
 
     /**
-     * Sets up the definition object into the final form, something
-     * not done by the constructor
-     * @param HTMLPurifier_Config $config
-     */
-    abstract protected function doSetup($config);
-
-    /**
      * Setup function that aborts if already setup
      * @param HTMLPurifier_Config $config
      */
@@ -1181,10 +1141,14 @@ abstract class HTMLPurifier_Definition
         $this->setup = true;
         $this->doSetup($config);
     }
+
+    /**
+     * Sets up the definition object into the final form, something
+     * not done by the constructor
+     * @param HTMLPurifier_Config $config
+     */
+    abstract protected function doSetup($config);
 }
-
-
-
 
 
 /**
@@ -1193,7 +1157,6 @@ abstract class HTMLPurifier_Definition
  */
 class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
 {
-
     public $type = 'CSS';
 
     /**
@@ -1214,24 +1177,24 @@ class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
         );
 
         $border_style =
-            $this->info['border-bottom-style'] =
-            $this->info['border-right-style'] =
-            $this->info['border-left-style'] =
-            $this->info['border-top-style'] = new HTMLPurifier_AttrDef_Enum(
-                array(
-                    'none',
-                    'hidden',
-                    'dotted',
-                    'dashed',
-                    'solid',
-                    'double',
-                    'groove',
-                    'ridge',
-                    'inset',
-                    'outset'
-                ),
-                false
-            );
+        $this->info['border-bottom-style'] =
+        $this->info['border-right-style'] =
+        $this->info['border-left-style'] =
+        $this->info['border-top-style'] = new HTMLPurifier_AttrDef_Enum(
+            array(
+                'none',
+                'hidden',
+                'dotted',
+                'dashed',
+                'solid',
+                'double',
+                'groove',
+                'ridge',
+                'inset',
+                'outset'
+            ),
+            false
+        );
 
         $this->info['border-style'] = new HTMLPurifier_AttrDef_CSS_Multiple($border_style);
 
@@ -1297,31 +1260,31 @@ class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
         $this->info['background-position'] = new HTMLPurifier_AttrDef_CSS_BackgroundPosition();
 
         $border_color =
-            $this->info['border-top-color'] =
-            $this->info['border-bottom-color'] =
-            $this->info['border-left-color'] =
-            $this->info['border-right-color'] =
-            $this->info['background-color'] = new HTMLPurifier_AttrDef_CSS_Composite(
-                array(
-                    new HTMLPurifier_AttrDef_Enum(array('transparent')),
-                    new HTMLPurifier_AttrDef_CSS_Color()
-                )
-            );
+        $this->info['border-top-color'] =
+        $this->info['border-bottom-color'] =
+        $this->info['border-left-color'] =
+        $this->info['border-right-color'] =
+        $this->info['background-color'] = new HTMLPurifier_AttrDef_CSS_Composite(
+            array(
+                new HTMLPurifier_AttrDef_Enum(array('transparent')),
+                new HTMLPurifier_AttrDef_CSS_Color()
+            )
+        );
 
         $this->info['background'] = new HTMLPurifier_AttrDef_CSS_Background($config);
 
         $this->info['border-color'] = new HTMLPurifier_AttrDef_CSS_Multiple($border_color);
 
         $border_width =
-            $this->info['border-top-width'] =
-            $this->info['border-bottom-width'] =
-            $this->info['border-left-width'] =
-            $this->info['border-right-width'] = new HTMLPurifier_AttrDef_CSS_Composite(
-                array(
-                    new HTMLPurifier_AttrDef_Enum(array('thin', 'medium', 'thick')),
-                    new HTMLPurifier_AttrDef_CSS_Length('0') //disallow negative
-                )
-            );
+        $this->info['border-top-width'] =
+        $this->info['border-bottom-width'] =
+        $this->info['border-left-width'] =
+        $this->info['border-right-width'] = new HTMLPurifier_AttrDef_CSS_Composite(
+            array(
+                new HTMLPurifier_AttrDef_Enum(array('thin', 'medium', 'thick')),
+                new HTMLPurifier_AttrDef_CSS_Length('0') //disallow negative
+            )
+        );
 
         $this->info['border-width'] = new HTMLPurifier_AttrDef_CSS_Multiple($border_width);
 
@@ -1369,30 +1332,30 @@ class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
         );
 
         $margin =
-            $this->info['margin-top'] =
-            $this->info['margin-bottom'] =
-            $this->info['margin-left'] =
-            $this->info['margin-right'] = new HTMLPurifier_AttrDef_CSS_Composite(
-                array(
-                    new HTMLPurifier_AttrDef_CSS_Length(),
-                    new HTMLPurifier_AttrDef_CSS_Percentage(),
-                    new HTMLPurifier_AttrDef_Enum(array('auto'))
-                )
-            );
+        $this->info['margin-top'] =
+        $this->info['margin-bottom'] =
+        $this->info['margin-left'] =
+        $this->info['margin-right'] = new HTMLPurifier_AttrDef_CSS_Composite(
+            array(
+                new HTMLPurifier_AttrDef_CSS_Length(),
+                new HTMLPurifier_AttrDef_CSS_Percentage(),
+                new HTMLPurifier_AttrDef_Enum(array('auto'))
+            )
+        );
 
         $this->info['margin'] = new HTMLPurifier_AttrDef_CSS_Multiple($margin);
 
         // non-negative
         $padding =
-            $this->info['padding-top'] =
-            $this->info['padding-bottom'] =
-            $this->info['padding-left'] =
-            $this->info['padding-right'] = new HTMLPurifier_AttrDef_CSS_Composite(
-                array(
-                    new HTMLPurifier_AttrDef_CSS_Length('0'),
-                    new HTMLPurifier_AttrDef_CSS_Percentage(true)
-                )
-            );
+        $this->info['padding-top'] =
+        $this->info['padding-bottom'] =
+        $this->info['padding-left'] =
+        $this->info['padding-right'] = new HTMLPurifier_AttrDef_CSS_Composite(
+            array(
+                new HTMLPurifier_AttrDef_CSS_Length('0'),
+                new HTMLPurifier_AttrDef_CSS_Percentage(true)
+            )
+        );
 
         $this->info['padding'] = new HTMLPurifier_AttrDef_CSS_Multiple($padding);
 
@@ -1557,7 +1520,6 @@ class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
             )
         );
         $this->info['page-break-inside'] = new HTMLPurifier_AttrDef_Enum(array('auto', 'avoid'));
-
     }
 
     /**
@@ -1659,9 +1621,6 @@ class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
 }
 
 
-
-
-
 /**
  * Defines allowed child nodes and validates nodes against it.
  */
@@ -1712,9 +1671,6 @@ abstract class HTMLPurifier_ChildDef
 }
 
 
-
-
-
 /**
  * Configuration object that triggers customizable behavior.
  *
@@ -1746,26 +1702,6 @@ class HTMLPurifier_Config
     public $autoFinalize = true;
 
     // protected member variables
-
-    /**
-     * Namespace indexed array of serials for specific namespaces.
-     * @see getSerial() for more info.
-     * @type string[]
-     */
-    protected $serials = array();
-
-    /**
-     * Serial for entire configuration object.
-     * @type string
-     */
-    protected $serial;
-
-    /**
-     * Parser for variables.
-     * @type HTMLPurifier_VarParser_Flexible
-     */
-    protected $parser = null;
-
     /**
      * Reference HTMLPurifier_ConfigSchema for value checking.
      * @type HTMLPurifier_ConfigSchema
@@ -1773,31 +1709,6 @@ class HTMLPurifier_Config
      *       abuse!
      */
     public $def;
-
-    /**
-     * Indexed array of definitions.
-     * @type HTMLPurifier_Definition[]
-     */
-    protected $definitions;
-
-    /**
-     * Whether or not config is finalized.
-     * @type bool
-     */
-    protected $finalized = false;
-
-    /**
-     * Property list containing configuration directives.
-     * @type array
-     */
-    protected $plist;
-
-    /**
-     * Whether or not a set is taking place due to an alias lookup.
-     * @type bool
-     */
-    private $aliasMode;
-
     /**
      * Set to false if you do not want line and file numbers in errors.
      * (useful when unit testing).  This will also compress some errors
@@ -1805,7 +1716,42 @@ class HTMLPurifier_Config
      * @type bool
      */
     public $chatty = true;
-
+    /**
+     * Namespace indexed array of serials for specific namespaces.
+     * @see getSerial() for more info.
+     * @type string[]
+     */
+    protected $serials = array();
+    /**
+     * Serial for entire configuration object.
+     * @type string
+     */
+    protected $serial;
+    /**
+     * Parser for variables.
+     * @type HTMLPurifier_VarParser_Flexible
+     */
+    protected $parser = null;
+    /**
+     * Indexed array of definitions.
+     * @type HTMLPurifier_Definition[]
+     */
+    protected $definitions;
+    /**
+     * Whether or not config is finalized.
+     * @type bool
+     */
+    protected $finalized = false;
+    /**
+     * Property list containing configuration directives.
+     * @type array
+     */
+    protected $plist;
+    /**
+     * Whether or not a set is taking place due to an alias lookup.
+     * @type bool
+     */
+    private $aliasMode;
     /**
      * Current lock; only gets to this namespace are allowed.
      * @type string
@@ -1824,6 +1770,130 @@ class HTMLPurifier_Config
         $this->plist = new HTMLPurifier_PropertyList($parent);
         $this->def = $definition; // keep a copy around for checking
         $this->parser = new HTMLPurifier_VarParser_Flexible();
+    }
+
+    /**
+     * Creates a new config object that inherits from a previous one.
+     * @param HTMLPurifier_Config $config Configuration object to inherit from.
+     * @return HTMLPurifier_Config object with $config as its parent.
+     */
+    public static function inherit(HTMLPurifier_Config $config)
+    {
+        return new HTMLPurifier_Config($config->def, $config->plist);
+    }
+
+    /**
+     * Loads configuration values from $_GET/$_POST that were posted
+     * via ConfigForm
+     *
+     * @param array $array $_GET or $_POST array to import
+     * @param string|bool $index Index/name that the config variables are in
+     * @param array|bool $allowed List of allowed namespaces/directives
+     * @param bool $mq_fix Boolean whether or not to enable magic quotes fix
+     * @param HTMLPurifier_ConfigSchema $schema Schema to use, if not global copy
+     *
+     * @return mixed
+     */
+    public static function loadArrayFromForm($array, $index = false, $allowed = true, $mq_fix = true, $schema = null)
+    {
+        $ret = HTMLPurifier_Config::prepareArrayFromForm($array, $index, $allowed, $mq_fix, $schema);
+        $config = HTMLPurifier_Config::create($ret, $schema);
+        return $config;
+    }
+
+    /**
+     * Prepares an array from a form into something usable for the more
+     * strict parts of HTMLPurifier_Config
+     *
+     * @param array $array $_GET or $_POST array to import
+     * @param string|bool $index Index/name that the config variables are in
+     * @param array|bool $allowed List of allowed namespaces/directives
+     * @param bool $mq_fix Boolean whether or not to enable magic quotes fix
+     * @param HTMLPurifier_ConfigSchema $schema Schema to use, if not global copy
+     *
+     * @return array
+     */
+    public static function prepareArrayFromForm($array, $index = false, $allowed = true, $mq_fix = true, $schema = null)
+    {
+        if ($index !== false) {
+            $array = (isset($array[$index]) && is_array($array[$index])) ? $array[$index] : array();
+        }
+        $mq = $mq_fix && function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc();
+
+        $allowed = HTMLPurifier_Config::getAllowedDirectivesForForm($allowed, $schema);
+        $ret = array();
+        foreach ($allowed as $key) {
+            list($ns, $directive) = $key;
+            $skey = "$ns.$directive";
+            if (!empty($array["Null_$skey"])) {
+                $ret[$ns][$directive] = null;
+                continue;
+            }
+            if (!isset($array[$skey])) {
+                continue;
+            }
+            $value = $mq ? stripslashes($array[$skey]) : $array[$skey];
+            $ret[$ns][$directive] = $value;
+        }
+        return $ret;
+    }
+
+    /**
+     * Returns a list of array(namespace, directive) for all directives
+     * that are allowed in a web-form context as per an allowed
+     * namespaces/directives list.
+     *
+     * @param array $allowed List of allowed namespaces/directives
+     * @param HTMLPurifier_ConfigSchema $schema Schema to use, if not global copy
+     *
+     * @return array
+     */
+    public static function getAllowedDirectivesForForm($allowed, $schema = null)
+    {
+        if (!$schema) {
+            $schema = HTMLPurifier_ConfigSchema::instance();
+        }
+        if ($allowed !== true) {
+            if (is_string($allowed)) {
+                $allowed = array($allowed);
+            }
+            $allowed_ns = array();
+            $allowed_directives = array();
+            $blacklisted_directives = array();
+            foreach ($allowed as $ns_or_directive) {
+                if (strpos($ns_or_directive, '.') !== false) {
+                    // directive
+                    if ($ns_or_directive[0] == '-') {
+                        $blacklisted_directives[substr($ns_or_directive, 1)] = true;
+                    } else {
+                        $allowed_directives[$ns_or_directive] = true;
+                    }
+                } else {
+                    // namespace
+                    $allowed_ns[$ns_or_directive] = true;
+                }
+            }
+        }
+        $ret = array();
+        foreach ($schema->info as $key => $def) {
+            list($ns, $directive) = explode('.', $key, 2);
+            if ($allowed !== true) {
+                if (isset($blacklisted_directives["$ns.$directive"])) {
+                    continue;
+                }
+                if (!isset($allowed_directives["$ns.$directive"]) && !isset($allowed_ns[$ns])) {
+                    continue;
+                }
+            }
+            if (isset($def->isAlias)) {
+                continue;
+            }
+            if ($directive == 'DefinitionID' || $directive == 'DefinitionRev') {
+                continue;
+            }
+            $ret[] = array($ns, $directive);
+        }
+        return $ret;
     }
 
     /**
@@ -1848,18 +1918,10 @@ class HTMLPurifier_Config
         }
         if (is_string($config)) {
             $ret->loadIni($config);
-        } elseif (is_array($config)) $ret->loadArray($config);
+        } elseif (is_array($config)) {
+            $ret->loadArray($config);
+        }
         return $ret;
-    }
-
-    /**
-     * Creates a new config object that inherits from a previous one.
-     * @param HTMLPurifier_Config $config Configuration object to inherit from.
-     * @return HTMLPurifier_Config object with $config as its parent.
-     */
-    public static function inherit(HTMLPurifier_Config $config)
-    {
-        return new HTMLPurifier_Config($config->def, $config->plist);
     }
 
     /**
@@ -1874,131 +1936,42 @@ class HTMLPurifier_Config
     }
 
     /**
-     * Retrieves a value from the configuration.
+     * Loads configuration values from an ini file
      *
-     * @param string $key String key
-     * @param mixed $a
-     *
-     * @return mixed
+     * @param string $filename Name of ini file
      */
-    public function get($key, $a = null)
+    public function loadIni($filename)
     {
-        if ($a !== null) {
-            $this->triggerError(
-                "Using deprecated API: use \$config->get('$key.$a') instead",
-                E_USER_WARNING
-            );
-            $key = "$key.$a";
-        }
-        if (!$this->finalized) {
-            $this->autoFinalize();
-        }
-        if (!isset($this->def->info[$key])) {
-            // can't add % due to SimpleTest bug
-            $this->triggerError(
-                'Cannot retrieve value of undefined directive ' . htmlspecialchars($key),
-                E_USER_WARNING
-            );
+        if ($this->isFinalized('Cannot load directives after finalization')) {
             return;
         }
-        if (isset($this->def->info[$key]->isAlias)) {
-            $d = $this->def->info[$key];
-            $this->triggerError(
-                'Cannot get value from aliased directive, use real name ' . $d->key,
-                E_USER_ERROR
-            );
+        $array = parse_ini_file($filename, true);
+        $this->loadArray($array);
+    }
+
+    /**
+     * Loads configuration values from an array with the following structure:
+     * Namespace.Directive => Value
+     *
+     * @param array $config_array Configuration associative array
+     */
+    public function loadArray($config_array)
+    {
+        if ($this->isFinalized('Cannot load directives after finalization')) {
             return;
         }
-        if ($this->lock) {
-            list($ns) = explode('.', $key);
-            if ($ns !== $this->lock) {
-                $this->triggerError(
-                    'Cannot get value of namespace ' . $ns . ' when lock for ' .
-                    $this->lock .
-                    ' is active, this probably indicates a Definition setup method ' .
-                    'is accessing directives that are not within its namespace',
-                    E_USER_ERROR
-                );
-                return;
+        foreach ($config_array as $key => $value) {
+            $key = str_replace('_', '.', $key);
+            if (strpos($key, '.') !== false) {
+                $this->set($key, $value);
+            } else {
+                $namespace = $key;
+                $namespace_values = $value;
+                foreach ($namespace_values as $directive => $value2) {
+                    $this->set($namespace . '.' . $directive, $value2);
+                }
             }
         }
-        return $this->plist->get($key);
-    }
-
-    /**
-     * Retrieves an array of directives to values from a given namespace
-     *
-     * @param string $namespace String namespace
-     *
-     * @return array
-     */
-    public function getBatch($namespace)
-    {
-        if (!$this->finalized) {
-            $this->autoFinalize();
-        }
-        $full = $this->getAll();
-        if (!isset($full[$namespace])) {
-            $this->triggerError(
-                'Cannot retrieve undefined namespace ' .
-                htmlspecialchars($namespace),
-                E_USER_WARNING
-            );
-            return;
-        }
-        return $full[$namespace];
-    }
-
-    /**
-     * Returns a SHA-1 signature of a segment of the configuration object
-     * that uniquely identifies that particular configuration
-     *
-     * @param string $namespace Namespace to get serial for
-     *
-     * @return string
-     * @note Revision is handled specially and is removed from the batch
-     *       before processing!
-     */
-    public function getBatchSerial($namespace)
-    {
-        if (empty($this->serials[$namespace])) {
-            $batch = $this->getBatch($namespace);
-            unset($batch['DefinitionRev']);
-            $this->serials[$namespace] = sha1(serialize($batch));
-        }
-        return $this->serials[$namespace];
-    }
-
-    /**
-     * Returns a SHA-1 signature for the entire configuration object
-     * that uniquely identifies that particular configuration
-     *
-     * @return string
-     */
-    public function getSerial()
-    {
-        if (empty($this->serial)) {
-            $this->serial = sha1(serialize($this->getAll()));
-        }
-        return $this->serial;
-    }
-
-    /**
-     * Retrieves all directives, organized by namespace
-     *
-     * @warning This is a pretty inefficient function, avoid if you can
-     */
-    public function getAll()
-    {
-        if (!$this->finalized) {
-            $this->autoFinalize();
-        }
-        $ret = array();
-        foreach ($this->plist->squash() as $name => $value) {
-            list($ns, $key) = explode('.', $name, 2);
-            $ret[$ns][$key] = $value;
-        }
-        return $ret;
     }
 
     /**
@@ -2034,7 +2007,7 @@ class HTMLPurifier_Config
         if (isset($def->isAlias)) {
             if ($this->aliasMode) {
                 $this->triggerError(
-                    'Double-aliases not allowed, please fix '.
+                    'Double-aliases not allowed, please fix ' .
                     'ConfigSchema bug with' . $key,
                     E_USER_ERROR
                 );
@@ -2096,6 +2069,21 @@ class HTMLPurifier_Config
     }
 
     /**
+     * Checks whether or not the configuration object is finalized.
+     *
+     * @param string|bool $error String error message, or false for no error
+     *
+     * @return bool
+     */
+    public function isFinalized($error = false)
+    {
+        if ($this->finalized && $error) {
+            $this->triggerError($error, E_USER_ERROR);
+        }
+        return $this->finalized;
+    }
+
+    /**
      * Convenience function for error reporting
      *
      * @param array $lookup
@@ -2109,6 +2097,82 @@ class HTMLPurifier_Config
             $list[] = $name;
         }
         return implode(', ', $list);
+    }
+
+    /**
+     * Returns a SHA-1 signature of a segment of the configuration object
+     * that uniquely identifies that particular configuration
+     *
+     * @param string $namespace Namespace to get serial for
+     *
+     * @return string
+     * @note Revision is handled specially and is removed from the batch
+     *       before processing!
+     */
+    public function getBatchSerial($namespace)
+    {
+        if (empty($this->serials[$namespace])) {
+            $batch = $this->getBatch($namespace);
+            unset($batch['DefinitionRev']);
+            $this->serials[$namespace] = sha1(serialize($batch));
+        }
+        return $this->serials[$namespace];
+    }
+
+    /**
+     * Retrieves an array of directives to values from a given namespace
+     *
+     * @param string $namespace String namespace
+     *
+     * @return array
+     */
+    public function getBatch($namespace)
+    {
+        if (!$this->finalized) {
+            $this->autoFinalize();
+        }
+        $full = $this->getAll();
+        if (!isset($full[$namespace])) {
+            $this->triggerError(
+                'Cannot retrieve undefined namespace ' .
+                htmlspecialchars($namespace),
+                E_USER_WARNING
+            );
+            return;
+        }
+        return $full[$namespace];
+    }
+
+    /**
+     * Retrieves all directives, organized by namespace
+     *
+     * @warning This is a pretty inefficient function, avoid if you can
+     */
+    public function getAll()
+    {
+        if (!$this->finalized) {
+            $this->autoFinalize();
+        }
+        $ret = array();
+        foreach ($this->plist->squash() as $name => $value) {
+            list($ns, $key) = explode('.', $name, 2);
+            $ret[$ns][$key] = $value;
+        }
+        return $ret;
+    }
+
+    /**
+     * Returns a SHA-1 signature for the entire configuration object
+     * that uniquely identifies that particular configuration
+     *
+     * @return string
+     */
+    public function getSerial()
+    {
+        if (empty($this->serial)) {
+            $this->serial = sha1(serialize($this->getAll()));
+        }
+        return $this->serial;
     }
 
     /**
@@ -2128,44 +2192,6 @@ class HTMLPurifier_Config
     public function getHTMLDefinition($raw = false, $optimized = false)
     {
         return $this->getDefinition('HTML', $raw, $optimized);
-    }
-
-    /**
-     * Retrieves object reference to the CSS definition
-     *
-     * @param bool $raw Return a copy that has not been setup yet. Must be
-     *             called before it's been setup, otherwise won't work.
-     * @param bool $optimized If true, this method may return null, to
-     *             indicate that a cached version of the modified
-     *             definition object is available and no further edits
-     *             are necessary.  Consider using
-     *             maybeGetRawCSSDefinition, which is more explicitly
-     *             named, instead.
-     *
-     * @return HTMLPurifier_CSSDefinition
-     */
-    public function getCSSDefinition($raw = false, $optimized = false)
-    {
-        return $this->getDefinition('CSS', $raw, $optimized);
-    }
-
-    /**
-     * Retrieves object reference to the URI definition
-     *
-     * @param bool $raw Return a copy that has not been setup yet. Must be
-     *             called before it's been setup, otherwise won't work.
-     * @param bool $optimized If true, this method may return null, to
-     *             indicate that a cached version of the modified
-     *             definition object is available and no further edits
-     *             are necessary.  Consider using
-     *             maybeGetRawURIDefinition, which is more explicitly
-     *             named, instead.
-     *
-     * @return HTMLPurifier_URIDefinition
-     */
-    public function getURIDefinition($raw = false, $optimized = false)
-    {
-        return $this->getDefinition('URI', $raw, $optimized);
     }
 
     /**
@@ -2356,228 +2382,56 @@ class HTMLPurifier_Config
         return $def;
     }
 
-    public function maybeGetRawDefinition($name)
-    {
-        return $this->getDefinition($name, true, true);
-    }
-
-    public function maybeGetRawHTMLDefinition()
-    {
-        return $this->getDefinition('HTML', true, true);
-    }
-
-    public function maybeGetRawCSSDefinition()
-    {
-        return $this->getDefinition('CSS', true, true);
-    }
-
-    public function maybeGetRawURIDefinition()
-    {
-        return $this->getDefinition('URI', true, true);
-    }
-
     /**
-     * Loads configuration values from an array with the following structure:
-     * Namespace.Directive => Value
+     * Retrieves a value from the configuration.
      *
-     * @param array $config_array Configuration associative array
-     */
-    public function loadArray($config_array)
-    {
-        if ($this->isFinalized('Cannot load directives after finalization')) {
-            return;
-        }
-        foreach ($config_array as $key => $value) {
-            $key = str_replace('_', '.', $key);
-            if (strpos($key, '.') !== false) {
-                $this->set($key, $value);
-            } else {
-                $namespace = $key;
-                $namespace_values = $value;
-                foreach ($namespace_values as $directive => $value2) {
-                    $this->set($namespace .'.'. $directive, $value2);
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns a list of array(namespace, directive) for all directives
-     * that are allowed in a web-form context as per an allowed
-     * namespaces/directives list.
-     *
-     * @param array $allowed List of allowed namespaces/directives
-     * @param HTMLPurifier_ConfigSchema $schema Schema to use, if not global copy
-     *
-     * @return array
-     */
-    public static function getAllowedDirectivesForForm($allowed, $schema = null)
-    {
-        if (!$schema) {
-            $schema = HTMLPurifier_ConfigSchema::instance();
-        }
-        if ($allowed !== true) {
-            if (is_string($allowed)) {
-                $allowed = array($allowed);
-            }
-            $allowed_ns = array();
-            $allowed_directives = array();
-            $blacklisted_directives = array();
-            foreach ($allowed as $ns_or_directive) {
-                if (strpos($ns_or_directive, '.') !== false) {
-                    // directive
-                    if ($ns_or_directive[0] == '-') {
-                        $blacklisted_directives[substr($ns_or_directive, 1)] = true;
-                    } else {
-                        $allowed_directives[$ns_or_directive] = true;
-                    }
-                } else {
-                    // namespace
-                    $allowed_ns[$ns_or_directive] = true;
-                }
-            }
-        }
-        $ret = array();
-        foreach ($schema->info as $key => $def) {
-            list($ns, $directive) = explode('.', $key, 2);
-            if ($allowed !== true) {
-                if (isset($blacklisted_directives["$ns.$directive"])) {
-                    continue;
-                }
-                if (!isset($allowed_directives["$ns.$directive"]) && !isset($allowed_ns[$ns])) {
-                    continue;
-                }
-            }
-            if (isset($def->isAlias)) {
-                continue;
-            }
-            if ($directive == 'DefinitionID' || $directive == 'DefinitionRev') {
-                continue;
-            }
-            $ret[] = array($ns, $directive);
-        }
-        return $ret;
-    }
-
-    /**
-     * Loads configuration values from $_GET/$_POST that were posted
-     * via ConfigForm
-     *
-     * @param array $array $_GET or $_POST array to import
-     * @param string|bool $index Index/name that the config variables are in
-     * @param array|bool $allowed List of allowed namespaces/directives
-     * @param bool $mq_fix Boolean whether or not to enable magic quotes fix
-     * @param HTMLPurifier_ConfigSchema $schema Schema to use, if not global copy
+     * @param string $key String key
+     * @param mixed $a
      *
      * @return mixed
      */
-    public static function loadArrayFromForm($array, $index = false, $allowed = true, $mq_fix = true, $schema = null)
+    public function get($key, $a = null)
     {
-        $ret = HTMLPurifier_Config::prepareArrayFromForm($array, $index, $allowed, $mq_fix, $schema);
-        $config = HTMLPurifier_Config::create($ret, $schema);
-        return $config;
-    }
-
-    /**
-     * Merges in configuration values from $_GET/$_POST to object. NOT STATIC.
-     *
-     * @param array $array $_GET or $_POST array to import
-     * @param string|bool $index Index/name that the config variables are in
-     * @param array|bool $allowed List of allowed namespaces/directives
-     * @param bool $mq_fix Boolean whether or not to enable magic quotes fix
-     */
-    public function mergeArrayFromForm($array, $index = false, $allowed = true, $mq_fix = true)
-    {
-         $ret = HTMLPurifier_Config::prepareArrayFromForm($array, $index, $allowed, $mq_fix, $this->def);
-         $this->loadArray($ret);
-    }
-
-    /**
-     * Prepares an array from a form into something usable for the more
-     * strict parts of HTMLPurifier_Config
-     *
-     * @param array $array $_GET or $_POST array to import
-     * @param string|bool $index Index/name that the config variables are in
-     * @param array|bool $allowed List of allowed namespaces/directives
-     * @param bool $mq_fix Boolean whether or not to enable magic quotes fix
-     * @param HTMLPurifier_ConfigSchema $schema Schema to use, if not global copy
-     *
-     * @return array
-     */
-    public static function prepareArrayFromForm($array, $index = false, $allowed = true, $mq_fix = true, $schema = null)
-    {
-        if ($index !== false) {
-            $array = (isset($array[$index]) && is_array($array[$index])) ? $array[$index] : array();
+        if ($a !== null) {
+            $this->triggerError(
+                "Using deprecated API: use \$config->get('$key.$a') instead",
+                E_USER_WARNING
+            );
+            $key = "$key.$a";
         }
-        $mq = $mq_fix && function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc();
-
-        $allowed = HTMLPurifier_Config::getAllowedDirectivesForForm($allowed, $schema);
-        $ret = array();
-        foreach ($allowed as $key) {
-            list($ns, $directive) = $key;
-            $skey = "$ns.$directive";
-            if (!empty($array["Null_$skey"])) {
-                $ret[$ns][$directive] = null;
-                continue;
-            }
-            if (!isset($array[$skey])) {
-                continue;
-            }
-            $value = $mq ? stripslashes($array[$skey]) : $array[$skey];
-            $ret[$ns][$directive] = $value;
+        if (!$this->finalized) {
+            $this->autoFinalize();
         }
-        return $ret;
-    }
-
-    /**
-     * Loads configuration values from an ini file
-     *
-     * @param string $filename Name of ini file
-     */
-    public function loadIni($filename)
-    {
-        if ($this->isFinalized('Cannot load directives after finalization')) {
+        if (!isset($this->def->info[$key])) {
+            // can't add % due to SimpleTest bug
+            $this->triggerError(
+                'Cannot retrieve value of undefined directive ' . htmlspecialchars($key),
+                E_USER_WARNING
+            );
             return;
         }
-        $array = parse_ini_file($filename, true);
-        $this->loadArray($array);
-    }
-
-    /**
-     * Checks whether or not the configuration object is finalized.
-     *
-     * @param string|bool $error String error message, or false for no error
-     *
-     * @return bool
-     */
-    public function isFinalized($error = false)
-    {
-        if ($this->finalized && $error) {
-            $this->triggerError($error, E_USER_ERROR);
+        if (isset($this->def->info[$key]->isAlias)) {
+            $d = $this->def->info[$key];
+            $this->triggerError(
+                'Cannot get value from aliased directive, use real name ' . $d->key,
+                E_USER_ERROR
+            );
+            return;
         }
-        return $this->finalized;
-    }
-
-    /**
-     * Finalizes configuration only if auto finalize is on and not
-     * already finalized
-     */
-    public function autoFinalize()
-    {
-        if ($this->autoFinalize) {
-            $this->finalize();
-        } else {
-            $this->plist->squash(true);
+        if ($this->lock) {
+            list($ns) = explode('.', $key);
+            if ($ns !== $this->lock) {
+                $this->triggerError(
+                    'Cannot get value of namespace ' . $ns . ' when lock for ' .
+                    $this->lock .
+                    ' is active, this probably indicates a Definition setup method ' .
+                    'is accessing directives that are not within its namespace',
+                    E_USER_ERROR
+                );
+                return;
+            }
         }
-    }
-
-    /**
-     * Finalizes a configuration object, prohibiting further change
-     */
-    public function finalize()
-    {
-        $this->finalized = true;
-        $this->parser = null;
+        return $this->plist->get($key);
     }
 
     /**
@@ -2608,6 +2462,100 @@ class HTMLPurifier_Config
     }
 
     /**
+     * Finalizes configuration only if auto finalize is on and not
+     * already finalized
+     */
+    public function autoFinalize()
+    {
+        if ($this->autoFinalize) {
+            $this->finalize();
+        } else {
+            $this->plist->squash(true);
+        }
+    }
+
+    /**
+     * Finalizes a configuration object, prohibiting further change
+     */
+    public function finalize()
+    {
+        $this->finalized = true;
+        $this->parser = null;
+    }
+
+    /**
+     * Retrieves object reference to the CSS definition
+     *
+     * @param bool $raw Return a copy that has not been setup yet. Must be
+     *             called before it's been setup, otherwise won't work.
+     * @param bool $optimized If true, this method may return null, to
+     *             indicate that a cached version of the modified
+     *             definition object is available and no further edits
+     *             are necessary.  Consider using
+     *             maybeGetRawCSSDefinition, which is more explicitly
+     *             named, instead.
+     *
+     * @return HTMLPurifier_CSSDefinition
+     */
+    public function getCSSDefinition($raw = false, $optimized = false)
+    {
+        return $this->getDefinition('CSS', $raw, $optimized);
+    }
+
+    /**
+     * Retrieves object reference to the URI definition
+     *
+     * @param bool $raw Return a copy that has not been setup yet. Must be
+     *             called before it's been setup, otherwise won't work.
+     * @param bool $optimized If true, this method may return null, to
+     *             indicate that a cached version of the modified
+     *             definition object is available and no further edits
+     *             are necessary.  Consider using
+     *             maybeGetRawURIDefinition, which is more explicitly
+     *             named, instead.
+     *
+     * @return HTMLPurifier_URIDefinition
+     */
+    public function getURIDefinition($raw = false, $optimized = false)
+    {
+        return $this->getDefinition('URI', $raw, $optimized);
+    }
+
+    public function maybeGetRawDefinition($name)
+    {
+        return $this->getDefinition($name, true, true);
+    }
+
+    public function maybeGetRawHTMLDefinition()
+    {
+        return $this->getDefinition('HTML', true, true);
+    }
+
+    public function maybeGetRawCSSDefinition()
+    {
+        return $this->getDefinition('CSS', true, true);
+    }
+
+    public function maybeGetRawURIDefinition()
+    {
+        return $this->getDefinition('URI', true, true);
+    }
+
+    /**
+     * Merges in configuration values from $_GET/$_POST to object. NOT STATIC.
+     *
+     * @param array $array $_GET or $_POST array to import
+     * @param string|bool $index Index/name that the config variables are in
+     * @param array|bool $allowed List of allowed namespaces/directives
+     * @param bool $mq_fix Boolean whether or not to enable magic quotes fix
+     */
+    public function mergeArrayFromForm($array, $index = false, $allowed = true, $mq_fix = true)
+    {
+        $ret = HTMLPurifier_Config::prepareArrayFromForm($array, $index, $allowed, $mq_fix, $this->def);
+        $this->loadArray($ret);
+    }
+
+    /**
      * Returns a serialized form of the configuration object that can
      * be reconstituted.
      *
@@ -2620,11 +2568,7 @@ class HTMLPurifier_Config
         $this->getDefinition('URI');
         return serialize($this);
     }
-
 }
-
-
-
 
 
 /**
@@ -2633,18 +2577,21 @@ class HTMLPurifier_Config
 class HTMLPurifier_ConfigSchema
 {
     /**
+     * Application-wide singleton
+     * @type HTMLPurifier_ConfigSchema
+     */
+    protected static $singleton;
+    /**
      * Defaults of the directives and namespaces.
      * @type array
      * @note This shares the exact same structure as HTMLPurifier_Config::$conf
      */
     public $defaults = array();
-
     /**
      * The default property list. Do not edit this property list.
      * @type array
      */
     public $defaultPlist;
-
     /**
      * Definition of the directives.
      * The structure of this is:
@@ -2678,30 +2625,9 @@ class HTMLPurifier_ConfigSchema
      */
     public $info = array();
 
-    /**
-     * Application-wide singleton
-     * @type HTMLPurifier_ConfigSchema
-     */
-    protected static $singleton;
-
     public function __construct()
     {
         $this->defaultPlist = new HTMLPurifier_PropertyList();
-    }
-
-    /**
-     * Unserializes the default ConfigSchema.
-     * @return HTMLPurifier_ConfigSchema
-     */
-    public static function makeFromSerial()
-    {
-        $contents = file_get_contents(HTMLPURIFIER_PREFIX . '/HTMLPurifier/ConfigSchema/schema.ser');
-        $r = unserialize($contents);
-        if (!$r) {
-            $hash = sha1($contents);
-            trigger_error("Unserialization of configuration schema failed, sha1 of file was $hash", E_USER_ERROR);
-        }
-        return $r;
     }
 
     /**
@@ -2717,6 +2643,21 @@ class HTMLPurifier_ConfigSchema
             HTMLPurifier_ConfigSchema::$singleton = HTMLPurifier_ConfigSchema::makeFromSerial();
         }
         return HTMLPurifier_ConfigSchema::$singleton;
+    }
+
+    /**
+     * Unserializes the default ConfigSchema.
+     * @return HTMLPurifier_ConfigSchema
+     */
+    public static function makeFromSerial()
+    {
+        $contents = file_get_contents(HTMLPURIFIER_PREFIX . '/HTMLPurifier/ConfigSchema/schema.ser');
+        $r = unserialize($contents);
+        if (!$r) {
+            $hash = sha1($contents);
+            trigger_error("Unserialization of configuration schema failed, sha1 of file was $hash", E_USER_ERROR);
+        }
+        return $r;
     }
 
     /**
@@ -2791,17 +2732,14 @@ class HTMLPurifier_ConfigSchema
     public function postProcess()
     {
         foreach ($this->info as $key => $v) {
-            if (count((array) $v) == 1) {
+            if (count((array)$v) == 1) {
                 $this->info[$key] = $v->type;
-            } elseif (count((array) $v) == 2 && isset($v->allow_null)) {
+            } elseif (count((array)$v) == 2 && isset($v->allow_null)) {
                 $this->info[$key] = -$v->type;
             }
         }
     }
 }
-
-
-
 
 
 /**
@@ -2875,8 +2813,24 @@ class HTMLPurifier_ContentSets
         foreach ($this->lookup as $key => $lookup) {
             $this->info[$key] = implode(' | ', array_keys($lookup));
         }
-        $this->keys   = array_keys($this->info);
+        $this->keys = array_keys($this->info);
         $this->values = array_values($this->info);
+    }
+
+    /**
+     * Converts a string list of elements separated by pipes into
+     * a lookup array.
+     * @param string $string List of elements
+     * @return array Lookup array of elements
+     */
+    protected function convertToLookup($string)
+    {
+        $array = explode('|', str_replace(' ', '', $string));
+        $ret = array();
+        foreach ($array as $k) {
+            $ret[$k] = true;
+        }
+        return $ret;
     }
 
     /**
@@ -2903,11 +2857,6 @@ class HTMLPurifier_ContentSets
         $def->child = $this->getChildDef($def, $module);
     }
 
-    public function generateChildDefCallback($matches)
-    {
-        return $this->info[$matches[0]];
-    }
-
     /**
      * Instantiates a ChildDef based on content_model and content_model_type
      * member variables in HTMLPurifier_ElementDef
@@ -2922,7 +2871,7 @@ class HTMLPurifier_ContentSets
         $value = $def->content_model;
         if (is_object($value)) {
             trigger_error(
-                'Literal object child definitions should be stored in '.
+                'Literal object child definitions should be stored in ' .
                 'ElementDef->child not ElementDef->content_model',
                 E_USER_NOTICE
             );
@@ -2954,25 +2903,11 @@ class HTMLPurifier_ContentSets
         return false;
     }
 
-    /**
-     * Converts a string list of elements separated by pipes into
-     * a lookup array.
-     * @param string $string List of elements
-     * @return array Lookup array of elements
-     */
-    protected function convertToLookup($string)
+    public function generateChildDefCallback($matches)
     {
-        $array = explode('|', str_replace(' ', '', $string));
-        $ret = array();
-        foreach ($array as $k) {
-            $ret[$k] = true;
-        }
-        return $ret;
+        return $this->info[$matches[0]];
     }
 }
-
-
-
 
 
 /**
@@ -2990,23 +2925,6 @@ class HTMLPurifier_Context
      * @type array
      */
     private $_storage = array();
-
-    /**
-     * Registers a variable into the context.
-     * @param string $name String name
-     * @param mixed $ref Reference to variable to be registered
-     */
-    public function register($name, &$ref)
-    {
-        if (array_key_exists($name, $this->_storage)) {
-            trigger_error(
-                "Name $name produces collision, cannot re-register",
-                E_USER_ERROR
-            );
-            return;
-        }
-        $this->_storage[$name] =& $ref;
-    }
 
     /**
      * Retrieves a variable reference from the context.
@@ -3065,10 +2983,24 @@ class HTMLPurifier_Context
             $this->register($key, $context_array[$key]);
         }
     }
+
+    /**
+     * Registers a variable into the context.
+     * @param string $name String name
+     * @param mixed $ref Reference to variable to be registered
+     */
+    public function register($name, &$ref)
+    {
+        if (array_key_exists($name, $this->_storage)) {
+            trigger_error(
+                "Name $name produces collision, cannot re-register",
+                E_USER_ERROR
+            );
+            return;
+        }
+        $this->_storage[$name] =& $ref;
+    }
 }
-
-
-
 
 
 /**
@@ -3103,8 +3035,8 @@ abstract class HTMLPurifier_DefinitionCache
     public function generateKey($config)
     {
         return $config->version . ',' . // possibly replace with function calls
-               $config->getBatchSerial($this->type) . ',' .
-               $config->get($this->type . '.DefinitionRev');
+            $config->getBatchSerial($this->type) . ',' .
+            $config->get($this->type . '.DefinitionRev');
     }
 
     /**
@@ -3127,7 +3059,8 @@ abstract class HTMLPurifier_DefinitionCache
         }
         // versions match, ids match, check revision number
         if ($hash == $config->getBatchSerial($this->type) &&
-            $revision < $config->get($this->type . '.DefinitionRev')) {
+            $revision < $config->get($this->type . '.DefinitionRev')
+        ) {
             return true;
         }
         return false;
@@ -3198,9 +3131,6 @@ abstract class HTMLPurifier_DefinitionCache
 }
 
 
-
-
-
 /**
  * Responsible for creating definition caches.
  */
@@ -3222,14 +3152,6 @@ class HTMLPurifier_DefinitionCacheFactory
     protected $decorators = array();
 
     /**
-     * Initialize default decorators
-     */
-    public function setup()
-    {
-        $this->addDecorator('Cleanup');
-    }
-
-    /**
      * Retrieves an instance of global definition cache factory.
      * @param HTMLPurifier_DefinitionCacheFactory $prototype
      * @return HTMLPurifier_DefinitionCacheFactory
@@ -3244,6 +3166,27 @@ class HTMLPurifier_DefinitionCacheFactory
             $instance->setup();
         }
         return $instance;
+    }
+
+    /**
+     * Initialize default decorators
+     */
+    public function setup()
+    {
+        $this->addDecorator('Cleanup');
+    }
+
+    /**
+     * Registers a decorator to add to all new cache objects
+     * @param HTMLPurifier_DefinitionCache_Decorator|string $decorator An instance or the name of a decorator
+     */
+    public function addDecorator($decorator)
+    {
+        if (is_string($decorator)) {
+            $class = "HTMLPurifier_DefinitionCache_Decorator_$decorator";
+            $decorator = new $class;
+        }
+        $this->decorators[$decorator->name] = $decorator;
     }
 
     /**
@@ -3272,7 +3215,8 @@ class HTMLPurifier_DefinitionCacheFactory
             return $this->caches[$method][$type];
         }
         if (isset($this->implementations[$method]) &&
-            class_exists($class = $this->implementations[$method], false)) {
+            class_exists($class = $this->implementations[$method], false)
+        ) {
             $cache = new $class($type);
         } else {
             if ($method != 'Serializer') {
@@ -3289,23 +3233,7 @@ class HTMLPurifier_DefinitionCacheFactory
         $this->caches[$method][$type] = $cache;
         return $this->caches[$method][$type];
     }
-
-    /**
-     * Registers a decorator to add to all new cache objects
-     * @param HTMLPurifier_DefinitionCache_Decorator|string $decorator An instance or the name of a decorator
-     */
-    public function addDecorator($decorator)
-    {
-        if (is_string($decorator)) {
-            $class = "HTMLPurifier_DefinitionCache_Decorator_$decorator";
-            $decorator = new $class;
-        }
-        $this->decorators[$decorator->name] = $decorator;
-    }
 }
-
-
-
 
 
 /**
@@ -3367,19 +3295,17 @@ class HTMLPurifier_Doctype
         $aliases = array(),
         $dtd_public = null,
         $dtd_system = null
-    ) {
-        $this->name         = $name;
-        $this->xml          = $xml;
-        $this->modules      = $modules;
-        $this->tidyModules  = $tidyModules;
-        $this->aliases      = $aliases;
-        $this->dtdPublic    = $dtd_public;
-        $this->dtdSystem    = $dtd_system;
+    )
+    {
+        $this->name = $name;
+        $this->xml = $xml;
+        $this->modules = $modules;
+        $this->tidyModules = $tidyModules;
+        $this->aliases = $aliases;
+        $this->dtdPublic = $dtd_public;
+        $this->dtdSystem = $dtd_system;
     }
 }
-
-
-
 
 
 class HTMLPurifier_DoctypeRegistry
@@ -3418,7 +3344,8 @@ class HTMLPurifier_DoctypeRegistry
         $aliases = array(),
         $dtd_public = null,
         $dtd_system = null
-    ) {
+    )
+    {
         if (!is_array($modules)) {
             $modules = array($modules);
         }
@@ -3456,6 +3383,21 @@ class HTMLPurifier_DoctypeRegistry
     }
 
     /**
+     * Creates a doctype based on a configuration object,
+     * will perform initialization on the doctype
+     * @note Use this function to get a copy of doctype that config
+     *       can hold on to (this is necessary in order to tell
+     *       Generator whether or not the current document is XML
+     *       based or not).
+     * @param HTMLPurifier_Config $config
+     * @return HTMLPurifier_Doctype
+     */
+    public function make($config)
+    {
+        return clone $this->get($this->getDoctypeFromConfig($config));
+    }
+
+    /**
      * Retrieves reference to a doctype of a certain name
      * @note This function resolves aliases
      * @note When possible, use the more fully-featured make()
@@ -3473,21 +3415,6 @@ class HTMLPurifier_DoctypeRegistry
             return $anon;
         }
         return $this->doctypes[$doctype];
-    }
-
-    /**
-     * Creates a doctype based on a configuration object,
-     * will perform initialization on the doctype
-     * @note Use this function to get a copy of doctype that config
-     *       can hold on to (this is necessary in order to tell
-     *       Generator whether or not the current document is XML
-     *       based or not).
-     * @param HTMLPurifier_Config $config
-     * @return HTMLPurifier_Doctype
-     */
-    public function make($config)
-    {
-        return clone $this->get($this->getDoctypeFromConfig($config));
     }
 
     /**
@@ -3520,9 +3447,6 @@ class HTMLPurifier_DoctypeRegistry
         return $doctype;
     }
 }
-
-
-
 
 
 /**
@@ -3739,15 +3663,21 @@ class HTMLPurifier_ElementDef
 }
 
 
-
-
-
 /**
  * A UTF-8 specific character encoder that handles cleaning and transforming.
  * @note All functions in this class should be static.
  */
 class HTMLPurifier_Encoder
 {
+
+    /** No bugs detected in iconv. */
+    const ICONV_OK = 0;
+    /** Iconv truncates output if converting from UTF-8 to another
+     *  character set with //IGNORE, and a non-encodable character is found */
+    const ICONV_TRUNCATES = 1;
+    /** Iconv does not support //IGNORE, making it unusable for
+     *  transcoding purposes */
+    const ICONV_UNUSABLE = 2;
 
     /**
      * Constructor throws fatal error if you attempt to instantiate class
@@ -3765,78 +3695,30 @@ class HTMLPurifier_Encoder
     }
 
     /**
-     * iconv wrapper which mutes errors, but doesn't work around bugs.
-     * @param string $in Input encoding
-     * @param string $out Output encoding
-     * @param string $text The text to convert
-     * @return string
+     * Translates a Unicode codepoint into its corresponding UTF-8 character.
+     * @note Based on Feyd's function at
+     *       <http://forums.devnetwork.net/viewtopic.php?p=191404#191404>,
+     *       which is in public domain.
+     * @note While we're going to do code point parsing anyway, a good
+     *       optimization would be to refuse to translate code points that
+     *       are non-SGML characters.  However, this could lead to duplication.
+     * @note This is very similar to the unichr function in
+     *       maintenance/generate-entity-file.php (although this is superior,
+     *       due to its sanity checks).
      */
-    public static function unsafeIconv($in, $out, $text)
-    {
-        set_error_handler(array('HTMLPurifier_Encoder', 'muteErrorHandler'));
-        $r = iconv($in, $out, $text);
-        restore_error_handler();
-        return $r;
-    }
 
-    /**
-     * iconv wrapper which mutes errors and works around bugs.
-     * @param string $in Input encoding
-     * @param string $out Output encoding
-     * @param string $text The text to convert
-     * @param int $max_chunk_size
-     * @return string
-     */
-    public static function iconv($in, $out, $text, $max_chunk_size = 8000)
-    {
-        $code = self::testIconvTruncateBug();
-        if ($code == self::ICONV_OK) {
-            return self::unsafeIconv($in, $out, $text);
-        } elseif ($code == self::ICONV_TRUNCATES) {
-            // we can only work around this if the input character set
-            // is utf-8
-            if ($in == 'utf-8') {
-                if ($max_chunk_size < 4) {
-                    trigger_error('max_chunk_size is too small', E_USER_WARNING);
-                    return false;
-                }
-                // split into 8000 byte chunks, but be careful to handle
-                // multibyte boundaries properly
-                if (($c = strlen($text)) <= $max_chunk_size) {
-                    return self::unsafeIconv($in, $out, $text);
-                }
-                $r = '';
-                $i = 0;
-                while (true) {
-                    if ($i + $max_chunk_size >= $c) {
-                        $r .= self::unsafeIconv($in, $out, substr($text, $i));
-                        break;
-                    }
-                    // wibble the boundary
-                    if (0x80 != (0xC0 & ord($text[$i + $max_chunk_size]))) {
-                        $chunk_size = $max_chunk_size;
-                    } elseif (0x80 != (0xC0 & ord($text[$i + $max_chunk_size - 1]))) {
-                        $chunk_size = $max_chunk_size - 1;
-                    } elseif (0x80 != (0xC0 & ord($text[$i + $max_chunk_size - 2]))) {
-                        $chunk_size = $max_chunk_size - 2;
-                    } elseif (0x80 != (0xC0 & ord($text[$i + $max_chunk_size - 3]))) {
-                        $chunk_size = $max_chunk_size - 3;
-                    } else {
-                        return false; // rather confusing UTF-8...
-                    }
-                    $chunk = substr($text, $i, $chunk_size); // substr doesn't mind overlong lengths
-                    $r .= self::unsafeIconv($in, $out, $chunk);
-                    $i += $chunk_size;
-                }
-                return $r;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
+    // +----------+----------+----------+----------+
+    // | 33222222 | 22221111 | 111111   |          |
+    // | 10987654 | 32109876 | 54321098 | 76543210 | bit
+    // +----------+----------+----------+----------+
+    // |          |          |          | 0xxxxxxx | 1 byte 0x00000000..0x0000007F
+    // |          |          | 110yyyyy | 10xxxxxx | 2 byte 0x00000080..0x000007FF
+    // |          | 1110zzzz | 10yyyyyy | 10xxxxxx | 3 byte 0x00000800..0x0000FFFF
+    // | 11110www | 10wwzzzz | 10yyyyyy | 10xxxxxx | 4 byte 0x00010000..0x0010FFFF
+    // +----------+----------+----------+----------+
+    // | 00000000 | 00011111 | 11111111 | 11111111 | Theoretical upper limit of legal scalars: 2097151 (0x001FFFFF)
+    // | 00000000 | 00010000 | 11111111 | 11111111 | Defined upper limit of legal scalar codes
+    // +----------+----------+----------+----------+
     /**
      * Cleans a UTF-8 string for well-formedness and SGML validity
      *
@@ -3881,8 +3763,8 @@ class HTMLPurifier_Encoder
         }
 
         $mState = 0; // cached expected number of octets after the current octet
-                     // until the beginning of the next UTF8 character sequence
-        $mUcs4  = 0; // cached Unicode character
+        // until the beginning of the next UTF8 character sequence
+        $mUcs4 = 0; // cached Unicode character
         $mBytes = 1; // cached expected number of octets in the current sequence
 
         // original code involved an $out that was an array of Unicode
@@ -3956,7 +3838,7 @@ class HTMLPurifier_Encoder
                     // Current octet is neither in the US-ASCII range nor a
                     // legal first octet of a multi-octet sequence.
                     $mState = 0;
-                    $mUcs4  = 0;
+                    $mUcs4 = 0;
                     $mBytes = 1;
                     $char = '';
                 }
@@ -3986,7 +3868,6 @@ class HTMLPurifier_Encoder
                             // Codepoints outside the Unicode range are illegal
                             ($mUcs4 > 0x10FFFF)
                         ) {
-
                         } elseif (0xFEFF != $mUcs4 && // omit BOM
                             // check for valid Char unicode codepoints
                             (
@@ -4004,7 +3885,7 @@ class HTMLPurifier_Encoder
                         }
                         // initialize UTF8 cache (reset)
                         $mState = 0;
-                        $mUcs4  = 0;
+                        $mUcs4 = 0;
                         $mBytes = 1;
                         $char = '';
                     }
@@ -4013,45 +3894,22 @@ class HTMLPurifier_Encoder
                     // Incomplete multi-octet sequence.
                     // used to result in complete fail, but we'll reset
                     $mState = 0;
-                    $mUcs4  = 0;
+                    $mUcs4 = 0;
                     $mBytes = 1;
-                    $char ='';
+                    $char = '';
                 }
             }
         }
         return $out;
     }
 
-    /**
-     * Translates a Unicode codepoint into its corresponding UTF-8 character.
-     * @note Based on Feyd's function at
-     *       <http://forums.devnetwork.net/viewtopic.php?p=191404#191404>,
-     *       which is in public domain.
-     * @note While we're going to do code point parsing anyway, a good
-     *       optimization would be to refuse to translate code points that
-     *       are non-SGML characters.  However, this could lead to duplication.
-     * @note This is very similar to the unichr function in
-     *       maintenance/generate-entity-file.php (although this is superior,
-     *       due to its sanity checks).
-     */
 
-    // +----------+----------+----------+----------+
-    // | 33222222 | 22221111 | 111111   |          |
-    // | 10987654 | 32109876 | 54321098 | 76543210 | bit
-    // +----------+----------+----------+----------+
-    // |          |          |          | 0xxxxxxx | 1 byte 0x00000000..0x0000007F
-    // |          |          | 110yyyyy | 10xxxxxx | 2 byte 0x00000080..0x000007FF
-    // |          | 1110zzzz | 10yyyyyy | 10xxxxxx | 3 byte 0x00000800..0x0000FFFF
-    // | 11110www | 10wwzzzz | 10yyyyyy | 10xxxxxx | 4 byte 0x00010000..0x0010FFFF
-    // +----------+----------+----------+----------+
-    // | 00000000 | 00011111 | 11111111 | 11111111 | Theoretical upper limit of legal scalars: 2097151 (0x001FFFFF)
-    // | 00000000 | 00010000 | 11111111 | 11111111 | Defined upper limit of legal scalar codes
-    // +----------+----------+----------+----------+
 
     public static function unichr($code)
     {
         if ($code > 1114111 or $code < 0 or
-          ($code >= 55296 and $code <= 57343) ) {
+            ($code >= 55296 and $code <= 57343)
+        ) {
             // bits are set outside the "valid" range as defined
             // by UNICODE 4.1.0
             return '';
@@ -4072,7 +3930,7 @@ class HTMLPurifier_Encoder
                     $z = (($code >> 12) & 15) | 224;
                 } else {
                     $z = (($code >> 12) & 63) | 128;
-                    $w = (($code >> 18) & 7)  | 240;
+                    $w = (($code >> 18) & 7) | 240;
                 }
             }
         }
@@ -4090,18 +3948,6 @@ class HTMLPurifier_Encoder
         $ret .= chr($x);
 
         return $ret;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function iconvAvailable()
-    {
-        static $iconv = null;
-        if ($iconv === null) {
-            $iconv = function_exists('iconv') && self::testIconvTruncateBug() != self::ICONV_UNUSABLE;
-        }
-        return $iconv;
     }
 
     /**
@@ -4148,6 +3994,126 @@ class HTMLPurifier_Encoder
                 E_USER_ERROR
             );
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public static function iconvAvailable()
+    {
+        static $iconv = null;
+        if ($iconv === null) {
+            $iconv = function_exists('iconv') && self::testIconvTruncateBug() != self::ICONV_UNUSABLE;
+        }
+        return $iconv;
+    }
+
+    /**
+     * glibc iconv has a known bug where it doesn't handle the magic
+     * //IGNORE stanza correctly.  In particular, rather than ignore
+     * characters, it will return an EILSEQ after consuming some number
+     * of characters, and expect you to restart iconv as if it were
+     * an E2BIG.  Old versions of PHP did not respect the errno, and
+     * returned the fragment, so as a result you would see iconv
+     * mysteriously truncating output. We can work around this by
+     * manually chopping our input into segments of about 8000
+     * characters, as long as PHP ignores the error code.  If PHP starts
+     * paying attention to the error code, iconv becomes unusable.
+     *
+     * @return int Error code indicating severity of bug.
+     */
+    public static function testIconvTruncateBug()
+    {
+        static $code = null;
+        if ($code === null) {
+            // better not use iconv, otherwise infinite loop!
+            $r = self::unsafeIconv('utf-8', 'ascii//IGNORE', "\xCE\xB1" . str_repeat('a', 9000));
+            if ($r === false) {
+                $code = self::ICONV_UNUSABLE;
+            } elseif (($c = strlen($r)) < 9000) {
+                $code = self::ICONV_TRUNCATES;
+            } elseif ($c > 9000) {
+                trigger_error(
+                    'Your copy of iconv is extremely buggy. Please notify HTML Purifier maintainers: ' .
+                    'include your iconv version as per phpversion()',
+                    E_USER_ERROR
+                );
+            } else {
+                $code = self::ICONV_OK;
+            }
+        }
+        return $code;
+    }
+
+    /**
+     * iconv wrapper which mutes errors, but doesn't work around bugs.
+     * @param string $in Input encoding
+     * @param string $out Output encoding
+     * @param string $text The text to convert
+     * @return string
+     */
+    public static function unsafeIconv($in, $out, $text)
+    {
+        set_error_handler(array('HTMLPurifier_Encoder', 'muteErrorHandler'));
+        $r = iconv($in, $out, $text);
+        restore_error_handler();
+        return $r;
+    }
+
+    /**
+     * This expensive function tests whether or not a given character
+     * encoding supports ASCII. 7/8-bit encodings like Shift_JIS will
+     * fail this test, and require special processing. Variable width
+     * encodings shouldn't ever fail.
+     *
+     * @param string $encoding Encoding name to test, as per iconv format
+     * @param bool $bypass Whether or not to bypass the precompiled arrays.
+     * @return Array of UTF-8 characters to their corresponding ASCII,
+     *      which can be used to "undo" any overzealous iconv action.
+     */
+    public static function testEncodingSupportsASCII($encoding, $bypass = false)
+    {
+        // All calls to iconv here are unsafe, proof by case analysis:
+        // If ICONV_OK, no difference.
+        // If ICONV_TRUNCATE, all calls involve one character inputs,
+        // so bug is not triggered.
+        // If ICONV_UNUSABLE, this call is irrelevant
+        static $encodings = array();
+        if (!$bypass) {
+            if (isset($encodings[$encoding])) {
+                return $encodings[$encoding];
+            }
+            $lenc = strtolower($encoding);
+            switch ($lenc) {
+                case 'shift_jis':
+                    return array("\xC2\xA5" => '\\', "\xE2\x80\xBE" => '~');
+                case 'johab':
+                    return array("\xE2\x82\xA9" => '\\');
+            }
+            if (strpos($lenc, 'iso-8859-') === 0) {
+                return array();
+            }
+        }
+        $ret = array();
+        if (self::unsafeIconv('UTF-8', $encoding, 'a') === false) {
+            return false;
+        }
+        for ($i = 0x20; $i <= 0x7E; $i++) { // all printable ASCII chars
+            $c = chr($i); // UTF-8 char
+            $r = self::unsafeIconv('UTF-8', "$encoding//IGNORE", $c); // initial conversion
+            if ($r === '' ||
+                // This line is needed for iconv implementations that do not
+                // omit characters that do not exist in the target character set
+                ($r === $c && self::unsafeIconv($encoding, 'UTF-8//IGNORE', $r) !== $c)
+            ) {
+                // Reverse engineer: what's the UTF-8 equiv of this byte
+                // sequence? This assumes that there's no variable width
+                // encoding that doesn't support ASCII.
+                $ret[self::unsafeIconv($encoding, 'UTF-8//IGNORE', $c)] = $c;
+            }
+        }
+        $encodings[$encoding] = $ret;
+        return $ret;
     }
 
     /**
@@ -4245,113 +4211,64 @@ class HTMLPurifier_Encoder
         return $result;
     }
 
-    /** No bugs detected in iconv. */
-    const ICONV_OK = 0;
-
-    /** Iconv truncates output if converting from UTF-8 to another
-     *  character set with //IGNORE, and a non-encodable character is found */
-    const ICONV_TRUNCATES = 1;
-
-    /** Iconv does not support //IGNORE, making it unusable for
-     *  transcoding purposes */
-    const ICONV_UNUSABLE = 2;
-
     /**
-     * glibc iconv has a known bug where it doesn't handle the magic
-     * //IGNORE stanza correctly.  In particular, rather than ignore
-     * characters, it will return an EILSEQ after consuming some number
-     * of characters, and expect you to restart iconv as if it were
-     * an E2BIG.  Old versions of PHP did not respect the errno, and
-     * returned the fragment, so as a result you would see iconv
-     * mysteriously truncating output. We can work around this by
-     * manually chopping our input into segments of about 8000
-     * characters, as long as PHP ignores the error code.  If PHP starts
-     * paying attention to the error code, iconv becomes unusable.
-     *
-     * @return int Error code indicating severity of bug.
+     * iconv wrapper which mutes errors and works around bugs.
+     * @param string $in Input encoding
+     * @param string $out Output encoding
+     * @param string $text The text to convert
+     * @param int $max_chunk_size
+     * @return string
      */
-    public static function testIconvTruncateBug()
+    public static function iconv($in, $out, $text, $max_chunk_size = 8000)
     {
-        static $code = null;
-        if ($code === null) {
-            // better not use iconv, otherwise infinite loop!
-            $r = self::unsafeIconv('utf-8', 'ascii//IGNORE', "\xCE\xB1" . str_repeat('a', 9000));
-            if ($r === false) {
-                $code = self::ICONV_UNUSABLE;
-            } elseif (($c = strlen($r)) < 9000) {
-                $code = self::ICONV_TRUNCATES;
-            } elseif ($c > 9000) {
-                trigger_error(
-                    'Your copy of iconv is extremely buggy. Please notify HTML Purifier maintainers: ' .
-                    'include your iconv version as per phpversion()',
-                    E_USER_ERROR
-                );
+        $code = self::testIconvTruncateBug();
+        if ($code == self::ICONV_OK) {
+            return self::unsafeIconv($in, $out, $text);
+        } elseif ($code == self::ICONV_TRUNCATES) {
+            // we can only work around this if the input character set
+            // is utf-8
+            if ($in == 'utf-8') {
+                if ($max_chunk_size < 4) {
+                    trigger_error('max_chunk_size is too small', E_USER_WARNING);
+                    return false;
+                }
+                // split into 8000 byte chunks, but be careful to handle
+                // multibyte boundaries properly
+                if (($c = strlen($text)) <= $max_chunk_size) {
+                    return self::unsafeIconv($in, $out, $text);
+                }
+                $r = '';
+                $i = 0;
+                while (true) {
+                    if ($i + $max_chunk_size >= $c) {
+                        $r .= self::unsafeIconv($in, $out, substr($text, $i));
+                        break;
+                    }
+                    // wibble the boundary
+                    if (0x80 != (0xC0 & ord($text[$i + $max_chunk_size]))) {
+                        $chunk_size = $max_chunk_size;
+                    } elseif (0x80 != (0xC0 & ord($text[$i + $max_chunk_size - 1]))) {
+                        $chunk_size = $max_chunk_size - 1;
+                    } elseif (0x80 != (0xC0 & ord($text[$i + $max_chunk_size - 2]))) {
+                        $chunk_size = $max_chunk_size - 2;
+                    } elseif (0x80 != (0xC0 & ord($text[$i + $max_chunk_size - 3]))) {
+                        $chunk_size = $max_chunk_size - 3;
+                    } else {
+                        return false; // rather confusing UTF-8...
+                    }
+                    $chunk = substr($text, $i, $chunk_size); // substr doesn't mind overlong lengths
+                    $r .= self::unsafeIconv($in, $out, $chunk);
+                    $i += $chunk_size;
+                }
+                return $r;
             } else {
-                $code = self::ICONV_OK;
+                return false;
             }
-        }
-        return $code;
-    }
-
-    /**
-     * This expensive function tests whether or not a given character
-     * encoding supports ASCII. 7/8-bit encodings like Shift_JIS will
-     * fail this test, and require special processing. Variable width
-     * encodings shouldn't ever fail.
-     *
-     * @param string $encoding Encoding name to test, as per iconv format
-     * @param bool $bypass Whether or not to bypass the precompiled arrays.
-     * @return Array of UTF-8 characters to their corresponding ASCII,
-     *      which can be used to "undo" any overzealous iconv action.
-     */
-    public static function testEncodingSupportsASCII($encoding, $bypass = false)
-    {
-        // All calls to iconv here are unsafe, proof by case analysis:
-        // If ICONV_OK, no difference.
-        // If ICONV_TRUNCATE, all calls involve one character inputs,
-        // so bug is not triggered.
-        // If ICONV_UNUSABLE, this call is irrelevant
-        static $encodings = array();
-        if (!$bypass) {
-            if (isset($encodings[$encoding])) {
-                return $encodings[$encoding];
-            }
-            $lenc = strtolower($encoding);
-            switch ($lenc) {
-                case 'shift_jis':
-                    return array("\xC2\xA5" => '\\', "\xE2\x80\xBE" => '~');
-                case 'johab':
-                    return array("\xE2\x82\xA9" => '\\');
-            }
-            if (strpos($lenc, 'iso-8859-') === 0) {
-                return array();
-            }
-        }
-        $ret = array();
-        if (self::unsafeIconv('UTF-8', $encoding, 'a') === false) {
+        } else {
             return false;
         }
-        for ($i = 0x20; $i <= 0x7E; $i++) { // all printable ASCII chars
-            $c = chr($i); // UTF-8 char
-            $r = self::unsafeIconv('UTF-8', "$encoding//IGNORE", $c); // initial conversion
-            if ($r === '' ||
-                // This line is needed for iconv implementations that do not
-                // omit characters that do not exist in the target character set
-                ($r === $c && self::unsafeIconv($encoding, 'UTF-8//IGNORE', $r) !== $c)
-            ) {
-                // Reverse engineer: what's the UTF-8 equiv of this byte
-                // sequence? This assumes that there's no variable width
-                // encoding that doesn't support ASCII.
-                $ret[self::unsafeIconv($encoding, 'UTF-8//IGNORE', $c)] = $c;
-            }
-        }
-        $encodings[$encoding] = $ret;
-        return $ret;
     }
 }
-
-
-
 
 
 /**
@@ -4364,21 +4281,6 @@ class HTMLPurifier_EntityLookup
      * @type array
      */
     public $table;
-
-    /**
-     * Sets up the entity lookup table from the serialized file contents.
-     * @param bool $file
-     * @note The serialized contents are versioned, but were generated
-     *       using the maintenance script generate_entity_file.php
-     * @warning This is not in constructor to help enforce the Singleton
-     */
-    public function setup($file = false)
-    {
-        if (!$file) {
-            $file = HTMLPURIFIER_PREFIX . '/HTMLPurifier/EntityLookup/entities.ser';
-        }
-        $this->table = unserialize(file_get_contents($file));
-    }
 
     /**
      * Retrieves sole instance of the object.
@@ -4397,10 +4299,22 @@ class HTMLPurifier_EntityLookup
         }
         return $instance;
     }
+
+    /**
+     * Sets up the entity lookup table from the serialized file contents.
+     * @param bool $file
+     * @note The serialized contents are versioned, but were generated
+     *       using the maintenance script generate_entity_file.php
+     * @warning This is not in constructor to help enforce the Singleton
+     */
+    public function setup($file = false)
+    {
+        if (!$file) {
+            $file = HTMLPURIFIER_PREFIX . '/HTMLPurifier/EntityLookup/entities.ser';
+        }
+        $this->table = unserialize(file_get_contents($file));
+    }
 }
-
-
-
 
 
 // if want to implement error collecting here, we'll need to use some sort
@@ -4425,32 +4339,32 @@ class HTMLPurifier_EntityParser
      */
     protected $_substituteEntitiesRegex =
         '/&(?:[#]x([a-fA-F0-9]+)|[#]0*(\d+)|([A-Za-z_:][A-Za-z0-9.\-_:]*));?/';
-        //     1. hex             2. dec      3. string (XML style)
+    //     1. hex             2. dec      3. string (XML style)
 
     /**
      * Decimal to parsed string conversion table for special entities.
      * @type array
      */
     protected $_special_dec2str =
-            array(
-                    34 => '"',
-                    38 => '&',
-                    39 => "'",
-                    60 => '<',
-                    62 => '>'
-            );
+        array(
+            34 => '"',
+            38 => '&',
+            39 => "'",
+            60 => '<',
+            62 => '>'
+        );
 
     /**
      * Stripped entity names to decimal conversion table for special entities.
      * @type array
      */
     protected $_special_ent2dec =
-            array(
-                    'quot' => 34,
-                    'amp'  => 38,
-                    'lt'   => 60,
-                    'gt'   => 62
-            );
+        array(
+            'quot' => 34,
+            'amp' => 38,
+            'lt' => 60,
+            'gt' => 62
+        );
 
     /**
      * Substitutes non-special entities with their parsed equivalents. Since
@@ -4468,43 +4382,6 @@ class HTMLPurifier_EntityParser
             array($this, 'nonSpecialEntityCallback'),
             $string
         );
-    }
-
-    /**
-     * Callback function for substituteNonSpecialEntities() that does the work.
-     *
-     * @param array $matches  PCRE matches array, with 0 the entire match, and
-     *                  either index 1, 2 or 3 set with a hex value, dec value,
-     *                  or string (respectively).
-     * @return string Replacement string.
-     */
-
-    protected function nonSpecialEntityCallback($matches)
-    {
-        // replaces all but big five
-        $entity = $matches[0];
-        $is_num = (@$matches[0][1] === '#');
-        if ($is_num) {
-            $is_hex = (@$entity[2] === 'x');
-            $code = $is_hex ? hexdec($matches[1]) : (int) $matches[2];
-            // abort for special characters
-            if (isset($this->_special_dec2str[$code])) {
-                return $entity;
-            }
-            return HTMLPurifier_Encoder::unichr($code);
-        } else {
-            if (isset($this->_special_ent2dec[$matches[3]])) {
-                return $entity;
-            }
-            if (!$this->_entity_lookup) {
-                $this->_entity_lookup = HTMLPurifier_EntityLookup::instance();
-            }
-            if (isset($this->_entity_lookup->table[$matches[3]])) {
-                return $this->_entity_lookup->table[$matches[3]];
-            } else {
-                return $entity;
-            }
-        }
     }
 
     /**
@@ -4526,11 +4403,48 @@ class HTMLPurifier_EntityParser
     }
 
     /**
+     * Callback function for substituteNonSpecialEntities() that does the work.
+     *
+     * @param array $matches PCRE matches array, with 0 the entire match, and
+     *                  either index 1, 2 or 3 set with a hex value, dec value,
+     *                  or string (respectively).
+     * @return string Replacement string.
+     */
+
+    protected function nonSpecialEntityCallback($matches)
+    {
+        // replaces all but big five
+        $entity = $matches[0];
+        $is_num = (@$matches[0][1] === '#');
+        if ($is_num) {
+            $is_hex = (@$entity[2] === 'x');
+            $code = $is_hex ? hexdec($matches[1]) : (int)$matches[2];
+            // abort for special characters
+            if (isset($this->_special_dec2str[$code])) {
+                return $entity;
+            }
+            return HTMLPurifier_Encoder::unichr($code);
+        } else {
+            if (isset($this->_special_ent2dec[$matches[3]])) {
+                return $entity;
+            }
+            if (!$this->_entity_lookup) {
+                $this->_entity_lookup = HTMLPurifier_EntityLookup::instance();
+            }
+            if (isset($this->_entity_lookup->table[$matches[3]])) {
+                return $this->_entity_lookup->table[$matches[3]];
+            } else {
+                return $entity;
+            }
+        }
+    }
+
+    /**
      * Callback function for substituteSpecialEntities() that does the work.
      *
      * This callback has same syntax as nonSpecialEntityCallback().
      *
-     * @param array $matches  PCRE-style matches array, with 0 the entire match, and
+     * @param array $matches PCRE-style matches array, with 0 the entire match, and
      *                  either index 1, 2 or 3 set with a hex value, dec value,
      *                  or string (respectively).
      * @return string Replacement string.
@@ -4541,7 +4455,7 @@ class HTMLPurifier_EntityParser
         $is_num = (@$matches[0][1] === '#');
         if ($is_num) {
             $is_hex = (@$entity[2] === 'x');
-            $int = $is_hex ? hexdec($matches[1]) : (int) $matches[2];
+            $int = $is_hex ? hexdec($matches[1]) : (int)$matches[2];
             return isset($this->_special_dec2str[$int]) ?
                 $this->_special_dec2str[$int] :
                 $entity;
@@ -4552,9 +4466,6 @@ class HTMLPurifier_EntityParser
         }
     }
 }
-
-
-
 
 
 /**
@@ -4568,9 +4479,9 @@ class HTMLPurifier_ErrorCollector
      * Identifiers for the returned error array. These are purposely numeric
      * so list() can be used.
      */
-    const LINENO   = 0;
+    const LINENO = 0;
     const SEVERITY = 1;
-    const MESSAGE  = 2;
+    const MESSAGE = 2;
     const CHILDREN = 3;
 
     /**
@@ -4613,10 +4524,10 @@ class HTMLPurifier_ErrorCollector
      */
     public function __construct($context)
     {
-        $this->locale    =& $context->get('Locale');
-        $this->context   = $context;
-        $this->_current  =& $this->_stacks[0];
-        $this->errors    =& $this->_stacks[0];
+        $this->locale =& $context->get('Locale');
+        $this->context = $context;
+        $this->_current =& $this->_stacks[0];
+        $this->errors =& $this->_stacks[0];
     }
 
     /**
@@ -4634,9 +4545,9 @@ class HTMLPurifier_ErrorCollector
         }
 
         $token = $this->context->get('CurrentToken', true);
-        $line  = $token ? $token->line : $this->context->get('CurrentLine', true);
-        $col   = $token ? $token->col  : $this->context->get('CurrentCol', true);
-        $attr  = $this->context->get('CurrentAttr', true);
+        $line = $token ? $token->line : $this->context->get('CurrentLine', true);
+        $col = $token ? $token->col : $this->context->get('CurrentCol', true);
+        $attr = $this->context->get('CurrentAttr', true);
 
         // perform special substitutions, also add custom parameters
         $subst = array();
@@ -4662,9 +4573,9 @@ class HTMLPurifier_ErrorCollector
 
         // (numerically indexed)
         $error = array(
-            self::LINENO   => $line,
+            self::LINENO => $line,
             self::SEVERITY => $severity,
-            self::MESSAGE  => $msg,
+            self::MESSAGE => $msg,
             self::CHILDREN => array()
         );
         $this->_current[] = $error;
@@ -4757,7 +4668,6 @@ class HTMLPurifier_ErrorCollector
         } else {
             return '<ul><li>' . implode('</li><li>', $ret) . '</li></ul>';
         }
-
     }
 
     private function _renderStruct(&$ret, $struct, $line = null, $col = null)
@@ -4799,9 +4709,6 @@ class HTMLPurifier_ErrorCollector
 }
 
 
-
-
-
 /**
  * Records errors for particular segments of an HTML document such as tokens,
  * attributes or CSS properties. They can contain error structs (which apply
@@ -4815,9 +4722,9 @@ class HTMLPurifier_ErrorStruct
      * Possible values for $children first-key. Note that top-level structures
      * are automatically token-level.
      */
-    const TOKEN     = 0;
-    const ATTR      = 1;
-    const CSSPROP   = 2;
+    const TOKEN = 0;
+    const ATTR = 1;
+    const CSSPROP = 2;
 
     /**
      * Type of this struct.
@@ -4874,20 +4781,13 @@ class HTMLPurifier_ErrorStruct
 }
 
 
-
-
-
 /**
  * Global exception class for HTML Purifier; any exceptions we throw
  * are from here.
  */
 class HTMLPurifier_Exception extends Exception
 {
-
 }
-
-
-
 
 
 /**
@@ -4908,7 +4808,6 @@ class HTMLPurifier_Exception extends Exception
  * @note Methods are not declared abstract as it is perfectly legitimate
  *       for an implementation not to want anything to happen on a step
  */
-
 class HTMLPurifier_Filter
 {
 
@@ -4944,9 +4843,6 @@ class HTMLPurifier_Filter
 }
 
 
-
-
-
 /**
  * Generates HTML from tokens.
  * @todo Refactor interface so that configuration/context is determined
@@ -4958,54 +4854,47 @@ class HTMLPurifier_Generator
 {
 
     /**
+     * Configuration for the generator
+     * @type HTMLPurifier_Config
+     */
+    protected $config;
+    /**
      * Whether or not generator should produce XML output.
      * @type bool
      */
     private $_xhtml = true;
-
     /**
      * :HACK: Whether or not generator should comment the insides of <script> tags.
      * @type bool
      */
     private $_scriptFix = false;
-
     /**
      * Cache of HTMLDefinition during HTML output to determine whether or
      * not attributes should be minimized.
      * @type HTMLPurifier_HTMLDefinition
      */
     private $_def;
-
     /**
      * Cache of %Output.SortAttr.
      * @type bool
      */
     private $_sortAttr;
-
     /**
      * Cache of %Output.FlashCompat.
      * @type bool
      */
     private $_flashCompat;
-
     /**
      * Cache of %Output.FixInnerHTML.
      * @type bool
      */
     private $_innerHTMLFix;
-
     /**
      * Stack for keeping track of object information when outputting IE
      * compatibility code.
      * @type array
      */
     private $_flashStack = array();
-
-    /**
-     * Configuration for the generator
-     * @type HTMLPurifier_Config
-     */
-    protected $config;
 
     /**
      * @param HTMLPurifier_Config $config
@@ -5037,7 +4926,8 @@ class HTMLPurifier_Generator
         $html = '';
         for ($i = 0, $size = count($tokens); $i < $size; $i++) {
             if ($this->_scriptFix && $tokens[$i]->name === 'script'
-                && $i + 2 < $size && $tokens[$i+2] instanceof HTMLPurifier_Token_End) {
+                && $i + 2 < $size && $tokens[$i + 2] instanceof HTMLPurifier_Token_End
+            ) {
                 // script special case
                 // the contents of the script block must be ONE token
                 // for this to work.
@@ -5053,16 +4943,16 @@ class HTMLPurifier_Generator
             $tidy->parseString(
                 $html,
                 array(
-                   'indent'=> true,
-                   'output-xhtml' => $this->_xhtml,
-                   'show-body-only' => true,
-                   'indent-spaces' => 2,
-                   'wrap' => 68,
+                    'indent' => true,
+                    'output-xhtml' => $this->_xhtml,
+                    'show-body-only' => true,
+                    'indent-spaces' => 2,
+                    'wrap' => 68,
                 ),
                 'utf8'
             );
             $tidy->cleanRepair();
-            $html = (string) $tidy; // explicit cast necessary
+            $html = (string)$tidy; // explicit cast necessary
         }
 
         // Normalize newlines to system defined value
@@ -5088,7 +4978,6 @@ class HTMLPurifier_Generator
         if (!$token instanceof HTMLPurifier_Token) {
             trigger_error('Cannot generate HTML from non-HTMLPurifier_Token object', E_USER_WARNING);
             return '';
-
         } elseif ($token instanceof HTMLPurifier_Token_Start) {
             $attr = $this->generateAttributes($token->attr, $token->name);
             if ($this->_flashCompat) {
@@ -5100,7 +4989,6 @@ class HTMLPurifier_Generator
                 }
             }
             return '<' . $token->name . ($attr ? ' ' : '') . $attr . '>';
-
         } elseif ($token instanceof HTMLPurifier_Token_End) {
             $_extra = '';
             if ($this->_flashCompat) {
@@ -5109,42 +4997,21 @@ class HTMLPurifier_Generator
                 }
             }
             return $_extra . '</' . $token->name . '>';
-
         } elseif ($token instanceof HTMLPurifier_Token_Empty) {
             if ($this->_flashCompat && $token->name == "param" && !empty($this->_flashStack)) {
-                $this->_flashStack[count($this->_flashStack)-1]->param[$token->attr['name']] = $token->attr['value'];
+                $this->_flashStack[count($this->_flashStack) - 1]->param[$token->attr['name']] = $token->attr['value'];
             }
             $attr = $this->generateAttributes($token->attr, $token->name);
-             return '<' . $token->name . ($attr ? ' ' : '') . $attr .
-                ( $this->_xhtml ? ' /': '' ) // <br /> v. <br>
+            return '<' . $token->name . ($attr ? ' ' : '') . $attr .
+                ($this->_xhtml ? ' /' : '') // <br /> v. <br>
                 . '>';
-
         } elseif ($token instanceof HTMLPurifier_Token_Text) {
             return $this->escape($token->data, ENT_NOQUOTES);
-
         } elseif ($token instanceof HTMLPurifier_Token_Comment) {
             return '<!--' . $token->data . '-->';
         } else {
             return '';
-
         }
-    }
-
-    /**
-     * Special case processor for the contents of script tags
-     * @param HTMLPurifier_Token $token HTMLPurifier_Token object.
-     * @return string
-     * @warning This runs into problems if there's already a literal
-     *          --> somewhere inside the script contents.
-     */
-    public function generateScriptFromToken($token)
-    {
-        if (!$token instanceof HTMLPurifier_Token_Text) {
-            return $this->generateFromToken($token);
-        }
-        // Thanks <http://lachy.id.au/log/2005/05/script-comments>
-        $data = preg_replace('#//\s*$#', '', $token->data);
-        return '<!--//--><![CDATA[//><!--' . "\n" . trim($data) . "\n" . '//--><!]]>';
     }
 
     /**
@@ -5204,7 +5071,7 @@ class HTMLPurifier_Generator
                     }
                 }
             }
-            $html .= $key.'="'.$this->escape($value).'" ';
+            $html .= $key . '="' . $this->escape($value) . '" ';
         }
         return rtrim($html);
     }
@@ -5228,10 +5095,24 @@ class HTMLPurifier_Generator
         }
         return htmlspecialchars($string, $quote, 'UTF-8');
     }
+
+    /**
+     * Special case processor for the contents of script tags
+     * @param HTMLPurifier_Token $token HTMLPurifier_Token object.
+     * @return string
+     * @warning This runs into problems if there's already a literal
+     *          --> somewhere inside the script contents.
+     */
+    public function generateScriptFromToken($token)
+    {
+        if (!$token instanceof HTMLPurifier_Token_Text) {
+            return $this->generateFromToken($token);
+        }
+        // Thanks <http://lachy.id.au/log/2005/05/script-comments>
+        $data = preg_replace('#//\s*$#', '', $token->data);
+        return '<!--//--><![CDATA[//><!--' . "\n" . trim($data) . "\n" . '//--><!]]>';
+    }
 }
-
-
-
 
 
 /**
@@ -5332,8 +5213,24 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
     public $doctype;
 
 
-
     // RAW CUSTOMIZATION STUFF --------------------------------------------
+    /**
+     * @type string
+     */
+    public $type = 'HTML';
+    /**
+     * @type HTMLPurifier_HTMLModuleManager
+     */
+    public $manager;
+    private $_anonModule = null;
+
+    /**
+     * Performs low-cost, preliminary initialization.
+     */
+    public function __construct()
+    {
+        $this->manager = new HTMLPurifier_HTMLModuleManager();
+    }
 
     /**
      * Adds a custom attribute to a pre-existing element
@@ -5353,6 +5250,23 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
             $element = $module->info[$element_name];
         }
         $element->attr[$attr_name] = $def;
+    }
+
+    // PUBLIC BUT INTERNAL VARIABLES --------------------------------------
+
+    /**
+     * Retrieves a reference to the anonymous module, so you can
+     * bust out advanced features without having to make your own
+     * module.
+     * @return HTMLPurifier_HTMLModule
+     */
+    public function getAnonymousModule()
+    {
+        if (!$this->_anonModule) {
+            $this->_anonModule = new HTMLPurifier_HTMLModule();
+            $this->_anonModule->name = 'Anonymous';
+        }
+        return $this->_anonModule;
     }
 
     /**
@@ -5379,46 +5293,9 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
      */
     public function addBlankElement($element_name)
     {
-        $module  = $this->getAnonymousModule();
+        $module = $this->getAnonymousModule();
         $element = $module->addBlankElement($element_name);
         return $element;
-    }
-
-    /**
-     * Retrieves a reference to the anonymous module, so you can
-     * bust out advanced features without having to make your own
-     * module.
-     * @return HTMLPurifier_HTMLModule
-     */
-    public function getAnonymousModule()
-    {
-        if (!$this->_anonModule) {
-            $this->_anonModule = new HTMLPurifier_HTMLModule();
-            $this->_anonModule->name = 'Anonymous';
-        }
-        return $this->_anonModule;
-    }
-
-    private $_anonModule = null;
-
-    // PUBLIC BUT INTERNAL VARIABLES --------------------------------------
-
-    /**
-     * @type string
-     */
-    public $type = 'HTML';
-
-    /**
-     * @type HTMLPurifier_HTMLModuleManager
-     */
-    public $manager;
-
-    /**
-     * Performs low-cost, preliminary initialization.
-     */
-    public function __construct()
-    {
-        $this->manager = new HTMLPurifier_HTMLModuleManager();
     }
 
     /**
@@ -5615,11 +5492,11 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
                             }
                             break;
                         }
-                        // otherwise fall through
+                    // otherwise fall through
                     case 1:
                         $attribute = htmlspecialchars($bits[0]);
                         trigger_error(
-                            "Global attribute '$attribute' is not ".
+                            "Global attribute '$attribute' is not " .
                             "supported in any elements $support",
                             E_USER_WARNING
                         );
@@ -5630,7 +5507,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
 
         // setup forbidden elements ---------------------------------------
 
-        $forbidden_elements   = $config->get('HTML.ForbiddenElements');
+        $forbidden_elements = $config->get('HTML.ForbiddenElements');
         $forbidden_attributes = $config->get('HTML.ForbiddenAttributes');
 
         foreach ($this->info as $tag => $info) {
@@ -5725,9 +5602,6 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
 }
 
 
-
-
-
 /**
  * Represents an XHTML 1.1 module, with information on elements, tags
  * and attributes.
@@ -5742,7 +5616,6 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
  *       objects (include it anyway if that's the correspondence though).
  * @todo Consider making some member functions protected
  */
-
 class HTMLPurifier_HTMLModule
 {
 
@@ -5894,40 +5767,6 @@ class HTMLPurifier_HTMLModule
     }
 
     /**
-     * Convenience function that creates a totally blank, non-standalone
-     * element.
-     * @param string $element Name of element to create
-     * @return HTMLPurifier_ElementDef Created element
-     */
-    public function addBlankElement($element)
-    {
-        if (!isset($this->info[$element])) {
-            $this->elements[] = $element;
-            $this->info[$element] = new HTMLPurifier_ElementDef();
-            $this->info[$element]->standalone = false;
-        } else {
-            trigger_error("Definition for $element already exists in module, cannot redefine");
-        }
-        return $this->info[$element];
-    }
-
-    /**
-     * Convenience function that registers an element to a content set
-     * @param string $element Element to register
-     * @param string $type Name content set (warning: case sensitive, usually upper-case
-     *        first letter)
-     */
-    public function addElementToContentSet($element, $type)
-    {
-        if (!isset($this->content_sets[$type])) {
-            $this->content_sets[$type] = '';
-        } else {
-            $this->content_sets[$type] .= ' | ';
-        }
-        $this->content_sets[$type] .= $element;
-    }
-
-    /**
      * Convenience function that transforms single-string contents
      * into separate content model and content model type
      * @param string $contents Allowed children in form of:
@@ -5976,6 +5815,40 @@ class HTMLPurifier_HTMLModule
     }
 
     /**
+     * Convenience function that registers an element to a content set
+     * @param string $element Element to register
+     * @param string $type Name content set (warning: case sensitive, usually upper-case
+     *        first letter)
+     */
+    public function addElementToContentSet($element, $type)
+    {
+        if (!isset($this->content_sets[$type])) {
+            $this->content_sets[$type] = '';
+        } else {
+            $this->content_sets[$type] .= ' | ';
+        }
+        $this->content_sets[$type] .= $element;
+    }
+
+    /**
+     * Convenience function that creates a totally blank, non-standalone
+     * element.
+     * @param string $element Name of element to create
+     * @return HTMLPurifier_ElementDef Created element
+     */
+    public function addBlankElement($element)
+    {
+        if (!isset($this->info[$element])) {
+            $this->elements[] = $element;
+            $this->info[$element] = new HTMLPurifier_ElementDef();
+            $this->info[$element]->standalone = false;
+        } else {
+            trigger_error("Definition for $element already exists in module, cannot redefine");
+        }
+        return $this->info[$element];
+    }
+
+    /**
      * Convenience function that generates a lookup table with boolean
      * true as value.
      * @param string $list List of values to turn into a lookup
@@ -6008,9 +5881,6 @@ class HTMLPurifier_HTMLModule
     {
     }
 }
-
-
-
 
 
 class HTMLPurifier_HTMLModuleManager
@@ -6088,7 +5958,7 @@ class HTMLPurifier_HTMLModuleManager
     {
         // editable internal objects
         $this->attrTypes = new HTMLPurifier_AttrTypes();
-        $this->doctypes  = new HTMLPurifier_DoctypeRegistry();
+        $this->doctypes = new HTMLPurifier_DoctypeRegistry();
 
         // setup basic modules
         $common = array(
@@ -6156,7 +6026,19 @@ class HTMLPurifier_HTMLModuleManager
             '-//W3C//DTD XHTML 1.1//EN',
             'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'
         );
+    }
 
+    /**
+     * Adds a module to the current doctype by first registering it,
+     * and then tacking it on to the active doctype
+     */
+    public function addModule($module)
+    {
+        $this->registerModule($module);
+        if (is_object($module)) {
+            $module = $module->name;
+        }
+        $this->userModules[] = $module;
     }
 
     /**
@@ -6213,19 +6095,6 @@ class HTMLPurifier_HTMLModuleManager
             trigger_error('Overloading ' . $module->name . ' without explicit overload parameter', E_USER_WARNING);
         }
         $this->registeredModules[$module->name] = $module;
-    }
-
-    /**
-     * Adds a module to the current doctype by first registering it,
-     * and then tacking it on to the active doctype
-     */
-    public function addModule($module)
-    {
-        $this->registerModule($module);
-        if (is_object($module)) {
-            $module = $module->name;
-        }
-        $this->userModules[] = $module;
     }
 
     /**
@@ -6323,8 +6192,8 @@ class HTMLPurifier_HTMLModuleManager
 
         // note the different choice
         $this->contentSets = new HTMLPurifier_ContentSets(
-            // content set assembly deals with all possible modules,
-            // not just ones deemed to be "safe"
+        // content set assembly deals with all possible modules,
+        // not just ones deemed to be "safe"
             $this->modules
         );
         $this->attrCollections = new HTMLPurifier_AttrCollections(
@@ -6376,7 +6245,6 @@ class HTMLPurifier_HTMLModuleManager
         }
 
         return $elements;
-
     }
 
     /**
@@ -6443,7 +6311,8 @@ class HTMLPurifier_HTMLModuleManager
 
             // descendants_are_inline, for ChildDef_Chameleon
             if (is_string($def->content_model) &&
-                strpos($def->content_model, 'Inline') !== false) {
+                strpos($def->content_model, 'Inline') !== false
+            ) {
                 if ($name != 'del' && $name != 'ins') {
                     // this is for you, ins/del
                     $def->descendants_are_inline = true;
@@ -6468,9 +6337,6 @@ class HTMLPurifier_HTMLModuleManager
         return $def;
     }
 }
-
-
-
 
 
 /**
@@ -6502,6 +6368,18 @@ class HTMLPurifier_IDAccumulator
     }
 
     /**
+     * Load a list of IDs into the lookup table
+     * @param $array_of_ids Array of IDs to load
+     * @note This function doesn't care about duplicates
+     */
+    public function load($array_of_ids)
+    {
+        foreach ($array_of_ids as $id) {
+            $this->ids[$id] = true;
+        }
+    }
+
+    /**
      * Add an ID to the lookup table.
      * @param string $id ID to be added.
      * @return bool status, true if success, false if there's a dupe
@@ -6513,22 +6391,7 @@ class HTMLPurifier_IDAccumulator
         }
         return $this->ids[$id] = true;
     }
-
-    /**
-     * Load a list of IDs into the lookup table
-     * @param $array_of_ids Array of IDs to load
-     * @note This function doesn't care about duplicates
-     */
-    public function load($array_of_ids)
-    {
-        foreach ($array_of_ids as $id) {
-            $this->ids[$id] = true;
-        }
-    }
 }
-
-
-
 
 
 /**
@@ -6552,31 +6415,6 @@ abstract class HTMLPurifier_Injector
      * @type string
      */
     public $name;
-
-    /**
-     * @type HTMLPurifier_HTMLDefinition
-     */
-    protected $htmlDefinition;
-
-    /**
-     * Reference to CurrentNesting variable in Context. This is an array
-     * list of tokens that we are currently "inside"
-     * @type array
-     */
-    protected $currentNesting;
-
-    /**
-     * Reference to current token.
-     * @type HTMLPurifier_Token
-     */
-    protected $currentToken;
-
-    /**
-     * Reference to InputZipper variable in Context.
-     * @type HTMLPurifier_Zipper
-     */
-    protected $inputZipper;
-
     /**
      * Array of elements and attributes this injector creates and therefore
      * need to be allowed by the definition. Takes form of
@@ -6584,7 +6422,26 @@ abstract class HTMLPurifier_Injector
      * @type array
      */
     public $needed = array();
-
+    /**
+     * @type HTMLPurifier_HTMLDefinition
+     */
+    protected $htmlDefinition;
+    /**
+     * Reference to CurrentNesting variable in Context. This is an array
+     * list of tokens that we are currently "inside"
+     * @type array
+     */
+    protected $currentNesting;
+    /**
+     * Reference to current token.
+     * @type HTMLPurifier_Token
+     */
+    protected $currentToken;
+    /**
+     * Reference to InputZipper variable in Context.
+     * @type HTMLPurifier_Zipper
+     */
+    protected $inputZipper;
     /**
      * Number of elements to rewind backwards (relative).
      * @type bool|int
@@ -6636,8 +6493,8 @@ abstract class HTMLPurifier_Injector
             return $result;
         }
         $this->currentNesting =& $context->get('CurrentNesting');
-        $this->currentToken   =& $context->get('CurrentToken');
-        $this->inputZipper    =& $context->get('InputZipper');
+        $this->currentToken =& $context->get('CurrentToken');
+        $this->inputZipper =& $context->get('InputZipper');
         return false;
     }
 
@@ -6690,89 +6547,11 @@ abstract class HTMLPurifier_Injector
         // check for exclusion
         for ($i = count($this->currentNesting) - 2; $i >= 0; $i--) {
             $node = $this->currentNesting[$i];
-            $def  = $this->htmlDefinition->info[$node->name];
+            $def = $this->htmlDefinition->info[$node->name];
             if (isset($def->excludes[$name])) {
                 return false;
             }
         }
-        return true;
-    }
-
-    /**
-     * Iterator function, which starts with the next token and continues until
-     * you reach the end of the input tokens.
-     * @warning Please prevent previous references from interfering with this
-     *          functions by setting $i = null beforehand!
-     * @param int $i Current integer index variable for inputTokens
-     * @param HTMLPurifier_Token $current Current token variable.
-     *          Do NOT use $token, as that variable is also a reference
-     * @return bool
-     */
-    protected function forward(&$i, &$current)
-    {
-        if ($i === null) {
-            $i = count($this->inputZipper->back) - 1;
-        } else {
-            $i--;
-        }
-        if ($i < 0) {
-            return false;
-        }
-        $current = $this->inputZipper->back[$i];
-        return true;
-    }
-
-    /**
-     * Similar to _forward, but accepts a third parameter $nesting (which
-     * should be initialized at 0) and stops when we hit the end tag
-     * for the node $this->inputIndex starts in.
-     * @param int $i Current integer index variable for inputTokens
-     * @param HTMLPurifier_Token $current Current token variable.
-     *          Do NOT use $token, as that variable is also a reference
-     * @param int $nesting
-     * @return bool
-     */
-    protected function forwardUntilEndToken(&$i, &$current, &$nesting)
-    {
-        $result = $this->forward($i, $current);
-        if (!$result) {
-            return false;
-        }
-        if ($nesting === null) {
-            $nesting = 0;
-        }
-        if ($current instanceof HTMLPurifier_Token_Start) {
-            $nesting++;
-        } elseif ($current instanceof HTMLPurifier_Token_End) {
-            if ($nesting <= 0) {
-                return false;
-            }
-            $nesting--;
-        }
-        return true;
-    }
-
-    /**
-     * Iterator function, starts with the previous token and continues until
-     * you reach the beginning of input tokens.
-     * @warning Please prevent previous references from interfering with this
-     *          functions by setting $i = null beforehand!
-     * @param int $i Current integer index variable for inputTokens
-     * @param HTMLPurifier_Token $current Current token variable.
-     *          Do NOT use $token, as that variable is also a reference
-     * @return bool
-     */
-    protected function backward(&$i, &$current)
-    {
-        if ($i === null) {
-            $i = count($this->inputZipper->front) - 1;
-        } else {
-            $i--;
-        }
-        if ($i < 0) {
-            return false;
-        }
-        $current = $this->inputZipper->front[$i];
         return true;
     }
 
@@ -6807,10 +6586,85 @@ abstract class HTMLPurifier_Injector
     public function notifyEnd($token)
     {
     }
+
+    /**
+     * Similar to _forward, but accepts a third parameter $nesting (which
+     * should be initialized at 0) and stops when we hit the end tag
+     * for the node $this->inputIndex starts in.
+     * @param int $i Current integer index variable for inputTokens
+     * @param HTMLPurifier_Token $current Current token variable.
+     *          Do NOT use $token, as that variable is also a reference
+     * @param int $nesting
+     * @return bool
+     */
+    protected function forwardUntilEndToken(&$i, &$current, &$nesting)
+    {
+        $result = $this->forward($i, $current);
+        if (!$result) {
+            return false;
+        }
+        if ($nesting === null) {
+            $nesting = 0;
+        }
+        if ($current instanceof HTMLPurifier_Token_Start) {
+            $nesting++;
+        } elseif ($current instanceof HTMLPurifier_Token_End) {
+            if ($nesting <= 0) {
+                return false;
+            }
+            $nesting--;
+        }
+        return true;
+    }
+
+    /**
+     * Iterator function, which starts with the next token and continues until
+     * you reach the end of the input tokens.
+     * @warning Please prevent previous references from interfering with this
+     *          functions by setting $i = null beforehand!
+     * @param int $i Current integer index variable for inputTokens
+     * @param HTMLPurifier_Token $current Current token variable.
+     *          Do NOT use $token, as that variable is also a reference
+     * @return bool
+     */
+    protected function forward(&$i, &$current)
+    {
+        if ($i === null) {
+            $i = count($this->inputZipper->back) - 1;
+        } else {
+            $i--;
+        }
+        if ($i < 0) {
+            return false;
+        }
+        $current = $this->inputZipper->back[$i];
+        return true;
+    }
+
+    /**
+     * Iterator function, starts with the previous token and continues until
+     * you reach the beginning of input tokens.
+     * @warning Please prevent previous references from interfering with this
+     *          functions by setting $i = null beforehand!
+     * @param int $i Current integer index variable for inputTokens
+     * @param HTMLPurifier_Token $current Current token variable.
+     *          Do NOT use $token, as that variable is also a reference
+     * @return bool
+     */
+    protected function backward(&$i, &$current)
+    {
+        if ($i === null) {
+            $i = count($this->inputZipper->front) - 1;
+        } else {
+            $i--;
+        }
+        if ($i < 0) {
+            return false;
+        }
+        $current = $this->inputZipper->front[$i];
+        return true;
+    }
 }
-
-
-
 
 
 /**
@@ -6875,41 +6729,8 @@ class HTMLPurifier_Language
      */
     public function __construct($config, $context)
     {
-        $this->config  = $config;
+        $this->config = $config;
         $this->context = $context;
-    }
-
-    /**
-     * Loads language object with necessary info from factory cache
-     * @note This is a lazy loader
-     */
-    public function load()
-    {
-        if ($this->_loaded) {
-            return;
-        }
-        $factory = HTMLPurifier_LanguageFactory::instance();
-        $factory->loadLanguage($this->code);
-        foreach ($factory->keys as $key) {
-            $this->$key = $factory->cache[$this->code][$key];
-        }
-        $this->_loaded = true;
-    }
-
-    /**
-     * Retrieves a localised message.
-     * @param string $key string identifier of message
-     * @return string localised message
-     */
-    public function getMessage($key)
-    {
-        if (!$this->_loaded) {
-            $this->load();
-        }
-        if (!isset($this->messages[$key])) {
-            return "[$key]";
-        }
-        return $this->messages[$key];
     }
 
     /**
@@ -6929,25 +6750,20 @@ class HTMLPurifier_Language
     }
 
     /**
-     * Converts an array list into a string readable representation
-     * @param array $array
-     * @return string
+     * Loads language object with necessary info from factory cache
+     * @note This is a lazy loader
      */
-    public function listify($array)
+    public function load()
     {
-        $sep      = $this->getMessage('Item separator');
-        $sep_last = $this->getMessage('Item separator last');
-        $ret = '';
-        for ($i = 0, $c = count($array); $i < $c; $i++) {
-            if ($i == 0) {
-            } elseif ($i + 1 < $c) {
-                $ret .= $sep;
-            } else {
-                $ret .= $sep_last;
-            }
-            $ret .= $array[$i];
+        if ($this->_loaded) {
+            return;
         }
-        return $ret;
+        $factory = HTMLPurifier_LanguageFactory::instance();
+        $factory->loadLanguage($this->code);
+        foreach ($factory->keys as $key) {
+            $this->$key = $factory->cache[$this->code][$key];
+        }
+        $this->_loaded = true;
     }
 
     /**
@@ -6977,34 +6793,34 @@ class HTMLPurifier_Language
                         $generator = $this->context->get('Generator');
                     }
                     if (isset($value->name)) {
-                        $subst['$'.$i.'.Name'] = $value->name;
+                        $subst['$' . $i . '.Name'] = $value->name;
                     }
                     if (isset($value->data)) {
-                        $subst['$'.$i.'.Data'] = $value->data;
+                        $subst['$' . $i . '.Data'] = $value->data;
                     }
-                    $subst['$'.$i.'.Compact'] =
-                    $subst['$'.$i.'.Serialized'] = $generator->generateFromToken($value);
+                    $subst['$' . $i . '.Compact'] =
+                    $subst['$' . $i . '.Serialized'] = $generator->generateFromToken($value);
                     // a more complex algorithm for compact representation
                     // could be introduced for all types of tokens. This
                     // may need to be factored out into a dedicated class
                     if (!empty($value->attr)) {
                         $stripped_token = clone $value;
                         $stripped_token->attr = array();
-                        $subst['$'.$i.'.Compact'] = $generator->generateFromToken($stripped_token);
+                        $subst['$' . $i . '.Compact'] = $generator->generateFromToken($stripped_token);
                     }
-                    $subst['$'.$i.'.Line'] = $value->line ? $value->line : 'unknown';
+                    $subst['$' . $i . '.Line'] = $value->line ? $value->line : 'unknown';
                 }
                 continue;
             } elseif (is_array($value)) {
                 $keys = array_keys($value);
                 if (array_keys($keys) === $keys) {
                     // list
-                    $subst['$'.$i] = $this->listify($value);
+                    $subst['$' . $i] = $this->listify($value);
                 } else {
                     // associative array
                     // no $i implementation yet, sorry
-                    $subst['$'.$i.'.Keys'] = $this->listify($keys);
-                    $subst['$'.$i.'.Values'] = $this->listify(array_values($value));
+                    $subst['$' . $i . '.Keys'] = $this->listify($keys);
+                    $subst['$' . $i . '.Values'] = $this->listify(array_values($value));
                 }
                 continue;
             }
@@ -7012,10 +6828,45 @@ class HTMLPurifier_Language
         }
         return strtr($raw, $subst);
     }
+
+    /**
+     * Converts an array list into a string readable representation
+     * @param array $array
+     * @return string
+     */
+    public function listify($array)
+    {
+        $sep = $this->getMessage('Item separator');
+        $sep_last = $this->getMessage('Item separator last');
+        $ret = '';
+        for ($i = 0, $c = count($array); $i < $c; $i++) {
+            if ($i == 0) {
+            } elseif ($i + 1 < $c) {
+                $ret .= $sep;
+            } else {
+                $ret .= $sep_last;
+            }
+            $ret .= $array[$i];
+        }
+        return $ret;
+    }
+
+    /**
+     * Retrieves a localised message.
+     * @param string $key string identifier of message
+     * @return string localised message
+     */
+    public function getMessage($key)
+    {
+        if (!$this->_loaded) {
+            $this->load();
+        }
+        if (!isset($this->messages[$key])) {
+            return "[$key]";
+        }
+        return $this->messages[$key];
+    }
 }
-
-
-
 
 
 /**
@@ -7126,7 +6977,7 @@ class HTMLPurifier_LanguageFactory
             $lang = new HTMLPurifier_Language($config, $context);
         } else {
             $class = 'HTMLPurifier_Language_' . $pcode;
-            $file  = $this->dir . '/Language/classes/' . $code . '.php';
+            $file = $this->dir . '/Language/classes/' . $code . '.php';
             if (file_exists($file) || class_exists($class, false)) {
                 $lang = new $class($config, $context);
             } else {
@@ -7225,33 +7076,12 @@ class HTMLPurifier_LanguageFactory
 }
 
 
-
-
-
 /**
  * Represents a measurable length, with a string numeric magnitude
  * and a unit. This object is immutable.
  */
 class HTMLPurifier_Length
 {
-
-    /**
-     * String numeric magnitude.
-     * @type string
-     */
-    protected $n;
-
-    /**
-     * String unit. False is permitted if $n = 0.
-     * @type string|bool
-     */
-    protected $unit;
-
-    /**
-     * Whether or not this length is valid. Null if not calculated yet.
-     * @type bool
-     */
-    protected $isValid;
 
     /**
      * Array Lookup array of units recognized by CSS 2.1
@@ -7261,6 +7091,21 @@ class HTMLPurifier_Length
         'em' => true, 'ex' => true, 'px' => true, 'in' => true,
         'cm' => true, 'mm' => true, 'pt' => true, 'pc' => true
     );
+    /**
+     * String numeric magnitude.
+     * @type string
+     */
+    protected $n;
+    /**
+     * String unit. False is permitted if $n = 0.
+     * @type string|bool
+     */
+    protected $unit;
+    /**
+     * Whether or not this length is valid. Null if not calculated yet.
+     * @type bool
+     */
+    protected $isValid;
 
     /**
      * @param string $n Magnitude
@@ -7268,8 +7113,8 @@ class HTMLPurifier_Length
      */
     public function __construct($n = '0', $u = false)
     {
-        $this->n = (string) $n;
-        $this->unit = $u !== false ? (string) $u : false;
+        $this->n = (string)$n;
+        $this->unit = $u !== false ? (string)$u : false;
     }
 
     /**
@@ -7289,6 +7134,30 @@ class HTMLPurifier_Length
             $unit = false;
         }
         return new HTMLPurifier_Length($n, $unit);
+    }
+
+    /**
+     * Returns string representation of number.
+     * @return string
+     */
+    public function toString()
+    {
+        if (!$this->isValid()) {
+            return false;
+        }
+        return $this->n . $this->unit;
+    }
+
+    /**
+     * Returns true if this length unit is valid.
+     * @return bool
+     */
+    public function isValid()
+    {
+        if ($this->isValid === null) {
+            $this->isValid = $this->validate();
+        }
+        return $this->isValid;
     }
 
     /**
@@ -7321,18 +7190,6 @@ class HTMLPurifier_Length
     }
 
     /**
-     * Returns string representation of number.
-     * @return string
-     */
-    public function toString()
-    {
-        if (!$this->isValid()) {
-            return false;
-        }
-        return $this->n . $this->unit;
-    }
-
-    /**
      * Retrieves string numeric magnitude.
      * @return string
      */
@@ -7348,18 +7205,6 @@ class HTMLPurifier_Length
     public function getUnit()
     {
         return $this->unit;
-    }
-
-    /**
-     * Returns true if this length unit is valid.
-     * @return bool
-     */
-    public function isValid()
-    {
-        if ($this->isValid === null) {
-            $this->isValid = $this->validate();
-        }
-        return $this->isValid;
     }
 
     /**
@@ -7384,9 +7229,6 @@ class HTMLPurifier_Length
         return $this->n - $l->n;
     }
 }
-
-
-
 
 
 /**
@@ -7438,6 +7280,27 @@ class HTMLPurifier_Lexer
     public $tracksLineNumbers = false;
 
     // -- STATIC ----------------------------------------------------------
+    /**
+     * Most common entity to raw value conversion table for special entities.
+     * @type array
+     */
+    protected $_special_entity2str =
+        array(
+            '&quot;' => '"',
+            '&amp;' => '&',
+            '&lt;' => '<',
+            '&gt;' => '>',
+            '&#39;' => "'",
+            '&#039;' => "'",
+            '&#x27;' => "'"
+        );
+
+    // -- CONVENIENCE MEMBERS ---------------------------------------------
+
+    public function __construct()
+    {
+        $this->_entity_parser = new HTMLPurifier_EntityParser();
+    }
 
     /**
      * Retrieves or sets the default Lexer as a Prototype Factory.
@@ -7533,30 +7396,22 @@ class HTMLPurifier_Lexer
         }
 
         return $inst;
-
-    }
-
-    // -- CONVENIENCE MEMBERS ---------------------------------------------
-
-    public function __construct()
-    {
-        $this->_entity_parser = new HTMLPurifier_EntityParser();
     }
 
     /**
-     * Most common entity to raw value conversion table for special entities.
-     * @type array
+     * Callback function for escapeCDATA() that does the work.
+     *
+     * @warning Though this is public in order to let the callback happen,
+     *          calling it directly is not recommended.
+     * @param array $matches PCRE matches array, with index 0 the entire match
+     *                  and 1 the inside of the CDATA section.
+     * @return string Escaped internals of the CDATA section.
      */
-    protected $_special_entity2str =
-        array(
-            '&quot;' => '"',
-            '&amp;' => '&',
-            '&lt;' => '<',
-            '&gt;' => '>',
-            '&#39;' => "'",
-            '&#039;' => "'",
-            '&#x27;' => "'"
-        );
+    protected static function CDATACallback($matches)
+    {
+        // not exactly sure why the character set is needed, but whatever
+        return htmlspecialchars($matches[1], ENT_COMPAT, 'UTF-8');
+    }
 
     /**
      * Parses special entities into the proper characters.
@@ -7612,63 +7467,6 @@ class HTMLPurifier_Lexer
     public function tokenizeHTML($string, $config, $context)
     {
         trigger_error('Call to abstract class', E_USER_ERROR);
-    }
-
-    /**
-     * Translates CDATA sections into regular sections (through escaping).
-     * @param string $string HTML string to process.
-     * @return string HTML with CDATA sections escaped.
-     */
-    protected static function escapeCDATA($string)
-    {
-        return preg_replace_callback(
-            '/<!\[CDATA\[(.+?)\]\]>/s',
-            array('HTMLPurifier_Lexer', 'CDATACallback'),
-            $string
-        );
-    }
-
-    /**
-     * Special CDATA case that is especially convoluted for <script>
-     * @param string $string HTML string to process.
-     * @return string HTML with CDATA sections escaped.
-     */
-    protected static function escapeCommentedCDATA($string)
-    {
-        return preg_replace_callback(
-            '#<!--//--><!\[CDATA\[//><!--(.+?)//--><!\]\]>#s',
-            array('HTMLPurifier_Lexer', 'CDATACallback'),
-            $string
-        );
-    }
-
-    /**
-     * Special Internet Explorer conditional comments should be removed.
-     * @param string $string HTML string to process.
-     * @return string HTML with conditional comments removed.
-     */
-    protected static function removeIEConditional($string)
-    {
-        return preg_replace(
-            '#<!--\[if [^>]+\]>.*?<!\[endif\]-->#si', // probably should generalize for all strings
-            '',
-            $string
-        );
-    }
-
-    /**
-     * Callback function for escapeCDATA() that does the work.
-     *
-     * @warning Though this is public in order to let the callback happen,
-     *          calling it directly is not recommended.
-     * @param array $matches PCRE matches array, with index 0 the entire match
-     *                  and 1 the inside of the CDATA section.
-     * @return string Escaped internals of the CDATA section.
-     */
-    protected static function CDATACallback($matches)
-    {
-        // not exactly sure why the character set is needed, but whatever
-        return htmlspecialchars($matches[1], ENT_COMPAT, 'UTF-8');
     }
 
     /**
@@ -7728,6 +7526,48 @@ class HTMLPurifier_Lexer
     }
 
     /**
+     * Special CDATA case that is especially convoluted for <script>
+     * @param string $string HTML string to process.
+     * @return string HTML with CDATA sections escaped.
+     */
+    protected static function escapeCommentedCDATA($string)
+    {
+        return preg_replace_callback(
+            '#<!--//--><!\[CDATA\[//><!--(.+?)//--><!\]\]>#s',
+            array('HTMLPurifier_Lexer', 'CDATACallback'),
+            $string
+        );
+    }
+
+    /**
+     * Translates CDATA sections into regular sections (through escaping).
+     * @param string $string HTML string to process.
+     * @return string HTML with CDATA sections escaped.
+     */
+    protected static function escapeCDATA($string)
+    {
+        return preg_replace_callback(
+            '/<!\[CDATA\[(.+?)\]\]>/s',
+            array('HTMLPurifier_Lexer', 'CDATACallback'),
+            $string
+        );
+    }
+
+    /**
+     * Special Internet Explorer conditional comments should be removed.
+     * @param string $string HTML string to process.
+     * @return string HTML with conditional comments removed.
+     */
+    protected static function removeIEConditional($string)
+    {
+        return preg_replace(
+            '#<!--\[if [^>]+\]>.*?<!\[endif\]-->#si', // probably should generalize for all strings
+            '',
+            $string
+        );
+    }
+
+    /**
      * Takes a string of HTML (fragment or document) and returns the content
      * @todo Consider making protected
      */
@@ -7742,9 +7582,6 @@ class HTMLPurifier_Lexer
         }
     }
 }
-
-
-
 
 
 /**
@@ -7794,9 +7631,6 @@ abstract class HTMLPurifier_Node
 }
 
 
-
-
-
 /**
  * Class that handles operations involving percent-encoding in URIs.
  *
@@ -7833,7 +7667,7 @@ class HTMLPurifier_PercentEncoder
         $this->preserve[45] = true; // Dash         -
         $this->preserve[46] = true; // Period       .
         $this->preserve[95] = true; // Underscore   _
-        $this->preserve[126]= true; // Tilde        ~
+        $this->preserve[126] = true; // Tilde        ~
 
         // extra letters not to escape
         if ($preserve !== false) {
@@ -7888,7 +7722,7 @@ class HTMLPurifier_PercentEncoder
                 continue;
             }
             $encoding = substr($part, 0, 2);
-            $text     = substr($part, 2);
+            $text = substr($part, 2);
             if (!ctype_xdigit($encoding)) {
                 $ret .= '%25' . $part;
                 continue;
@@ -7904,9 +7738,6 @@ class HTMLPurifier_PercentEncoder
         return $ret;
     }
 }
-
-
-
 
 
 /**
@@ -7958,16 +7789,6 @@ class HTMLPurifier_PropertyList
     }
 
     /**
-     * Sets the value of a key, for this plist
-     * @param string $name
-     * @param mixed $value
-     */
-    public function set($name, $value)
-    {
-        $this->data[$name] = $value;
-    }
-
-    /**
      * Returns true if a given key exists
      * @param string $name
      * @return bool
@@ -7975,6 +7796,16 @@ class HTMLPurifier_PropertyList
     public function has($name)
     {
         return array_key_exists($name, $this->data);
+    }
+
+    /**
+     * Sets the value of a key, for this plist
+     * @param string $name
+     * @param mixed $value
+     */
+    public function set($name, $value)
+    {
+        $this->data[$name] = $value;
     }
 
     /**
@@ -8029,9 +7860,6 @@ class HTMLPurifier_PropertyList
 }
 
 
-
-
-
 /**
  * Property list iterator. Do not instantiate this class directly.
  */
@@ -8072,9 +7900,6 @@ class HTMLPurifier_PropertyListIterator extends FilterIterator
 }
 
 
-
-
-
 /**
  * A simple array-backed queue, based off of the classic Okasaki
  * persistent amortized queue.  The basic idea is to maintain two
@@ -8092,11 +7917,13 @@ class HTMLPurifier_PropertyListIterator extends FilterIterator
  * behaviour caused by repeatedly shuffling data from the input stack
  * to the output stack and back.
  */
-class HTMLPurifier_Queue {
+class HTMLPurifier_Queue
+{
     private $input;
     private $output;
 
-    public function __construct($input = array()) {
+    public function __construct($input = array())
+    {
         $this->input = $input;
         $this->output = array();
     }
@@ -8104,13 +7931,14 @@ class HTMLPurifier_Queue {
     /**
      * Shifts an element off the front of the queue.
      */
-    public function shift() {
+    public function shift()
+    {
         if (empty($this->output)) {
             $this->output = array_reverse($this->input);
             $this->input = array();
         }
         if (empty($this->output)) {
-            return NULL;
+            return null;
         }
         return array_pop($this->output);
     }
@@ -8118,18 +7946,19 @@ class HTMLPurifier_Queue {
     /**
      * Pushes an element onto the front of the queue.
      */
-    public function push($x) {
+    public function push($x)
+    {
         array_push($this->input, $x);
     }
 
     /**
      * Checks if it's empty.
      */
-    public function isEmpty() {
+    public function isEmpty()
+    {
         return empty($this->input) && empty($this->output);
     }
 }
-
 
 
 /**
@@ -8139,8 +7968,6 @@ class HTMLPurifier_Queue {
  * strategies provide plug points for extra configuration or even extra
  * features, such as custom tags, custom parsing of text, etc.
  */
-
-
 abstract class HTMLPurifier_Strategy
 {
 
@@ -8154,9 +7981,6 @@ abstract class HTMLPurifier_Strategy
      */
     abstract public function execute($tokens, $config, $context);
 }
-
-
-
 
 
 /**
@@ -8202,9 +8026,6 @@ class HTMLPurifier_StringHash extends ArrayObject
         $this->accessed = array();
     }
 }
-
-
-
 
 
 /**
@@ -8260,28 +8081,6 @@ class HTMLPurifier_StringHashParser
     }
 
     /**
-     * Parses a file that contains multiple string-hashes delimited by '----'
-     * @param string $file
-     * @return array
-     */
-    public function parseMultiFile($file)
-    {
-        if (!file_exists($file)) {
-            return false;
-        }
-        $ret = array();
-        $fh = fopen($file, 'r');
-        if (!$fh) {
-            return false;
-        }
-        while (!feof($fh)) {
-            $ret[] = $this->parseHandle($fh);
-        }
-        fclose($fh);
-        return $ret;
-    }
-
-    /**
      * Internal parser that acepts a file handle.
      * @note While it's possible to simulate in-memory parsing by using
      *       custom stream wrappers, if such a use-case arises we should
@@ -8292,9 +8091,9 @@ class HTMLPurifier_StringHashParser
      */
     protected function parseHandle($fh)
     {
-        $state   = false;
-        $single  = false;
-        $ret     = array();
+        $state = false;
+        $single = false;
+        $ret = array();
         do {
             $line = fgets($fh);
             if ($line === false) {
@@ -8325,23 +8124,42 @@ class HTMLPurifier_StringHashParser
                     $line = trim($line);
                 } else {
                     // Use default declaration
-                    $state  = $this->default;
+                    $state = $this->default;
                 }
             }
             if ($single) {
                 $ret[$state] = $line;
                 $single = false;
-                $state  = false;
+                $state = false;
             } else {
                 $ret[$state] .= "$line\n";
             }
         } while (!feof($fh));
         return $ret;
     }
+
+    /**
+     * Parses a file that contains multiple string-hashes delimited by '----'
+     * @param string $file
+     * @return array
+     */
+    public function parseMultiFile($file)
+    {
+        if (!file_exists($file)) {
+            return false;
+        }
+        $ret = array();
+        $fh = fopen($file, 'r');
+        if (!$fh) {
+            return false;
+        }
+        while (!feof($fh)) {
+            $ret[] = $this->parseHandle($fh);
+        }
+        fclose($fh);
+        return $ret;
+    }
 }
-
-
-
 
 
 /**
@@ -8377,9 +8195,6 @@ abstract class HTMLPurifier_TagTransform
         $attr['style'] = $css . $attr['style'];
     }
 }
-
-
-
 
 
 /**
@@ -8478,9 +8293,6 @@ abstract class HTMLPurifier_Token
      */
     abstract public function toNode();
 }
-
-
-
 
 
 /**
@@ -8599,9 +8411,6 @@ class HTMLPurifier_TokenFactory
 }
 
 
-
-
-
 /**
  * HTML Purifier's internal representation of a URI.
  * @note
@@ -8666,36 +8475,6 @@ class HTMLPurifier_URI
         $this->path = $path;
         $this->query = $query;
         $this->fragment = $fragment;
-    }
-
-    /**
-     * Retrieves a scheme object corresponding to the URI's scheme/default
-     * @param HTMLPurifier_Config $config
-     * @param HTMLPurifier_Context $context
-     * @return HTMLPurifier_URIScheme Scheme object appropriate for validating this URI
-     */
-    public function getSchemeObj($config, $context)
-    {
-        $registry = HTMLPurifier_URISchemeRegistry::instance();
-        if ($this->scheme !== null) {
-            $scheme_obj = $registry->getScheme($this->scheme, $config, $context);
-            if (!$scheme_obj) {
-                return false;
-            } // invalid scheme, clean it out
-        } else {
-            // no scheme: retrieve the default one
-            $def = $config->getDefinition('URI');
-            $scheme_obj = $def->getDefaultScheme($config, $context);
-            if (!$scheme_obj) {
-                // something funky happened to the default scheme object
-                trigger_error(
-                    'Default scheme object "' . $def->defaultScheme . '" was not readable',
-                    E_USER_WARNING
-                );
-                return false;
-            }
-        }
-        return $scheme_obj;
     }
 
     /**
@@ -8859,30 +8638,6 @@ class HTMLPurifier_URI
     }
 
     /**
-     * Returns true if this URL might be considered a 'local' URL given
-     * the current context.  This is true when the host is null, or
-     * when it matches the host supplied to the configuration.
-     *
-     * Note that this does not do any scheme checking, so it is mostly
-     * only appropriate for metadata that doesn't care about protocol
-     * security.  isBenign is probably what you actually want.
-     * @param HTMLPurifier_Config $config
-     * @param HTMLPurifier_Context $context
-     * @return bool
-     */
-    public function isLocal($config, $context)
-    {
-        if ($this->host === null) {
-            return true;
-        }
-        $uri_def = $config->getDefinition('URI');
-        if ($uri_def->host === $this->host) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Returns true if this URL should be considered a 'benign' URL,
      * that is:
      *
@@ -8911,34 +8666,81 @@ class HTMLPurifier_URI
         }
         return true;
     }
+
+    /**
+     * Returns true if this URL might be considered a 'local' URL given
+     * the current context.  This is true when the host is null, or
+     * when it matches the host supplied to the configuration.
+     *
+     * Note that this does not do any scheme checking, so it is mostly
+     * only appropriate for metadata that doesn't care about protocol
+     * security.  isBenign is probably what you actually want.
+     * @param HTMLPurifier_Config $config
+     * @param HTMLPurifier_Context $context
+     * @return bool
+     */
+    public function isLocal($config, $context)
+    {
+        if ($this->host === null) {
+            return true;
+        }
+        $uri_def = $config->getDefinition('URI');
+        if ($uri_def->host === $this->host) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Retrieves a scheme object corresponding to the URI's scheme/default
+     * @param HTMLPurifier_Config $config
+     * @param HTMLPurifier_Context $context
+     * @return HTMLPurifier_URIScheme Scheme object appropriate for validating this URI
+     */
+    public function getSchemeObj($config, $context)
+    {
+        $registry = HTMLPurifier_URISchemeRegistry::instance();
+        if ($this->scheme !== null) {
+            $scheme_obj = $registry->getScheme($this->scheme, $config, $context);
+            if (!$scheme_obj) {
+                return false;
+            } // invalid scheme, clean it out
+        } else {
+            // no scheme: retrieve the default one
+            $def = $config->getDefinition('URI');
+            $scheme_obj = $def->getDefaultScheme($config, $context);
+            if (!$scheme_obj) {
+                // something funky happened to the default scheme object
+                trigger_error(
+                    'Default scheme object "' . $def->defaultScheme . '" was not readable',
+                    E_USER_WARNING
+                );
+                return false;
+            }
+        }
+        return $scheme_obj;
+    }
 }
-
-
-
 
 
 class HTMLPurifier_URIDefinition extends HTMLPurifier_Definition
 {
-
     public $type = 'URI';
-    protected $filters = array();
-    protected $postFilters = array();
-    protected $registeredFilters = array();
-
     /**
      * HTMLPurifier_URI object of the base specified at %URI.Base
      */
     public $base;
-
     /**
      * String host to consider "home" base, derived off of $base
      */
     public $host;
-
     /**
      * Name of default scheme based on %URI.DefaultScheme and %URI.Base
      */
     public $defaultScheme;
+    protected $filters = array();
+    protected $postFilters = array();
+    protected $registeredFilters = array();
 
     public function __construct()
     {
@@ -8956,21 +8758,54 @@ class HTMLPurifier_URIDefinition extends HTMLPurifier_Definition
         $this->registeredFilters[$filter->name] = $filter;
     }
 
-    public function addFilter($filter, $config)
+    public function getDefaultScheme($config, $context)
     {
-        $r = $filter->prepare($config);
-        if ($r === false) return; // null is ok, for backwards compat
-        if ($filter->post) {
-            $this->postFilters[$filter->name] = $filter;
-        } else {
-            $this->filters[$filter->name] = $filter;
+        return HTMLPurifier_URISchemeRegistry::instance()->getScheme($this->defaultScheme, $config, $context);
+    }
+
+    public function filter(&$uri, $config, $context)
+    {
+        foreach ($this->filters as $name => $f) {
+            $result = $f->filter($uri, $config, $context);
+            if (!$result) {
+                return false;
+            }
         }
+        return true;
+    }
+
+    public function postFilter(&$uri, $config, $context)
+    {
+        foreach ($this->postFilters as $name => $f) {
+            $result = $f->filter($uri, $config, $context);
+            if (!$result) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected function doSetup($config)
     {
         $this->setupMemberVariables($config);
         $this->setupFilters($config);
+    }
+
+    protected function setupMemberVariables($config)
+    {
+        $this->host = $config->get('URI.Host');
+        $base_uri = $config->get('URI.Base');
+        if (!is_null($base_uri)) {
+            $parser = new HTMLPurifier_URIParser();
+            $this->base = $parser->parse($base_uri);
+            $this->defaultScheme = $this->base->scheme;
+            if (is_null($this->host)) {
+                $this->host = $this->base->host;
+            }
+        }
+        if (is_null($this->defaultScheme)) {
+            $this->defaultScheme = $config->get('URI.DefaultScheme');
+        }
     }
 
     protected function setupFilters($config)
@@ -8988,46 +8823,19 @@ class HTMLPurifier_URIDefinition extends HTMLPurifier_Definition
         unset($this->registeredFilters);
     }
 
-    protected function setupMemberVariables($config)
+    public function addFilter($filter, $config)
     {
-        $this->host = $config->get('URI.Host');
-        $base_uri = $config->get('URI.Base');
-        if (!is_null($base_uri)) {
-            $parser = new HTMLPurifier_URIParser();
-            $this->base = $parser->parse($base_uri);
-            $this->defaultScheme = $this->base->scheme;
-            if (is_null($this->host)) $this->host = $this->base->host;
+        $r = $filter->prepare($config);
+        if ($r === false) {
+            return;
+        } // null is ok, for backwards compat
+        if ($filter->post) {
+            $this->postFilters[$filter->name] = $filter;
+        } else {
+            $this->filters[$filter->name] = $filter;
         }
-        if (is_null($this->defaultScheme)) $this->defaultScheme = $config->get('URI.DefaultScheme');
     }
-
-    public function getDefaultScheme($config, $context)
-    {
-        return HTMLPurifier_URISchemeRegistry::instance()->getScheme($this->defaultScheme, $config, $context);
-    }
-
-    public function filter(&$uri, $config, $context)
-    {
-        foreach ($this->filters as $name => $f) {
-            $result = $f->filter($uri, $config, $context);
-            if (!$result) return false;
-        }
-        return true;
-    }
-
-    public function postFilter(&$uri, $config, $context)
-    {
-        foreach ($this->postFilters as $name => $f) {
-            $result = $f->filter($uri, $config, $context);
-            if (!$result) return false;
-        }
-        return true;
-    }
-
 }
-
-
-
 
 
 /**
@@ -9102,9 +8910,6 @@ abstract class HTMLPurifier_URIFilter
 }
 
 
-
-
-
 /**
  * Parses a URI into the components and fragment identifier as specified
  * by RFC 3986.
@@ -9135,34 +8940,36 @@ class HTMLPurifier_URIParser
         // Regexp is as per Appendix B.
         // Note that ["<>] are an addition to the RFC's recommended
         // characters, because they represent external delimeters.
-        $r_URI = '!'.
-            '(([a-zA-Z0-9\.\+\-]+):)?'. // 2. Scheme
-            '(//([^/?#"<>]*))?'. // 4. Authority
-            '([^?#"<>]*)'.       // 5. Path
-            '(\?([^#"<>]*))?'.   // 7. Query
-            '(#([^"<>]*))?'.     // 8. Fragment
+        $r_URI = '!' .
+            '(([a-zA-Z0-9\.\+\-]+):)?' . // 2. Scheme
+            '(//([^/?#"<>]*))?' . // 4. Authority
+            '([^?#"<>]*)' .       // 5. Path
+            '(\?([^#"<>]*))?' .   // 7. Query
+            '(#([^"<>]*))?' .     // 8. Fragment
             '!';
 
         $matches = array();
         $result = preg_match($r_URI, $uri, $matches);
 
-        if (!$result) return false; // *really* invalid URI
+        if (!$result) {
+            return false;
+        } // *really* invalid URI
 
         // seperate out parts
-        $scheme     = !empty($matches[1]) ? $matches[2] : null;
-        $authority  = !empty($matches[3]) ? $matches[4] : null;
-        $path       = $matches[5]; // always present, can be empty
-        $query      = !empty($matches[6]) ? $matches[7] : null;
-        $fragment   = !empty($matches[8]) ? $matches[9] : null;
+        $scheme = !empty($matches[1]) ? $matches[2] : null;
+        $authority = !empty($matches[3]) ? $matches[4] : null;
+        $path = $matches[5]; // always present, can be empty
+        $query = !empty($matches[6]) ? $matches[7] : null;
+        $fragment = !empty($matches[8]) ? $matches[9] : null;
 
         // further parse authority
         if ($authority !== null) {
             $r_authority = "/^((.+?)@)?(\[[^\]]+\]|[^:]*)(:(\d*))?/";
             $matches = array();
             preg_match($r_authority, $authority, $matches);
-            $userinfo   = !empty($matches[1]) ? $matches[2] : null;
-            $host       = !empty($matches[3]) ? $matches[3] : '';
-            $port       = !empty($matches[4]) ? (int) $matches[5] : null;
+            $userinfo = !empty($matches[1]) ? $matches[2] : null;
+            $host = !empty($matches[3]) ? $matches[3] : '';
+            $port = !empty($matches[4]) ? (int)$matches[5] : null;
         } else {
             $port = $host = $userinfo = null;
         }
@@ -9170,11 +8977,7 @@ class HTMLPurifier_URIParser
         return new HTMLPurifier_URI(
             $scheme, $userinfo, $host, $port, $path, $query, $fragment);
     }
-
 }
-
-
-
 
 
 /**
@@ -9221,15 +9024,6 @@ abstract class HTMLPurifier_URIScheme
     public $may_omit_host = false;
 
     /**
-     * Validates the components of a URI for a specific scheme.
-     * @param HTMLPurifier_URI $uri Reference to a HTMLPurifier_URI object
-     * @param HTMLPurifier_Config $config
-     * @param HTMLPurifier_Context $context
-     * @return bool success or failure
-     */
-    abstract public function doValidate(&$uri, $config, $context);
-
-    /**
      * Public interface for validating components of a URI.  Performs a
      * bunch of default actions. Don't overload this method.
      * @param HTMLPurifier_URI $uri Reference to a HTMLPurifier_URI object
@@ -9274,10 +9068,16 @@ abstract class HTMLPurifier_URIScheme
         }
         return $this->doValidate($uri, $config, $context);
     }
+
+    /**
+     * Validates the components of a URI for a specific scheme.
+     * @param HTMLPurifier_URI $uri Reference to a HTMLPurifier_URI object
+     * @param HTMLPurifier_Config $config
+     * @param HTMLPurifier_Context $context
+     * @return bool success or failure
+     */
+    abstract public function doValidate(&$uri, $config, $context);
 }
-
-
-
 
 
 /**
@@ -9285,6 +9085,12 @@ abstract class HTMLPurifier_URIScheme
  */
 class HTMLPurifier_URISchemeRegistry
 {
+
+    /**
+     * Cache of retrieved schemes.
+     * @type HTMLPurifier_URIScheme[]
+     */
+    protected $schemes = array();
 
     /**
      * Retrieve sole instance of the registry.
@@ -9304,12 +9110,6 @@ class HTMLPurifier_URISchemeRegistry
         }
         return $instance;
     }
-
-    /**
-     * Cache of retrieved schemes.
-     * @type HTMLPurifier_URIScheme[]
-     */
-    protected $schemes = array();
 
     /**
      * Retrieves a scheme validator object
@@ -9359,16 +9159,12 @@ class HTMLPurifier_URISchemeRegistry
 }
 
 
-
-
-
 /**
  * Class for converting between different unit-lengths as specified by
  * CSS.
  */
 class HTMLPurifier_UnitConverter
 {
-
     const ENGLISH = 1;
     const METRIC = 2;
     const DIGITAL = 3;
@@ -9525,7 +9321,6 @@ class HTMLPurifier_UnitConverter
             $state = $dest_state;
 
             // One more loop around to convert the unit in the new system.
-
         }
 
         // Post-condition: $unit == $to_unit
@@ -9567,19 +9362,42 @@ class HTMLPurifier_UnitConverter
     }
 
     /**
-     * Adds two numbers, using arbitrary precision when available.
+     * Divides two numbers, using arbitrary precision when available.
      * @param string $s1
      * @param string $s2
      * @param int $scale
      * @return string
      */
-    private function add($s1, $s2, $scale)
+    private function div($s1, $s2, $scale)
     {
         if ($this->bcmath) {
-            return bcadd($s1, $s2, $scale);
+            return bcdiv($s1, $s2, $scale);
         } else {
-            return $this->scale((float)$s1 + (float)$s2, $scale);
+            return $this->scale((float)$s1 / (float)$s2, $scale);
         }
+    }
+
+    /**
+     * Scales a float to $scale digits right of decimal point, like BCMath.
+     * @param float $r
+     * @param int $scale
+     * @return string
+     */
+    private function scale($r, $scale)
+    {
+        if ($scale < 0) {
+            // The f sprintf type doesn't support negative numbers, so we
+            // need to cludge things manually. First get the string.
+            $r = sprintf('%.0f', (float)$r);
+            // Due to floating point precision loss, $r will more than likely
+            // look something like 4652999999999.9234. We grab one more digit
+            // than we need to precise from $r and then use that to round
+            // appropriately.
+            $precise = (string)round(substr($r, 0, strlen($r) + $scale), -1);
+            // Now we return it, truncating the zero that was rounded off.
+            return substr($precise, 0, -1) . str_repeat('0', -$scale + 1);
+        }
+        return sprintf('%.' . $scale . 'f', (float)$r);
     }
 
     /**
@@ -9595,22 +9413,6 @@ class HTMLPurifier_UnitConverter
             return bcmul($s1, $s2, $scale);
         } else {
             return $this->scale((float)$s1 * (float)$s2, $scale);
-        }
-    }
-
-    /**
-     * Divides two numbers, using arbitrary precision when available.
-     * @param string $s1
-     * @param string $s2
-     * @param int $scale
-     * @return string
-     */
-    private function div($s1, $s2, $scale)
-    {
-        if ($this->bcmath) {
-            return bcdiv($s1, $s2, $scale);
-        } else {
-            return $this->scale((float)$s1 / (float)$s2, $scale);
         }
     }
 
@@ -9643,31 +9445,21 @@ class HTMLPurifier_UnitConverter
     }
 
     /**
-     * Scales a float to $scale digits right of decimal point, like BCMath.
-     * @param float $r
+     * Adds two numbers, using arbitrary precision when available.
+     * @param string $s1
+     * @param string $s2
      * @param int $scale
      * @return string
      */
-    private function scale($r, $scale)
+    private function add($s1, $s2, $scale)
     {
-        if ($scale < 0) {
-            // The f sprintf type doesn't support negative numbers, so we
-            // need to cludge things manually. First get the string.
-            $r = sprintf('%.0f', (float)$r);
-            // Due to floating point precision loss, $r will more than likely
-            // look something like 4652999999999.9234. We grab one more digit
-            // than we need to precise from $r and then use that to round
-            // appropriately.
-            $precise = (string)round(substr($r, 0, strlen($r) + $scale), -1);
-            // Now we return it, truncating the zero that was rounded off.
-            return substr($precise, 0, -1) . str_repeat('0', -$scale + 1);
+        if ($this->bcmath) {
+            return bcadd($s1, $s2, $scale);
+        } else {
+            return $this->scale((float)$s1 + (float)$s2, $scale);
         }
-        return sprintf('%.' . $scale . 'f', (float)$r);
     }
 }
-
-
-
 
 
 /**
@@ -9676,7 +9468,6 @@ class HTMLPurifier_UnitConverter
  */
 class HTMLPurifier_VarParser
 {
-
     const STRING = 1;
     const ISTRING = 2;
     const TEXT = 3;
@@ -9837,17 +9628,6 @@ class HTMLPurifier_VarParser
     }
 
     /**
-     * Generic error for if a type didn't work.
-     * @param mixed $var
-     * @param int $type
-     */
-    protected function errorGeneric($var, $type)
-    {
-        $vtype = gettype($var);
-        $this->error("Expected type " . HTMLPurifier_VarParser::getTypeName($type) . ", got $vtype");
-    }
-
-    /**
      * @param int $type
      * @return string
      */
@@ -9863,10 +9643,18 @@ class HTMLPurifier_VarParser
         }
         return $lookup[$type];
     }
+
+    /**
+     * Generic error for if a type didn't work.
+     * @param mixed $var
+     * @param int $type
+     */
+    protected function errorGeneric($var, $type)
+    {
+        $vtype = gettype($var);
+        $this->error("Expected type " . HTMLPurifier_VarParser::getTypeName($type) . ", got $vtype");
+    }
 }
-
-
-
 
 
 /**
@@ -9874,11 +9662,7 @@ class HTMLPurifier_VarParser
  */
 class HTMLPurifier_VarParserException extends HTMLPurifier_Exception
 {
-
 }
-
-
-
 
 
 /**
@@ -9898,12 +9682,13 @@ class HTMLPurifier_VarParserException extends HTMLPurifier_Exception
  * Nota bene: the current class gets confused if you try to store NULLs
  * in the list.
  */
-
 class HTMLPurifier_Zipper
 {
-    public $front, $back;
+    public $front;
+    public $back;
 
-    public function __construct($front, $back) {
+    public function __construct($front, $back)
+    {
         $this->front = $front;
         $this->back = $back;
     }
@@ -9914,10 +9699,21 @@ class HTMLPurifier_Zipper
      * @param Array to zipper-ify.
      * @return Tuple of zipper and element of first position.
      */
-    static public function fromArray($array) {
+    public static function fromArray($array)
+    {
         $z = new self(array(), array_reverse($array));
         $t = $z->delete(); // delete the "dummy hole"
         return array($z, $t);
+    }
+
+    /**
+     * Delete contents of current hole, shifting hole to
+     * next element.
+     * @return Original contents of new hole.
+     */
+    public function delete()
+    {
+        return empty($this->back) ? null : array_pop($this->back);
     }
 
     /**
@@ -9925,23 +9721,16 @@ class HTMLPurifier_Zipper
      * the hole with a value. (Usually you should supply a $t, unless you
      * are at the end of the array.)
      */
-    public function toArray($t = NULL) {
+    public function toArray($t = null)
+    {
         $a = $this->front;
-        if ($t !== NULL) $a[] = $t;
-        for ($i = count($this->back)-1; $i >= 0; $i--) {
+        if ($t !== null) {
+            $a[] = $t;
+        }
+        for ($i = count($this->back) - 1; $i >= 0; $i--) {
             $a[] = $this->back[$i];
         }
         return $a;
-    }
-
-    /**
-     * Move hole to the next element.
-     * @param $t Element to fill hole with
-     * @return Original contents of new hole.
-     */
-    public function next($t) {
-        if ($t !== NULL) array_push($this->front, $t);
-        return empty($this->back) ? NULL : array_pop($this->back);
     }
 
     /**
@@ -9950,7 +9739,8 @@ class HTMLPurifier_Zipper
      * @param $i How many forward to advance hole
      * @return Original contents of new hole, i away
      */
-    public function advance($t, $n) {
+    public function advance($t, $n)
+    {
         for ($i = 0; $i < $n; $i++) {
             $t = $this->next($t);
         }
@@ -9958,29 +9748,37 @@ class HTMLPurifier_Zipper
     }
 
     /**
+     * Move hole to the next element.
+     * @param $t Element to fill hole with
+     * @return Original contents of new hole.
+     */
+    public function next($t)
+    {
+        if ($t !== null) {
+            array_push($this->front, $t);
+        }
+        return empty($this->back) ? null : array_pop($this->back);
+    }
+
+    /**
      * Move hole to the previous element
      * @param $t Element to fill hole with
      * @return Original contents of new hole.
      */
-    public function prev($t) {
-        if ($t !== NULL) array_push($this->back, $t);
-        return empty($this->front) ? NULL : array_pop($this->front);
-    }
-
-    /**
-     * Delete contents of current hole, shifting hole to
-     * next element.
-     * @return Original contents of new hole.
-     */
-    public function delete() {
-        return empty($this->back) ? NULL : array_pop($this->back);
+    public function prev($t)
+    {
+        if ($t !== null) {
+            array_push($this->back, $t);
+        }
+        return empty($this->front) ? null : array_pop($this->front);
     }
 
     /**
      * Returns true if we are at the end of the list.
      * @return bool
      */
-    public function done() {
+    public function done()
+    {
         return empty($this->back);
     }
 
@@ -9988,16 +9786,11 @@ class HTMLPurifier_Zipper
      * Insert element before hole.
      * @param Element to insert
      */
-    public function insertBefore($t) {
-        if ($t !== NULL) array_push($this->front, $t);
-    }
-
-    /**
-     * Insert element after hole.
-     * @param Element to insert
-     */
-    public function insertAfter($t) {
-        if ($t !== NULL) array_push($this->back, $t);
+    public function insertBefore($t)
+    {
+        if ($t !== null) {
+            array_push($this->front, $t);
+        }
     }
 
     /**
@@ -10020,7 +9813,8 @@ class HTMLPurifier_Zipper
      *
      * @param Current contents of hole.
      */
-    public function splice($t, $delete, $replacement) {
+    public function splice($t, $delete, $replacement)
+    {
         // delete
         $old = array();
         $r = $t;
@@ -10029,14 +9823,24 @@ class HTMLPurifier_Zipper
             $r = $this->delete();
         }
         // insert
-        for ($i = count($replacement)-1; $i >= 0; $i--) {
+        for ($i = count($replacement) - 1; $i >= 0; $i--) {
             $this->insertAfter($r);
             $r = $replacement[$i];
         }
         return array($old, $r);
     }
-}
 
+    /**
+     * Insert element after hole.
+     * @param Element to insert
+     */
+    public function insertAfter($t)
+    {
+        if ($t !== null) {
+            array_push($this->back, $t);
+        }
+    }
+}
 
 
 /**
@@ -10137,13 +9941,8 @@ class HTMLPurifier_AttrDef_CSS extends HTMLPurifier_AttrDef
         }
 
         return $new_declarations ? $new_declarations : false;
-
     }
-
 }
-
-
-
 
 
 /**
@@ -10186,9 +9985,6 @@ class HTMLPurifier_AttrDef_Clone extends HTMLPurifier_AttrDef
         return clone $this->clone;
     }
 }
-
-
-
 
 
 // Enum = Enumerated
@@ -10260,9 +10056,6 @@ class HTMLPurifier_AttrDef_Enum extends HTMLPurifier_AttrDef
         return new HTMLPurifier_AttrDef_Enum($values, $sensitive);
     }
 }
-
-
-
 
 
 /**
@@ -10354,9 +10147,6 @@ class HTMLPurifier_AttrDef_Integer extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates the HTML attribute lang, effectively a language code.
  * @note Built according to RFC 3066, which obsoleted RFC 1766
@@ -10441,9 +10231,6 @@ class HTMLPurifier_AttrDef_Lang extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Decorator that, depending on a token, switches between two definitions.
  */
@@ -10495,9 +10282,6 @@ class HTMLPurifier_AttrDef_Switch
 }
 
 
-
-
-
 /**
  * Validates arbitrary text according to the HTML spec.
  */
@@ -10515,9 +10299,6 @@ class HTMLPurifier_AttrDef_Text extends HTMLPurifier_AttrDef
         return $this->parseCDATA($string);
     }
 }
-
-
-
 
 
 /**
@@ -10616,7 +10397,6 @@ class HTMLPurifier_AttrDef_URI extends HTMLPurifier_AttrDef
 
             // survived gauntlet
             $ok = true;
-
         } while (false);
 
         $context->destroy('EmbeddedURI');
@@ -10627,9 +10407,6 @@ class HTMLPurifier_AttrDef_URI extends HTMLPurifier_AttrDef
         return $uri->toString();
     }
 }
-
-
-
 
 
 /**
@@ -10714,12 +10491,8 @@ class HTMLPurifier_AttrDef_CSS_Number extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 class HTMLPurifier_AttrDef_CSS_AlphaValue extends HTMLPurifier_AttrDef_CSS_Number
 {
-
     public function __construct()
     {
         parent::__construct(false); // opacity is non-negative, but we will clamp it
@@ -10747,9 +10520,6 @@ class HTMLPurifier_AttrDef_CSS_AlphaValue extends HTMLPurifier_AttrDef_CSS_Numbe
         return $result;
     }
 }
-
-
-
 
 
 /**
@@ -10842,7 +10612,7 @@ class HTMLPurifier_AttrDef_CSS_Background extends HTMLPurifier_AttrDef
         }
         if ($caught['position'] !== false) {
             $caught['position'] = $this->info['background-position']->
-                validate($caught['position'], $config, $context);
+            validate($caught['position'], $config, $context);
         }
 
         $ret = array();
@@ -10859,9 +10629,6 @@ class HTMLPurifier_AttrDef_CSS_Background extends HTMLPurifier_AttrDef
         return implode(' ', $ret);
     }
 }
-
-
-
 
 
 /* W3C says:
@@ -11019,9 +10786,6 @@ class HTMLPurifier_AttrDef_CSS_BackgroundPosition extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates the border property as defined by CSS.
  */
@@ -11074,9 +10838,6 @@ class HTMLPurifier_AttrDef_CSS_Border extends HTMLPurifier_AttrDef
         return rtrim($ret);
     }
 }
-
-
-
 
 
 /**
@@ -11182,9 +10943,6 @@ class HTMLPurifier_AttrDef_CSS_Color extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Allows multiple validators to attempt to validate attribute.
  *
@@ -11231,9 +10989,6 @@ class HTMLPurifier_AttrDef_CSS_Composite extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Decorator which enables CSS properties to be disabled for specific elements.
  */
@@ -11274,9 +11029,6 @@ class HTMLPurifier_AttrDef_CSS_DenyElementDecorator extends HTMLPurifier_AttrDef
         return $this->def->validate($string, $config, $context);
     }
 }
-
-
-
 
 
 /**
@@ -11352,9 +11104,6 @@ class HTMLPurifier_AttrDef_CSS_Filter extends HTMLPurifier_AttrDef
         return $ret_function;
     }
 }
-
-
-
 
 
 /**
@@ -11531,15 +11280,11 @@ class HTMLPurifier_AttrDef_CSS_Font extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates a font family list according to CSS spec
  */
 class HTMLPurifier_AttrDef_CSS_FontFamily extends HTMLPurifier_AttrDef
 {
-
     protected $mask = null;
 
     public function __construct()
@@ -11747,11 +11492,7 @@ class HTMLPurifier_AttrDef_CSS_FontFamily extends HTMLPurifier_AttrDef
         }
         return $final;
     }
-
 }
-
-
-
 
 
 /**
@@ -11782,9 +11523,6 @@ class HTMLPurifier_AttrDef_CSS_Ident extends HTMLPurifier_AttrDef
         return $string;
     }
 }
-
-
-
 
 
 /**
@@ -11839,9 +11577,6 @@ class HTMLPurifier_AttrDef_CSS_ImportantDecorator extends HTMLPurifier_AttrDef
         return $string;
     }
 }
-
-
-
 
 
 /**
@@ -11917,9 +11652,6 @@ class HTMLPurifier_AttrDef_CSS_Length extends HTMLPurifier_AttrDef
         return $length->toString();
     }
 }
-
-
-
 
 
 /**
@@ -12032,9 +11764,6 @@ class HTMLPurifier_AttrDef_CSS_ListStyle extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Framework class for strings that involve multiple values.
  *
@@ -12104,9 +11833,6 @@ class HTMLPurifier_AttrDef_CSS_Multiple extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates a Percentage as defined by the CSS spec.
  */
@@ -12159,9 +11885,6 @@ class HTMLPurifier_AttrDef_CSS_Percentage extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates the value for the CSS property text-decoration
  * @note This class could be generalized into a version that acts sort of
@@ -12206,9 +11929,6 @@ class HTMLPurifier_AttrDef_CSS_TextDecoration extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates a URI in CSS syntax, which uses url('http://example.com')
  * @note While theoretically speaking a URI in a CSS document could
@@ -12220,7 +11940,6 @@ class HTMLPurifier_AttrDef_CSS_TextDecoration extends HTMLPurifier_AttrDef
  */
 class HTMLPurifier_AttrDef_CSS_URI extends HTMLPurifier_AttrDef_URI
 {
-
     public function __construct()
     {
         parent::__construct(true); // always embedded
@@ -12281,9 +12000,6 @@ class HTMLPurifier_AttrDef_CSS_URI extends HTMLPurifier_AttrDef_URI
 }
 
 
-
-
-
 /**
  * Validates a boolean attribute
  */
@@ -12293,12 +12009,11 @@ class HTMLPurifier_AttrDef_HTML_Bool extends HTMLPurifier_AttrDef
     /**
      * @type bool
      */
-    protected $name;
-
+    public $minimized = true;
     /**
      * @type bool
      */
-    public $minimized = true;
+    protected $name;
 
     /**
      * @param bool $name
@@ -12331,9 +12046,6 @@ class HTMLPurifier_AttrDef_HTML_Bool extends HTMLPurifier_AttrDef
         return new HTMLPurifier_AttrDef_HTML_Bool($string);
     }
 }
-
-
-
 
 
 /**
@@ -12404,9 +12116,6 @@ class HTMLPurifier_AttrDef_HTML_Nmtokens extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Implements special behavior for class attribute (normally NMTOKENS)
  */
@@ -12453,7 +12162,6 @@ class HTMLPurifier_AttrDef_HTML_Class extends HTMLPurifier_AttrDef_HTML_Nmtokens
         return $ret;
     }
 }
-
 
 
 /**
@@ -12505,9 +12213,6 @@ class HTMLPurifier_AttrDef_HTML_Color extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Special-case enum attribute definition that lazy loads allowed frame targets
  */
@@ -12544,9 +12249,6 @@ class HTMLPurifier_AttrDef_HTML_FrameTarget extends HTMLPurifier_AttrDef_Enum
 }
 
 
-
-
-
 /**
  * Validates the HTML attribute ID.
  * @warning Even though this is the id processor, it
@@ -12555,7 +12257,6 @@ class HTMLPurifier_AttrDef_HTML_FrameTarget extends HTMLPurifier_AttrDef_Enum
  *          automatically generated, it will have already absorbed the
  *          blacklist. If you're hacking around, make sure you use load()!
  */
-
 class HTMLPurifier_AttrDef_HTML_ID extends HTMLPurifier_AttrDef
 {
 
@@ -12650,9 +12351,6 @@ class HTMLPurifier_AttrDef_HTML_ID extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates an integer representation of pixels according to the HTML spec.
  */
@@ -12727,16 +12425,12 @@ class HTMLPurifier_AttrDef_HTML_Pixels extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates the HTML type length (not to be confused with CSS's length).
  *
  * This accepts integer pixels or percentages as lengths for certain
  * HTML attributes.
  */
-
 class HTMLPurifier_AttrDef_HTML_Length extends HTMLPurifier_AttrDef_HTML_Pixels
 {
 
@@ -12782,9 +12476,6 @@ class HTMLPurifier_AttrDef_HTML_Length extends HTMLPurifier_AttrDef_HTML_Pixels
         return ((string)$points) . '%';
     }
 }
-
-
-
 
 
 /**
@@ -12857,9 +12548,6 @@ class HTMLPurifier_AttrDef_HTML_LinkTypes extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates a MultiLength as defined by the HTML spec.
  *
@@ -12918,9 +12606,6 @@ class HTMLPurifier_AttrDef_HTML_MultiLength extends HTMLPurifier_AttrDef_HTML_Le
 }
 
 
-
-
-
 abstract class HTMLPurifier_AttrDef_URI_Email extends HTMLPurifier_AttrDef
 {
 
@@ -12933,13 +12618,9 @@ abstract class HTMLPurifier_AttrDef_URI_Email extends HTMLPurifier_AttrDef
     {
         // needs to be implemented
     }
-
 }
 
 // sub-implementations
-
-
-
 
 
 /**
@@ -13019,8 +12700,8 @@ class HTMLPurifier_AttrDef_URI_Host extends HTMLPurifier_AttrDef
         $underscore = $config->get('Core.AllowHostnameUnderscore') ? '_' : '';
 
         // The productions describing this are:
-        $a   = '[a-z]';     // alpha
-        $an  = '[a-z0-9]';  // alphanum
+        $a = '[a-z]';     // alpha
+        $an = '[a-z0-9]';  // alphanum
         $and = "[a-z0-9-$underscore]"; // alphanum | "-"
         // domainlabel = alphanum | alphanum *( alphanum | "-" ) alphanum
         $domainlabel = "$an($and*$an)?";
@@ -13068,9 +12749,6 @@ class HTMLPurifier_AttrDef_URI_Host extends HTMLPurifier_AttrDef
 }
 
 
-
-
-
 /**
  * Validates an IPv4 address
  * @author Feyd @ forums.devnetwork.net (public domain)
@@ -13112,9 +12790,6 @@ class HTMLPurifier_AttrDef_URI_IPv4 extends HTMLPurifier_AttrDef
         $this->ip4 = "(?:{$oct}\\.{$oct}\\.{$oct}\\.{$oct})";
     }
 }
-
-
-
 
 
 /**
@@ -13204,9 +12879,6 @@ class HTMLPurifier_AttrDef_URI_IPv6 extends HTMLPurifier_AttrDef_URI_IPv4
 }
 
 
-
-
-
 /**
  * Primitive email validation class based on the regexp found at
  * http://www.regular-expressions.info/email.html
@@ -13232,9 +12904,6 @@ class HTMLPurifier_AttrDef_URI_Email_SimpleCheck extends HTMLPurifier_AttrDef_UR
         return $result ? $string : false;
     }
 }
-
-
-
 
 
 /**
@@ -13263,9 +12932,6 @@ class HTMLPurifier_AttrTransform_Background extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 // this MUST be placed in post, as it assumes that any value in dir is valid
 
 /**
@@ -13289,9 +12955,6 @@ class HTMLPurifier_AttrTransform_BdoDir extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 /**
@@ -13318,9 +12981,6 @@ class HTMLPurifier_AttrTransform_BgColor extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 /**
@@ -13368,9 +13028,6 @@ class HTMLPurifier_AttrTransform_BoolToCSS extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 /**
  * Pre-transform that changes deprecated border attribute to CSS.
  */
@@ -13393,9 +13050,6 @@ class HTMLPurifier_AttrTransform_Border extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 /**
@@ -13464,9 +13118,6 @@ class HTMLPurifier_AttrTransform_EnumToCSS extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 // must be called POST validation
 
 /**
@@ -13511,9 +13162,6 @@ class HTMLPurifier_AttrTransform_ImgRequired extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 /**
@@ -13575,9 +13223,6 @@ class HTMLPurifier_AttrTransform_ImgSpace extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 /**
  * Performs miscellaneous cross attribute validation and filtering for
  * input elements. This is meant to be a post-transform.
@@ -13632,9 +13277,6 @@ class HTMLPurifier_AttrTransform_Input extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 /**
  * Post-transform that copies lang's value to xml:lang (and vice-versa)
  * @note Theoretically speaking, this could be a pre-transform, but putting
@@ -13662,9 +13304,6 @@ class HTMLPurifier_AttrTransform_Lang extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 /**
@@ -13710,9 +13349,6 @@ class HTMLPurifier_AttrTransform_Length extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 /**
  * Pre-transform that changes deprecated name attribute to ID if necessary
  */
@@ -13744,9 +13380,6 @@ class HTMLPurifier_AttrTransform_Name extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 /**
  * Post-transform that performs validation to the name attribute; if
  * it is present with an equivalent id attribute, it is passed through;
@@ -13754,7 +13387,6 @@ class HTMLPurifier_AttrTransform_Name extends HTMLPurifier_AttrTransform
  */
 class HTMLPurifier_AttrTransform_NameSync extends HTMLPurifier_AttrTransform
 {
-
     public function __construct()
     {
         $this->idDef = new HTMLPurifier_AttrDef_HTML_ID();
@@ -13784,9 +13416,6 @@ class HTMLPurifier_AttrTransform_NameSync extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 // must be called POST validation
@@ -13839,9 +13468,6 @@ class HTMLPurifier_AttrTransform_Nofollow extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 class HTMLPurifier_AttrTransform_SafeEmbed extends HTMLPurifier_AttrTransform
 {
     /**
@@ -13863,9 +13489,6 @@ class HTMLPurifier_AttrTransform_SafeEmbed extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 /**
@@ -13892,9 +13515,6 @@ class HTMLPurifier_AttrTransform_SafeObject extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 /**
@@ -13974,9 +13594,6 @@ class HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 /**
  * Implements required attribute stipulation for <script>
  */
@@ -13996,9 +13613,6 @@ class HTMLPurifier_AttrTransform_ScriptRequired extends HTMLPurifier_AttrTransfo
         return $attr;
     }
 }
-
-
-
 
 
 // must be called POST validation
@@ -14044,9 +13658,6 @@ class HTMLPurifier_AttrTransform_TargetBlank extends HTMLPurifier_AttrTransform
 }
 
 
-
-
-
 /**
  * Sets height/width defaults for <textarea>
  */
@@ -14070,9 +13681,6 @@ class HTMLPurifier_AttrTransform_Textarea extends HTMLPurifier_AttrTransform
         return $attr;
     }
 }
-
-
-
 
 
 /**
@@ -14138,9 +13746,6 @@ class HTMLPurifier_ChildDef_Chameleon extends HTMLPurifier_ChildDef
         }
     }
 }
-
-
-
 
 
 /**
@@ -14243,9 +13848,6 @@ class HTMLPurifier_ChildDef_Custom extends HTMLPurifier_ChildDef
 }
 
 
-
-
-
 /**
  * Definition that disallows all elements.
  * @warning validateChildren() in this class is actually never called, because
@@ -14280,9 +13882,6 @@ class HTMLPurifier_ChildDef_Empty extends HTMLPurifier_ChildDef
         return array();
     }
 }
-
-
-
 
 
 /**
@@ -14369,9 +13968,6 @@ class HTMLPurifier_ChildDef_List extends HTMLPurifier_ChildDef
 }
 
 
-
-
-
 /**
  * Definition that allows a set of elements, but disallows empty children.
  */
@@ -14382,7 +13978,14 @@ class HTMLPurifier_ChildDef_Required extends HTMLPurifier_ChildDef
      * @type array
      */
     public $elements = array();
-
+    /**
+     * @type bool
+     */
+    public $allow_empty = false;
+    /**
+     * @type string
+     */
+    public $type = 'required';
     /**
      * Whether or not the last passed node was all whitespace.
      * @type bool
@@ -14410,16 +14013,6 @@ class HTMLPurifier_ChildDef_Required extends HTMLPurifier_ChildDef
         }
         $this->elements = $elements;
     }
-
-    /**
-     * @type bool
-     */
-    public $allow_empty = false;
-
-    /**
-     * @type string
-     */
-    public $type = 'required';
 
     /**
      * @param array $children
@@ -14488,9 +14081,6 @@ class HTMLPurifier_ChildDef_Required extends HTMLPurifier_ChildDef
 }
 
 
-
-
-
 /**
  * Definition that allows a set of elements, and allows no children.
  * @note This is a hack to reuse code from HTMLPurifier_ChildDef_Required,
@@ -14534,34 +14124,27 @@ class HTMLPurifier_ChildDef_Optional extends HTMLPurifier_ChildDef_Required
 }
 
 
-
-
-
 /**
  * Takes the contents of blockquote when in strict and reformats for validation.
  */
 class HTMLPurifier_ChildDef_StrictBlockquote extends HTMLPurifier_ChildDef_Required
 {
     /**
-     * @type array
-     */
-    protected $real_elements;
-
-    /**
-     * @type array
-     */
-    protected $fake_elements;
-
-    /**
      * @type bool
      */
     public $allow_empty = true;
-
     /**
      * @type string
      */
     public $type = 'strictblockquote';
-
+    /**
+     * @type array
+     */
+    protected $real_elements;
+    /**
+     * @type array
+     */
+    protected $fake_elements;
     /**
      * @type bool
      */
@@ -14577,6 +14160,21 @@ class HTMLPurifier_ChildDef_StrictBlockquote extends HTMLPurifier_ChildDef_Requi
     {
         $this->init($config);
         return $this->fake_elements;
+    }
+
+    /**
+     * @param HTMLPurifier_Config $config
+     */
+    private function init($config)
+    {
+        if (!$this->init) {
+            $def = $config->getHTMLDefinition();
+            // allow all inline elements
+            $this->real_elements = $this->elements;
+            $this->fake_elements = $def->info_content_sets['Flow'];
+            $this->fake_elements['#PCDATA'] = true;
+            $this->init = true;
+        }
     }
 
     /**
@@ -14609,14 +14207,14 @@ class HTMLPurifier_ChildDef_StrictBlockquote extends HTMLPurifier_ChildDef_Requi
         foreach ($result as $node) {
             if ($block_wrap === false) {
                 if (($node instanceof HTMLPurifier_Node_Text && !$node->is_whitespace) ||
-                    ($node instanceof HTMLPurifier_Node_Element && !isset($this->elements[$node->name]))) {
-                        $block_wrap = new HTMLPurifier_Node_Element($def->info_block_wrapper);
-                        $ret[] = $block_wrap;
+                    ($node instanceof HTMLPurifier_Node_Element && !isset($this->elements[$node->name]))
+                ) {
+                    $block_wrap = new HTMLPurifier_Node_Element($def->info_block_wrapper);
+                    $ret[] = $block_wrap;
                 }
             } else {
                 if ($node instanceof HTMLPurifier_Node_Element && isset($this->elements[$node->name])) {
                     $block_wrap = false;
-
                 }
             }
             if ($block_wrap) {
@@ -14627,25 +14225,7 @@ class HTMLPurifier_ChildDef_StrictBlockquote extends HTMLPurifier_ChildDef_Requi
         }
         return $ret;
     }
-
-    /**
-     * @param HTMLPurifier_Config $config
-     */
-    private function init($config)
-    {
-        if (!$this->init) {
-            $def = $config->getHTMLDefinition();
-            // allow all inline elements
-            $this->real_elements = $this->elements;
-            $this->fake_elements = $def->info_content_sets['Flow'];
-            $this->fake_elements['#PCDATA'] = true;
-            $this->init = true;
-        }
-    }
 }
-
-
-
 
 
 /**
@@ -14734,7 +14314,7 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
         $content = array();
 
         $tbody_mode = false; // if true, then we need to wrap any stray
-                             // <tr>s with a <tbody>.
+        // <tr>s with a <tbody>.
 
         $ws_accum =& $initial_ws;
 
@@ -14744,71 +14324,73 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
                 continue;
             }
             switch ($node->name) {
-            case 'tbody':
-                $tbody_mode = true;
+                case 'tbody':
+                    $tbody_mode = true;
                 // fall through
-            case 'tr':
-                $content[] = $node;
-                $ws_accum =& $content;
-                break;
-            case 'caption':
-                // there can only be one caption!
-                if ($caption !== false)  break;
-                $caption = $node;
-                $ws_accum =& $after_caption_ws;
-                break;
-            case 'thead':
-                $tbody_mode = true;
-                // XXX This breaks rendering properties with
-                // Firefox, which never floats a <thead> to
-                // the top. Ever. (Our scheme will float the
-                // first <thead> to the top.)  So maybe
-                // <thead>s that are not first should be
-                // turned into <tbody>? Very tricky, indeed.
-                if ($thead === false) {
-                    $thead = $node;
-                    $ws_accum =& $after_thead_ws;
-                } else {
-                    // Oops, there's a second one! What
-                    // should we do?  Current behavior is to
-                    // transmutate the first and last entries into
-                    // tbody tags, and then put into content.
-                    // Maybe a better idea is to *attach
-                    // it* to the existing thead or tfoot?
-                    // We don't do this, because Firefox
-                    // doesn't float an extra tfoot to the
-                    // bottom like it does for the first one.
-                    $node->name = 'tbody';
+                case 'tr':
                     $content[] = $node;
                     $ws_accum =& $content;
-                }
-                break;
-            case 'tfoot':
-                // see above for some aveats
-                $tbody_mode = true;
-                if ($tfoot === false) {
-                    $tfoot = $node;
-                    $ws_accum =& $after_tfoot_ws;
-                } else {
-                    $node->name = 'tbody';
-                    $content[] = $node;
-                    $ws_accum =& $content;
-                }
-                break;
-            case 'colgroup':
-            case 'col':
-                $cols[] = $node;
-                $ws_accum =& $cols;
-                break;
-            case '#PCDATA':
-                // How is whitespace handled? We treat is as sticky to
-                // the *end* of the previous element. So all of the
-                // nonsense we have worked on is to keep things
-                // together.
-                if (!empty($node->is_whitespace)) {
-                    $ws_accum[] = $node;
-                }
-                break;
+                    break;
+                case 'caption':
+                    // there can only be one caption!
+                    if ($caption !== false) {
+                        break;
+                    }
+                    $caption = $node;
+                    $ws_accum =& $after_caption_ws;
+                    break;
+                case 'thead':
+                    $tbody_mode = true;
+                    // XXX This breaks rendering properties with
+                    // Firefox, which never floats a <thead> to
+                    // the top. Ever. (Our scheme will float the
+                    // first <thead> to the top.)  So maybe
+                    // <thead>s that are not first should be
+                    // turned into <tbody>? Very tricky, indeed.
+                    if ($thead === false) {
+                        $thead = $node;
+                        $ws_accum =& $after_thead_ws;
+                    } else {
+                        // Oops, there's a second one! What
+                        // should we do?  Current behavior is to
+                        // transmutate the first and last entries into
+                        // tbody tags, and then put into content.
+                        // Maybe a better idea is to *attach
+                        // it* to the existing thead or tfoot?
+                        // We don't do this, because Firefox
+                        // doesn't float an extra tfoot to the
+                        // bottom like it does for the first one.
+                        $node->name = 'tbody';
+                        $content[] = $node;
+                        $ws_accum =& $content;
+                    }
+                    break;
+                case 'tfoot':
+                    // see above for some aveats
+                    $tbody_mode = true;
+                    if ($tfoot === false) {
+                        $tfoot = $node;
+                        $ws_accum =& $after_tfoot_ws;
+                    } else {
+                        $node->name = 'tbody';
+                        $content[] = $node;
+                        $ws_accum =& $content;
+                    }
+                    break;
+                case 'colgroup':
+                case 'col':
+                    $cols[] = $node;
+                    $ws_accum =& $cols;
+                    break;
+                case '#PCDATA':
+                    // How is whitespace handled? We treat is as sticky to
+                    // the *end* of the previous element. So all of the
+                    // nonsense we have worked on is to keep things
+                    // together.
+                    if (!empty($node->is_whitespace)) {
+                        $ws_accum[] = $node;
+                    }
+                    break;
             }
         }
 
@@ -14837,27 +14419,27 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
             // we have to shuffle tr into tbody
             $current_tr_tbody = null;
 
-            foreach($content as $node) {
+            foreach ($content as $node) {
                 switch ($node->name) {
-                case 'tbody':
-                    $current_tr_tbody = null;
-                    $ret[] = $node;
-                    break;
-                case 'tr':
-                    if ($current_tr_tbody === null) {
-                        $current_tr_tbody = new HTMLPurifier_Node_Element('tbody');
-                        $ret[] = $current_tr_tbody;
-                    }
-                    $current_tr_tbody->children[] = $node;
-                    break;
-                case '#PCDATA':
-                    assert($node->is_whitespace);
-                    if ($current_tr_tbody === null) {
+                    case 'tbody':
+                        $current_tr_tbody = null;
                         $ret[] = $node;
-                    } else {
+                        break;
+                    case 'tr':
+                        if ($current_tr_tbody === null) {
+                            $current_tr_tbody = new HTMLPurifier_Node_Element('tbody');
+                            $ret[] = $current_tr_tbody;
+                        }
                         $current_tr_tbody->children[] = $node;
-                    }
-                    break;
+                        break;
+                    case '#PCDATA':
+                        assert($node->is_whitespace);
+                        if ($current_tr_tbody === null) {
+                            $ret[] = $node;
+                        } else {
+                            $current_tr_tbody->children[] = $node;
+                        }
+                        break;
                 }
             }
         } else {
@@ -14865,12 +14447,8 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
         }
 
         return $ret;
-
     }
 }
-
-
-
 
 
 class HTMLPurifier_DefinitionCache_Decorator extends HTMLPurifier_DefinitionCache
@@ -14983,9 +14561,6 @@ class HTMLPurifier_DefinitionCache_Decorator extends HTMLPurifier_DefinitionCach
 }
 
 
-
-
-
 /**
  * Null cache object to use when no caching is on.
  */
@@ -15060,9 +14635,6 @@ class HTMLPurifier_DefinitionCache_Null extends HTMLPurifier_DefinitionCache
 }
 
 
-
-
-
 class HTMLPurifier_DefinitionCache_Serializer extends HTMLPurifier_DefinitionCache
 {
 
@@ -15084,6 +14656,154 @@ class HTMLPurifier_DefinitionCache_Serializer extends HTMLPurifier_DefinitionCac
             return false;
         }
         return $this->_write($file, serialize($def), $config);
+    }
+
+    /**
+     * Generates the file path to the serial file corresponding to
+     * the configuration and definition name
+     * @param HTMLPurifier_Config $config
+     * @return string
+     * @todo Make protected
+     */
+    public function generateFilePath($config)
+    {
+        $key = $this->generateKey($config);
+        return $this->generateDirectoryPath($config) . '/' . $key . '.ser';
+    }
+
+    /**
+     * Generates the path to the directory contain this cache's serial files
+     * @param HTMLPurifier_Config $config
+     * @return string
+     * @note No trailing slash
+     * @todo Make protected
+     */
+    public function generateDirectoryPath($config)
+    {
+        $base = $this->generateBaseDirectoryPath($config);
+        return $base . '/' . $this->type;
+    }
+
+    /**
+     * Generates path to base directory that contains all definition type
+     * serials
+     * @param HTMLPurifier_Config $config
+     * @return mixed|string
+     * @todo Make protected
+     */
+    public function generateBaseDirectoryPath($config)
+    {
+        $base = $config->get('Cache.SerializerPath');
+        $base = is_null($base) ? HTMLPURIFIER_PREFIX . '/HTMLPurifier/DefinitionCache/Serializer' : $base;
+        return $base;
+    }
+
+    /**
+     * Prepares the directory that this type stores the serials in
+     * @param HTMLPurifier_Config $config
+     * @return bool True if successful
+     */
+    private function _prepareDir($config)
+    {
+        $directory = $this->generateDirectoryPath($config);
+        $chmod = $config->get('Cache.SerializerPermissions');
+        if (!$chmod) {
+            $chmod = 0755; // invalid config or simpletest
+        }
+        if (!is_dir($directory)) {
+            $base = $this->generateBaseDirectoryPath($config);
+            if (!is_dir($base)) {
+                trigger_error(
+                    'Base directory ' . $base . ' does not exist,
+                    please create or change using %Cache.SerializerPath',
+                    E_USER_WARNING
+                );
+                return false;
+            } elseif (!$this->_testPermissions($base, $chmod)) {
+                return false;
+            }
+            $old = umask(0000);
+            mkdir($directory, $chmod);
+            umask($old);
+        } elseif (!$this->_testPermissions($directory, $chmod)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Tests permissions on a directory and throws out friendly
+     * error messages and attempts to chmod it itself if possible
+     * @param string $dir Directory path
+     * @param int $chmod Permissions
+     * @return bool True if directory is writable
+     */
+    private function _testPermissions($dir, $chmod)
+    {
+        // early abort, if it is writable, everything is hunky-dory
+        if (is_writable($dir)) {
+            return true;
+        }
+        if (!is_dir($dir)) {
+            // generally, you'll want to handle this beforehand
+            // so a more specific error message can be given
+            trigger_error(
+                'Directory ' . $dir . ' does not exist',
+                E_USER_WARNING
+            );
+            return false;
+        }
+        if (function_exists('posix_getuid')) {
+            // POSIX system, we can give more specific advice
+            if (fileowner($dir) === posix_getuid()) {
+                // we can chmod it ourselves
+                $chmod = $chmod | 0700;
+                if (chmod($dir, $chmod)) {
+                    return true;
+                }
+            } elseif (filegroup($dir) === posix_getgid()) {
+                $chmod = $chmod | 0070;
+            } else {
+                // PHP's probably running as nobody, so we'll
+                // need to give global permissions
+                $chmod = $chmod | 0777;
+            }
+            trigger_error(
+                'Directory ' . $dir . ' not writable, ' .
+                'please chmod to ' . decoct($chmod),
+                E_USER_WARNING
+            );
+        } else {
+            // generic error message
+            trigger_error(
+                'Directory ' . $dir . ' not writable, ' .
+                'please alter file permissions',
+                E_USER_WARNING
+            );
+        }
+        return false;
+    }
+
+    /**
+     * Convenience wrapper function for file_put_contents
+     * @param string $file File name to write to
+     * @param string $data Data to write into file
+     * @param HTMLPurifier_Config $config
+     * @return int|bool Number of bytes written if success, or false if failure.
+     */
+    private function _write($file, $data, $config)
+    {
+        $result = file_put_contents($file, $data);
+        if ($result !== false) {
+            // set permissions of the new file (no execute)
+            $chmod = $config->get('Cache.SerializerPermissions');
+            if (!$chmod) {
+                $chmod = 0644; // invalid config or simpletest
+            }
+            $chmod = $chmod & 0666;
+            chmod($file, $chmod);
+        }
+        return $result;
     }
 
     /**
@@ -15195,158 +14915,7 @@ class HTMLPurifier_DefinitionCache_Serializer extends HTMLPurifier_DefinitionCac
             }
         }
     }
-
-    /**
-     * Generates the file path to the serial file corresponding to
-     * the configuration and definition name
-     * @param HTMLPurifier_Config $config
-     * @return string
-     * @todo Make protected
-     */
-    public function generateFilePath($config)
-    {
-        $key = $this->generateKey($config);
-        return $this->generateDirectoryPath($config) . '/' . $key . '.ser';
-    }
-
-    /**
-     * Generates the path to the directory contain this cache's serial files
-     * @param HTMLPurifier_Config $config
-     * @return string
-     * @note No trailing slash
-     * @todo Make protected
-     */
-    public function generateDirectoryPath($config)
-    {
-        $base = $this->generateBaseDirectoryPath($config);
-        return $base . '/' . $this->type;
-    }
-
-    /**
-     * Generates path to base directory that contains all definition type
-     * serials
-     * @param HTMLPurifier_Config $config
-     * @return mixed|string
-     * @todo Make protected
-     */
-    public function generateBaseDirectoryPath($config)
-    {
-        $base = $config->get('Cache.SerializerPath');
-        $base = is_null($base) ? HTMLPURIFIER_PREFIX . '/HTMLPurifier/DefinitionCache/Serializer' : $base;
-        return $base;
-    }
-
-    /**
-     * Convenience wrapper function for file_put_contents
-     * @param string $file File name to write to
-     * @param string $data Data to write into file
-     * @param HTMLPurifier_Config $config
-     * @return int|bool Number of bytes written if success, or false if failure.
-     */
-    private function _write($file, $data, $config)
-    {
-        $result = file_put_contents($file, $data);
-        if ($result !== false) {
-            // set permissions of the new file (no execute)
-            $chmod = $config->get('Cache.SerializerPermissions');
-            if (!$chmod) {
-                $chmod = 0644; // invalid config or simpletest
-            }
-            $chmod = $chmod & 0666;
-            chmod($file, $chmod);
-        }
-        return $result;
-    }
-
-    /**
-     * Prepares the directory that this type stores the serials in
-     * @param HTMLPurifier_Config $config
-     * @return bool True if successful
-     */
-    private function _prepareDir($config)
-    {
-        $directory = $this->generateDirectoryPath($config);
-        $chmod = $config->get('Cache.SerializerPermissions');
-        if (!$chmod) {
-            $chmod = 0755; // invalid config or simpletest
-        }
-        if (!is_dir($directory)) {
-            $base = $this->generateBaseDirectoryPath($config);
-            if (!is_dir($base)) {
-                trigger_error(
-                    'Base directory ' . $base . ' does not exist,
-                    please create or change using %Cache.SerializerPath',
-                    E_USER_WARNING
-                );
-                return false;
-            } elseif (!$this->_testPermissions($base, $chmod)) {
-                return false;
-            }
-            $old = umask(0000);
-            mkdir($directory, $chmod);
-            umask($old);
-        } elseif (!$this->_testPermissions($directory, $chmod)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Tests permissions on a directory and throws out friendly
-     * error messages and attempts to chmod it itself if possible
-     * @param string $dir Directory path
-     * @param int $chmod Permissions
-     * @return bool True if directory is writable
-     */
-    private function _testPermissions($dir, $chmod)
-    {
-        // early abort, if it is writable, everything is hunky-dory
-        if (is_writable($dir)) {
-            return true;
-        }
-        if (!is_dir($dir)) {
-            // generally, you'll want to handle this beforehand
-            // so a more specific error message can be given
-            trigger_error(
-                'Directory ' . $dir . ' does not exist',
-                E_USER_WARNING
-            );
-            return false;
-        }
-        if (function_exists('posix_getuid')) {
-            // POSIX system, we can give more specific advice
-            if (fileowner($dir) === posix_getuid()) {
-                // we can chmod it ourselves
-                $chmod = $chmod | 0700;
-                if (chmod($dir, $chmod)) {
-                    return true;
-                }
-            } elseif (filegroup($dir) === posix_getgid()) {
-                $chmod = $chmod | 0070;
-            } else {
-                // PHP's probably running as nobody, so we'll
-                // need to give global permissions
-                $chmod = $chmod | 0777;
-            }
-            trigger_error(
-                'Directory ' . $dir . ' not writable, ' .
-                'please chmod to ' . decoct($chmod),
-                E_USER_WARNING
-            );
-        } else {
-            // generic error message
-            trigger_error(
-                'Directory ' . $dir . ' not writable, ' .
-                'please alter file permissions',
-                E_USER_WARNING
-            );
-        }
-        return false;
-    }
 }
-
-
-
 
 
 /**
@@ -15425,9 +14994,6 @@ class HTMLPurifier_DefinitionCache_Decorator_Cleanup extends HTMLPurifier_Defini
 }
 
 
-
-
-
 /**
  * Definition cache decorator class that saves all cache retrievals
  * to PHP's memory; good for unit tests or circumstances where
@@ -15436,14 +15002,13 @@ class HTMLPurifier_DefinitionCache_Decorator_Cleanup extends HTMLPurifier_Defini
 class HTMLPurifier_DefinitionCache_Decorator_Memory extends HTMLPurifier_DefinitionCache_Decorator
 {
     /**
-     * @type array
-     */
-    protected $definitions;
-
-    /**
      * @type string
      */
     public $name = 'Memory';
+    /**
+     * @type array
+     */
+    protected $definitions;
 
     /**
      * @return HTMLPurifier_DefinitionCache_Decorator_Memory
@@ -15511,9 +15076,6 @@ class HTMLPurifier_DefinitionCache_Decorator_Memory extends HTMLPurifier_Definit
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Bi-directional Text Module, defines elements that
  * declare directionality of content. Text Extension Module.
@@ -15556,9 +15118,6 @@ class HTMLPurifier_HTMLModule_Bdo extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 class HTMLPurifier_HTMLModule_CommonAttributes extends HTMLPurifier_HTMLModule
 {
     /**
@@ -15588,9 +15147,6 @@ class HTMLPurifier_HTMLModule_CommonAttributes extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Edit Module, defines editing-related elements. Text Extension
  * Module.
@@ -15602,6 +15158,17 @@ class HTMLPurifier_HTMLModule_Edit extends HTMLPurifier_HTMLModule
      * @type string
      */
     public $name = 'Edit';
+    /**
+     * @type bool
+     */
+    public $defines_child_def = true;
+
+    // HTML 4.01 specifies that ins/del must not contain block
+    // elements when used in an inline context, chameleon is
+    // a complicated workaround to acheive this effect
+
+    // Inline context ! Block context (exclamation mark is
+    // separator, see getChildDef for parsing)
 
     /**
      * @param HTMLPurifier_Config $config
@@ -15617,18 +15184,6 @@ class HTMLPurifier_HTMLModule_Edit extends HTMLPurifier_HTMLModule
         $this->addElement('ins', 'Inline', $contents, 'Common', $attr);
     }
 
-    // HTML 4.01 specifies that ins/del must not contain block
-    // elements when used in an inline context, chameleon is
-    // a complicated workaround to acheive this effect
-
-    // Inline context ! Block context (exclamation mark is
-    // separator, see getChildDef for parsing)
-
-    /**
-     * @type bool
-     */
-    public $defines_child_def = true;
-
     /**
      * @param HTMLPurifier_ElementDef $def
      * @return HTMLPurifier_ChildDef_Chameleon
@@ -15642,9 +15197,6 @@ class HTMLPurifier_HTMLModule_Edit extends HTMLPurifier_HTMLModule
         return new HTMLPurifier_ChildDef_Chameleon($value[0], $value[1]);
     }
 }
-
-
-
 
 
 /**
@@ -15835,9 +15387,6 @@ class HTMLPurifier_HTMLModule_Forms extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Hypertext Module, defines hypertext links. Core Module.
  */
@@ -15874,9 +15423,6 @@ class HTMLPurifier_HTMLModule_Hypertext extends HTMLPurifier_HTMLModule
         $a->excludes = array('a' => true);
     }
 }
-
-
-
 
 
 /**
@@ -15928,9 +15474,6 @@ class HTMLPurifier_HTMLModule_Iframe extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Image Module provides basic image embedding.
  * @note There is specialized code for removing empty images in
@@ -15978,9 +15521,6 @@ class HTMLPurifier_HTMLModule_Image extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Legacy module defines elements that were previously
  * deprecated.
@@ -15996,7 +15536,6 @@ class HTMLPurifier_HTMLModule_Image extends HTMLPurifier_HTMLModule
  * as well as transform elements that don't have an implementation.
  * See docs/ref-strictness.txt for more details.
  */
-
 class HTMLPurifier_HTMLModule_Legacy extends HTMLPurifier_HTMLModule
 {
     /**
@@ -16165,9 +15704,6 @@ class HTMLPurifier_HTMLModule_Legacy extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 List Module, defines list-oriented elements. Core Module.
  */
@@ -16217,9 +15753,6 @@ class HTMLPurifier_HTMLModule_List extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 class HTMLPurifier_HTMLModule_Name extends HTMLPurifier_HTMLModule
 {
     /**
@@ -16242,9 +15775,6 @@ class HTMLPurifier_HTMLModule_Name extends HTMLPurifier_HTMLModule
         }
     }
 }
-
-
-
 
 
 /**
@@ -16270,9 +15800,6 @@ class HTMLPurifier_HTMLModule_Nofollow extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 class HTMLPurifier_HTMLModule_NonXMLCommonAttributes extends HTMLPurifier_HTMLModule
 {
     /**
@@ -16289,9 +15816,6 @@ class HTMLPurifier_HTMLModule_NonXMLCommonAttributes extends HTMLPurifier_HTMLMo
         )
     );
 }
-
-
-
 
 
 /**
@@ -16354,9 +15878,6 @@ class HTMLPurifier_HTMLModule_Object extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Presentation Module, defines simple presentation-related
  * markup. Text Extension Module.
@@ -16397,9 +15918,6 @@ class HTMLPurifier_HTMLModule_Presentation extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * Module defines proprietary tags and attributes in HTML.
  * @warning If this module is enabled, standards-compliance is off!
@@ -16438,9 +15956,6 @@ class HTMLPurifier_HTMLModule_Proprietary extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Ruby Annotation Module, defines elements that indicate
  * short runs of text alongside base text for annotation or pronounciation.
@@ -16473,9 +15988,6 @@ class HTMLPurifier_HTMLModule_Ruby extends HTMLPurifier_HTMLModule
         $this->addElement('rp', false, 'Optional: #PCDATA', 'Common');
     }
 }
-
-
-
 
 
 /**
@@ -16514,9 +16026,6 @@ class HTMLPurifier_HTMLModule_SafeEmbed extends HTMLPurifier_HTMLModule
         $embed->attr_transform_post[] = new HTMLPurifier_AttrTransform_SafeEmbed();
     }
 }
-
-
-
 
 
 /**
@@ -16579,9 +16088,6 @@ class HTMLPurifier_HTMLModule_SafeObject extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * A "safe" script module. No inline JS is allowed, and pointed to JS
  * files must match whitelist.
@@ -16618,9 +16124,6 @@ class HTMLPurifier_HTMLModule_SafeScripting extends HTMLPurifier_HTMLModule
         $script->attr_transform_post[] = new HTMLPurifier_AttrTransform_ScriptRequired();
     }
 }
-
-
-
 
 
 /*
@@ -16694,9 +16197,6 @@ class HTMLPurifier_HTMLModule_Scripting extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Edit Module, defines editing-related elements. Text Extension
  * Module.
@@ -16726,9 +16226,6 @@ class HTMLPurifier_HTMLModule_StyleAttribute extends HTMLPurifier_HTMLModule
         $this->attr_collections['Style']['style'] = new HTMLPurifier_AttrDef_CSS();
     }
 }
-
-
-
 
 
 /**
@@ -16804,9 +16301,6 @@ class HTMLPurifier_HTMLModule_Tables extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * XHTML 1.1 Target Module, defines target attribute in link elements.
  */
@@ -16833,9 +16327,6 @@ class HTMLPurifier_HTMLModule_Target extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * Module adds the target=blank attribute transformation to a tags.  It
  * is enabled by HTML.TargetBlank
@@ -16856,9 +16347,6 @@ class HTMLPurifier_HTMLModule_TargetBlank extends HTMLPurifier_HTMLModule
         $a->attr_transform_post[] = new HTMLPurifier_AttrTransform_TargetBlank();
     }
 }
-
-
-
 
 
 /**
@@ -16946,9 +16434,6 @@ class HTMLPurifier_HTMLModule_Text extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 /**
  * Abstract class for a set of proprietary modules that clean up (tidy)
  * poorly written HTML.
@@ -17006,13 +16491,44 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
         foreach ($fixes as $name => $fix) {
             // needs to be refactored a little to implement globbing
             if (isset($remove_fixes[$name]) ||
-                (!isset($add_fixes[$name]) && !isset($fixes_lookup[$name]))) {
+                (!isset($add_fixes[$name]) && !isset($fixes_lookup[$name]))
+            ) {
                 unset($fixes[$name]);
             }
         }
 
         // populate this module with necessary fixes
         $this->populate($fixes);
+    }
+
+    /**
+     * Defines all fixes the module will perform in a compact
+     * associative array of fix name to fix implementation.
+     * @return array
+     */
+    public function makeFixes()
+    {
+    }
+
+    /**
+     * Dynamically populates the $fixesForLevel member variable using
+     * the fixes array. It may be custom overloaded, used in conjunction
+     * with $defaultLevel, or not used at all.
+     * @param array $fixes
+     */
+    public function makeFixesForLevel($fixes)
+    {
+        if (!isset($this->defaultLevel)) {
+            return;
+        }
+        if (!isset($this->fixesForLevel[$this->defaultLevel])) {
+            trigger_error(
+                'Default level ' . $this->defaultLevel . ' does not exist',
+                E_USER_ERROR
+            );
+            return;
+        }
+        $this->fixesForLevel[$this->defaultLevel] = array_keys($fixes);
     }
 
     /**
@@ -17047,27 +16563,6 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
             }
         }
         return $ret;
-    }
-
-    /**
-     * Dynamically populates the $fixesForLevel member variable using
-     * the fixes array. It may be custom overloaded, used in conjunction
-     * with $defaultLevel, or not used at all.
-     * @param array $fixes
-     */
-    public function makeFixesForLevel($fixes)
-    {
-        if (!isset($this->defaultLevel)) {
-            return;
-        }
-        if (!isset($this->fixesForLevel[$this->defaultLevel])) {
-            trigger_error(
-                'Default level ' . $this->defaultLevel . ' does not exist',
-                E_USER_ERROR
-            );
-            return;
-        }
-        $this->fixesForLevel[$this->defaultLevel] = array_keys($fixes);
     }
 
     /**
@@ -17163,21 +16658,8 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
         }
 
         return array($property, $params);
-
-    }
-
-    /**
-     * Defines all fixes the module will perform in a compact
-     * associative array of fix name to fix implementation.
-     * @return array
-     */
-    public function makeFixes()
-    {
     }
 }
-
-
-
 
 
 class HTMLPurifier_HTMLModule_XMLCommonAttributes extends HTMLPurifier_HTMLModule
@@ -17196,9 +16678,6 @@ class HTMLPurifier_HTMLModule_XMLCommonAttributes extends HTMLPurifier_HTMLModul
         )
     );
 }
-
-
-
 
 
 /**
@@ -17232,9 +16711,6 @@ class HTMLPurifier_HTMLModule_Tidy_Name extends HTMLPurifier_HTMLModule_Tidy
 }
 
 
-
-
-
 class HTMLPurifier_HTMLModule_Tidy_Proprietary extends HTMLPurifier_HTMLModule_Tidy
 {
 
@@ -17255,19 +16731,16 @@ class HTMLPurifier_HTMLModule_Tidy_Proprietary extends HTMLPurifier_HTMLModule_T
     {
         $r = array();
         $r['table@background'] = new HTMLPurifier_AttrTransform_Background();
-        $r['td@background']    = new HTMLPurifier_AttrTransform_Background();
-        $r['th@background']    = new HTMLPurifier_AttrTransform_Background();
-        $r['tr@background']    = new HTMLPurifier_AttrTransform_Background();
+        $r['td@background'] = new HTMLPurifier_AttrTransform_Background();
+        $r['th@background'] = new HTMLPurifier_AttrTransform_Background();
+        $r['tr@background'] = new HTMLPurifier_AttrTransform_Background();
         $r['thead@background'] = new HTMLPurifier_AttrTransform_Background();
         $r['tfoot@background'] = new HTMLPurifier_AttrTransform_Background();
         $r['tbody@background'] = new HTMLPurifier_AttrTransform_Background();
-        $r['table@height']     = new HTMLPurifier_AttrTransform_Length('height');
+        $r['table@height'] = new HTMLPurifier_AttrTransform_Length('height');
         return $r;
     }
 }
-
-
-
 
 
 class HTMLPurifier_HTMLModule_Tidy_XHTMLAndHTML4 extends HTMLPurifier_HTMLModule_Tidy
@@ -17447,9 +16920,6 @@ class HTMLPurifier_HTMLModule_Tidy_XHTMLAndHTML4 extends HTMLPurifier_HTMLModule
 }
 
 
-
-
-
 class HTMLPurifier_HTMLModule_Tidy_Strict extends HTMLPurifier_HTMLModule_Tidy_XHTMLAndHTML4
 {
     /**
@@ -17461,6 +16931,10 @@ class HTMLPurifier_HTMLModule_Tidy_Strict extends HTMLPurifier_HTMLModule_Tidy_X
      * @type string
      */
     public $defaultLevel = 'light';
+    /**
+     * @type bool
+     */
+    public $defines_child_def = true;
 
     /**
      * @return array
@@ -17471,11 +16945,6 @@ class HTMLPurifier_HTMLModule_Tidy_Strict extends HTMLPurifier_HTMLModule_Tidy_X
         $r['blockquote#content_model_type'] = 'strictblockquote';
         return $r;
     }
-
-    /**
-     * @type bool
-     */
-    public $defines_child_def = true;
 
     /**
      * @param HTMLPurifier_ElementDef $def
@@ -17491,9 +16960,6 @@ class HTMLPurifier_HTMLModule_Tidy_Strict extends HTMLPurifier_HTMLModule_Tidy_X
 }
 
 
-
-
-
 class HTMLPurifier_HTMLModule_Tidy_Transitional extends HTMLPurifier_HTMLModule_Tidy_XHTMLAndHTML4
 {
     /**
@@ -17506,9 +16972,6 @@ class HTMLPurifier_HTMLModule_Tidy_Transitional extends HTMLPurifier_HTMLModule_
      */
     public $defaultLevel = 'heavy';
 }
-
-
-
 
 
 class HTMLPurifier_HTMLModule_Tidy_XHTML extends HTMLPurifier_HTMLModule_Tidy
@@ -17535,9 +16998,6 @@ class HTMLPurifier_HTMLModule_Tidy_XHTML extends HTMLPurifier_HTMLModule_Tidy
 }
 
 
-
-
-
 /**
  * Injector that auto paragraphs text in the root node based on
  * double-spacing.
@@ -17555,16 +17015,6 @@ class HTMLPurifier_Injector_AutoParagraph extends HTMLPurifier_Injector
      * @type array
      */
     public $needed = array('p');
-
-    /**
-     * @return HTMLPurifier_Token_Start
-     */
-    private function _pStart()
-    {
-        $par = new HTMLPurifier_Token_Start('p');
-        $par->armor['MakeWellFormed_TagClosedError'] = true;
-        return $par;
-    }
 
     /**
      * @param HTMLPurifier_Token_Text $token
@@ -17626,7 +17076,8 @@ class HTMLPurifier_Injector_AutoParagraph extends HTMLPurifier_Injector
             }
             // Is the current parent a <p> tag?
         } elseif (!empty($this->currentNesting) &&
-            $this->currentNesting[count($this->currentNesting) - 1]->name == 'p') {
+            $this->currentNesting[count($this->currentNesting) - 1]->name == 'p'
+        ) {
             // State 3.1: ...<p>PAR1
             //                  ----
 
@@ -17642,6 +17093,167 @@ class HTMLPurifier_Injector_AutoParagraph extends HTMLPurifier_Injector
             // State 4.2: ...<b>PAR1\n\nPAR2
             //                  ------------
         }
+    }
+
+    /**
+     * Returns true if passed token is inline (and, ergo, allowed in
+     * paragraph tags)
+     * @param HTMLPurifier_Token $token
+     * @return bool
+     */
+    private function _isInline($token)
+    {
+        return isset($this->htmlDefinition->info['p']->child->elements[$token->name]);
+    }
+
+    /**
+     * @return HTMLPurifier_Token_Start
+     */
+    private function _pStart()
+    {
+        $par = new HTMLPurifier_Token_Start('p');
+        $par->armor['MakeWellFormed_TagClosedError'] = true;
+        return $par;
+    }
+
+    /**
+     * Splits up a text in paragraph tokens and appends them
+     * to the result stream that will replace the original
+     * @param string $data String text data that will be processed
+     *    into paragraphs
+     * @param HTMLPurifier_Token[] $result Reference to array of tokens that the
+     *    tags will be appended onto
+     */
+    private function _splitText($data, &$result)
+    {
+        $raw_paragraphs = explode("\n\n", $data);
+        $paragraphs = array(); // without empty paragraphs
+        $needs_start = false;
+        $needs_end = false;
+
+        $c = count($raw_paragraphs);
+        if ($c == 1) {
+            // There were no double-newlines, abort quickly. In theory this
+            // should never happen.
+            $result[] = new HTMLPurifier_Token_Text($data);
+            return;
+        }
+        for ($i = 0; $i < $c; $i++) {
+            $par = $raw_paragraphs[$i];
+            if (trim($par) !== '') {
+                $paragraphs[] = $par;
+            } else {
+                if ($i == 0) {
+                    // Double newline at the front
+                    if (empty($result)) {
+                        // The empty result indicates that the AutoParagraph
+                        // injector did not add any start paragraph tokens.
+                        // This means that we have been in a paragraph for
+                        // a while, and the newline means we should start a new one.
+                        $result[] = new HTMLPurifier_Token_End('p');
+                        $result[] = new HTMLPurifier_Token_Text("\n\n");
+                        // However, the start token should only be added if
+                        // there is more processing to be done (i.e. there are
+                        // real paragraphs in here). If there are none, the
+                        // next start paragraph tag will be handled by the
+                        // next call to the injector
+                        $needs_start = true;
+                    } else {
+                        // We just started a new paragraph!
+                        // Reinstate a double-newline for presentation's sake, since
+                        // it was in the source code.
+                        array_unshift($result, new HTMLPurifier_Token_Text("\n\n"));
+                    }
+                } elseif ($i + 1 == $c) {
+                    // Double newline at the end
+                    // There should be a trailing </p> when we're finally done.
+                    $needs_end = true;
+                }
+            }
+        }
+
+        // Check if this was just a giant blob of whitespace. Move this earlier,
+        // perhaps?
+        if (empty($paragraphs)) {
+            return;
+        }
+
+        // Add the start tag indicated by \n\n at the beginning of $data
+        if ($needs_start) {
+            $result[] = $this->_pStart();
+        }
+
+        // Append the paragraphs onto the result
+        foreach ($paragraphs as $par) {
+            $result[] = new HTMLPurifier_Token_Text($par);
+            $result[] = new HTMLPurifier_Token_End('p');
+            $result[] = new HTMLPurifier_Token_Text("\n\n");
+            $result[] = $this->_pStart();
+        }
+
+        // Remove trailing start token; Injector will handle this later if
+        // it was indeed needed. This prevents from needing to do a lookahead,
+        // at the cost of a lookbehind later.
+        array_pop($result);
+
+        // If there is no need for an end tag, remove all of it and let
+        // MakeWellFormed close it later.
+        if (!$needs_end) {
+            array_pop($result); // removes \n\n
+            array_pop($result); // removes </p>
+        }
+    }
+
+    /**
+     * Looks ahead in the token list and determines whether or not we need
+     * to insert a <p> tag.
+     * @return bool
+     */
+    private function _pLookAhead()
+    {
+        if ($this->currentToken instanceof HTMLPurifier_Token_Start) {
+            $nesting = 1;
+        } else {
+            $nesting = 0;
+        }
+        $ok = false;
+        $i = null;
+        while ($this->forwardUntilEndToken($i, $current, $nesting)) {
+            $result = $this->_checkNeedsP($current);
+            if ($result !== null) {
+                $ok = $result;
+                break;
+            }
+        }
+        return $ok;
+    }
+
+    /**
+     * Determines if a particular token requires an earlier inline token
+     * to get a paragraph. This should be used with _forwardUntilEndToken
+     * @param HTMLPurifier_Token $current
+     * @return bool
+     */
+    private function _checkNeedsP($current)
+    {
+        if ($current instanceof HTMLPurifier_Token_Start) {
+            if (!$this->_isInline($current)) {
+                // <div>PAR1<div>
+                //      ----
+                // Terminate early, since we hit a block element
+                return false;
+            }
+        } elseif ($current instanceof HTMLPurifier_Token_Text) {
+            if (strpos($current->data, "\n\n") !== false) {
+                // <div>PAR1<b>PAR1\n\nPAR2
+                //      ----
+                return true;
+            } else {
+                // <div>PAR1<b>PAR1...
+                //      ----
+            }
+        }
+        return null;
     }
 
     /**
@@ -17738,161 +17350,7 @@ class HTMLPurifier_Injector_AutoParagraph extends HTMLPurifier_Injector
             //               ---
         }
     }
-
-    /**
-     * Splits up a text in paragraph tokens and appends them
-     * to the result stream that will replace the original
-     * @param string $data String text data that will be processed
-     *    into paragraphs
-     * @param HTMLPurifier_Token[] $result Reference to array of tokens that the
-     *    tags will be appended onto
-     */
-    private function _splitText($data, &$result)
-    {
-        $raw_paragraphs = explode("\n\n", $data);
-        $paragraphs = array(); // without empty paragraphs
-        $needs_start = false;
-        $needs_end = false;
-
-        $c = count($raw_paragraphs);
-        if ($c == 1) {
-            // There were no double-newlines, abort quickly. In theory this
-            // should never happen.
-            $result[] = new HTMLPurifier_Token_Text($data);
-            return;
-        }
-        for ($i = 0; $i < $c; $i++) {
-            $par = $raw_paragraphs[$i];
-            if (trim($par) !== '') {
-                $paragraphs[] = $par;
-            } else {
-                if ($i == 0) {
-                    // Double newline at the front
-                    if (empty($result)) {
-                        // The empty result indicates that the AutoParagraph
-                        // injector did not add any start paragraph tokens.
-                        // This means that we have been in a paragraph for
-                        // a while, and the newline means we should start a new one.
-                        $result[] = new HTMLPurifier_Token_End('p');
-                        $result[] = new HTMLPurifier_Token_Text("\n\n");
-                        // However, the start token should only be added if
-                        // there is more processing to be done (i.e. there are
-                        // real paragraphs in here). If there are none, the
-                        // next start paragraph tag will be handled by the
-                        // next call to the injector
-                        $needs_start = true;
-                    } else {
-                        // We just started a new paragraph!
-                        // Reinstate a double-newline for presentation's sake, since
-                        // it was in the source code.
-                        array_unshift($result, new HTMLPurifier_Token_Text("\n\n"));
-                    }
-                } elseif ($i + 1 == $c) {
-                    // Double newline at the end
-                    // There should be a trailing </p> when we're finally done.
-                    $needs_end = true;
-                }
-            }
-        }
-
-        // Check if this was just a giant blob of whitespace. Move this earlier,
-        // perhaps?
-        if (empty($paragraphs)) {
-            return;
-        }
-
-        // Add the start tag indicated by \n\n at the beginning of $data
-        if ($needs_start) {
-            $result[] = $this->_pStart();
-        }
-
-        // Append the paragraphs onto the result
-        foreach ($paragraphs as $par) {
-            $result[] = new HTMLPurifier_Token_Text($par);
-            $result[] = new HTMLPurifier_Token_End('p');
-            $result[] = new HTMLPurifier_Token_Text("\n\n");
-            $result[] = $this->_pStart();
-        }
-
-        // Remove trailing start token; Injector will handle this later if
-        // it was indeed needed. This prevents from needing to do a lookahead,
-        // at the cost of a lookbehind later.
-        array_pop($result);
-
-        // If there is no need for an end tag, remove all of it and let
-        // MakeWellFormed close it later.
-        if (!$needs_end) {
-            array_pop($result); // removes \n\n
-            array_pop($result); // removes </p>
-        }
-    }
-
-    /**
-     * Returns true if passed token is inline (and, ergo, allowed in
-     * paragraph tags)
-     * @param HTMLPurifier_Token $token
-     * @return bool
-     */
-    private function _isInline($token)
-    {
-        return isset($this->htmlDefinition->info['p']->child->elements[$token->name]);
-    }
-
-    /**
-     * Looks ahead in the token list and determines whether or not we need
-     * to insert a <p> tag.
-     * @return bool
-     */
-    private function _pLookAhead()
-    {
-        if ($this->currentToken instanceof HTMLPurifier_Token_Start) {
-            $nesting = 1;
-        } else {
-            $nesting = 0;
-        }
-        $ok = false;
-        $i = null;
-        while ($this->forwardUntilEndToken($i, $current, $nesting)) {
-            $result = $this->_checkNeedsP($current);
-            if ($result !== null) {
-                $ok = $result;
-                break;
-            }
-        }
-        return $ok;
-    }
-
-    /**
-     * Determines if a particular token requires an earlier inline token
-     * to get a paragraph. This should be used with _forwardUntilEndToken
-     * @param HTMLPurifier_Token $current
-     * @return bool
-     */
-    private function _checkNeedsP($current)
-    {
-        if ($current instanceof HTMLPurifier_Token_Start) {
-            if (!$this->_isInline($current)) {
-                // <div>PAR1<div>
-                //      ----
-                // Terminate early, since we hit a block element
-                return false;
-            }
-        } elseif ($current instanceof HTMLPurifier_Token_Text) {
-            if (strpos($current->data, "\n\n") !== false) {
-                // <div>PAR1<b>PAR1\n\nPAR2
-                //      ----
-                return true;
-            } else {
-                // <div>PAR1<b>PAR1...
-                //      ----
-            }
-        }
-        return null;
-    }
 }
-
-
-
 
 
 /**
@@ -17931,9 +17389,6 @@ class HTMLPurifier_Injector_DisplayLinkURI extends HTMLPurifier_Injector
         }
     }
 }
-
-
-
 
 
 /**
@@ -17991,9 +17446,6 @@ class HTMLPurifier_Injector_Linkify extends HTMLPurifier_Injector
         }
     }
 }
-
-
-
 
 
 /**
@@ -18063,9 +17515,6 @@ class HTMLPurifier_Injector_PurifierLinkify extends HTMLPurifier_Injector
         }
     }
 }
-
-
-
 
 
 class HTMLPurifier_Injector_RemoveEmpty extends HTMLPurifier_Injector
@@ -18160,14 +17609,11 @@ class HTMLPurifier_Injector_RemoveEmpty extends HTMLPurifier_Injector
                 break;
             }
             // This is safe because we removed the token that triggered this.
-            $this->rewindOffset($b+$deleted);
+            $this->rewindOffset($b + $deleted);
             return;
         }
     }
 }
-
-
-
 
 
 /**
@@ -18250,9 +17696,6 @@ class HTMLPurifier_Injector_RemoveSpansWithoutAttributes extends HTMLPurifier_In
         }
     }
 }
-
-
-
 
 
 /**
@@ -18345,7 +17788,8 @@ class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector
                 // already been added
                 if (!isset($this->paramStack[$i][$n]) &&
                     isset($this->addParam[$n]) &&
-                    $token->attr['name'] === $this->addParam[$n]) {
+                    $token->attr['name'] === $this->addParam[$n]
+                ) {
                     // keep token, and add to param stack
                     $this->paramStack[$i][$n] = true;
                 } elseif (isset($this->allowedParam[$n])) {
@@ -18374,9 +17818,6 @@ class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector
 }
 
 
-
-
-
 /**
  * Parser that uses PHP 5's DOM extension (part of the core).
  *
@@ -18400,7 +17841,6 @@ class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector
  *          around, you may want to run Tidy on the resulting output or use
  *          HTMLPurifier_DirectLex
  */
-
 class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
 {
 
@@ -18460,10 +17900,40 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
     }
 
     /**
+     * Wraps an HTML fragment in the necessary HTML
+     * @param string $html
+     * @param HTMLPurifier_Config $config
+     * @param HTMLPurifier_Context $context
+     * @return string
+     */
+    protected function wrapHTML($html, $config, $context)
+    {
+        $def = $config->getDefinition('HTML');
+        $ret = '';
+
+        if (!empty($def->doctype->dtdPublic) || !empty($def->doctype->dtdSystem)) {
+            $ret .= '<!DOCTYPE html ';
+            if (!empty($def->doctype->dtdPublic)) {
+                $ret .= 'PUBLIC "' . $def->doctype->dtdPublic . '" ';
+            }
+            if (!empty($def->doctype->dtdSystem)) {
+                $ret .= '"' . $def->doctype->dtdSystem . '" ';
+            }
+            $ret .= '>';
+        }
+
+        $ret .= '<html><head>';
+        $ret .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+        // No protection if $html contains a stray </div>!
+        $ret .= '</head><body><div>' . $html . '</div></body></html>';
+        return $ret;
+    }
+
+    /**
      * Iterative function that tokenizes a node, putting it into an accumulator.
      * To iterate is human, to recurse divine - L. Peter Deutsch
      * @param DOMNode $node DOMNode to be tokenized.
-     * @param HTMLPurifier_Token[] $tokens   Array-list of already tokenized tokens.
+     * @param HTMLPurifier_Token[] $tokens Array-list of already tokenized tokens.
      * @return HTMLPurifier_Token of node appended to previously passed tokens.
      */
     protected function tokenizeDOM($node, &$tokens)
@@ -18498,8 +17968,8 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
 
     /**
      * @param DOMNode $node DOMNode to be tokenized.
-     * @param HTMLPurifier_Token[] $tokens   Array-list of already tokenized tokens.
-     * @param bool $collect  Says whether or start and close are collected, set to
+     * @param HTMLPurifier_Token[] $tokens Array-list of already tokenized tokens.
+     * @param bool $collect Says whether or start and close are collected, set to
      *                    false at first recursion because it's the implicit DIV
      *                    tag you're dealing with.
      * @return bool if the token needs an endtoken
@@ -18562,16 +18032,6 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
     }
 
     /**
-     * @param DOMNode $node
-     * @param HTMLPurifier_Token[] $tokens
-     */
-    protected function createEndNode($node, &$tokens)
-    {
-        $tokens[] = $this->factory->createEnd($node->tagName);
-    }
-
-
-    /**
      * Converts a DOMNamedNodeMap of DOMAttr objects into an assoc array.
      *
      * @param DOMNamedNodeMap $node_map DOMNamedNodeMap of DOMAttr objects.
@@ -18590,6 +18050,15 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
             $array[$attr->name] = $attr->value;
         }
         return $array;
+    }
+
+    /**
+     * @param DOMNode $node
+     * @param HTMLPurifier_Token[] $tokens
+     */
+    protected function createEndNode($node, &$tokens)
+    {
+        $tokens[] = $this->factory->createEnd($node->tagName);
     }
 
     /**
@@ -18622,40 +18091,7 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
     {
         return '<!--' . str_replace('&', '&amp;', $matches[1]) . $matches[2];
     }
-
-    /**
-     * Wraps an HTML fragment in the necessary HTML
-     * @param string $html
-     * @param HTMLPurifier_Config $config
-     * @param HTMLPurifier_Context $context
-     * @return string
-     */
-    protected function wrapHTML($html, $config, $context)
-    {
-        $def = $config->getDefinition('HTML');
-        $ret = '';
-
-        if (!empty($def->doctype->dtdPublic) || !empty($def->doctype->dtdSystem)) {
-            $ret .= '<!DOCTYPE html ';
-            if (!empty($def->doctype->dtdPublic)) {
-                $ret .= 'PUBLIC "' . $def->doctype->dtdPublic . '" ';
-            }
-            if (!empty($def->doctype->dtdSystem)) {
-                $ret .= '"' . $def->doctype->dtdSystem . '" ';
-            }
-            $ret .= '>';
-        }
-
-        $ret .= '<html><head>';
-        $ret .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-        // No protection if $html contains a stray </div>!
-        $ret .= '</head><body><div>' . $html . '</div></body></html>';
-        return $ret;
-    }
 }
-
-
-
 
 
 /**
@@ -18680,16 +18116,6 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
      * @type string
      */
     protected $_whitespace = "\x20\x09\x0D\x0A";
-
-    /**
-     * Callback function for script CDATA fudge
-     * @param array $matches, in form of array(opening tag, contents, closing tag)
-     * @return string
-     */
-    protected function scriptCallback($matches)
-    {
-        return $matches[1] . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8') . $matches[3];
-    }
 
     /**
      * @param String $html
@@ -18768,7 +18194,8 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                 // recalculate lines
                 if ($synchronize_interval && // synchronization is on
                     $cursor > 0 && // cursor is further than zero
-                    $loops % $synchronize_interval === 0) { // time to synchronize!
+                    $loops % $synchronize_interval === 0
+                ) { // time to synchronize!
                     $current_line = 1 + $this->substrCount($html, $nl, 0, $cursor);
                 }
             }
@@ -19192,10 +18619,17 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
         }
         return $array;
     }
+
+    /**
+     * Callback function for script CDATA fudge
+     * @param array $matches , in form of array(opening tag, contents, closing tag)
+     * @return string
+     */
+    protected function scriptCallback($matches)
+    {
+        return $matches[1] . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8') . $matches[3];
+    }
 }
-
-
-
 
 
 /**
@@ -19228,11 +18662,11 @@ class HTMLPurifier_Node_Comment extends HTMLPurifier_Node
         $this->col = $col;
     }
 
-    public function toTokenPair() {
+    public function toTokenPair()
+    {
         return array(new HTMLPurifier_Token_Comment($this->data, $this->line, $this->col), null);
     }
 }
-
 
 
 /**
@@ -19269,9 +18703,12 @@ class HTMLPurifier_Node_Element extends HTMLPurifier_Node
      */
     public $empty = false;
 
-    public $endCol = null, $endLine = null, $endArmor = array();
+    public $endCol = null;
+    public $endLine = null;
+    public $endArmor = array();
 
-    public function __construct($name, $attr = array(), $line = null, $col = null, $armor = array()) {
+    public function __construct($name, $attr = array(), $line = null, $col = null, $armor = array())
+    {
         $this->name = $name;
         $this->attr = $attr;
         $this->line = $line;
@@ -19279,7 +18716,8 @@ class HTMLPurifier_Node_Element extends HTMLPurifier_Node
         $this->armor = $armor;
     }
 
-    public function toTokenPair() {
+    public function toTokenPair()
+    {
         // XXX inefficiency here, normalization is not necessary
         if ($this->empty) {
             return array(new HTMLPurifier_Token_Empty($this->name, $this->attr, $this->line, $this->col, $this->armor), null);
@@ -19291,8 +18729,6 @@ class HTMLPurifier_Node_Element extends HTMLPurifier_Node
         }
     }
 }
-
-
 
 
 /**
@@ -19341,13 +18777,11 @@ class HTMLPurifier_Node_Text extends HTMLPurifier_Node
         $this->col = $col;
     }
 
-    public function toTokenPair() {
+    public function toTokenPair()
+    {
         return array(new HTMLPurifier_Token_Text($this->data, $this->line, $this->col), null);
     }
 }
-
-
-
 
 
 /**
@@ -19378,9 +18812,6 @@ abstract class HTMLPurifier_Strategy_Composite extends HTMLPurifier_Strategy
 }
 
 
-
-
-
 /**
  * Core strategy composed of the big four strategies.
  */
@@ -19394,9 +18825,6 @@ class HTMLPurifier_Strategy_Core extends HTMLPurifier_Strategy_Composite
         $this->strategies[] = new HTMLPurifier_Strategy_ValidateAttributes();
     }
 }
-
-
-
 
 
 /**
@@ -19427,7 +18855,6 @@ class HTMLPurifier_Strategy_Core extends HTMLPurifier_Strategy_Composite
  * @todo Enable nodes to be bubbled out of the structure.  This is
  *       easier with our new algorithm.
  */
-
 class HTMLPurifier_Strategy_FixNesting extends HTMLPurifier_Strategy
 {
 
@@ -19502,10 +18929,10 @@ class HTMLPurifier_Strategy_FixNesting extends HTMLPurifier_Strategy
         $parent_def = $definition->info_parent_def;
         $stack = array(
             array($top_node,
-                  $parent_def->descendants_are_inline,
-                  $parent_def->excludes, // exclusions
-                  0)
-            );
+                $parent_def->descendants_are_inline,
+                $parent_def->excludes, // exclusions
+                0)
+        );
 
         while (!empty($stack)) {
             list($node, $is_inline, $excludes, $ix) = array_pop($stack);
@@ -19522,24 +18949,30 @@ class HTMLPurifier_Strategy_FixNesting extends HTMLPurifier_Strategy
                         // child_def, but double check this...
                         $is_inline || $def->descendants_are_inline,
                         empty($def->excludes) ? $excludes
-                                              : array_merge($excludes, $def->excludes),
+                            : array_merge($excludes, $def->excludes),
                         0);
                     break;
                 }
             };
-            if ($go) continue;
+            if ($go) {
+                continue;
+            }
             list($token, $d) = $node->toTokenPair();
             // base case
             if ($excludes_enabled && isset($excludes[$node->name])) {
                 $node->dead = true;
-                if ($e) $e->send(E_ERROR, 'Strategy_FixNesting: Node excluded');
+                if ($e) {
+                    $e->send(E_ERROR, 'Strategy_FixNesting: Node excluded');
+                }
             } else {
                 // XXX I suppose it would be slightly more efficient to
                 // avoid the allocation here and have children
                 // strategies handle it
                 $children = array();
                 foreach ($node->children as $child) {
-                    if (!$child->dead) $children[] = $child;
+                    if (!$child->dead) {
+                        $children[] = $child;
+                    }
                 }
                 $result = $def->child->validateChildren($children, $config, $context);
                 if ($result === true) {
@@ -19547,14 +18980,16 @@ class HTMLPurifier_Strategy_FixNesting extends HTMLPurifier_Strategy
                     $node->children = $children;
                 } elseif ($result === false) {
                     $node->dead = true;
-                    if ($e) $e->send(E_ERROR, 'Strategy_FixNesting: Node removed');
+                    if ($e) {
+                        $e->send(E_ERROR, 'Strategy_FixNesting: Node removed');
+                    }
                 } else {
                     $node->children = $result;
                     if ($e) {
                         // XXX This will miss mutations of internal nodes. Perhaps defer to the child validators
                         if (empty($result) && !empty($children)) {
                             $e->send(E_ERROR, 'Strategy_FixNesting: Node contents removed');
-                        } else if ($result != $children) {
+                        } elseif ($result != $children) {
                             $e->send(E_WARNING, 'Strategy_FixNesting: Node reorganized');
                         }
                     }
@@ -19576,9 +19011,6 @@ class HTMLPurifier_Strategy_FixNesting extends HTMLPurifier_Strategy
         return HTMLPurifier_Arborize::flatten($node, $config, $context);
     }
 }
-
-
-
 
 
 /**
@@ -19656,7 +19088,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
         $e = $context->get('ErrorCollector', true);
         $i = false; // injector index
         list($zipper, $token) = HTMLPurifier_Zipper::fromArray($tokens);
-        if ($token === NULL) {
+        if ($token === null) {
             return array();
         }
         $reprocess = false; // whether or not to reprocess the same token
@@ -19731,9 +19163,9 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
         //      punt ($reprocess = true; continue;) and it does that for us.
 
         // isset is in loop because $tokens size changes during loop exec
-        for (;;
-             // only increment if we don't need to reprocess
-             $reprocess ? $reprocess = false : $token = $zipper->next($token)) {
+        for (; ;
+            // only increment if we don't need to reprocess
+            $reprocess ? $reprocess = false : $token = $zipper->next($token)) {
 
             // check for a rewind
             if (is_int($i)) {
@@ -19743,7 +19175,9 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
                 $rewind_offset = $this->injectors[$i]->getRewindOffset();
                 if (is_int($rewind_offset)) {
                     for ($j = 0; $j < $rewind_offset; $j++) {
-                        if (empty($zipper->front)) break;
+                        if (empty($zipper->front)) {
+                            break;
+                        }
                         $token = $zipper->prev($token);
                         // indicate that other injectors should not process this token,
                         // but we need to reprocess it
@@ -19760,7 +19194,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
             }
 
             // handle case of document end
-            if ($token === NULL) {
+            if ($token === null) {
                 // kill processing if stack is empty
                 if (empty($this->stack)) {
                     break;
@@ -19940,7 +19374,6 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
                         $reprocess = true;
                         continue;
                     }
-
                 }
                 $ok = true;
             }
@@ -20151,7 +19584,6 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
         }
 
         return $r;
-
     }
 
     /**
@@ -20179,9 +19611,6 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
 }
 
 
-
-
-
 /**
  * Removes all unrecognized tags from the list of tokens.
  *
@@ -20189,7 +19618,6 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
  * tokens. If a token is not recognized but a TagTransform is defined for
  * that element, the element will be transformed accordingly.
  */
-
 class HTMLPurifier_Strategy_RemoveForeignElements extends HTMLPurifier_Strategy
 {
 
@@ -20255,7 +19683,7 @@ class HTMLPurifier_Strategy_RemoveForeignElements extends HTMLPurifier_Strategy
                     // there is a transformation for this tag
                     // DEFINITION CALL
                     $token = $definition->
-                        info_tag_transform[$token->name]->transform($token, $config, $context);
+                    info_tag_transform[$token->name]->transform($token, $config, $context);
                     if ($e) {
                         $e->send(E_NOTICE, 'Strategy_RemoveForeignElements: Tag transform', $original_name);
                     }
@@ -20294,7 +19722,6 @@ class HTMLPurifier_Strategy_RemoveForeignElements extends HTMLPurifier_Strategy
                     } elseif ($token->name === $textify_comments && $token instanceof HTMLPurifier_Token_End) {
                         $textify_comments = false;
                     }
-
                 } elseif ($escape_invalid_tags) {
                     // invalid tag, generate HTML representation and insert in
                     if ($e) {
@@ -20345,7 +19772,8 @@ class HTMLPurifier_Strategy_RemoveForeignElements extends HTMLPurifier_Strategy
                         $token->data = str_replace('--', '-', $token->data);
                     }
                     if ($trusted || !empty($comment_lookup[trim($token->data)]) ||
-                        ($comment_regexp !== null && preg_match($comment_regexp, trim($token->data)))) {
+                        ($comment_regexp !== null && preg_match($comment_regexp, trim($token->data)))
+                    ) {
                         // OK good
                         if ($e) {
                             if ($trailing_hyphen) {
@@ -20387,13 +19815,9 @@ class HTMLPurifier_Strategy_RemoveForeignElements extends HTMLPurifier_Strategy
 }
 
 
-
-
-
 /**
  * Validate all attributes in the tokens.
  */
-
 class HTMLPurifier_Strategy_ValidateAttributes extends HTMLPurifier_Strategy
 {
 
@@ -20431,9 +19855,6 @@ class HTMLPurifier_Strategy_ValidateAttributes extends HTMLPurifier_Strategy
         return $tokens;
     }
 }
-
-
-
 
 
 /**
@@ -20548,9 +19969,6 @@ class HTMLPurifier_TagTransform_Font extends HTMLPurifier_TagTransform
 }
 
 
-
-
-
 /**
  * Simple transformation, just change tag name to something else,
  * and possibly add some styling. This will cover most of the deprecated
@@ -20593,9 +20011,6 @@ class HTMLPurifier_TagTransform_Simple extends HTMLPurifier_TagTransform
 }
 
 
-
-
-
 /**
  * Concrete comment token class. Generally will be ignored.
  */
@@ -20626,13 +20041,11 @@ class HTMLPurifier_Token_Comment extends HTMLPurifier_Token
         $this->col = $col;
     }
 
-    public function toNode() {
+    public function toNode()
+    {
         return new HTMLPurifier_Node_Comment($this->data, $this->line, $this->col);
     }
 }
-
-
-
 
 
 /**
@@ -20695,13 +20108,11 @@ abstract class HTMLPurifier_Token_Tag extends HTMLPurifier_Token
         $this->armor = $armor;
     }
 
-    public function toNode() {
+    public function toNode()
+    {
         return new HTMLPurifier_Node_Element($this->name, $this->attr, $this->line, $this->col, $this->armor);
     }
 }
-
-
-
 
 
 /**
@@ -20709,15 +20120,13 @@ abstract class HTMLPurifier_Token_Tag extends HTMLPurifier_Token
  */
 class HTMLPurifier_Token_Empty extends HTMLPurifier_Token_Tag
 {
-    public function toNode() {
+    public function toNode()
+    {
         $n = parent::toNode();
         $n->empty = true;
         return $n;
     }
 }
-
-
-
 
 
 /**
@@ -20736,13 +20145,11 @@ class HTMLPurifier_Token_End extends HTMLPurifier_Token_Tag
      */
     public $start;
 
-    public function toNode() {
+    public function toNode()
+    {
         throw new Exception("HTMLPurifier_Token_End->toNode not supported!");
     }
 }
-
-
-
 
 
 /**
@@ -20751,9 +20158,6 @@ class HTMLPurifier_Token_End extends HTMLPurifier_Token_Tag
 class HTMLPurifier_Token_Start extends HTMLPurifier_Token_Tag
 {
 }
-
-
-
 
 
 /**
@@ -20801,13 +20205,11 @@ class HTMLPurifier_Token_Text extends HTMLPurifier_Token
         $this->col = $col;
     }
 
-    public function toNode() {
+    public function toNode()
+    {
         return new HTMLPurifier_Node_Text($this->data, $this->is_whitespace, $this->line, $this->col);
     }
 }
-
-
-
 
 
 class HTMLPurifier_URIFilter_DisableExternal extends HTMLPurifier_URIFilter
@@ -20862,9 +20264,6 @@ class HTMLPurifier_URIFilter_DisableExternal extends HTMLPurifier_URIFilter
 }
 
 
-
-
-
 class HTMLPurifier_URIFilter_DisableExternalResources extends HTMLPurifier_URIFilter_DisableExternal
 {
     /**
@@ -20888,9 +20287,6 @@ class HTMLPurifier_URIFilter_DisableExternalResources extends HTMLPurifier_URIFi
 }
 
 
-
-
-
 class HTMLPurifier_URIFilter_DisableResources extends HTMLPurifier_URIFilter
 {
     /**
@@ -20909,9 +20305,6 @@ class HTMLPurifier_URIFilter_DisableResources extends HTMLPurifier_URIFilter
         return !$context->get('EmbeddedURI', true);
     }
 }
-
-
-
 
 
 // It's not clear to me whether or not Punycode means that hostnames
@@ -20958,9 +20351,6 @@ class HTMLPurifier_URIFilter_HostBlacklist extends HTMLPurifier_URIFilter
 }
 
 
-
-
-
 // does not support network paths
 
 class HTMLPurifier_URIFilter_MakeAbsolute extends HTMLPurifier_URIFilter
@@ -21005,6 +20395,51 @@ class HTMLPurifier_URIFilter_MakeAbsolute extends HTMLPurifier_URIFilter
     }
 
     /**
+     * Resolve dots and double-dots in a path stack
+     * @param array $stack
+     * @return array
+     */
+    private function _collapseStack($stack)
+    {
+        $result = array();
+        $is_folder = false;
+        for ($i = 0; isset($stack[$i]); $i++) {
+            $is_folder = false;
+            // absorb an internally duplicated slash
+            if ($stack[$i] == '' && $i && isset($stack[$i + 1])) {
+                continue;
+            }
+            if ($stack[$i] == '..') {
+                if (!empty($result)) {
+                    $segment = array_pop($result);
+                    if ($segment === '' && empty($result)) {
+                        // error case: attempted to back out too far:
+                        // restore the leading slash
+                        $result[] = '';
+                    } elseif ($segment === '..') {
+                        $result[] = '..'; // cannot remove .. with ..
+                    }
+                } else {
+                    // relative path, preserve the double-dots
+                    $result[] = '..';
+                }
+                $is_folder = true;
+                continue;
+            }
+            if ($stack[$i] == '.') {
+                // silently absorb
+                $is_folder = true;
+                continue;
+            }
+            $result[] = $stack[$i];
+        }
+        if ($is_folder) {
+            $result[] = '';
+        }
+        return $result;
+    }
+
+    /**
      * @param HTMLPurifier_URI $uri
      * @param HTMLPurifier_Config $config
      * @param HTMLPurifier_Context $context
@@ -21016,7 +20451,8 @@ class HTMLPurifier_URIFilter_MakeAbsolute extends HTMLPurifier_URIFilter
             return true;
         } // abort early
         if ($uri->path === '' && is_null($uri->scheme) &&
-            is_null($uri->host) && is_null($uri->query) && is_null($uri->fragment)) {
+            is_null($uri->host) && is_null($uri->query) && is_null($uri->fragment)
+        ) {
             // reference to current document
             $uri = clone $this->base;
             return true;
@@ -21069,55 +20505,7 @@ class HTMLPurifier_URIFilter_MakeAbsolute extends HTMLPurifier_URIFilter
         }
         return true;
     }
-
-    /**
-     * Resolve dots and double-dots in a path stack
-     * @param array $stack
-     * @return array
-     */
-    private function _collapseStack($stack)
-    {
-        $result = array();
-        $is_folder = false;
-        for ($i = 0; isset($stack[$i]); $i++) {
-            $is_folder = false;
-            // absorb an internally duplicated slash
-            if ($stack[$i] == '' && $i && isset($stack[$i + 1])) {
-                continue;
-            }
-            if ($stack[$i] == '..') {
-                if (!empty($result)) {
-                    $segment = array_pop($result);
-                    if ($segment === '' && empty($result)) {
-                        // error case: attempted to back out too far:
-                        // restore the leading slash
-                        $result[] = '';
-                    } elseif ($segment === '..') {
-                        $result[] = '..'; // cannot remove .. with ..
-                    }
-                } else {
-                    // relative path, preserve the double-dots
-                    $result[] = '..';
-                }
-                $is_folder = true;
-                continue;
-            }
-            if ($stack[$i] == '.') {
-                // silently absorb
-                $is_folder = true;
-                continue;
-            }
-            $result[] = $stack[$i];
-        }
-        if ($is_folder) {
-            $result[] = '';
-        }
-        return $result;
-    }
 }
-
-
-
 
 
 class HTMLPurifier_URIFilter_Munge extends HTMLPurifier_URIFilter
@@ -21131,31 +20519,26 @@ class HTMLPurifier_URIFilter_Munge extends HTMLPurifier_URIFilter
      * @type bool
      */
     public $post = true;
-
-    /**
-     * @type string
-     */
-    private $target;
-
-    /**
-     * @type HTMLPurifier_URIParser
-     */
-    private $parser;
-
-    /**
-     * @type bool
-     */
-    private $doEmbed;
-
-    /**
-     * @type string
-     */
-    private $secretKey;
-
     /**
      * @type array
      */
     protected $replace = array();
+    /**
+     * @type string
+     */
+    private $target;
+    /**
+     * @type HTMLPurifier_URIParser
+     */
+    private $parser;
+    /**
+     * @type bool
+     */
+    private $doEmbed;
+    /**
+     * @type string
+     */
+    private $secretKey;
 
     /**
      * @param HTMLPurifier_Config $config
@@ -21233,9 +20616,6 @@ class HTMLPurifier_URIFilter_Munge extends HTMLPurifier_URIFilter
 }
 
 
-
-
-
 /**
  * Implements safety checks for safe iframes.
  *
@@ -21300,9 +20680,6 @@ class HTMLPurifier_URIFilter_SafeIframe extends HTMLPurifier_URIFilter
         return preg_match($this->regexp, $uri->toString());
     }
 }
-
-
-
 
 
 /**
@@ -21432,7 +20809,6 @@ class HTMLPurifier_URIScheme_data extends HTMLPurifier_URIScheme
 }
 
 
-
 /**
  * Validates file as defined by RFC 1630 and RFC 1738.
  */
@@ -21473,9 +20849,6 @@ class HTMLPurifier_URIScheme_file extends HTMLPurifier_URIScheme
         return true;
     }
 }
-
-
-
 
 
 /**
@@ -21534,9 +20907,6 @@ class HTMLPurifier_URIScheme_ftp extends HTMLPurifier_URIScheme
 }
 
 
-
-
-
 /**
  * Validates http (HyperText Transfer Protocol) as defined by RFC 2616
  */
@@ -21571,9 +20941,6 @@ class HTMLPurifier_URIScheme_http extends HTMLPurifier_URIScheme
 }
 
 
-
-
-
 /**
  * Validates https (Secure HTTP) according to http scheme.
  */
@@ -21590,9 +20957,6 @@ class HTMLPurifier_URIScheme_https extends HTMLPurifier_URIScheme_http
 }
 
 
-
-
-
 // VERY RELAXED! Shouldn't cause problems, not even Firefox checks if the
 // email is valid, but be careful!
 
@@ -21601,7 +20965,6 @@ class HTMLPurifier_URIScheme_https extends HTMLPurifier_URIScheme_http
  * @todo Validate the email address
  * @todo Filter allowed query parameters
  */
-
 class HTMLPurifier_URIScheme_mailto extends HTMLPurifier_URIScheme
 {
     /**
@@ -21623,15 +20986,12 @@ class HTMLPurifier_URIScheme_mailto extends HTMLPurifier_URIScheme
     public function doValidate(&$uri, $config, $context)
     {
         $uri->userinfo = null;
-        $uri->host     = null;
-        $uri->port     = null;
+        $uri->host = null;
+        $uri->port = null;
         // we need to validate path against RFC 2368's addr-spec
         return true;
     }
 }
-
-
-
 
 
 /**
@@ -21667,9 +21027,6 @@ class HTMLPurifier_URIScheme_news extends HTMLPurifier_URIScheme
 }
 
 
-
-
-
 /**
  * Validates nntp (Network News Transfer Protocol) as defined by generic RFC 1738
  */
@@ -21698,9 +21055,6 @@ class HTMLPurifier_URIScheme_nntp extends HTMLPurifier_URIScheme
         return true;
     }
 }
-
-
-
 
 
 /**
@@ -21831,9 +21185,6 @@ class HTMLPurifier_VarParser_Flexible extends HTMLPurifier_VarParser
 }
 
 
-
-
-
 /**
  * This variable parser uses PHP's internal code engine. Because it does
  * this, it can represent all inputs; however, it is dangerous and cannot
@@ -21868,6 +21219,3 @@ class HTMLPurifier_VarParser_Native extends HTMLPurifier_VarParser
         return $var;
     }
 }
-
-
-

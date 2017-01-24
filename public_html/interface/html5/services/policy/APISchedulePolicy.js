@@ -1,66 +1,65 @@
-var APISchedulePolicy = ServiceCaller.extend( {
+var APISchedulePolicy = ServiceCaller.extend({
 
-	key_name: 'SchedulePolicy',
-	className: 'APISchedulePolicy',
+    key_name: 'SchedulePolicy',
+    className: 'APISchedulePolicy',
 
-	getSchedulePolicyTotalData: function() {
+    getSchedulePolicyTotalData: function () {
 
-		return this.argumentsHandler( this.className, 'getSchedulePolicyTotalData', arguments );
+        return this.argumentsHandler(this.className, 'getSchedulePolicyTotalData', arguments);
 
-	},
+    },
 
-	getSchedulePolicyData: function() {
+    getSchedulePolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getSchedulePolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getSchedulePolicyData', arguments);
 
-	},
+    },
 
-	getCommonSchedulePolicyData: function() {
+    getCommonSchedulePolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonSchedulePolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonSchedulePolicyData', arguments);
 
-	},
+    },
 
-	getSchedulePolicy: function() {
+    getSchedulePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getSchedulePolicy', arguments );
+        return this.argumentsHandler(this.className, 'getSchedulePolicy', arguments);
 
-	},
+    },
 
-	setSchedulePolicy: function() {
+    setSchedulePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setSchedulePolicy', arguments );
+        return this.argumentsHandler(this.className, 'setSchedulePolicy', arguments);
 
-	},
+    },
 
-	getSchedulePolicyDefaultData: function() {
+    getSchedulePolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getSchedulePolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getSchedulePolicyDefaultData', arguments);
 
-	},
+    },
 
-	deleteSchedulePolicy: function() {
+    deleteSchedulePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteSchedulePolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteSchedulePolicy', arguments);
 
-	},
+    },
 
-	validateSchedulePolicy: function() {
+    validateSchedulePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateSchedulePolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateSchedulePolicy', arguments);
 
-	},
+    },
 
-	copySchedulePolicy: function() {
+    copySchedulePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'copySchedulePolicy', arguments );
+        return this.argumentsHandler(this.className, 'copySchedulePolicy', arguments);
 
-	},
+    },
 
-	exportSchedulePolicy: function() {
-		return this.argumentsHandler( this.className, 'exportSchedulePolicy', arguments );
-	}
+    exportSchedulePolicy: function () {
+        return this.argumentsHandler(this.className, 'exportSchedulePolicy', arguments);
+    }
 
 
-
-} );
+});

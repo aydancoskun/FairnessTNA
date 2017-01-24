@@ -1,17 +1,17 @@
-var RibbonSubMenuNavItem = Base.extend( {
+var RibbonSubMenuNavItem = Base.extend({
 
-	defaults: {
-		label: null,
-		id: null,
-		nav: null
-	},
+    defaults: {
+        label: null,
+        id: null,
+        nav: null
+    },
 
-	constructor: function() {
+    constructor: function () {
 
-		this._super( 'constructor', arguments[0] );
+        this._super('constructor', arguments[0]);
 
-		this.get( 'nav' ).get( 'items' ).push( this );
+        this.get('nav').get('items').push(this);
 
-	}
+    }
 
-} )
+})

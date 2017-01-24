@@ -22,21 +22,22 @@
  * @package Mail
  * @version $Revision$
  */
-class Mail_sendmail extends Mail {
+class Mail_sendmail extends Mail
+{
 
     /**
      * The location of the sendmail or sendmail wrapper binary on the
      * filesystem.
      * @var string
      */
-    var $sendmail_path = '/usr/sbin/sendmail';
+    public $sendmail_path = '/usr/sbin/sendmail';
 
     /**
      * Any extra command-line parameters to pass to the sendmail or
      * sendmail wrapper binary.
      * @var string
      */
-    var $sendmail_args = '-i';
+    public $sendmail_args = '-i';
 
     /**
      * Constructor.
@@ -133,9 +134,10 @@ class Mail_sendmail extends Mail {
         if (!isset($from)) {
             return PEAR::raiseError('No from address given.');
         } elseif (strpos($from, ' ') !== false ||
-                  strpos($from, ';') !== false ||
-                  strpos($from, '&') !== false ||
-                  strpos($from, '`') !== false) {
+            strpos($from, ';') !== false ||
+            strpos($from, '&') !== false ||
+            strpos($from, '`') !== false
+        ) {
             return PEAR::raiseError('From address specified with dangerous characters.');
         }
 
@@ -160,10 +162,9 @@ class Mail_sendmail extends Mail {
 
         if ($result != 0) {
             return PEAR::raiseError('sendmail returned error code ' . $result,
-                                    $result);
+                $result);
         }
 
         return true;
     }
-
 }

@@ -1,45 +1,44 @@
-var APICurrencyRate = ServiceCaller.extend( {
+var APICurrencyRate = ServiceCaller.extend({
 
 
-	key_name: 'CurrencyRate',
-	className: 'APICurrencyRate',
+    key_name: 'CurrencyRate',
+    className: 'APICurrencyRate',
 
-	getCurrencyRate: function() {
+    getCurrencyRate: function () {
 
-		return this.argumentsHandler( this.className, 'getCurrencyRate', arguments );
+        return this.argumentsHandler(this.className, 'getCurrencyRate', arguments);
 
-	},
-	getCurrencyRateDefaultData: function() {
+    },
+    getCurrencyRateDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getCurrencyRateDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getCurrencyRateDefaultData', arguments);
 
-	},
-	getCommonCurrencyRateData: function() {
+    },
+    getCommonCurrencyRateData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonCurrencyRateData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonCurrencyRateData', arguments);
 
-	},
-	validateCurrencyRate: function() {
+    },
+    validateCurrencyRate: function () {
 
-		return this.argumentsHandler( this.className, 'validateCurrencyRate', arguments );
+        return this.argumentsHandler(this.className, 'validateCurrencyRate', arguments);
 
-	},
-	setCurrencyRate: function() {
+    },
+    setCurrencyRate: function () {
 
-		return this.argumentsHandler( this.className, 'setCurrencyRate', arguments );
+        return this.argumentsHandler(this.className, 'setCurrencyRate', arguments);
 
-	},
-	deleteCurrencyRate: function() {
+    },
+    deleteCurrencyRate: function () {
 
-		return this.argumentsHandler( this.className, 'deleteCurrencyRate', arguments );
+        return this.argumentsHandler(this.className, 'deleteCurrencyRate', arguments);
 
-	},
-	copyCurrencyRate: function() {
+    },
+    copyCurrencyRate: function () {
 
-		return this.argumentsHandler( this.className, 'copyCurrencyRate', arguments );
+        return this.argumentsHandler(this.className, 'copyCurrencyRate', arguments);
 
-	}
+    }
 
 
-
-} );
+});

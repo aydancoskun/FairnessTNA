@@ -21,23 +21,23 @@
 require_once 'HTML/QuickForm/Action.php';
 
 /**
- * The action for a 'back' button of wizard-type multipage form. 
- * 
+ * The action for a 'back' button of wizard-type multipage form.
+ *
  * @author  Alexey Borzov <avb@php.net>
  * @package HTML_QuickForm_Controller
  * @version $Revision: 1.3 $
  */
 class HTML_QuickForm_Action_Back extends HTML_QuickForm_Action
 {
-    function perform(&$page, $actionName)
+    public function perform(&$page, $actionName)
     {
         // save the form values and validation status to the session
         $page->isFormBuilt() or $page->buildForm();
-        $pageName =  $page->getAttribute('id');
-        $data     = $page->controller->container();
+        $pageName = $page->getAttribute('id');
+        $data = $page->controller->container();
         $data['values'][$pageName] = $page->exportValues();
         if (!$page->controller->isModal()) {
-            $data['valid'][$pageName]  = $page->validate();
+            $data['valid'][$pageName] = $page->validate();
         }
 
         // get the previous page and go to it
@@ -50,5 +50,3 @@ class HTML_QuickForm_Action_Back extends HTML_QuickForm_Action
         }
     }
 }
-
-?>

@@ -19,159 +19,163 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Company
  */
-class CompanyUserCountListFactory extends CompanyUserCountFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class CompanyUserCountListFactory extends CompanyUserCountFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$this->rs = $this->getCache($id);
-		if ( $this->rs === FALSE ) {
-			$ph = array(
-						'id' => (int)$id,
-						);
+        $this->rs = $this->getCache($id);
+        if ($this->rs === false) {
+            $ph = array(
+                'id' => (int)$id,
+            );
 
-			$query = '
+            $query = '
 						select	*
-						from	'. $this->getTable() .'
+						from	' . $this->getTable() . '
 						where	id = ?
 						';
-			$query .= $this->getWhereSQL( $where );
-			$query .= $this->getSortSQL( $order );
+            $query .= $this->getWhereSQL($where);
+            $query .= $this->getSortSQL($order);
 
-			$this->ExecuteSQL( $query, $ph );
+            $this->ExecuteSQL($query, $ph);
 
-			$this->saveCache($this->rs, $id);
-		}
+            $this->saveCache($this->rs, $id);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($id, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($id, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getActiveUsers($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
+    public function getActiveUsers($limit = null, $page = null, $where = null, $order = null)
+    {
+        $uf = new UserFactory();
 
-		$uf = new UserFactory();
-
-		$query = '
+        $query = '
 					select	company_id,
 							count(*) as total
-					from	'. $uf->getTable() .'
+					from	' . $uf->getTable() . '
 					where
 						status_id = 10
 						AND deleted = 0
 					GROUP BY company_id
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getInActiveUsers($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
+    public function getInActiveUsers($limit = null, $page = null, $where = null, $order = null)
+    {
+        $uf = new UserFactory();
 
-		$uf = new UserFactory();
-
-		$query = '
+        $query = '
 					select	company_id,
 							count(*) as total
-					from	'. $uf->getTable() .'
+					from	' . $uf->getTable() . '
 					where
 						status_id != 10
 						AND deleted = 0
 					GROUP BY company_id
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getDeletedUsers($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
+    public function getDeletedUsers($limit = null, $page = null, $where = null, $order = null)
+    {
+        $uf = new UserFactory();
 
-		$uf = new UserFactory();
-
-		$query = '
+        $query = '
 					select	company_id,
 							count(*) as total
-					from	'. $uf->getTable() .'
+					from	' . $uf->getTable() . '
 					where
 						deleted = 1
 					GROUP BY company_id
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getMinAvgMaxByCompanyIdAndStartDateAndEndDate($id, $start_date, $end_date, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getMinAvgMaxByCompanyIdAndStartDateAndEndDate($id, $start_date, $end_date, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $start_date == '' ) {
-			return FALSE;
-		}
+        if ($start_date == '') {
+            return false;
+        }
 
-		if ( $end_date == '' ) {
-			return FALSE;
-		}
+        if ($end_date == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$id,
-					'start_date' => $this->db->BindDate( $start_date ),
-					'end_date' => $this->db->BindDate( $end_date ),
-					);
+        $ph = array(
+            'company_id' => (int)$id,
+            'start_date' => $this->db->BindDate($start_date),
+            'end_date' => $this->db->BindDate($end_date),
+        );
 
-		$query = '
+        $query = '
 					select
 							min(active_users) as min_active_users,
 							ceil(avg(active_users)) as avg_active_users,
@@ -185,40 +189,41 @@ class CompanyUserCountListFactory extends CompanyUserCountFactory implements Ite
 							ceil(avg(deleted_users)) as avg_deleted_users,
 							max(deleted_users) as max_deleted_users
 
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND date_stamp >= ?
 						AND date_stamp <= ?
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	//This function returns data for multiple companies, used by the API.
-	function getMinAvgMaxByCompanyIDsAndStartDateAndEndDate($id, $start_date, $end_date, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    //This function returns data for multiple companies, used by the API.
+    public function getMinAvgMaxByCompanyIDsAndStartDateAndEndDate($id, $start_date, $end_date, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $start_date == '' ) {
-			return FALSE;
-		}
+        if ($start_date == '') {
+            return false;
+        }
 
-		if ( $end_date == '' ) {
-			return FALSE;
-		}
+        if ($end_date == '') {
+            return false;
+        }
 
-		$ph = array(
-					//'company_id' => (int)$id,
-					'start_date' => $this->db->BindDate( $start_date ),
-					'end_date' => $this->db->BindDate( $end_date ),
-					);
+        $ph = array(
+            //'company_id' => (int)$id,
+            'start_date' => $this->db->BindDate($start_date),
+            'end_date' => $this->db->BindDate($end_date),
+        );
 
-		$query = '
+        $query = '
 					select
 							company_id,
 							min(active_users) as min_active_users,
@@ -233,55 +238,56 @@ class CompanyUserCountListFactory extends CompanyUserCountFactory implements Ite
 							ceil(avg(deleted_users)) as avg_deleted_users,
 							max(deleted_users) as max_deleted_users
 
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where
 						date_stamp >= ?
 						AND date_stamp <= ? ';
 
-		if ( $id != '' AND ( isset($id[0]) AND !in_array(-1, (array)$id) ) ) {
-			$query	.=	' AND company_id in ('. $this->getListSQL( $id, $ph, 'int' ) .') ';
-		}
+        if ($id != '' and (isset($id[0]) and !in_array(-1, (array)$id))) {
+            $query .= ' AND company_id in (' . $this->getListSQL($id, $ph, 'int') . ') ';
+        }
 
-		$query .= ' group by company_id';
+        $query .= ' group by company_id';
 
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getMonthlyMinAvgMaxByCompanyIdAndStartDateAndEndDate($id, $start_date, $end_date, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getMonthlyMinAvgMaxByCompanyIdAndStartDateAndEndDate($id, $start_date, $end_date, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $start_date == '' ) {
-			return FALSE;
-		}
+        if ($start_date == '') {
+            return false;
+        }
 
-		if ( $end_date == '' ) {
-			return FALSE;
-		}
+        if ($end_date == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$id,
-					'start_date' => $this->db->BindDate( $start_date ),
-					'end_date' => $this->db->BindDate( $end_date ),
-					);
+        $ph = array(
+            'company_id' => (int)$id,
+            'start_date' => $this->db->BindDate($start_date),
+            'end_date' => $this->db->BindDate($end_date),
+        );
 
-		if ( $this->getDatabaseType() == 'mysql' ) {
-			//$month_sql = '(month( date_stamp ))';
-			$month_sql = '( date_format( date_stamp, \'%Y-%m-01\') )';
-		} else {
-			//$month_sql = '( date_part(\'month\', date_stamp) )';
-			$month_sql = '( to_char(date_stamp, \'YYYY-MM\') || \'-01\' )'; //Concat -01 to end due to EnterpriseDB issue with to_char
-		}
+        if ($this->getDatabaseType() == 'mysql') {
+            //$month_sql = '(month( date_stamp ))';
+            $month_sql = '( date_format( date_stamp, \'%Y-%m-01\') )';
+        } else {
+            //$month_sql = '( date_part(\'month\', date_stamp) )';
+            $month_sql = '( to_char(date_stamp, \'YYYY-MM\') || \'-01\' )'; //Concat -01 to end due to EnterpriseDB issue with to_char
+        }
 
-		$query = '
+        $query = '
 					select
-							'. $month_sql .' as date_stamp,
+							' . $month_sql . ' as date_stamp,
 							min(active_users) as min_active_users,
 							ceil(avg(active_users)) as avg_active_users,
 							max(active_users) as max_active_users,
@@ -294,46 +300,47 @@ class CompanyUserCountListFactory extends CompanyUserCountFactory implements Ite
 							ceil(avg(deleted_users)) as avg_deleted_users,
 							max(deleted_users) as max_deleted_users
 
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND date_stamp >= ?
 						AND date_stamp <= ?
-					GROUP BY '. $month_sql .'
+					GROUP BY ' . $month_sql . '
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getMonthlyMinAvgMaxByStartDateAndEndDate($start_date, $end_date, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $start_date == '' ) {
-			return FALSE;
-		}
+    public function getMonthlyMinAvgMaxByStartDateAndEndDate($start_date, $end_date, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($start_date == '') {
+            return false;
+        }
 
-		if ( $end_date == '' ) {
-			return FALSE;
-		}
+        if ($end_date == '') {
+            return false;
+        }
 
-		$ph = array(
-					'start_date' => $this->db->BindDate( $start_date ),
-					'end_date' => $this->db->BindDate( $end_date ),
-					);
+        $ph = array(
+            'start_date' => $this->db->BindDate($start_date),
+            'end_date' => $this->db->BindDate($end_date),
+        );
 
-		if ( $this->getDatabaseType() == 'mysql' ) {
-			//$month_sql = '(month( date_stamp ))';
-			$month_sql = '( date_format( date_stamp, \'%Y-%m-01\') )';
-		} else {
-			//$month_sql = '( date_part(\'month\', date_stamp) )';
-			$month_sql = '( to_char(date_stamp, \'YYYY-MM-01\') )';
-		}
+        if ($this->getDatabaseType() == 'mysql') {
+            //$month_sql = '(month( date_stamp ))';
+            $month_sql = '( date_format( date_stamp, \'%Y-%m-01\') )';
+        } else {
+            //$month_sql = '( date_part(\'month\', date_stamp) )';
+            $month_sql = '( to_char(date_stamp, \'YYYY-MM-01\') )';
+        }
 
-		$query = '
+        $query = '
 					select
 							company_id,
-							'. $month_sql .' as date_stamp,
+							' . $month_sql . ' as date_stamp,
 							min(active_users) as min_active_users,
 							ceil(avg(active_users)) as avg_active_users,
 							max(active_users) as max_active_users,
@@ -346,48 +353,49 @@ class CompanyUserCountListFactory extends CompanyUserCountFactory implements Ite
 							ceil(avg(deleted_users)) as avg_deleted_users,
 							max(deleted_users) as max_deleted_users
 
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where
 						date_stamp >= ?
 						AND date_stamp <= ?
-					GROUP BY company_id, '. $month_sql .'
-					ORDER BY company_id, '. $month_sql .'
+					GROUP BY company_id, ' . $month_sql . '
+					ORDER BY company_id, ' . $month_sql . '
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	//This gets the totals across all companies.
-	function getTotalMonthlyMinAvgMaxByCompanyStatusAndStartDateAndEndDate($status_id, $start_date, $end_date, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $start_date == '' ) {
-			return FALSE;
-		}
+    //This gets the totals across all companies.
+    public function getTotalMonthlyMinAvgMaxByCompanyStatusAndStartDateAndEndDate($status_id, $start_date, $end_date, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($start_date == '') {
+            return false;
+        }
 
-		if ( $end_date == '' ) {
-			return FALSE;
-		}
+        if ($end_date == '') {
+            return false;
+        }
 
-		$cf = TTNew('CompanyFactory');
+        $cf = TTNew('CompanyFactory');
 
-		$ph = array(
-					'status_id' => (int)$status_id,
-					'start_date' => $this->db->BindDate( $start_date ),
-					'end_date' => $this->db->BindDate( $end_date ),
-					);
+        $ph = array(
+            'status_id' => (int)$status_id,
+            'start_date' => $this->db->BindDate($start_date),
+            'end_date' => $this->db->BindDate($end_date),
+        );
 
-		if ( $this->getDatabaseType() == 'mysql' ) {
-			//$month_sql = '(month( date_stamp ))';
-			$month_sql = '( date_format( a.date_stamp, \'%Y-%m-01\') )';
-		} else {
-			//$month_sql = '( date_part(\'month\', date_stamp) )';
-			$month_sql = '( to_char(a.date_stamp, \'YYYY-MM-01\') )';
-		}
+        if ($this->getDatabaseType() == 'mysql') {
+            //$month_sql = '(month( date_stamp ))';
+            $month_sql = '( date_format( a.date_stamp, \'%Y-%m-01\') )';
+        } else {
+            //$month_sql = '( date_part(\'month\', date_stamp) )';
+            $month_sql = '( to_char(a.date_stamp, \'YYYY-MM-01\') )';
+        }
 
-		$query = '
+        $query = '
 					select
 							date_stamp,
 							sum(min_active_users) as min_active_users,
@@ -404,7 +412,7 @@ class CompanyUserCountListFactory extends CompanyUserCountFactory implements Ite
 					FROM (
 							select
 									company_id,
-									'. $month_sql .' as date_stamp,
+									' . $month_sql . ' as date_stamp,
 									min(a.active_users) as min_active_users,
 									ceil(avg(a.active_users)) as avg_active_users,
 									max(a.active_users) as max_active_users,
@@ -417,75 +425,74 @@ class CompanyUserCountListFactory extends CompanyUserCountFactory implements Ite
 									ceil(avg(a.deleted_users)) as avg_deleted_users,
 									max(a.deleted_users) as max_deleted_users
 
-							from	'. $this->getTable() .' as a
-								LEFT JOIN '. $cf->getTable() .' as cf ON ( a.company_id = cf.id )
+							from	' . $this->getTable() . ' as a
+								LEFT JOIN ' . $cf->getTable() . ' as cf ON ( a.company_id = cf.id )
 							where
 								cf.status_id = ?
 								AND a.date_stamp >= ?
 								AND a.date_stamp <= ?
 								AND ( cf.deleted = 0 )
-							GROUP BY company_id, '. $month_sql .'
+							GROUP BY company_id, ' . $month_sql . '
 						) as tmp
 					GROUP BY date_stamp
 						';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getLastDateByCompanyId($company_id, $order = NULL) {
-		if ( $company_id == '' ) {
-			return FALSE;
-		}
+    public function getLastDateByCompanyId($company_id, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 					ORDER BY date_stamp desc
 					LIMIT 1
 						';
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndCompanyId($id, $company_id, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getByIdAndCompanyId($id, $company_id, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $company_id == '' ) {
-			return FALSE;
-		}
+        if ($company_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND	id = ?
 						';
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
-
-
+        return $this;
+    }
 }
-?>

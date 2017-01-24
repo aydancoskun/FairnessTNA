@@ -39,17 +39,17 @@
 /**
  * Methods for common data validations
  */
-define('VALIDATE_NUM',          '0-9');
-define('VALIDATE_SPACE',        '\s');
-define('VALIDATE_ALPHA_LOWER',  'a-z');
-define('VALIDATE_ALPHA_UPPER',  'A-Z');
-define('VALIDATE_ALPHA',        VALIDATE_ALPHA_LOWER . VALIDATE_ALPHA_UPPER);
-define('VALIDATE_EALPHA_LOWER', VALIDATE_ALPHA_LOWER . 'áéíóúàèìòùäëïöüâêîôûñçþæðå');
-define('VALIDATE_EALPHA_UPPER', VALIDATE_ALPHA_UPPER . 'ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛÑÇÞÆÐÅ');
-define('VALIDATE_EALPHA',       VALIDATE_EALPHA_LOWER . VALIDATE_EALPHA_UPPER);
-define('VALIDATE_PUNCTUATION',  VALIDATE_SPACE . '\.,;\:&"\'\?\!\(\)');
-define('VALIDATE_NAME',         VALIDATE_EALPHA . VALIDATE_SPACE . "'");
-define('VALIDATE_STREET',       VALIDATE_NAME . "/\\ºª\.");
+define('VALIDATE_NUM', '0-9');
+define('VALIDATE_SPACE', '\s');
+define('VALIDATE_ALPHA_LOWER', 'a-z');
+define('VALIDATE_ALPHA_UPPER', 'A-Z');
+define('VALIDATE_ALPHA', VALIDATE_ALPHA_LOWER . VALIDATE_ALPHA_UPPER);
+define('VALIDATE_EALPHA_LOWER', VALIDATE_ALPHA_LOWER . 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½');
+define('VALIDATE_EALPHA_UPPER', VALIDATE_ALPHA_UPPER . 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½');
+define('VALIDATE_EALPHA', VALIDATE_EALPHA_LOWER . VALIDATE_EALPHA_UPPER);
+define('VALIDATE_PUNCTUATION', VALIDATE_SPACE . '\.,;\:&"\'\?\!\(\)');
+define('VALIDATE_NAME', VALIDATE_EALPHA . VALIDATE_SPACE . "'");
+define('VALIDATE_STREET', VALIDATE_NAME . "/\\ï¿½ï¿½\.");
 
 /**
  * Validation class
@@ -76,8 +76,8 @@ class Validate
     /**
      * Validate a number
      *
-     * @param string    $number     Number to validate
-     * @param array     $options    array where:
+     * @param string $number Number to validate
+     * @param array $options array where:
      *                              'decimal'   is the decimal char or false when decimal not allowed
      *                                          i.e. ',.' to allow both ',' and '.'
      *                              'dec_prec'  Number of allowed decimals
@@ -88,15 +88,15 @@ class Validate
      *
      * @access public
      */
-    static function number($number, $options = array())
+    public static function number($number, $options = array())
     {
         $decimal = $dec_prec = $min = $max = null;
         if (is_array($options)) {
             extract($options);
         }
 
-        $dec_prec   = $dec_prec ? "{1,$dec_prec}" : '+';
-        $dec_regex  = $decimal  ? "[$decimal][0-9]$dec_prec" : '';
+        $dec_prec = $dec_prec ? "{1,$dec_prec}" : '+';
+        $dec_regex = $decimal ? "[$decimal][0-9]$dec_prec" : '';
 
         if (!preg_match("|^[-+]?\s*[0-9]+($dec_regex)?\$|", $number)) {
             return false;
@@ -116,73 +116,54 @@ class Validate
         }
         return true;
     }
-    
-    /**
-     * Converting a string to UTF-7 (RFC 2152)
-     *
-     * @param   $string     string to be converted
-     *
-     * @return  string  converted string
-     *
-     * @access  private
-     */
-    static function __stringToUtf7($string) {
-        $utf7 = array(
-                        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-                        'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-                        'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
-                        'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
-                        '3', '4', '5', '6', '7', '8', '9', '+', ','
-                    );
 
-        $state = 0;
-        if (!empty($string)) {
-            $i = 0;
-            while ($i <= strlen($string)) {
-                $char = substr($string, $i, 1);
-                if ($state == 0) {
-                    if ((ord($char) >= 0x7F) || (ord($char) <= 0x1F)) {
-                        if ($char) {
-                            $return .= '&';
-                        }
-                        $state = 1;
-                    } elseif ($char == '&') {
-                        $return .= '&-';
-                    } else {
-                        $return .= $char;
-                    }
-                } elseif (($i == strlen($string) || 
-                            !((ord($char) >= 0x7F)) || (ord($char) <= 0x1F))) {
-                    if ($state != 1) {
-                        $return .= $utf7[ord($char)];
-                    }
-                    $return .= '-';
-                    $state = 0;
-                } else {
-                    switch($state) {
-                        case 1:
-                            $return .= $utf7[ord($char) >> 2];
-                            $residue = (ord($char) & 0x03) << 4;
-                            $state = 2;
-                            break;
-                        case 2:
-                            $return .= $utf7[$residue | (ord($char) >> 4)];
-                            $residue = (ord($char) & 0x0F) << 2;
-                            $state = 3;
-                            break;
-                        case 3:
-                            $return .= $utf7[$residue | (ord($char) >> 6)];
-                            $return .= $utf7[ord($char) & 0x3F];
-                            $state = 1;
-                            break;
-                    }
-                }
-                $i++;
-            }
-            return $return;
+    /**
+     * Validate an email
+     *
+     * @param string $email email to validate
+     * @param mixed boolean (BC) $check_domain   Check or not if the domain exists
+     *              array $options associative array of options
+     *              'check_domain' boolean Check or not if the domain exists
+     *              'use_rfc822' boolean Apply the full RFC822 grammar
+     *
+     * @return boolean true if valid email, false if not
+     *
+     * @access public
+     */
+    public static function email($email, $options = null)
+    {
+        $check_domain = false;
+        $use_rfc822 = false;
+        if (is_bool($options)) {
+            $check_domain = $options;
+        } elseif (is_array($options)) {
+            extract($options);
         }
-        return '';
+
+        // the base regexp for address
+        $regex = '&^(?:                                               # recipient:
+         ("\s*(?:[^"\f\n\r\t\v\b\s]+\s*)+")|                          #1 quoted name
+         ([-\w!\#\$%\&\'*+~/^`|{}]+(?:\.[-\w!\#\$%\&\'*+~/^`|{}]+)*)) #2 OR dot-atom
+         @(((\[)?                     #3 domain, 4 as IPv4, 5 optionally bracketed
+         (?:(?:(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:[0-1]?[0-9]?[0-9]))\.){3}
+               (?:(?:25[0-5])|(?:2[0-4][0-9])|(?:[0-1]?[0-9]?[0-9]))))(?(5)\])|
+         ((?:[a-z0-9](?:[-a-z0-9]*[a-z0-9])?\.)*[a-z](?:[-a-z0-9]*[a-z0-9])?)  #6 domain as hostname
+         \.((?:([^-])[-a-z]*[-a-z])?)) #7 ICANN domain names 
+         $&xi';
+
+        if ($use_rfc822 ? Validate::__emailRFC822($email, $options) :
+            preg_match($regex, $email)
+        ) {
+            if ($check_domain && function_exists('checkdnsrr')) {
+                list(, $domain) = explode('@', $email);
+                if (checkdnsrr($domain, 'MX') || checkdnsrr($domain, 'A')) {
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -196,7 +177,7 @@ class Validate
      *
      * @access private
      */
-    static function __emailRFC822(&$email, &$options)
+    public static function __emailRFC822(&$email, &$options)
     {
         if (Validate::__stringToUtf7($email) != $email) {
             return false;
@@ -236,7 +217,7 @@ class Validate
             // route-addr  =  "<" [route] addr-spec ">"
             $route_addr = '<\s*(?:' . $route . ')?' . $addr_spec . '>\s*';
             // phrase      =  1*word                       ; Sequence of words
-            $phrase = $word  . '+';
+            $phrase = $word . '+';
             // mailbox     =  addr-spec                    ; simple address
             //             /  phrase route-addr            ; name & addr-spec
             $mailbox = '(?:' . $addr_spec . '|' . $phrase . $route_addr . ')';
@@ -246,8 +227,8 @@ class Validate
             //                 /  group                        ; named list
             $address = '/^\s*(?:' . $mailbox . '|' . $group . ')$/';
             $uncomment =
-            '/((?:(?:\\\\"|[^("])*(?:' . $quoted_string .
-                                             ')?)*)((?<!\\\\)\((?:(?2)|.)*?(?<!\\\\)\))/';
+                '/((?:(?:\\\\"|[^("])*(?:' . $quoted_string .
+                ')?)*)((?<!\\\\)\((?:(?2)|.)*?(?<!\\\\)\))/';
         }
         // strip comments
         $email = preg_replace($uncomment, '$1 ', $email);
@@ -255,58 +236,80 @@ class Validate
     }
 
     /**
-     * Validate an email
+     * Converting a string to UTF-7 (RFC 2152)
      *
-     * @param string $email email to validate
-     * @param mixed boolean (BC) $check_domain   Check or not if the domain exists
-     *              array $options associative array of options
-     *              'check_domain' boolean Check or not if the domain exists
-     *              'use_rfc822' boolean Apply the full RFC822 grammar
+     * @param   $string     string to be converted
      *
-     * @return boolean true if valid email, false if not
+     * @return  string  converted string
      *
-     * @access public
+     * @access  private
      */
-    static function email($email, $options = null)
+    public static function __stringToUtf7($string)
     {
-        $check_domain = false;
-        $use_rfc822 = false;
-        if (is_bool($options)) {
-            $check_domain = $options;
-        } elseif (is_array($options)) {
-            extract($options);
-        }
+        $utf7 = array(
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+            'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+            'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+            'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+            's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
+            '3', '4', '5', '6', '7', '8', '9', '+', ','
+        );
 
-        // the base regexp for address
-        $regex = '&^(?:                                               # recipient:
-         ("\s*(?:[^"\f\n\r\t\v\b\s]+\s*)+")|                          #1 quoted name
-         ([-\w!\#\$%\&\'*+~/^`|{}]+(?:\.[-\w!\#\$%\&\'*+~/^`|{}]+)*)) #2 OR dot-atom
-         @(((\[)?                     #3 domain, 4 as IPv4, 5 optionally bracketed
-         (?:(?:(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:[0-1]?[0-9]?[0-9]))\.){3}
-               (?:(?:25[0-5])|(?:2[0-4][0-9])|(?:[0-1]?[0-9]?[0-9]))))(?(5)\])|
-         ((?:[a-z0-9](?:[-a-z0-9]*[a-z0-9])?\.)*[a-z](?:[-a-z0-9]*[a-z0-9])?)  #6 domain as hostname
-         \.((?:([^-])[-a-z]*[-a-z])?)) #7 ICANN domain names 
-         $&xi';
-
-        if ($use_rfc822? Validate::__emailRFC822($email, $options) :
-            preg_match($regex, $email)) {
-            if ($check_domain && function_exists('checkdnsrr')) {
-                list (, $domain)  = explode('@', $email);
-                if (checkdnsrr($domain, 'MX') || checkdnsrr($domain, 'A')) {
-                    return true;
+        $state = 0;
+        if (!empty($string)) {
+            $i = 0;
+            while ($i <= strlen($string)) {
+                $char = substr($string, $i, 1);
+                if ($state == 0) {
+                    if ((ord($char) >= 0x7F) || (ord($char) <= 0x1F)) {
+                        if ($char) {
+                            $return .= '&';
+                        }
+                        $state = 1;
+                    } elseif ($char == '&') {
+                        $return .= '&-';
+                    } else {
+                        $return .= $char;
+                    }
+                } elseif (($i == strlen($string) ||
+                    !((ord($char) >= 0x7F)) || (ord($char) <= 0x1F))
+                ) {
+                    if ($state != 1) {
+                        $return .= $utf7[ord($char)];
+                    }
+                    $return .= '-';
+                    $state = 0;
+                } else {
+                    switch ($state) {
+                        case 1:
+                            $return .= $utf7[ord($char) >> 2];
+                            $residue = (ord($char) & 0x03) << 4;
+                            $state = 2;
+                            break;
+                        case 2:
+                            $return .= $utf7[$residue | (ord($char) >> 4)];
+                            $residue = (ord($char) & 0x0F) << 2;
+                            $state = 3;
+                            break;
+                        case 3:
+                            $return .= $utf7[$residue | (ord($char) >> 6)];
+                            $return .= $utf7[ord($char) & 0x3F];
+                            $state = 1;
+                            break;
+                    }
                 }
-                return false;
+                $i++;
             }
-            return true;
+            return $return;
         }
-        return false;
+        return '';
     }
 
     /**
      * Validate a string using the given format 'format'
      *
-     * @param string    $string     String to validate
-     * @param array     $options    Options array where:
+     * @param string $string String to validate
+     * @param array $options Options array where:
      *                              'format' is the format of the string
      *                                  Ex: VALIDATE_NUM . VALIDATE_ALPHA (see constants)
      *                              'min_length' minimum length
@@ -316,7 +319,7 @@ class Validate
      *
      * @access public
      */
-    static function string($string, $options)
+    public static function string($string, $options)
     {
         $format = null;
         $min_length = $max_length = 0;
@@ -355,8 +358,8 @@ class Validate
      *         the characters ';/?:@$,' will not be accepted in the query part
      *         if not urlencoded, refer to the option "strict'"
      *
-     * @param string    $url        URI to validate
-     * @param array     $options    Options used by the validation method.
+     * @param string $url URI to validate
+     * @param array $options Options used by the validation method.
      *                              key => type
      *                              'domain_check' => boolean
      *                                  Whether to check the DNS entry or not
@@ -372,7 +375,7 @@ class Validate
      *
      * @access public
      */
-    static function uri($url, $options = null)
+    public static function uri($url, $options = null)
     {
         $strict = ';/?:@$,';
         $domain_check = false;
@@ -381,7 +384,7 @@ class Validate
             extract($options);
         }
         if (preg_match(
-             '&^(?:([a-z][-+.a-z0-9]*):)?                             # 1. scheme
+            '&^(?:([a-z][-+.a-z0-9]*):)?                             # 1. scheme
               (?://                                                   # authority start
               (?:((?:%[0-9a-f]{2}|[-a-z0-9_.!~*\'();:\&=+$,])*)@)?    # 2. authority-userinfo
               (?:((?:[a-z0-9](?:[-a-z0-9]*[a-z0-9])?\.)*[a-z](?:[a-z0-9]+)?\.?)  # 3. authority-hostname OR
@@ -392,9 +395,9 @@ class Validate
               (?:\#((?:%[0-9a-f]{2}|[-a-z0-9_.!~*\'();/?:@\&=+$,])*))? # 8. fragment
               $&xi', $url, $matches)) {
             $scheme = isset($matches[1]) ? $matches[1] : '';
-            $authority = isset($matches[3]) ? $matches[3] : '' ;
+            $authority = isset($matches[3]) ? $matches[3] : '';
             if (is_array($allowed_schemes) &&
-                !in_array($scheme,$allowed_schemes)
+                !in_array($scheme, $allowed_schemes)
             ) {
                 return false;
             }
@@ -413,7 +416,8 @@ class Validate
             if ($strict) {
                 $strict = '#[' . preg_quote($strict, '#') . ']#';
                 if ((!empty($matches[7]) && preg_match($strict, $matches[7]))
-                 || (!empty($matches[8]) && preg_match($strict, $matches[8]))) {
+                    || (!empty($matches[8]) && preg_match($strict, $matches[8]))
+                ) {
                     return false;
                 }
             }
@@ -425,8 +429,8 @@ class Validate
     /**
      * Validate date and times. Note that this method need the Date_Calc class
      *
-     * @param string    $date   Date to validate
-     * @param array     $options array options where :
+     * @param string $date Date to validate
+     * @param array $options array options where :
      *                          'format' The format of the date (%d-%m-%Y)
      *                          'min' The date has to be greater
      *                                than this array($day, $month, $year)
@@ -439,7 +443,7 @@ class Validate
      *
      * @access public
      */
-    function date($date, $options)
+    public function date($date, $options)
     {
         $max = $min = false;
         $format = '';
@@ -479,10 +483,10 @@ class Validate
                     case 'y':
                         if ($next == 'Y') {
                             $year = Validate::_substr($date, 4);
-                            $year = (int)$year?$year:'';
+                            $year = (int)$year ? $year : '';
                         } else {
                             $year = (int)(substr(date('Y'), 0, 2) .
-                                          Validate::_substr($date, 2));
+                                Validate::_substr($date, 2));
                         }
                         if (strlen($year) != 4 || $year < 0 || $year > 9999) {
                             return false;
@@ -518,7 +522,7 @@ class Validate
                         }
                         break;
                     default:
-                        trigger_error("Not supported char `$next' after % in offset " . ($i+2), E_USER_WARNING);
+                        trigger_error("Not supported char `$next' after % in offset " . ($i + 2), E_USER_WARNING);
                 }
                 $i++;
             } else {
@@ -542,13 +546,13 @@ class Validate
                 include_once 'Date/Calc.php';
                 if (is_a($min, 'Date') &&
                     (Date_Calc::compareDates($day, $month, $year,
-                                             $min->getDay(), $min->getMonth(), $min->getYear()) < 0))
-                {
+                            $min->getDay(), $min->getMonth(), $min->getYear()) < 0)
+                ) {
                     return false;
                 } elseif (is_array($min) &&
-                        (Date_Calc::compareDates($day, $month, $year,
-                                             $min[0], $min[1], $min[2]) < 0))
-                {
+                    (Date_Calc::compareDates($day, $month, $year,
+                            $min[0], $min[1], $min[2]) < 0)
+                ) {
                     return false;
                 }
             }
@@ -557,13 +561,13 @@ class Validate
                 include_once 'Date/Calc.php';
                 if (is_a($max, 'Date') &&
                     (Date_Calc::compareDates($day, $month, $year,
-                                             $max->getDay(), $max->getMonth(), $max->getYear()) > 0))
-                {
+                            $max->getDay(), $max->getMonth(), $max->getYear()) > 0)
+                ) {
                     return false;
                 } elseif (is_array($max) &&
-                        (Date_Calc::compareDates($day, $month, $year,
-                                                 $max[0], $max[1], $max[2]) > 0))
-                {
+                    (Date_Calc::compareDates($day, $month, $year,
+                            $max[0], $max[1], $max[2]) > 0)
+                ) {
                     return false;
                 }
             }
@@ -572,9 +576,9 @@ class Validate
         return true;
     }
 
-    static function _substr(&$date, $num, $opt = false)
+    public static function _substr(&$date, $num, $opt = false)
     {
-        if ($opt && strlen($date) >= $opt && preg_match('/^[0-9]{'.$opt.'}/', $date, $m)) {
+        if ($opt && strlen($date) >= $opt && preg_match('/^[0-9]{' . $opt . '}/', $date, $m)) {
             $ret = $m[0];
         } else {
             $ret = substr($date, 0, $num);
@@ -583,42 +587,36 @@ class Validate
         return $ret;
     }
 
-    static function _modf($val, $div) {
-        if (function_exists('bcmod')) {
-            return bcmod($val, $div);
-        } elseif (function_exists('fmod')) {
-            return fmod($val, $div);
-        }
-        $r = $val / $div;
-        $i = intval($r);
-        return intval($val - $i * $div + .1);
-    }
-
     /**
-     * Calculates sum of product of number digits with weights
+     * Validates a number
      *
-     * @param string $number number string
+     * @param string $number number to validate
      * @param array $weights reference to array of weights
+     * @param int $modulo (optionsl) number
+     * @param int $subtract (optional) numbier
      *
-     * @returns int returns product of number digits with weights
+     * @returns bool true if valid, false if not
      *
      * @access protected
      */
-    static function _multWeights($number, &$weights) {
-        if (!is_array($weights)) {
-            return -1;
+    public function _checkControlNumber($number, &$weights, $modulo = 10, $subtract = 0)
+    {
+        if (strlen($number) < count($weights)) {
+            return false;
         }
-        $sum = 0;
+        $target_digit = substr($number, count($weights), 1);
+        $control_digit = Validate::_getControlNumber($number, $weights, $modulo, $subtract, $target_digit === 'X');
 
-        $count = min(count($weights), strlen($number));
-        if ($count == 0)  { // empty string or weights array
-            return -1;
+        if ($control_digit == -1) {
+            return false;
         }
-        for ($i = 0; $i < $count; ++$i) {
-            $sum += intval(substr($number, $i, 1)) * $weights[$i];
+        if ($target_digit === 'X' && $control_digit == 10) {
+            return true;
         }
-
-        return $sum;
+        if ($control_digit != $target_digit) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -634,7 +632,8 @@ class Validate
      *
      * @access protected
      */
-    static function _getControlNumber($number, &$weights, $modulo = 10, $subtract = 0, $allow_high = false) {
+    public static function _getControlNumber($number, &$weights, $modulo = 10, $subtract = 0, $allow_high = false)
+    {
         // calc sum
         $sum = Validate::_multWeights($number, $weights);
         if ($sum == -1) {
@@ -652,34 +651,43 @@ class Validate
     }
 
     /**
-     * Validates a number
+     * Calculates sum of product of number digits with weights
      *
-     * @param string $number number to validate
+     * @param string $number number string
      * @param array $weights reference to array of weights
-     * @param int $modulo (optionsl) number
-     * @param int $subtract (optional) numbier
      *
-     * @returns bool true if valid, false if not
+     * @returns int returns product of number digits with weights
      *
      * @access protected
      */
-    function _checkControlNumber($number, &$weights, $modulo = 10, $subtract = 0) {
-        if (strlen($number) < count($weights)) {
-            return false;
+    public static function _multWeights($number, &$weights)
+    {
+        if (!is_array($weights)) {
+            return -1;
         }
-        $target_digit  = substr($number, count($weights), 1);
-        $control_digit = Validate::_getControlNumber($number, $weights, $modulo, $subtract, $target_digit === 'X');
+        $sum = 0;
 
-        if ($control_digit == -1) {
-            return false;
+        $count = min(count($weights), strlen($number));
+        if ($count == 0) { // empty string or weights array
+            return -1;
         }
-        if ($target_digit === 'X' && $control_digit == 10) {
-            return true;
+        for ($i = 0; $i < $count; ++$i) {
+            $sum += intval(substr($number, $i, 1)) * $weights[$i];
         }
-        if ($control_digit != $target_digit) {
-            return false;
+
+        return $sum;
+    }
+
+    public static function _modf($val, $div)
+    {
+        if (function_exists('bcmod')) {
+            return bcmod($val, $div);
+        } elseif (function_exists('fmod')) {
+            return fmod($val, $div);
         }
-        return true;
+        $r = $val / $div;
+        $i = intval($r);
+        return intval($val - $i * $div + .1);
     }
 
     /**
@@ -687,8 +695,8 @@ class Validate
      * assoc array in the form $var_name => $value.
      * Can be used on any of Validate subpackages
      *
-     * @param  array   $data     Ex: array('name' => 'toto', 'email' => 'toto@thing.info');
-     * @param  array   $val_type Contains the validation type and all parameters used in.
+     * @param  array $data Ex: array('name' => 'toto', 'email' => 'toto@thing.info');
+     * @param  array $val_type Contains the validation type and all parameters used in.
      *                           'val_type' is not optional
      *                           others validations properties must have the same name as the function
      *                           parameters.
@@ -699,7 +707,7 @@ class Validate
      *
      * @access public
      */
-    function multiple(&$data, &$val_type, $remove = false)
+    public function multiple(&$data, &$val_type, $remove = false)
     {
         $keys = array_keys($data);
         $valid = array();
@@ -724,25 +732,25 @@ class Validate
                 }
                 $valid[$var_name] = call_user_func(array('Validate', $method), $val2check, $opt);
 
-            /**
-             * external validation method in the form:
-             * "<class name><underscore><method name>"
-             * Ex: us_ssn will include class Validate/US.php and call method ssn()
-             */
+                /**
+                 * external validation method in the form:
+                 * "<class name><underscore><method name>"
+                 * Ex: us_ssn will include class Validate/US.php and call method ssn()
+                 */
             } elseif (strpos($opt['type'], '_') !== false) {
                 $validateType = explode('_', $opt['type']);
-                $method       = array_pop($validateType);
-                $class        = implode('_', $validateType);
-                $classPath    = str_replace('_', DIRECTORY_SEPARATOR, $class);
-                $class        = 'Validate_' . $class;
+                $method = array_pop($validateType);
+                $class = implode('_', $validateType);
+                $classPath = str_replace('_', DIRECTORY_SEPARATOR, $class);
+                $class = 'Validate_' . $class;
                 if (!@include_once "Validate/$classPath.php") {
                     trigger_error("$class isn't installed or you may have some permissoin issues", E_USER_ERROR);
                 }
 
                 $ce = substr(phpversion(), 0, 1) > 4 ? class_exists($class, false) : class_exists($class);
                 if (!$ce ||
-                    !in_array($method, get_class_methods($class)))
-                {
+                    !in_array($method, get_class_methods($class))
+                ) {
                     trigger_error("Invalid validation type $class::$method", E_USER_WARNING);
                     continue;
                 }
@@ -758,5 +766,3 @@ class Validate
         return $valid;
     }
 }
-
-?>

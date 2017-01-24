@@ -23,7 +23,7 @@ require_once("HTML/QuickForm/input.php");
 
 /**
  * HTML class for a button type element
- * 
+ *
  * @author       Adam Daniel <adaniel1@eesus.jnj.com>
  * @author       Bertrand Mansion <bmansion@mamasam.com>
  * @version      1.1
@@ -36,38 +36,36 @@ class HTML_QuickForm_button extends HTML_QuickForm_input
 
     /**
      * Class constructor
-     * 
-     * @param     string    $elementName    (optional)Input field name attribute
-     * @param     string    $value          (optional)Input field value
-     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string 
+     *
+     * @param     string $elementName (optional)Input field name attribute
+     * @param     string $value (optional)Input field value
+     * @param     mixed $attributes (optional)Either a typical HTML attribute string
      *                                      or an associative array
      * @since     1.0
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_button($elementName=null, $value=null, $attributes=null)
+    public function HTML_QuickForm_button($elementName = null, $value = null, $attributes = null)
     {
         HTML_QuickForm_input::HTML_QuickForm_input($elementName, null, $attributes);
         $this->_persistantFreeze = false;
         $this->setValue($value);
         $this->setType('button');
     } //end constructor
-    
+
     // }}}
     // {{{ freeze()
 
     /**
      * Freeze the element so that only its value is returned
-     * 
+     *
      * @access    public
      * @return    void
      */
-    function freeze()
+    public function freeze()
     {
         return false;
     } //end func freeze
 
     // }}}
- 
-} //end class HTML_QuickForm_button
-?>
+} //end class HTML_QuickForm_button;

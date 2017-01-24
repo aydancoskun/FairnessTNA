@@ -1,51 +1,51 @@
-var APIRecurringScheduleControl = ServiceCaller.extend( {
+var APIRecurringScheduleControl = ServiceCaller.extend({
 
-	key_name: 'RecurringScheduleControl',
-	className: 'APIRecurringScheduleControl',
+    key_name: 'RecurringScheduleControl',
+    className: 'APIRecurringScheduleControl',
 
-	getRecurringScheduleControlDefaultData: function() {
+    getRecurringScheduleControlDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getRecurringScheduleControlDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getRecurringScheduleControlDefaultData', arguments);
 
-	},
+    },
 
-	getRecurringScheduleControl: function() {
+    getRecurringScheduleControl: function () {
 
-		return this.argumentsHandler( this.className, 'getRecurringScheduleControl', arguments );
+        return this.argumentsHandler(this.className, 'getRecurringScheduleControl', arguments);
 
-	},
+    },
 
-	getCommonRecurringScheduleControlData: function() {
+    getCommonRecurringScheduleControlData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonRecurringScheduleControlData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonRecurringScheduleControlData', arguments);
 
-	},
+    },
 
-	validateRecurringScheduleControl: function() {
+    validateRecurringScheduleControl: function () {
 
-		return this.argumentsHandler( this.className, 'validateRecurringScheduleControl', arguments );
+        return this.argumentsHandler(this.className, 'validateRecurringScheduleControl', arguments);
 
-	},
+    },
 
-	setRecurringScheduleControl: function() {
+    setRecurringScheduleControl: function () {
 
-		return this.argumentsHandler( this.className, 'setRecurringScheduleControl', arguments );
+        return this.argumentsHandler(this.className, 'setRecurringScheduleControl', arguments);
 
-	},
+    },
 
-	deleteRecurringScheduleControl: function() {
+    deleteRecurringScheduleControl: function () {
 
-		return this.argumentsHandler( this.className, 'deleteRecurringScheduleControl', arguments );
+        return this.argumentsHandler(this.className, 'deleteRecurringScheduleControl', arguments);
 
-	},
+    },
 
-	copyRecurringScheduleControl: function() {
-		return this.argumentsHandler( this.className, 'copyRecurringScheduleControl', arguments );
-	},
+    copyRecurringScheduleControl: function () {
+        return this.argumentsHandler(this.className, 'copyRecurringScheduleControl', arguments);
+    },
 
-	exportRecurringScheduleControl: function() {
-		return this.argumentsHandler( this.className, 'exportRecurringScheduleControl', arguments );
-	}
+    exportRecurringScheduleControl: function () {
+        return this.argumentsHandler(this.className, 'exportRecurringScheduleControl', arguments);
+    }
 
 
-} );
+});

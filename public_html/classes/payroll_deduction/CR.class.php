@@ -19,133 +19,141 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package PayrollDeduction\CR
  */
-class PayrollDeduction_CR extends PayrollDeduction_CR_Data {
-	//
-	// Federal
-	//
-	function setFederalFilingStatus($value) {
-		$this->data['federal_filing_status'] = $value;
+class PayrollDeduction_CR extends PayrollDeduction_CR_Data
+{
+    //
+    // Federal
+    //
+    public function setFederalFilingStatus($value)
+    {
+        $this->data['federal_filing_status'] = $value;
 
-		return TRUE;
-	}
-	function getFederalFilingStatus() {
-		if ( isset($this->data['federal_filing_status']) ) {
-			return $this->data['federal_filing_status'];
-		}
+        return true;
+    }
 
-		return 10; //Single
-	}
+    public function setFederalAllowance($value)
+    {
+        $this->data['federal_allowance'] = $value;
 
-	function setFederalAllowance($value) {
-		$this->data['federal_allowance'] = $value;
+        return true;
+    }
 
-		return TRUE;
-	}
-	function getFederalAllowance() {
-		if ( isset($this->data['federal_allowance']) ) {
-			return $this->data['federal_allowance'];
-		}
+    public function getFederalPayPeriodDeductions()
+    {
+        return $this->convertToUserCurrency(bcdiv($this->getFederalTaxPayable(), $this->getAnnualPayPeriods()));
+    }
 
-		return FALSE;
-	}
+    public function getFederalTaxPayable()
+    {
+        $annual_taxable_income = $this->getAnnualTaxableIncome();
+        $annual_allowance = bcmul($this->getFederalAllowanceAmount($this->getDate()), $this->getFederalAllowance());
 
-	//
-	// Calculation Functions
-	//
-	function getAnnualTaxableIncome() {
+        Debug::text('Annual Taxable Income: ' . $annual_taxable_income, __FILE__, __LINE__, __METHOD__, 10);
+        Debug::text('Allowance: ' . $annual_allowance, __FILE__, __LINE__, __METHOD__, 10);
 
-		$retval = bcmul( $this->getGrossPayPeriodIncome(), $this->getAnnualPayPeriods() );
+        if ($this->getFederalFilingStatus() == 20) {
+            $annual_filing = $this->getFederalFilingAmount($this->getData());
+        } else {
+            $annual_filing = 0;
+        }
 
-		Debug::text('Annual Taxable Income: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
+        Debug::text('Filing: ' . $annual_filing, __FILE__, __LINE__, __METHOD__, 10);
 
-		return $retval;
-	}
+        $taxTable = $this->getData()->getFederalTaxTable($annual_taxable_income);
 
-	//
-	// Federal Tax
-	//
-	function getFederalPayPeriodDeductions() {
-		return $this->convertToUserCurrency( bcdiv( $this->getFederalTaxPayable(), $this->getAnnualPayPeriods() ) );
-	}
+        /*
+         *	T = Total Income Tax calculated for that employee
+         *	TT1= Tax Tier 1, ranging from CRC 0 to ~ CRC 6MM
+         *	TT2 = Tax Tier 2, ranging from ~ CRC 6MM to ~ CRC 9MM
+         *	TT3 = Tax Tier 3, above ~ CRC 9MM
+         *	AD = Total Income Tax Adjustments
+         *
+         *	T =  (TT1 + TT2 + TT3)  – AD
+        */
 
-	function getFederalTaxPayable() {
+        $AD = $annual_allowance + $annual_filing;
+        $tax = 0;
+        if ($annual_taxable_income > $AD) {
+            $tmp_prev_income = array();
+            $i = 0;
 
-		$annual_taxable_income = $this->getAnnualTaxableIncome();
-		$annual_allowance = bcmul( $this->getFederalAllowanceAmount( $this->getDate() ), $this->getFederalAllowance() );
+            foreach ($taxTable as $taxTier) {
+                $prev_income = $taxTier['prev_income'];
+                $prev_rate = $taxTier['prev_rate'];
+                $income = $taxTier['income'];
+                $rate = $taxTier['rate'];
 
-		Debug::text('Annual Taxable Income: '. $annual_taxable_income, __FILE__, __LINE__, __METHOD__, 10);
-		Debug::text('Allowance: '. $annual_allowance, __FILE__, __LINE__, __METHOD__, 10);
+                if ($prev_income != 0 and $prev_income > 0) {
+                    if ($annual_taxable_income > $prev_income and $annual_taxable_income <= $income) {
+                        $tax = bcadd($tax, (bcmul($rate, bcsub($annual_taxable_income, $prev_income))));
+                    } else {
+                        $tmp_prev_income[$i] = $prev_income;
+                        if ($i >= 2 and $i < 3) {
+                            if ($annual_taxable_income > $income) {
+                                $tax = bcadd($tax, bcmul($prev_rate, bcsub($prev_income, $tmp_prev_income[$i - 1])));
+                                $tax = bcadd($tax, bcmul($rate, bcsub($annual_taxable_income, $income)));
+                            }
+                        }
+                    }
+                }
 
-		if ( $this->getFederalFilingStatus() == 20 ) {
-			$annual_filing = $this->getFederalFilingAmount( $this->getData() );
-		} else {
-			$annual_filing = 0;
-		}
+                $i++;
+            }
 
-		Debug::text('Filing: '. $annual_filing, __FILE__, __LINE__, __METHOD__, 10);
+            $tax = bcsub($tax, $AD);
+        } else {
+            Debug::text('Income is less then Total Income Tax Adjustments: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$taxTable = $this->getData()->getFederalTaxTable($annual_taxable_income);
+            $tax = 0;
+        }
 
-		/*
-		 *	T = Total Income Tax calculated for that employee
-		 *	TT1= Tax Tier 1, ranging from CRC 0 to ~ CRC 6MM
-		 *	TT2 = Tax Tier 2, ranging from ~ CRC 6MM to ~ CRC 9MM
-		 *	TT3 = Tax Tier 3, above ~ CRC 9MM
-		 *	AD = Total Income Tax Adjustments
-		 *
-		 *	T =  (TT1 + TT2 + TT3)  – AD
-		*/
+        if ($tax < 0) {
+            $tax = 0;
+        }
 
-		$AD = $annual_allowance + $annual_filing;
-		$tax = 0;
-		if ( $annual_taxable_income > $AD ) {
-			$tmp_prev_income = array();
-			$i = 0;
+        Debug::text('RetVal: ' . $tax, __FILE__, __LINE__, __METHOD__, 10);
 
-			foreach ( $taxTable as $taxTier ) {
-				$prev_income = $taxTier['prev_income'];
-				$prev_rate = $taxTier['prev_rate'];
-				$income = $taxTier['income'];
-				$rate = $taxTier['rate'];
+        return $tax;
+    }
 
-				if ( $prev_income != 0 AND $prev_income > 0 ) {
+    //
+    // Calculation Functions
+    //
 
-					if ( $annual_taxable_income > $prev_income AND $annual_taxable_income <= $income ) {
-						$tax = bcadd( $tax, (bcmul($rate, bcsub($annual_taxable_income, $prev_income))) );
-					} else {
-						$tmp_prev_income[$i] = $prev_income;
-						if ( $i >= 2 AND $i < 3 ) {
-							if ( $annual_taxable_income > $income ) {
-								$tax = bcadd( $tax, bcmul($prev_rate, bcsub($prev_income, $tmp_prev_income[$i - 1])) );
-								$tax = bcadd( $tax, bcmul($rate, bcsub($annual_taxable_income, $income)) );
-							}
-						}
-					}
-				}
+    public function getAnnualTaxableIncome()
+    {
+        $retval = bcmul($this->getGrossPayPeriodIncome(), $this->getAnnualPayPeriods());
 
-				$i++;
-			}
+        Debug::text('Annual Taxable Income: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-			$tax = bcsub($tax, $AD);
-		}else{
-			Debug::text('Income is less then Total Income Tax Adjustments: ', __FILE__, __LINE__, __METHOD__, 10);
+        return $retval;
+    }
 
-			$tax = 0;
-		}
+    //
+    // Federal Tax
+    //
 
-		if ( $tax < 0 ) {
-			$tax = 0;
-		}
+    public function getFederalAllowance()
+    {
+        if (isset($this->data['federal_allowance'])) {
+            return $this->data['federal_allowance'];
+        }
 
-		Debug::text('RetVal: '. $tax, __FILE__, __LINE__, __METHOD__, 10);
+        return false;
+    }
 
-		return $tax;
-	}
+    public function getFederalFilingStatus()
+    {
+        if (isset($this->data['federal_filing_status'])) {
+            return $this->data['federal_filing_status'];
+        }
+
+        return 10; //Single
+    }
 }
-?>

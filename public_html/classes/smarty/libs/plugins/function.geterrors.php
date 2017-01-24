@@ -7,30 +7,27 @@
 
 function smarty_function_geterrors($params, &$smarty)
 {
-
     $objects = $params['object'];
 
     //Allow specifying multiple comma separated objects at once.
     $split_objects = explode(',', $objects);
 
-    $errors = NULL;
-    foreach($split_objects as $key => $object ) {
-        if ( is_object($smarty->_tpl_vars[$object]->Validator) ) {
+    $errors = null;
+    foreach ($split_objects as $key => $object) {
+        if (is_object($smarty->_tpl_vars[$object]->Validator)) {
             //return $smarty->_tpl_vars[$object]->Validator->getErrors();
             $errors .= $smarty->_tpl_vars[$object]->Validator->getErrors();
-        } elseif ( is_object($smarty->_tpl_vars[$object]) ) {
+        } elseif (is_object($smarty->_tpl_vars[$object])) {
             //return $smarty->_tpl_vars[$object]->getErrors();
             $errors .= $smarty->_tpl_vars[$object]->getErrors();
         }
     }
 
-    if ( $errors !== NULL ) {
+    if ($errors !== null) {
         return $errors;
     }
 
-    return FALSE;
+    return false;
 }
 
-/* vim: set expandtab: */
-
-?>
+/* vim: set expandtab: */;

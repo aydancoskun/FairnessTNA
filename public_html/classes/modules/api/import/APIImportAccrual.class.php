@@ -19,20 +19,20 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
-
+ ********************************************************************************/
 
 
 /**
  * @package API\Import
  */
-class APIImportAccrual extends APIImport {
-	protected $main_class = 'ImportAccrual';
+class APIImportAccrual extends APIImport
+{
+    protected $main_class = 'ImportAccrual';
 
-	public function __construct() {
-		parent::__construct(); //Make sure parent constructor is always called.
+    public function __construct()
+    {
+        parent::__construct(); //Make sure parent constructor is always called.
 
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

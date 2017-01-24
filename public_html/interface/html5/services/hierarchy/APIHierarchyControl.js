@@ -1,76 +1,76 @@
-var APIHierarchyControl = ServiceCaller.extend( {
+var APIHierarchyControl = ServiceCaller.extend({
 
-	key_name: 'HierarchyControl',
-	className: 'APIHierarchyControl',
+    key_name: 'HierarchyControl',
+    className: 'APIHierarchyControl',
 
-	reMapHierarchyLevels: function() {
+    reMapHierarchyLevels: function () {
 
-		return this.argumentsHandler( this.className, 'reMapHierarchyLevels', arguments );
+        return this.argumentsHandler(this.className, 'reMapHierarchyLevels', arguments);
 
-	},
+    },
 
-	setHierarchyLevel: function() {
+    setHierarchyLevel: function () {
 
 
-		return this.argumentsHandler( this.className, 'setHierarchyLevel', arguments );
+        return this.argumentsHandler(this.className, 'setHierarchyLevel', arguments);
 
-	},
+    },
 
-	getHierarchyLevel: function() {
+    getHierarchyLevel: function () {
 
-		return this.argumentsHandler( this.className, 'getHierarchyLevel', arguments );
+        return this.argumentsHandler(this.className, 'getHierarchyLevel', arguments);
 
-	},
+    },
 
-	getHierarchyControlOptions: function() {
+    getHierarchyControlOptions: function () {
 
-		return this.argumentsHandler( this.className, 'getHierarchyControlOptions', arguments );
+        return this.argumentsHandler(this.className, 'getHierarchyControlOptions', arguments);
 
-	},
+    },
 
-	getCommonHierarchyControlData: function() {
+    getCommonHierarchyControlData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonHierarchyControlData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonHierarchyControlData', arguments);
 
-	},
+    },
 
-	getHierarchyControl: function() {
+    getHierarchyControl: function () {
 
-		return this.argumentsHandler( this.className, 'getHierarchyControl', arguments );
+        return this.argumentsHandler(this.className, 'getHierarchyControl', arguments);
 
-	},
+    },
 
-	setHierarchyControl: function() {
-		LocalCacheData.result_cache['getHierarchyControlOptions'] = null;
-		return this.argumentsHandler( this.className, 'setHierarchyControl', arguments );
+    setHierarchyControl: function () {
+        LocalCacheData.result_cache['getHierarchyControlOptions'] = null;
+        return this.argumentsHandler(this.className, 'setHierarchyControl', arguments);
 
-	},
+    },
 
-	getHierarchyControlDefaultData: function() {
+    getHierarchyControlDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getHierarchyControlDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getHierarchyControlDefaultData', arguments);
 
-	},
+    },
 
-	deleteHierarchyControl: function() {
-		LocalCacheData.result_cache['getHierarchyControlOptions'] = null;
-		return this.argumentsHandler( this.className, 'deleteHierarchyControl', arguments );
+    deleteHierarchyControl: function () {
+        LocalCacheData.result_cache['getHierarchyControlOptions'] = null;
+        return this.argumentsHandler(this.className, 'deleteHierarchyControl', arguments);
 
-	},
+    },
 
-	validateHierarchyControl: function() {
+    validateHierarchyControl: function () {
 
-		return this.argumentsHandler( this.className, 'validateHierarchyControl', arguments );
+        return this.argumentsHandler(this.className, 'validateHierarchyControl', arguments);
 
-	},
+    },
 
-	copyHierarchyControl: function() {
-		LocalCacheData.result_cache['getHierarchyControlOptions'] = null;
-		return this.argumentsHandler( this.className, 'copyHierarchyControl', arguments );
+    copyHierarchyControl: function () {
+        LocalCacheData.result_cache['getHierarchyControlOptions'] = null;
+        return this.argumentsHandler(this.className, 'copyHierarchyControl', arguments);
 
-	},
+    },
 
-	exportHierarchyControl: function() {
-		return this.argumentsHandler( this.className, 'exportHierarchyControl', arguments );
-	},
-} );
+    exportHierarchyControl: function () {
+        return this.argumentsHandler(this.className, 'exportHierarchyControl', arguments);
+    },
+});

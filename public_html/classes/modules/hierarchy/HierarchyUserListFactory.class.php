@@ -19,133 +19,137 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Hierarchy
  */
-class HierarchyUserListFactory extends HierarchyUserFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class HierarchyUserListFactory extends HierarchyUserFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable();
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+					from	' . $this->getTable();
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '' ) {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$hcf = new HierarchyControlFactory();
+        $hcf = new HierarchyControlFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-					LEFT JOIN '. $hcf->getTable() .' as b ON a.hierarchy_control_id = b.id
+					from	' . $this->getTable() . ' as a
+					LEFT JOIN ' . $hcf->getTable() . ' as b ON a.hierarchy_control_id = b.id
 					where	 b.company_id = ?
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByHierarchyControlId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByHierarchyControlId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$hcf = new HierarchyControlFactory();
+        $hcf = new HierarchyControlFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $hcf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $hcf->getTable() . ' as b
 					where	a.hierarchy_control_id = b.id
 						AND a.hierarchy_control_id = ?
 						AND b.deleted = 0
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByHierarchyControlAndUserId($id, $user_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByHierarchyControlAndUserId($id, $user_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $user_id == '') {
-			return FALSE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		$hcf = new HierarchyControlFactory();
+        $hcf = new HierarchyControlFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					'user_id' => (int)$user_id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+            'user_id' => (int)$user_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $hcf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $hcf->getTable() . ' as b
 					where	b.id = a.hierarchy_control_id
 						AND a.hierarchy_control_id = ?
 						AND a.user_id = ?
 						AND b.deleted = 0
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 }
-?>

@@ -18,31 +18,32 @@
 // $Id: GenericConf.php 306537 2010-12-21 08:09:34Z cweiske $
 
 /**
-* Config parser for  generic .conf files like
-* htdig.conf...
-*
-* @author      Bertrand Mansion <bmansion@mamasam.com>
-* @package     Config
-*/
-class Config_Container_GenericConf {
+ * Config parser for  generic .conf files like
+ * htdig.conf...
+ *
+ * @author      Bertrand Mansion <bmansion@mamasam.com>
+ * @package     Config
+ */
+class Config_Container_GenericConf
+{
 
     /**
-    * This class options:
-    *   Ex: $options['comment'] = '#';
-    *   Ex: $options['equals'] = ':';
-    *   Ex: $options['newline'] = '\\';
-    *
-    * @var  array
-    */
-    var $options = array();
+     * This class options:
+     *   Ex: $options['comment'] = '#';
+     *   Ex: $options['equals'] = ':';
+     *   Ex: $options['newline'] = '\\';
+     *
+     * @var  array
+     */
+    public $options = array();
 
     /**
-    * Constructor
-    *
-    * @access public
-    * @param    string  $options    (optional)Options to be used by renderer
-    */
-    function Config_Container_GenericConf($options = array())
+     * Constructor
+     *
+     * @access public
+     * @param    string $options (optional)Options to be used by renderer
+     */
+    public function Config_Container_GenericConf($options = array())
     {
         if (empty($options['comment'])) {
             $options['comment'] = '#';
@@ -57,14 +58,14 @@ class Config_Container_GenericConf {
     } // end constructor
 
     /**
-    * Parses the data of the given configuration file
-    *
-    * @access public
-    * @param string $datasrc    path to the configuration file
-    * @param object $obj        reference to a config object
-    * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
-    */
-    function &parseDatasrc($datasrc, &$obj)
+     * Parses the data of the given configuration file
+     *
+     * @access public
+     * @param string $datasrc path to the configuration file
+     * @param object $obj reference to a config object
+     * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
+     */
+    public function &parseDatasrc($datasrc, &$obj)
     {
         $return = true;
         if (!is_readable($datasrc)) {
@@ -77,23 +78,24 @@ class Config_Container_GenericConf {
         $currentSection =& $obj->container;
         foreach ($lines as $line) {
             $n++;
-            if (!preg_match('/^\s*'.$this->options['comment'].'/', $line) && 
-                 preg_match('/^\s*(.*)'.$this->options['newline'].'\s*$/', $line, $match)) {
+            if (!preg_match('/^\s*' . $this->options['comment'] . '/', $line) &&
+                preg_match('/^\s*(.*)' . $this->options['newline'] . '\s*$/', $line, $match)
+            ) {
                 // directive on more than one line
                 $lastline .= $match[1];
                 continue;
             }
             if ($lastline != '') {
-                $line = $lastline.trim($line);
+                $line = $lastline . trim($line);
                 $lastline = '';
             }
-            if (preg_match('/^\s*'.$this->options['comment'].'+\s*(.*?)\s*$/', $line, $match)) {
+            if (preg_match('/^\s*' . $this->options['comment'] . '+\s*(.*?)\s*$/', $line, $match)) {
                 // a comment
                 $currentSection->createComment($match[1]);
             } elseif (preg_match('/^\s*$/', $line)) {
                 // a blank line
                 $currentSection->createBlank();
-            } elseif (preg_match('/^\s*([\w-]+)\s*'.$this->options['equals'].'\s*((.*?)|)\s*$/', $line, $match)) {
+            } elseif (preg_match('/^\s*([\w-]+)\s*' . $this->options['equals'] . '\s*((.*?)|)\s*$/', $line, $match)) {
                 // a directive
                 $currentSection->createDirective($match[1], $match[2]);
             } else {
@@ -104,12 +106,12 @@ class Config_Container_GenericConf {
     } // end func parseDatasrc
 
     /**
-    * Returns a formatted string of the object
-    * @param    object  $obj    Container object to be output as string
-    * @access public
-    * @return string
-    */
-    function toString(&$obj)
+     * Returns a formatted string of the object
+     * @param    object $obj Container object to be output as string
+     * @access public
+     * @return string
+     */
+    public function toString(&$obj)
     {
         $string = '';
         switch ($obj->type) {
@@ -117,10 +119,10 @@ class Config_Container_GenericConf {
                 $string = "\n";
                 break;
             case 'comment':
-                $string = $this->options['comment'].$obj->content."\n";
+                $string = $this->options['comment'] . $obj->content . "\n";
                 break;
             case 'directive':
-                $string = $obj->name.$this->options['equals'].$obj->content."\n";
+                $string = $obj->name . $this->options['equals'] . $obj->content . "\n";
                 break;
             case 'section':
                 // How to deal with sections ???
@@ -135,5 +137,4 @@ class Config_Container_GenericConf {
         }
         return $string;
     } // end func toString
-} // end class Config_Container_GenericConf
-?>
+} // end class Config_Container_GenericConf;

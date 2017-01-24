@@ -44,7 +44,6 @@ require_once 'Config.php';
  * @version    Release: @package_version@
  * @link       http://pear.php.net/package/HTML_Progress
  */
-
 class HTML_Progress_Model extends HTML_Progress_UI
 {
     /**
@@ -54,29 +53,29 @@ class HTML_Progress_Model extends HTML_Progress_UI
      * @since      1.0
      * @access     private
      */
-    var $_package;
+    public $_package;
 
 
     /**
      * The progress bar's UI extended model class constructor
      *
-     * @param      string    $file          file name of model properties
-     * @param      string    $type          type of external ressource (phpArray, iniFile, XML ...)
+     * @param      string $file file name of model properties
+     * @param      string $type type of external ressource (phpArray, iniFile, XML ...)
      *
      * @since      1.0
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      */
-    function HTML_Progress_Model($file, $type)
+    public function HTML_Progress_Model($file, $type)
     {
         $this->_package = 'HTML_Progress';
 
         if (!file_exists($file)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                 array('var' => '$file',
-                      'was' => $file,
-                      'expected' => 'file exists',
-                      'paramnum' => 1));
+                    'was' => $file,
+                    'expected' => 'file exists',
+                    'paramnum' => 1));
         }
 
         $conf = new Config();
@@ -84,9 +83,9 @@ class HTML_Progress_Model extends HTML_Progress_UI
         if (!$conf->isConfigTypeRegistered($type)) {
             return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                 array('var' => '$type',
-                      'was' => $type,
-                      'expected' => implode (" | ", array_keys($GLOBALS['CONFIG_TYPES'])),
-                      'paramnum' => 2));
+                    'was' => $type,
+                    'expected' => implode(" | ", array_keys($GLOBALS['CONFIG_TYPES'])),
+                    'paramnum' => 2));
         }
 
         $data = $conf->parseConfig($file, $type);
@@ -118,5 +117,3 @@ class HTML_Progress_Model extends HTML_Progress_UI
         $this->_updateProgressSize();
     }
 }
-
-?>

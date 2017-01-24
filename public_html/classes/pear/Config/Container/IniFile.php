@@ -32,8 +32,8 @@ class Config_Container_IniFile
      * Not used at the moment
      *
      * @var array
-    */
-    var $options = array();
+     */
+    public $options = array();
 
     /**
      * Constructor
@@ -42,7 +42,7 @@ class Config_Container_IniFile
      *
      * @access public
      */
-    function __construct($options = array())
+    public function __construct($options = array())
     {
         $this->options = $options;
     } // end constructor
@@ -51,13 +51,13 @@ class Config_Container_IniFile
      * Parses the data of the given configuration file
      *
      * @param string $datasrc path to the configuration file
-     * @param object &$obj    reference to a config object
+     * @param object &$obj reference to a config object
      *
      * @return mixed Returns a PEAR_ERROR, if error occurs or true if ok
      *
      * @access public
      */
-    function &parseDatasrc($datasrc, &$obj)
+    public function &parseDatasrc($datasrc, &$obj)
     {
         $return = true;
         if (!file_exists($datasrc)) {
@@ -108,7 +108,7 @@ class Config_Container_IniFile
      *
      * @access public
      */
-    function toString(&$obj)
+    public function toString(&$obj)
     {
         static $childrenCount, $commaString;
 
@@ -116,68 +116,67 @@ class Config_Container_IniFile
             $string = '';
         }
         switch ($obj->type) {
-        case 'blank':
-            $string = "\n";
-            break;
-        case 'comment':
-            $string = ';'.$obj->content."\n";
-            break;
-        case 'directive':
-            $count = $obj->parent->countChildren('directive', $obj->name);
-            $content = $obj->content;
-            if (!is_array($content)) {
-                $content = $this->contentToString($content);
-                if ($count > 1) {
-                    // multiple values for a directive are separated by a comma
-                    if (isset($childrenCount[$obj->name])) {
-                        $childrenCount[$obj->name]++;
+            case 'blank':
+                $string = "\n";
+                break;
+            case 'comment':
+                $string = ';' . $obj->content . "\n";
+                break;
+            case 'directive':
+                $count = $obj->parent->countChildren('directive', $obj->name);
+                $content = $obj->content;
+                if (!is_array($content)) {
+                    $content = $this->contentToString($content);
+                    if ($count > 1) {
+                        // multiple values for a directive are separated by a comma
+                        if (isset($childrenCount[$obj->name])) {
+                            $childrenCount[$obj->name]++;
+                        } else {
+                            $childrenCount[$obj->name] = 0;
+                            $commaString[$obj->name] = $obj->name . '=';
+                        }
+                        if ($childrenCount[$obj->name] == $count - 1) {
+                            // Clean the static for future calls to toString
+                            $string .= $commaString[$obj->name] . $content . "\n";
+                            unset($childrenCount[$obj->name]);
+                            unset($commaString[$obj->name]);
+                        } else {
+                            $commaString[$obj->name] .= $content . ', ';
+                        }
                     } else {
-                        $childrenCount[$obj->name] = 0;
-                        $commaString[$obj->name] = $obj->name.'=';
-                    }
-                    if ($childrenCount[$obj->name] == $count-1) {
-                        // Clean the static for future calls to toString
-                        $string .= $commaString[$obj->name].$content."\n";
-                        unset($childrenCount[$obj->name]);
-                        unset($commaString[$obj->name]);
-                    } else {
-                        $commaString[$obj->name] .= $content.', ';
+                        $string = $obj->name . '=' . $content . "\n";
                     }
                 } else {
-                    $string = $obj->name.'='.$content."\n";
-                }
-            } else {
-                //array
-                $string = '';
-                $n = 0;
-                foreach ($content as $contentKey => $contentValue) {
-                    if (is_integer($contentKey) && $contentKey == $n) {
-                        $stringKey = '';
-                        ++$n;
-                    } else {
-                        $stringKey = $contentKey;
+                    //array
+                    $string = '';
+                    $n = 0;
+                    foreach ($content as $contentKey => $contentValue) {
+                        if (is_integer($contentKey) && $contentKey == $n) {
+                            $stringKey = '';
+                            ++$n;
+                        } else {
+                            $stringKey = $contentKey;
+                        }
+                        $string .= $obj->name . '[' . $stringKey . ']='
+                            . $this->contentToString($contentValue) . "\n";
                     }
-                    $string .= $obj->name . '[' . $stringKey . ']='
-                        . $this->contentToString($contentValue) . "\n";
                 }
-            }
-            break;
-        case 'section':
-            if (!$obj->isRoot()) {
-                $string = '['.$obj->name."]\n";
-            }
-            if (count($obj->children) > 0) {
-                for ($i = 0; $i < count($obj->children); $i++) {
-                    $string .= $this->toString($obj->getChild($i));
+                break;
+            case 'section':
+                if (!$obj->isRoot()) {
+                    $string = '[' . $obj->name . "]\n";
                 }
-            }
-            break;
-        default:
-            $string = '';
+                if (count($obj->children) > 0) {
+                    for ($i = 0; $i < count($obj->children); $i++) {
+                        $string .= $this->toString($obj->getChild($i));
+                    }
+                }
+                break;
+            default:
+                $string = '';
         }
         return $string;
     } // end func toString
-
 
 
     /**
@@ -188,13 +187,13 @@ class Config_Container_IniFile
      *
      * @return string $content String to be used as ini value
      */
-    function contentToString($content)
+    public function contentToString($content)
     {
         if ($content === false) {
             $content = '0';
-        } else if ($content === true) {
+        } elseif ($content === true) {
             $content = '1';
-        } else if (strlen(trim($content)) < strlen($content)
+        } elseif (strlen(trim($content)) < strlen($content)
             || strpos($content, ',') !== false
             || strpos($content, ';') !== false
             || strpos($content, '=') !== false
@@ -208,10 +207,8 @@ class Config_Container_IniFile
             || strpos($content, ')') !== false
             || $content === 'none'
         ) {
-            $content = '"'.addslashes($content).'"';          
+            $content = '"' . addslashes($content) . '"';
         }
         return $content;
     }
-
-} // end class Config_Container_IniFile
-?>
+} // end class Config_Container_IniFile;

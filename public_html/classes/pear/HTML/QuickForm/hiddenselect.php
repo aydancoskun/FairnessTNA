@@ -29,7 +29,7 @@ require_once('HTML/QuickForm/select.php');
  * selected values to be passed.
  *
  * @author       Isaac Shepard <ishepard@bsiweb.com>
- * 
+ *
  * @version      1.0
  * @since        2.1
  * @access       public
@@ -37,10 +37,10 @@ require_once('HTML/QuickForm/select.php');
 class HTML_QuickForm_hiddenselect extends HTML_QuickForm_select
 {
     // {{{ constructor
-        
+
     /**
      * Class constructor
-     * 
+     *
      * @param     string    Select name attribute
      * @param     mixed     Label(s) for the select (not used)
      * @param     mixed     Data to be used to populate options
@@ -49,7 +49,7 @@ class HTML_QuickForm_hiddenselect extends HTML_QuickForm_select
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_hiddenselect($elementName=null, $elementLabel=null, $options=null, $attributes=null)
+    public function HTML_QuickForm_hiddenselect($elementName = null, $elementLabel = null, $options = null, $attributes = null)
     {
         //HTML_QuickForm_element::HTML_QuickForm_element($elementName, $elementLabel, $attributes);
         new HTML_QuickForm_element($elementName, $elementLabel, $attributes);
@@ -59,7 +59,7 @@ class HTML_QuickForm_hiddenselect extends HTML_QuickForm_select
             self::load($options);
         }
     } //end constructor
-    
+
     // }}}
     // {{{ toHtml()
 
@@ -69,12 +69,12 @@ class HTML_QuickForm_hiddenselect extends HTML_QuickForm_select
      * @since     1.0
      * @access    public
      * @return    string
-     * @throws    
+     * @throws
      */
-    static function toHtml()
+    public static function toHtml()
     {
-        $tabs    = self::_getTabs();
-        $name    = self::getPrivateName();
+        $tabs = self::_getTabs();
+        $name = self::getPrivateName();
         $strHtml = '';
 
         foreach (self::$_values as $key => $val) {
@@ -87,18 +87,17 @@ class HTML_QuickForm_hiddenselect extends HTML_QuickForm_select
 
         return $strHtml;
     } //end func toHtml
-    
+
     // }}}
     // {{{ accept()
 
-   /**
-    * This is essentially a hidden element and should be rendered as one  
-    */
-    static function accept(&$renderer)
+    /**
+     * This is essentially a hidden element and should be rendered as one
+     */
+    public static function accept(&$renderer)
     {
         $renderer->renderHidden($this);
     }
 
     // }}}
-} //end class HTML_QuickForm_hiddenselect
-?>
+} //end class HTML_QuickForm_hiddenselect;

@@ -1,55 +1,55 @@
-var APIPayCode = ServiceCaller.extend( {
+var APIPayCode = ServiceCaller.extend({
 
-	key_name: 'PayCode',
-	className: 'APIPayCode',
+    key_name: 'PayCode',
+    className: 'APIPayCode',
 
-	getPayCodeDefaultData: function() {
+    getPayCodeDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayCodeDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayCodeDefaultData', arguments);
 
-	},
+    },
 
-	getPayCode: function() {
+    getPayCode: function () {
 
-		return this.argumentsHandler( this.className, 'getPayCode', arguments );
+        return this.argumentsHandler(this.className, 'getPayCode', arguments);
 
-	},
+    },
 
-	getCommonPayCodeData: function() {
+    getCommonPayCodeData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayCodeData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayCodeData', arguments);
 
-	},
+    },
 
-	validatePayCode: function() {
+    validatePayCode: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayCode', arguments );
+        return this.argumentsHandler(this.className, 'validatePayCode', arguments);
 
-	},
+    },
 
-	setPayCode: function() {
+    setPayCode: function () {
 
-		return this.argumentsHandler( this.className, 'setPayCode', arguments );
+        return this.argumentsHandler(this.className, 'setPayCode', arguments);
 
-	},
+    },
 
-	deletePayCode: function() {
+    deletePayCode: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayCode', arguments );
+        return this.argumentsHandler(this.className, 'deletePayCode', arguments);
 
-	},
+    },
 
-	copyPayCode: function() {
-		return this.argumentsHandler( this.className, 'copyPayCode', arguments );
-	},
+    copyPayCode: function () {
+        return this.argumentsHandler(this.className, 'copyPayCode', arguments);
+    },
 
-	migratePayCode: function() {
-		return this.argumentsHandler( this.className, 'migratePayCode', arguments );
-	},
+    migratePayCode: function () {
+        return this.argumentsHandler(this.className, 'migratePayCode', arguments);
+    },
 
-	exportPayCode: function() {
-		return this.argumentsHandler( this.className, 'exportPayCode', arguments );
-	}
+    exportPayCode: function () {
+        return this.argumentsHandler(this.className, 'exportPayCode', arguments);
+    }
 
 
-} );
+});

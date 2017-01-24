@@ -1,52 +1,51 @@
-var APIROE = ServiceCaller.extend( {
+var APIROE = ServiceCaller.extend({
 
-	key_name: 'ROE',
-	className: 'APIROE',
+    key_name: 'ROE',
+    className: 'APIROE',
 
-	getROEDefaultData: function() {
+    getROEDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getROEDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getROEDefaultData', arguments);
 
-	},
+    },
 
-	getROE: function() {
+    getROE: function () {
 
-		return this.argumentsHandler( this.className, 'getROE', arguments );
+        return this.argumentsHandler(this.className, 'getROE', arguments);
 
-	},
+    },
 
-	getCommonROEData: function() {
+    getCommonROEData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonROEData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonROEData', arguments);
 
-	},
+    },
 
-	validateROE: function() {
+    validateROE: function () {
 
-		return this.argumentsHandler( this.className, 'validateROE', arguments );
+        return this.argumentsHandler(this.className, 'validateROE', arguments);
 
-	},
+    },
 
-	setROE: function() {
+    setROE: function () {
 
-		return this.argumentsHandler( this.className, 'setROE', arguments );
+        return this.argumentsHandler(this.className, 'setROE', arguments);
 
-	},
+    },
 
-	deleteROE: function() {
+    deleteROE: function () {
 
-		return this.argumentsHandler( this.className, 'deleteROE', arguments );
+        return this.argumentsHandler(this.className, 'deleteROE', arguments);
 
-	},
+    },
 
-	copyROE: function() {
-		return this.argumentsHandler( this.className, 'copyROE', arguments );
-	},
+    copyROE: function () {
+        return this.argumentsHandler(this.className, 'copyROE', arguments);
+    },
 
-	exportROE: function() {
-		return this.argumentsHandler( this.className, 'exportROE', arguments );
-	},
+    exportROE: function () {
+        return this.argumentsHandler(this.className, 'exportROE', arguments);
+    },
 
 
-
-} );
+});

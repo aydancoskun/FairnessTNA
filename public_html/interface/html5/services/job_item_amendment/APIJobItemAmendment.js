@@ -1,50 +1,49 @@
-var APIJobItemAmendment = ServiceCaller.extend( {
+var APIJobItemAmendment = ServiceCaller.extend({
 
-	key_name: 'JobItemAmendment',
-	className: 'APIJobItemAmendment',
+    key_name: 'JobItemAmendment',
+    className: 'APIJobItemAmendment',
 
-	getCommonJobItemAmendmentData: function() {
+    getCommonJobItemAmendmentData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonJobItemAmendmentData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonJobItemAmendmentData', arguments);
 
-	},
+    },
 
-	getJobItemAmendment: function() {
+    getJobItemAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'getJobItemAmendment', arguments );
+        return this.argumentsHandler(this.className, 'getJobItemAmendment', arguments);
 
-	},
+    },
 
-	setJobItemAmendment: function() {
+    setJobItemAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'setJobItemAmendment', arguments );
+        return this.argumentsHandler(this.className, 'setJobItemAmendment', arguments);
 
-	},
+    },
 
-	getJobItemAmendmentDefaultData: function() {
+    getJobItemAmendmentDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getJobItemAmendmentDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getJobItemAmendmentDefaultData', arguments);
 
-	},
+    },
 
-	deleteJobItemAmendment: function() {
+    deleteJobItemAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'deleteJobItemAmendment', arguments );
+        return this.argumentsHandler(this.className, 'deleteJobItemAmendment', arguments);
 
-	},
+    },
 
-	validateJobItemAmendment: function() {
+    validateJobItemAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'validateJobItemAmendment', arguments );
+        return this.argumentsHandler(this.className, 'validateJobItemAmendment', arguments);
 
-	},
+    },
 
-	copyJobItemAmendment: function() {
+    copyJobItemAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'copyJobItemAmendment', arguments );
+        return this.argumentsHandler(this.className, 'copyJobItemAmendment', arguments);
 
-	}
+    }
 
 
-
-} );
+});

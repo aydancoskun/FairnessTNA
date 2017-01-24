@@ -1,51 +1,51 @@
-var APIRecurringHoliday = ServiceCaller.extend( {
+var APIRecurringHoliday = ServiceCaller.extend({
 
-	key_name: 'RecurringHoliday',
-	className: 'APIRecurringHoliday',
+    key_name: 'RecurringHoliday',
+    className: 'APIRecurringHoliday',
 
-	getRecurringHolidayDefaultData: function() {
+    getRecurringHolidayDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getRecurringHolidayDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getRecurringHolidayDefaultData', arguments);
 
-	},
+    },
 
-	getRecurringHoliday: function() {
+    getRecurringHoliday: function () {
 
-		return this.argumentsHandler( this.className, 'getRecurringHoliday', arguments );
+        return this.argumentsHandler(this.className, 'getRecurringHoliday', arguments);
 
-	},
+    },
 
-	getCommonRecurringHolidayData: function() {
+    getCommonRecurringHolidayData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonRecurringHolidayData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonRecurringHolidayData', arguments);
 
-	},
+    },
 
-	validateRecurringHoliday: function() {
+    validateRecurringHoliday: function () {
 
-		return this.argumentsHandler( this.className, 'validateRecurringHoliday', arguments );
+        return this.argumentsHandler(this.className, 'validateRecurringHoliday', arguments);
 
-	},
+    },
 
-	setRecurringHoliday: function() {
+    setRecurringHoliday: function () {
 
-		return this.argumentsHandler( this.className, 'setRecurringHoliday', arguments );
+        return this.argumentsHandler(this.className, 'setRecurringHoliday', arguments);
 
-	},
+    },
 
-	deleteRecurringHoliday: function() {
+    deleteRecurringHoliday: function () {
 
-		return this.argumentsHandler( this.className, 'deleteRecurringHoliday', arguments );
+        return this.argumentsHandler(this.className, 'deleteRecurringHoliday', arguments);
 
-	},
+    },
 
-	copyRecurringHoliday: function() {
-		return this.argumentsHandler( this.className, 'copyRecurringHoliday', arguments );
-	},
+    copyRecurringHoliday: function () {
+        return this.argumentsHandler(this.className, 'copyRecurringHoliday', arguments);
+    },
 
-	exportRecurringHoliday: function() {
-		return this.argumentsHandler( this.className, 'exportRecurringHoliday', arguments );
-	}
+    exportRecurringHoliday: function () {
+        return this.argumentsHandler(this.className, 'exportRecurringHoliday', arguments);
+    }
 
 
-} );
+});

@@ -19,31 +19,34 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 require_once('../includes/global.inc.php');
-if ( ( isset($config_vars['other']['installer_enabled']) AND $config_vars['other']['installer_enabled'] == 1)
-		OR ( isset($_SERVER['HTTP_REFERER']) AND stristr( $_SERVER['HTTP_REFERER'], 'quick_punch') ) ) {
-		Debug::text('AJAX Server - Installer enabled, or using quickpunch... NOT AUTHENTICATING...', __FILE__, __LINE__, __METHOD__, 10);
-		$authenticate = FALSE;
+if ((isset($config_vars['other']['installer_enabled']) and $config_vars['other']['installer_enabled'] == 1)
+    or (isset($_SERVER['HTTP_REFERER']) and stristr($_SERVER['HTTP_REFERER'], 'quick_punch'))
+) {
+    Debug::text('AJAX Server - Installer enabled, or using quickpunch... NOT AUTHENTICATING...', __FILE__, __LINE__, __METHOD__, 10);
+    $authenticate = false;
 }
-$skip_message_check = TRUE;
+$skip_message_check = true;
 
-unset( $_GET['cb'], $_POST['cb'] ); //Prevent usage of a callback function which could result in an exploit.
+unset($_GET['cb'], $_POST['cb']); //Prevent usage of a callback function which could result in an exploit.
 
-require_once(Environment::getBasePath() .'includes/Interface.inc.php');
+require_once(Environment::getBasePath() . 'includes/Interface.inc.php');
 require_once('HTML/AJAX/Server.php');
 
-class AutoServer extends HTML_AJAX_Server {
-		// this flag must be set for your init methods to be used
-		var $initMethods = TRUE;
+class AutoServer extends HTML_AJAX_Server
+{
+    // this flag must be set for your init methods to be used
+    public $initMethods = true;
 
-		// init method for my ajax class
-		function initAJAX_Server() {
-			$ajax = new AJAX_Server();
-			$this->registerClass($ajax);
-		}
+    // init method for my ajax class
+    public function initAJAX_Server()
+    {
+        $ajax = new AJAX_Server();
+        $this->registerClass($ajax);
+    }
 }
 
 $server = new AutoServer();
@@ -51,4 +54,3 @@ $server->handleRequest();
 
 Debug::text('AJAX Server called...', __FILE__, __LINE__, __METHOD__, 10);
 Debug::writeToLog();
-?>

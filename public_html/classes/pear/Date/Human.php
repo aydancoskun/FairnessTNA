@@ -101,7 +101,7 @@ class Date_Human
      *  Since 0 is a valid month number under the Human Calendar, I have left
      *  the month as -1 for New Years Day.
      */
-    function gregorianToHuman($day=0, $month=0, $year=0)
+    public function gregorianToHuman($day = 0, $month = 0, $year = 0)
     {
         /*
          * Check to see if any of the arguments are empty
@@ -175,11 +175,11 @@ class Date_Human
          * Return an associative array of the values
          */
         return array(
-                     "hdom" => $humanDayOfMonth,
-                     "hdow" => $humanDayOfWeek,
-                     "hwom" => $humanWeekOfMonth,
-                     "hwoy" => $humanWeekOfYear,
-                     "hmoy" => $humanMonthOfYear );
+            "hdom" => $humanDayOfMonth,
+            "hdow" => $humanDayOfWeek,
+            "hwom" => $humanWeekOfMonth,
+            "hwoy" => $humanWeekOfYear,
+            "hmoy" => $humanMonthOfYear);
     }
 
     // }}}
@@ -196,7 +196,7 @@ class Date_Human
      *
      * @return int unix timestamp of date
      */
-    function humanToGregorian($day, $month, $year=0)
+    public function humanToGregorian($day, $month, $year = 0)
     {
         /*
          * Check to see if the year has been passed through.
@@ -238,5 +238,4 @@ class Date_Human
  * c-basic-offset: 4
  * c-hanging-comment-ender-p: nil
  * End:
- */
-?>
+ */;

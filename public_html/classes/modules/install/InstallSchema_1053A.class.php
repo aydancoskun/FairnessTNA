@@ -19,24 +19,25 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1053A extends InstallSchema_Base {
+class InstallSchema_1053A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
-
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

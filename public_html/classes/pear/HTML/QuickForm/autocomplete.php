@@ -51,7 +51,7 @@ class HTML_QuickForm_autocomplete extends HTML_QuickForm_text
      * @var       array
      * @access    private
      */
-    var $_options = array();
+    public $_options = array();
 
     // }}}
     // {{{ constructor
@@ -59,15 +59,15 @@ class HTML_QuickForm_autocomplete extends HTML_QuickForm_text
     /**
      * Class constructor
      *
-     * @param     string    $elementName    (optional)Input field name attribute
-     * @param     string    $elementLabel   (optional)Input field label in form
-     * @param     array     $options        (optional)Autocomplete options
-     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string
+     * @param     string $elementName (optional)Input field name attribute
+     * @param     string $elementLabel (optional)Input field label in form
+     * @param     array $options (optional)Autocomplete options
+     * @param     mixed $attributes (optional)Either a typical HTML attribute string
      *                                      or an associative array. Date format is passed along the attributes.
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_autocomplete($elementName = null, $elementLabel = null, $options = null, $attributes = null)
+    public function HTML_QuickForm_autocomplete($elementName = null, $elementLabel = null, $options = null, $attributes = null)
     {
         $this->HTML_QuickForm_text($elementName, $elementLabel, $attributes);
         $this->_persistantFreeze = true;
@@ -83,11 +83,11 @@ class HTML_QuickForm_autocomplete extends HTML_QuickForm_text
     /**
      * Sets the options for the autocomplete input text element
      *
-     * @param     array    $options    Array of options for the autocomplete input text element
+     * @param     array $options Array of options for the autocomplete input text element
      * @access    public
      * @return    void
      */
-    function setOptions($options)
+    public function setOptions($options)
     {
         $this->_options = array_values($options);
     } // end func setOptions
@@ -101,7 +101,7 @@ class HTML_QuickForm_autocomplete extends HTML_QuickForm_text
      * @access      public
      * @return      string
      */
-    function toHtml()
+    public function toHtml()
     {
         // prevent problems with grouped elements
         $arrayName = str_replace(array('[', ']'), array('__', ''), $this->getName()) . '_values';
@@ -218,14 +218,14 @@ EOS;
                 define('HTML_QUICKFORM_AUTOCOMPLETE_EXISTS', true);
             }
             $jsEscape = array(
-                "\r"    => '\r',
-                "\n"    => '\n',
-                "\t"    => '\t',
-                "'"     => "\\'",
-                '"'     => '\"',
-                '\\'    => '\\\\'
+                "\r" => '\r',
+                "\n" => '\n',
+                "\t" => '\t',
+                "'" => "\\'",
+                '"' => '\"',
+                '\\' => '\\\\'
             );
-            
+
             $js .= 'var ' . $arrayName . " = new Array();\n";
             for ($i = 0; $i < count($this->_options); $i++) {
                 $js .= $arrayName . '[' . $i . "] = '" . strtr($this->_options[$i], $jsEscape) . "';\n";
@@ -236,5 +236,4 @@ EOS;
     }// end func toHtml
 
     // }}}
-} // end class HTML_QuickForm_autocomplete
-?>
+} // end class HTML_QuickForm_autocomplete;

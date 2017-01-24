@@ -1,71 +1,71 @@
-var APIMessageControl = ServiceCaller.extend( {
+var APIMessageControl = ServiceCaller.extend({
 
-	key_name: 'MessageControl',
-	className: 'APIMessageControl',
+    key_name: 'MessageControl',
+    className: 'APIMessageControl',
 
-	getMessageControlDefaultData: function() {
+    getMessageControlDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getMessageControlDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getMessageControlDefaultData', arguments);
 
-	},
+    },
 
-	getMessageControl: function() {
+    getMessageControl: function () {
 
-		return this.argumentsHandler( this.className, 'getMessageControl', arguments );
+        return this.argumentsHandler(this.className, 'getMessageControl', arguments);
 
-	},
+    },
 
-	getMessage: function() {
+    getMessage: function () {
 
-		return this.argumentsHandler( this.className, 'getMessage', arguments );
+        return this.argumentsHandler(this.className, 'getMessage', arguments);
 
-	},
+    },
 
-	getEmbeddedMessage: function() {
+    getEmbeddedMessage: function () {
 
-		return this.argumentsHandler( this.className, 'getEmbeddedMessage', arguments );
+        return this.argumentsHandler(this.className, 'getEmbeddedMessage', arguments);
 
-	},
+    },
 
-	getCommonMessageControlData: function() {
+    getCommonMessageControlData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonMessageControlData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonMessageControlData', arguments);
 
-	},
+    },
 
-	validateMessageControl: function() {
+    validateMessageControl: function () {
 
-		return this.argumentsHandler( this.className, 'validateMessageControl', arguments );
+        return this.argumentsHandler(this.className, 'validateMessageControl', arguments);
 
-	},
+    },
 
-	setMessageControl: function() {
-		return this.argumentsHandler( this.className, 'setMessageControl', arguments );
-	},
+    setMessageControl: function () {
+        return this.argumentsHandler(this.className, 'setMessageControl', arguments);
+    },
 
-	deleteMessageControl: function() {
-		return this.argumentsHandler( this.className, 'deleteMessageControl', arguments );
-	},
+    deleteMessageControl: function () {
+        return this.argumentsHandler(this.className, 'deleteMessageControl', arguments);
+    },
 
-	copyMessageControl: function() {
-		return this.argumentsHandler( this.className, 'copyMessageControl', arguments );
-	},
+    copyMessageControl: function () {
+        return this.argumentsHandler(this.className, 'copyMessageControl', arguments);
+    },
 
-	exportMessageControl: function() {
-		return this.argumentsHandler( this.className, 'exportMessageControl', arguments );
-	},
+    exportMessageControl: function () {
+        return this.argumentsHandler(this.className, 'exportMessageControl', arguments);
+    },
 
-	getUser: function() {
-		return this.argumentsHandler( this.className, 'getUser', arguments );
-	},
+    getUser: function () {
+        return this.argumentsHandler(this.className, 'getUser', arguments);
+    },
 
-	isNewMessage: function() {
-		return this.argumentsHandler( this.className, 'isNewMessage', arguments );
-	},
+    isNewMessage: function () {
+        return this.argumentsHandler(this.className, 'isNewMessage', arguments);
+    },
 
-	markRecipientMessageAsRead: function() {
-		return this.argumentsHandler( this.className, 'markRecipientMessageAsRead', arguments );
-	}
+    markRecipientMessageAsRead: function () {
+        return this.argumentsHandler(this.className, 'markRecipientMessageAsRead', arguments);
+    }
 
 
-} );
+});

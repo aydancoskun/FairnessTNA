@@ -3,5 +3,5 @@
 var $u = HTML_AJAX_Util;
 var $a = HTML_AJAX;
 if (!$) {
-	var $ = HTML_AJAX_Util.getElement;
+    var $ = HTML_AJAX_Util.getElement;
 }

@@ -1,52 +1,52 @@
-var APIWageGroup = ServiceCaller.extend( {
+var APIWageGroup = ServiceCaller.extend({
 
-	key_name: 'WageGroup',
-	className: 'APIWageGroup',
+    key_name: 'WageGroup',
+    className: 'APIWageGroup',
 
-	getCommonWageGroupData: function() {
+    getCommonWageGroupData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonWageGroupData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonWageGroupData', arguments);
 
-	},
+    },
 
-	getWageGroup: function() {
+    getWageGroup: function () {
 
-		return this.argumentsHandler( this.className, 'getWageGroup', arguments );
+        return this.argumentsHandler(this.className, 'getWageGroup', arguments);
 
-	},
+    },
 
-	setWageGroup: function() {
+    setWageGroup: function () {
 
-		return this.argumentsHandler( this.className, 'setWageGroup', arguments );
+        return this.argumentsHandler(this.className, 'setWageGroup', arguments);
 
-	},
+    },
 
-	getWageGroupDefaultData: function() {
+    getWageGroupDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getWageGroupDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getWageGroupDefaultData', arguments);
 
-	},
+    },
 
-	deleteWageGroup: function() {
+    deleteWageGroup: function () {
 
-		return this.argumentsHandler( this.className, 'deleteWageGroup', arguments );
+        return this.argumentsHandler(this.className, 'deleteWageGroup', arguments);
 
-	},
+    },
 
-	validateWageGroup: function() {
+    validateWageGroup: function () {
 
-		return this.argumentsHandler( this.className, 'validateWageGroup', arguments );
+        return this.argumentsHandler(this.className, 'validateWageGroup', arguments);
 
-	},
+    },
 
-	copyWageGroup: function() {
+    copyWageGroup: function () {
 
-		return this.argumentsHandler( this.className, 'copyWageGroup', arguments );
+        return this.argumentsHandler(this.className, 'copyWageGroup', arguments);
 
-	},
+    },
 
-	exportWageGroup: function() {
-		return this.argumentsHandler( this.className, 'exportWageGroup', arguments );
-	},
+    exportWageGroup: function () {
+        return this.argumentsHandler(this.className, 'exportWageGroup', arguments);
+    },
 
-} );
+});

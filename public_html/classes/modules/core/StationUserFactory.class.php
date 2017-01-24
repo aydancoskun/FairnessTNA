@@ -19,110 +19,143 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 /*
 CREATE TABLE station_user (
-	id serial NOT NULL,
-	station_id integer DEFAULT 0 NOT NULL,
-	user_id integer DEFAULT 0 NOT NULL
+    id serial NOT NULL,
+    station_id integer DEFAULT 0 NOT NULL,
+    user_id integer DEFAULT 0 NOT NULL
 ) WITHOUT OIDS;
 */
 
 /**
  * @package Core
  */
-class StationUserFactory extends Factory {
-	protected $table = 'station_user';
-	protected $pk_sequence_name = 'station_user_id_seq'; //PK Sequence name
-	function getStation() {
-		return (int)$this->data['station_id'];
-	}
-	function setStation($id) {
-		$id = trim($id);
+class StationUserFactory extends Factory
+{
+    protected $table = 'station_user';
+    protected $pk_sequence_name = 'station_user_id_seq'; //PK Sequence name
 
-		$slf = TTnew( 'StationListFactory' );
+    public function getStation()
+    {
+        return (int)$this->data['station_id'];
+    }
 
-		if ( $id != 0
-				OR $this->Validator->isResultSetWithRows(	'station',
-															$slf->getByID($id),
-															TTi18n::gettext('Station is invalid')
-															) ) {
-			$this->data['station_id'] = $id;
+    public function setStation($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $slf = TTnew('StationListFactory');
 
-		return FALSE;
-	}
+        if ($id != 0
+            or $this->Validator->isResultSetWithRows('station',
+                $slf->getByID($id),
+                TTi18n::gettext('Station is invalid')
+            )
+        ) {
+            $this->data['station_id'] = $id;
 
-	function getUser() {
-		return (int)$this->data['user_id'];
-	}
-	function setUser($id) {
-		$id = trim($id);
+            return true;
+        }
 
-		$ulf = TTnew( 'UserListFactory' );
+        return false;
+    }
 
-		if ( $id == -1
-				OR $this->Validator->isResultSetWithRows(	'user',
-															$ulf->getByID($id),
-															TTi18n::gettext('User is invalid')
-															) ) {
-			$this->data['user_id'] = $id;
+    public function getUser()
+    {
+        return (int)$this->data['user_id'];
+    }
 
-			return TRUE;
-		}
+    public function setUser($id)
+    {
+        $id = trim($id);
 
-		return FALSE;
-	}
+        $ulf = TTnew('UserListFactory');
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+        if ($id == -1
+            or $this->Validator->isResultSetWithRows('user',
+                $ulf->getByID($id),
+                TTi18n::gettext('User is invalid')
+            )
+        ) {
+            $this->data['user_id'] = $id;
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+            return true;
+        }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+        return false;
+    }
+
+    //This table doesn't have any of these columns, so overload the functions.
+    public function getDeleted()
+    {
+        return false;
+    }
+
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedDate()
+    {
+        return false;
+    }
+
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
 
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 }
-?>

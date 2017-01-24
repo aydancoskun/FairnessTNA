@@ -19,230 +19,234 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Schedule
  */
-class RecurringScheduleTemplateControlListFactory extends RecurringScheduleTemplateControlFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class RecurringScheduleTemplateControlListFactory extends RecurringScheduleTemplateControlFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndCompanyId($id, $company_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByIdAndCompanyId($id, $company_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $company_id == '') {
-			return FALSE;
-		}
+        if ($company_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .' as a
+					from	' . $this->getTable() . ' as a
 					where	company_id = ?
 						AND id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($id, $limit = NULL, $page = NULL, $where = NULL, $order = NULL ) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdArray($company_id, $include_blank = true)
+    {
+        $rstclf = new RecurringScheduleTemplateControlListFactory();
+        $rstclf->getByCompanyId($company_id);
 
-		if ( $order == NULL ) {
-			$order = array( 'name' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        $list = array();
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        if ($include_blank == true) {
+            $list[0] = '--';
+        }
+
+        foreach ($rstclf as $obj) {
+            $list[$obj->getID()] = $obj->getName();
+        }
+
+        return $list;
+    }
+
+    public function getByCompanyId($id, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
+
+        if ($order == null) {
+            $order = array('name' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
+
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .' as a
+					from	' . $this->getTable() . ' as a
 					where	company_id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdArray($company_id, $include_blank = TRUE) {
+    public function getSearchByCompanyIdAndArrayCriteria($company_id, $filter_data, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$rstclf = new RecurringScheduleTemplateControlListFactory();
-		$rstclf->getByCompanyId($company_id);
+        if (!is_array($order)) {
+            //Use Filter Data ordering if its set.
+            if (isset($filter_data['sort_column']) and $filter_data['sort_order']) {
+                $order = array(Misc::trimSortPrefix($filter_data['sort_column']) => $filter_data['sort_order']);
+            }
+        }
 
-		$list = array();
-
-		if ( $include_blank == TRUE ) {
-			$list[0] = '--';
-		}
-
-		foreach ($rstclf as $obj) {
-			$list[$obj->getID()] = $obj->getName();
-		}
-
-		return $list;
-	}
-
-	function getSearchByCompanyIdAndArrayCriteria( $company_id, $filter_data, $limit = NULL, $page = NULL, $where = NULL, $order = NULL ) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
-
-		if ( !is_array($order) ) {
-			//Use Filter Data ordering if its set.
-			if ( isset($filter_data['sort_column']) AND $filter_data['sort_order']) {
-				$order = array(Misc::trimSortPrefix($filter_data['sort_column']) => $filter_data['sort_order']);
-			}
-		}
-
-		$additional_order_fields = array('a.name');
-		if ( $order == NULL ) {
-			$order = array( 'a.name' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
-		//Debug::Arr($order, 'Order Data:', __FILE__, __LINE__, __METHOD__, 10);
-		//Debug::Arr($filter_data, 'Filter Data:', __FILE__, __LINE__, __METHOD__, 10);
+        $additional_order_fields = array('a.name');
+        if ($order == null) {
+            $order = array('a.name' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
+        //Debug::Arr($order, 'Order Data:', __FILE__, __LINE__, __METHOD__, 10);
+        //Debug::Arr($filter_data, 'Filter Data:', __FILE__, __LINE__, __METHOD__, 10);
 
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
+					from	' . $this->getTable() . ' as a
 					where	a.company_id = ?
 					';
 
-		if ( isset($filter_data['created_by']) AND isset($filter_data['created_by'][0]) AND !in_array(-1, (array)$filter_data['created_by']) ) {
-			$query	.=	' AND a.created_by in ('. $this->getListSQL($filter_data['created_by'], $ph) .') ';
-		}
-		/*
-		if ( isset($filter_data['severity_id']) AND isset($filter_data['severity_id'][0]) AND !in_array(-1, (array)$filter_data['severity_id']) ) {
-			$query	.=	' AND i.severity_id in ('. $this->getListSQL($filter_data['severity_id'], $ph) .') ';
-		}
-		*/
+        if (isset($filter_data['created_by']) and isset($filter_data['created_by'][0]) and !in_array(-1, (array)$filter_data['created_by'])) {
+            $query .= ' AND a.created_by in (' . $this->getListSQL($filter_data['created_by'], $ph) . ') ';
+        }
+        /*
+        if ( isset($filter_data['severity_id']) AND isset($filter_data['severity_id'][0]) AND !in_array(-1, (array)$filter_data['severity_id']) ) {
+            $query	.=	' AND i.severity_id in ('. $this->getListSQL($filter_data['severity_id'], $ph) .') ';
+        }
+        */
 
-		if ( isset($filter_data['name']) AND !is_array($filter_data['name']) AND trim($filter_data['name']) != '' ) {
-			$ph[] = strtolower( trim($filter_data['name']) );
-			$query	.=	' AND lower(a.name) LIKE ?';
-		}
+        if (isset($filter_data['name']) and !is_array($filter_data['name']) and trim($filter_data['name']) != '') {
+            $ph[] = strtolower(trim($filter_data['name']));
+            $query .= ' AND lower(a.name) LIKE ?';
+        }
 
-		$query .=	'
+        $query .= '
 						AND a.deleted = 0
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict, $additional_order_fields );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict, $additional_order_fields);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getAPISearchByCompanyIdAndArrayCriteria( $company_id, $filter_data, $limit = NULL, $page = NULL, $where = NULL, $order = NULL ) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getAPISearchByCompanyIdAndArrayCriteria($company_id, $filter_data, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( !is_array($order) ) {
-			//Use Filter Data ordering if its set.
-			if ( isset($filter_data['sort_column']) AND $filter_data['sort_order']) {
-				$order = array(Misc::trimSortPrefix($filter_data['sort_column']) => $filter_data['sort_order']);
-			}
-		}
+        if (!is_array($order)) {
+            //Use Filter Data ordering if its set.
+            if (isset($filter_data['sort_column']) and $filter_data['sort_order']) {
+                $order = array(Misc::trimSortPrefix($filter_data['sort_column']) => $filter_data['sort_order']);
+            }
+        }
 
 
-		$additional_order_fields = array( 'in_use' );
-		$sort_column_aliases = array(
+        $additional_order_fields = array('in_use');
+        $sort_column_aliases = array();
 
-									);
+        $order = $this->getColumnsFromAliases($order, $sort_column_aliases);
 
-		$order = $this->getColumnsFromAliases( $order, $sort_column_aliases );
+        if ($order == null) {
+            $order = array('name' => 'asc', 'description' => 'asc');
+            $strict = false;
+        } else {
+            //Always sort by last name, first name after other columns
+            if (!isset($order['name'])) {
+                $order['name'] = 'asc';
+            }
+            $strict = true;
+        }
+        //Debug::Arr($order, 'Order Data:', __FILE__, __LINE__, __METHOD__, 10);
+        //Debug::Arr($filter_data, 'Filter Data:', __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $order == NULL ) {
-			$order = array( 'name' => 'asc', 'description' => 'asc');
-			$strict = FALSE;
-		} else {
-			//Always sort by last name, first name after other columns
-			if ( !isset($order['name']) ) {
-				$order['name'] = 'asc';
-			}
-			$strict = TRUE;
-		}
-		//Debug::Arr($order, 'Order Data:', __FILE__, __LINE__, __METHOD__, 10);
-		//Debug::Arr($filter_data, 'Filter Data:', __FILE__, __LINE__, __METHOD__, 10);
+        $uf = new UserFactory();
+        $rscf = new RecurringScheduleControlFactory();
 
-		$uf = new UserFactory();
-		$rscf = new RecurringScheduleControlFactory();
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
-
-		$query = '
+        $query = '
 					select	a.*,
 							_ADODB_COUNT
 							(
 								CASE WHEN EXISTS
-									( select 1 from '. $rscf->getTable() .' as w where w.company_id = a.company_id AND w.recurring_schedule_template_control_id = a.id AND w.deleted = 0 )
+									( select 1 from ' . $rscf->getTable() . ' as w where w.company_id = a.company_id AND w.recurring_schedule_template_control_id = a.id AND w.deleted = 0 )
 									THEN 1
 									ELSE 0
 								END
@@ -254,30 +258,28 @@ class RecurringScheduleTemplateControlListFactory extends RecurringScheduleTempl
 							z.middle_name as updated_by_middle_name,
 							z.last_name as updated_by_last_name
 							_ADODB_COUNT
-					from	'. $this->getTable() .' as a
-						LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
-						LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
+					from	' . $this->getTable() . ' as a
+						LEFT JOIN ' . $uf->getTable() . ' as y ON ( a.created_by = y.id AND y.deleted = 0 )
+						LEFT JOIN ' . $uf->getTable() . ' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
 					where	a.company_id = ?
 					';
 
-		$query .= ( isset($filter_data['permission_children_ids']) ) ? $this->getWhereClauseSQL( 'a.created_by', $filter_data['permission_children_ids'], 'numeric_list', $ph ) : NULL;
-		$query .= ( isset($filter_data['id']) ) ? $this->getWhereClauseSQL( 'a.id', $filter_data['id'], 'numeric_list', $ph ) : NULL;
-		$query .= ( isset($filter_data['exclude_id']) ) ? $this->getWhereClauseSQL( 'a.id', $filter_data['exclude_id'], 'not_numeric_list', $ph ) : NULL;
-					
-		$query .= ( isset($filter_data['name']) ) ? $this->getWhereClauseSQL( 'a.name', $filter_data['name'], 'text', $ph ) : NULL;
-		$query .= ( isset($filter_data['description']) ) ? $this->getWhereClauseSQL( 'a.description', $filter_data['description'], 'text', $ph ) : NULL;
-		
-		$query .= ( isset($filter_data['created_by']) ) ? $this->getWhereClauseSQL( array('a.created_by', 'y.first_name', 'y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph ) : NULL;
-		$query .= ( isset($filter_data['updated_by']) ) ? $this->getWhereClauseSQL( array('a.updated_by', 'z.first_name', 'z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph ) : NULL;
+        $query .= (isset($filter_data['permission_children_ids'])) ? $this->getWhereClauseSQL('a.created_by', $filter_data['permission_children_ids'], 'numeric_list', $ph) : null;
+        $query .= (isset($filter_data['id'])) ? $this->getWhereClauseSQL('a.id', $filter_data['id'], 'numeric_list', $ph) : null;
+        $query .= (isset($filter_data['exclude_id'])) ? $this->getWhereClauseSQL('a.id', $filter_data['exclude_id'], 'not_numeric_list', $ph) : null;
 
-		$query .=	' AND a.deleted = 0 ';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict, $additional_order_fields );
+        $query .= (isset($filter_data['name'])) ? $this->getWhereClauseSQL('a.name', $filter_data['name'], 'text', $ph) : null;
+        $query .= (isset($filter_data['description'])) ? $this->getWhereClauseSQL('a.description', $filter_data['description'], 'text', $ph) : null;
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $query .= (isset($filter_data['created_by'])) ? $this->getWhereClauseSQL(array('a.created_by', 'y.first_name', 'y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph) : null;
+        $query .= (isset($filter_data['updated_by'])) ? $this->getWhereClauseSQL(array('a.updated_by', 'z.first_name', 'z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph) : null;
 
-		return $this;
-	}
+        $query .= ' AND a.deleted = 0 ';
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict, $additional_order_fields);
 
+        $this->ExecuteSQL($query, $ph, $limit, $page);
+
+        return $this;
+    }
 }
-?>

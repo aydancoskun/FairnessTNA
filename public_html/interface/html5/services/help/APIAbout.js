@@ -1,12 +1,12 @@
-var APIAbout = ServiceCaller.extend( {
+var APIAbout = ServiceCaller.extend({
 
-	key_name: 'AboutData',
-	className: 'APIAbout',
+    key_name: 'AboutData',
+    className: 'APIAbout',
 
-	getAboutData: function() {
+    getAboutData: function () {
 
-		return this.argumentsHandler( this.className, 'getAboutData', arguments );
+        return this.argumentsHandler(this.className, 'getAboutData', arguments);
 
-	},
+    },
 
-} );
+});

@@ -19,106 +19,108 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class UserSettingListFactory extends UserSettingFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class UserSettingListFactory extends UserSettingFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id, 
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
+        $uf = new UserFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-					LEFT JOIN '. $uf->getTable() .' as uf ON a.user_id = uf.id
+					from	' . $this->getTable() . ' as a
+					LEFT JOIN ' . $uf->getTable() . ' as uf ON a.user_id = uf.id
 					where	uf.company_id = ?
 						AND ( uf.deleted = 0 )';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByUserIdAndName($user_id, $name) {		
-		if ( $user_id == '' ) {
-			return FALSE;
-		}
-		
-		if ( $name == '') {
-			return FALSE;
-		}
+    public function getByUserIdAndName($user_id, $name)
+    {
+        if ($user_id == '') {
+            return false;
+        }
 
-		$cache_id = $user_id.$name;
+        if ($name == '') {
+            return false;
+        }
 
-		$ph = array(
-					'user_id' => (int)$user_id, 
-					'name' => $name, 
-					);
+        $cache_id = $user_id . $name;
 
-		$this->rs = $this->getCache($cache_id);
-		if ( $this->rs === FALSE ) {
-			$query = '
+        $ph = array(
+            'user_id' => (int)$user_id,
+            'name' => $name,
+        );
+
+        $this->rs = $this->getCache($cache_id);
+        if ($this->rs === false) {
+            $query = '
 						select	*
-						from	'. $this->getTable() .'
+						from	' . $this->getTable() . '
 						where	user_id = ?
 							AND	name = ?
 							AND deleted = 0';
 
-			$this->ExecuteSQL( $query, $ph );
+            $this->ExecuteSQL($query, $ph);
 
-			$this->saveCache($this->rs, $cache_id);
-		}
-		
-		return $this;
-	}
+            $this->saveCache($this->rs, $cache_id);
+        }
 
+        return $this;
+    }
 }
-?>

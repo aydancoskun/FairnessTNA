@@ -1,51 +1,51 @@
-var APIRoundIntervalPolicy = ServiceCaller.extend( {
+var APIRoundIntervalPolicy = ServiceCaller.extend({
 
-	key_name: 'RoundIntervalPolicy',
-	className: 'APIRoundIntervalPolicy',
+    key_name: 'RoundIntervalPolicy',
+    className: 'APIRoundIntervalPolicy',
 
-	getRoundIntervalPolicyDefaultData: function() {
+    getRoundIntervalPolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getRoundIntervalPolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getRoundIntervalPolicyDefaultData', arguments);
 
-	},
+    },
 
-	getRoundIntervalPolicy: function() {
+    getRoundIntervalPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getRoundIntervalPolicy', arguments );
+        return this.argumentsHandler(this.className, 'getRoundIntervalPolicy', arguments);
 
-	},
+    },
 
-	getCommonRoundIntervalPolicyData: function() {
+    getCommonRoundIntervalPolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonRoundIntervalPolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonRoundIntervalPolicyData', arguments);
 
-	},
+    },
 
-	validateRoundIntervalPolicy: function() {
+    validateRoundIntervalPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateRoundIntervalPolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateRoundIntervalPolicy', arguments);
 
-	},
+    },
 
-	setRoundIntervalPolicy: function() {
+    setRoundIntervalPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setRoundIntervalPolicy', arguments );
+        return this.argumentsHandler(this.className, 'setRoundIntervalPolicy', arguments);
 
-	},
+    },
 
-	deleteRoundIntervalPolicy: function() {
+    deleteRoundIntervalPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteRoundIntervalPolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteRoundIntervalPolicy', arguments);
 
-	},
+    },
 
-	copyRoundIntervalPolicy: function() {
-		return this.argumentsHandler( this.className, 'copyRoundIntervalPolicy', arguments );
-	},
+    copyRoundIntervalPolicy: function () {
+        return this.argumentsHandler(this.className, 'copyRoundIntervalPolicy', arguments);
+    },
 
-	exportRoundIntervalPolicy: function() {
-		return this.argumentsHandler( this.className, 'exportRoundIntervalPolicy', arguments );
-	}
+    exportRoundIntervalPolicy: function () {
+        return this.argumentsHandler(this.className, 'exportRoundIntervalPolicy', arguments);
+    }
 
 
-} );
+});

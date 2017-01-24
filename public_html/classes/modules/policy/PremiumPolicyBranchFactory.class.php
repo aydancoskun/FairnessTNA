@@ -19,143 +19,177 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class PremiumPolicyBranchFactory extends Factory {
-	protected $table = 'premium_policy_branch';
-	protected $pk_sequence_name = 'premium_policy_branch_id_seq'; //PK Sequence name
+class PremiumPolicyBranchFactory extends Factory
+{
+    protected $table = 'premium_policy_branch';
+    protected $pk_sequence_name = 'premium_policy_branch_id_seq'; //PK Sequence name
 
-	protected $branch_obj = NULL;
+    protected $branch_obj = null;
 
-	function getBranchObject() {
-		if ( is_object($this->branch_obj) ) {
-			return $this->branch_obj;
-		} else {
-			$lf = TTnew( 'BranchListFactory' );
-			$lf->getById( $this->getBranch() );
-			if ( $lf->getRecordCount() == 1 ) {
-				$this->branch_obj = $lf->getCurrent();
-				return $this->branch_obj;
-			}
+    public function setPremiumPolicy($id)
+    {
+        $id = trim($id);
 
-			return FALSE;
-		}
-	}
+        if ($id == 0
+            or
+            $this->Validator->isNumeric('premium_policy',
+                $id,
+                TTi18n::gettext('Selected Premium Policy is invalid')
+            /*
+                            $this->Validator->isResultSetWithRows(	'premium_policy',
+                                                                $pplf->getByID($id),
+                                                                TTi18n::gettext('Selected Premium Policy is invalid')
+            */
+            )
+        ) {
+            $this->data['premium_policy_id'] = $id;
 
-	function getPremiumPolicy() {
-		if ( isset($this->data['premium_policy_id']) ) {
-			return (int)$this->data['premium_policy_id'];
-		}
-	}
-	function setPremiumPolicy($id) {
-		$id = trim($id);
+            return true;
+        }
 
-		if (	$id == 0
-				OR
-				$this->Validator->isNumeric(	'premium_policy',
-													$id,
-													TTi18n::gettext('Selected Premium Policy is invalid')
-/*
-				$this->Validator->isResultSetWithRows(	'premium_policy',
-													$pplf->getByID($id),
-													TTi18n::gettext('Selected Premium Policy is invalid')
-*/
-															)
-			) {
+        return false;
+    }
 
-			$this->data['premium_policy_id'] = $id;
+    public function setBranch($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $blf = TTnew('BranchListFactory');
 
-		return FALSE;
-	}
+        if ($this->Validator->isResultSetWithRows('branch',
+            $blf->getByID($id),
+            TTi18n::gettext('Selected Branch is invalid')
+        )
+        ) {
+            $this->data['branch_id'] = $id;
 
-	function getBranch() {
-		if ( isset($this->data['branch_id']) ) {
-			return (int)$this->data['branch_id'];
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setBranch($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		$blf = TTnew( 'BranchListFactory' );
+    public function postSave()
+    {
+        $this->removeCache('premium_policy-' . $this->getPremiumPolicy());
+        return true;
+    }
 
-		if ( $this->Validator->isResultSetWithRows(	'branch',
-													$blf->getByID($id),
-													TTi18n::gettext('Selected Branch is invalid')
-													) ) {
-			$this->data['branch_id'] = $id;
+    public function getPremiumPolicy()
+    {
+        if (isset($this->data['premium_policy_id'])) {
+            return (int)$this->data['premium_policy_id'];
+        }
+    }
 
-			return TRUE;
-		}
+    public function getDeleted()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
 
-	function postSave() {
-		$this->removeCache( 'premium_policy-'. $this->getPremiumPolicy() );
-		return TRUE;
-	}
-	
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getCreatedDate()
+    {
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getCreatedBy()
+    {
+        return false;
+    }
 
-	function addLog( $log_action ) {
-		$obj = $this->getBranchObject();
-		if ( is_object($obj) ) {
-			return TTLog::addEntry( $this->getPremiumPolicy(), $log_action, TTi18n::getText('Branch').': '. $obj->getName(), NULL, $this->getTable() );
-		}
-	}
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
+
+    public function addLog($log_action)
+    {
+        $obj = $this->getBranchObject();
+        if (is_object($obj)) {
+            return TTLog::addEntry($this->getPremiumPolicy(), $log_action, TTi18n::getText('Branch') . ': ' . $obj->getName(), null, $this->getTable());
+        }
+    }
+
+    public function getBranchObject()
+    {
+        if (is_object($this->branch_obj)) {
+            return $this->branch_obj;
+        } else {
+            $lf = TTnew('BranchListFactory');
+            $lf->getById($this->getBranch());
+            if ($lf->getRecordCount() == 1) {
+                $this->branch_obj = $lf->getCurrent();
+                return $this->branch_obj;
+            }
+
+            return false;
+        }
+    }
+
+    public function getBranch()
+    {
+        if (isset($this->data['branch_id'])) {
+            return (int)$this->data['branch_id'];
+        }
+
+        return false;
+    }
 }
-?>

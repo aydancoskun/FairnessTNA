@@ -66,7 +66,7 @@ class Mail
      * types
      *
      * @param string $driver The kind of Mail:: object to instantiate.
-     * @param array  $params The parameters to pass to the Mail:: object.
+     * @param array $params The parameters to pass to the Mail:: object.
      *
      * @return object Mail a instance of the driver class or if fails a PEAR Error
      */
@@ -151,7 +151,7 @@ class Mail
         foreach ($headers as $key => $value) {
             $headers[$key] =
                 preg_replace('=((<CR>|<LF>|0x0A/%0A|0x0D/%0D|\\n|\\r)\S).*=i',
-                             null, $value);
+                    null, $value);
         }
     }
 
@@ -198,8 +198,7 @@ class Mail
                     foreach ($value as $line) {
                         $received[] = $key . ': ' . $line;
                     }
-                }
-                else {
+                } else {
                     $received[] = $key . ': ' . $value;
                 }
                 // Put Received: headers at the top.  Spam detectors often
@@ -261,5 +260,4 @@ class Mail
 
         return $recipients;
     }
-
 }

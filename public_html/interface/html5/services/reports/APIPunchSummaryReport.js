@@ -1,56 +1,55 @@
-var APIPunchSummaryReport = ServiceCaller.extend( {
+var APIPunchSummaryReport = ServiceCaller.extend({
 
-	key_name: 'PunchSummaryReport',
-	className: 'APIPunchSummaryReport',
+    key_name: 'PunchSummaryReport',
+    className: 'APIPunchSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonPunchSummaryReportData: function() {
+    getCommonPunchSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPunchSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPunchSummaryReportData', arguments);
 
-	},
+    },
 
-	getPunchSummaryReport: function() {
+    getPunchSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getPunchSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getPunchSummaryReport', arguments);
 
-	},
+    },
 
-	setPunchSummaryReport: function() {
+    setPunchSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setPunchSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setPunchSummaryReport', arguments);
 
-	},
+    },
 
-	getPunchSummaryReportDefaultData: function() {
+    getPunchSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPunchSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPunchSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deletePunchSummaryReport: function() {
+    deletePunchSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deletePunchSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deletePunchSummaryReport', arguments);
 
-	},
+    },
 
-	validatePunchSummaryReport: function() {
+    validatePunchSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validatePunchSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validatePunchSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

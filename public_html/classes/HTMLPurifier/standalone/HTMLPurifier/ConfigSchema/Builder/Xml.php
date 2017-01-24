@@ -18,33 +18,6 @@ class HTMLPurifier_ConfigSchema_Builder_Xml extends XMLWriter
     private $namespace;
 
     /**
-     * @param string $html
-     */
-    protected function writeHTMLDiv($html)
-    {
-        $this->startElement('div');
-
-        $purifier = HTMLPurifier::getInstance();
-        $html = $purifier->purify($html);
-        $this->writeAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-        $this->writeRaw($html);
-
-        $this->endElement(); // div
-    }
-
-    /**
-     * @param mixed $var
-     * @return string
-     */
-    protected function export($var)
-    {
-        if ($var === array()) {
-            return 'array()';
-        }
-        return var_export($var, true);
-    }
-
-    /**
      * @param HTMLPurifier_ConfigSchema_Interchange $interchange
      */
     public function build($interchange)
@@ -138,6 +111,33 @@ class HTMLPurifier_ConfigSchema_Builder_Xml extends XMLWriter
         $this->endElement(); // description
 
         $this->endElement(); // directive
+    }
+
+    /**
+     * @param mixed $var
+     * @return string
+     */
+    protected function export($var)
+    {
+        if ($var === array()) {
+            return 'array()';
+        }
+        return var_export($var, true);
+    }
+
+    /**
+     * @param string $html
+     */
+    protected function writeHTMLDiv($html)
+    {
+        $this->startElement('div');
+
+        $purifier = HTMLPurifier::getInstance();
+        $html = $purifier->purify($html);
+        $this->writeAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+        $this->writeRaw($html);
+
+        $this->endElement(); // div
     }
 }
 

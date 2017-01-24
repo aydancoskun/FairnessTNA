@@ -21,44 +21,45 @@
 require_once('HTML/QuickForm/Rule.php');
 
 /**
-* Validates values using range comparison
-* @version     1.0
-*/
+ * Validates values using range comparison
+ * @version     1.0
+ */
 class HTML_QuickForm_Rule_Range extends HTML_QuickForm_Rule
 {
     /**
      * Validates a value using a range comparison
      *
-     * @param     string    $value      Value to be checked
-     * @param     mixed     $options    Int for length, array for range
+     * @param     string $value Value to be checked
+     * @param     mixed $options Int for length, array for range
      * @access    public
      * @return    boolean   true if value is valid
      */
-    function validate($value, $options)
+    public function validate($value, $options)
     {
         $length = strlen($value);
         switch ($this->name) {
-            case 'minlength': return ($length >= $options);
-            case 'maxlength': return ($length <= $options);
-            default:          return ($length >= $options[0] && $length <= $options[1]);
+            case 'minlength':
+                return ($length >= $options);
+            case 'maxlength':
+                return ($length <= $options);
+            default:
+                return ($length >= $options[0] && $length <= $options[1]);
         }
     } // end func validate
 
 
-    function getValidationScript($options = null)
+    public function getValidationScript($options = null)
     {
         switch ($this->name) {
-            case 'minlength': 
-                $test = '{jsVar}.length < '.$options;
+            case 'minlength':
+                $test = '{jsVar}.length < ' . $options;
                 break;
-            case 'maxlength': 
-                $test = '{jsVar}.length > '.$options;
+            case 'maxlength':
+                $test = '{jsVar}.length > ' . $options;
                 break;
-            default: 
-                $test = '({jsVar}.length < '.$options[0].' || {jsVar}.length > '.$options[1].')';
+            default:
+                $test = '({jsVar}.length < ' . $options[0] . ' || {jsVar}.length > ' . $options[1] . ')';
         }
         return array('', "{jsVar} != '' && {$test}");
     } // end func getValidationScript
-
-} // end class HTML_QuickForm_Rule_Range
-?>
+} // end class HTML_QuickForm_Rule_Range;

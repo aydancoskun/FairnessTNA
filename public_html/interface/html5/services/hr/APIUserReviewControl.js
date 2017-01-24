@@ -1,60 +1,59 @@
-var APIUserReviewControl = ServiceCaller.extend( {
+var APIUserReviewControl = ServiceCaller.extend({
 
-	key_name: 'UserReviewControl',
-	className: 'APIUserReviewControl',
+    key_name: 'UserReviewControl',
+    className: 'APIUserReviewControl',
 
-	getCommonUserReviewControlData: function() {
+    getCommonUserReviewControlData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserReviewControlData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserReviewControlData', arguments);
 
-	},
+    },
 
-	getUserReviewControl: function() {
+    getUserReviewControl: function () {
 
-		return this.argumentsHandler( this.className, 'getUserReviewControl', arguments );
+        return this.argumentsHandler(this.className, 'getUserReviewControl', arguments);
 
-	},
+    },
 
-	setUserReviewControl: function() {
+    setUserReviewControl: function () {
 
-		return this.argumentsHandler( this.className, 'setUserReviewControl', arguments );
+        return this.argumentsHandler(this.className, 'setUserReviewControl', arguments);
 
-	},
+    },
 
-	getUserReviewControlDefaultData: function() {
+    getUserReviewControlDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserReviewControlDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserReviewControlDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserReviewControl: function() {
+    deleteUserReviewControl: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserReviewControl', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserReviewControl', arguments);
 
-	},
+    },
 
-	validateUserReviewControl: function() {
+    validateUserReviewControl: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserReviewControl', arguments );
+        return this.argumentsHandler(this.className, 'validateUserReviewControl', arguments);
 
-	},
+    },
 
-	copyUserReviewControl: function() {
+    copyUserReviewControl: function () {
 
-		return this.argumentsHandler( this.className, 'copyUserReviewControl', arguments );
+        return this.argumentsHandler(this.className, 'copyUserReviewControl', arguments);
 
-	},
+    },
 
-	exportUserReviewControl: function() {
-		return this.argumentsHandler( this.className, 'exportUserReviewControl', arguments );
-	},
+    exportUserReviewControl: function () {
+        return this.argumentsHandler(this.className, 'exportUserReviewControl', arguments);
+    },
 
-	generateInvoices: function() {
+    generateInvoices: function () {
 
-		return this.argumentsHandler( this.className, 'generateInvoices', arguments );
+        return this.argumentsHandler(this.className, 'generateInvoices', arguments);
 
-	}
+    }
 
 
-
-} );
+});

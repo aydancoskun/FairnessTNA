@@ -7,13 +7,12 @@
 
 function smarty_function_isvalid($params, &$smarty)
 {
-
     $object = $params['object'];
     $value = $params['value'];
 
 
     $label = $params['label'];
-    if ( strstr($label,",") ) {
+    if (strstr($label, ",")) {
         $labels = explode(",", $label);
     } else {
         $labels = array($label);
@@ -23,19 +22,19 @@ function smarty_function_isvalid($params, &$smarty)
 
     $error_value = $params['error_value'];
     if (empty($error_value)) {
-        $error_value = $value.'_error';
+        $error_value = $value . '_error';
     }
 
     //If even one label is invalid, return the error label.
     foreach ($labels as $label) {
-        if ( is_object( $smarty->_tpl_vars[$object]->Validator )
-            AND $smarty->_tpl_vars[$object]->Validator->isValid($label) == FALSE) {
+        if (is_object($smarty->_tpl_vars[$object]->Validator)
+            and $smarty->_tpl_vars[$object]->Validator->isValid($label) == false
+        ) {
             return $error_value;
         }
     }
 
     return $value;
 }
-/* vim: set expandtab: */
 
-?>
+/* vim: set expandtab: */;

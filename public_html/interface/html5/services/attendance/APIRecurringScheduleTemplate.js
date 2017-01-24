@@ -1,47 +1,47 @@
-var APIRecurringScheduleTemplate = ServiceCaller.extend( {
+var APIRecurringScheduleTemplate = ServiceCaller.extend({
 
-	key_name: 'RecurringScheduleTemplate',
-	className: 'APIRecurringScheduleTemplate',
+    key_name: 'RecurringScheduleTemplate',
+    className: 'APIRecurringScheduleTemplate',
 
-	getRecurringScheduleTemplateDefaultData: function() {
+    getRecurringScheduleTemplateDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getRecurringScheduleTemplateDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getRecurringScheduleTemplateDefaultData', arguments);
 
-	},
+    },
 
-	getRecurringScheduleTemplate: function() {
+    getRecurringScheduleTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getRecurringScheduleTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getRecurringScheduleTemplate', arguments);
 
-	},
+    },
 
-	getCommonRecurringScheduleTemplateData: function() {
+    getCommonRecurringScheduleTemplateData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonRecurringScheduleTemplateData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonRecurringScheduleTemplateData', arguments);
 
-	},
+    },
 
-	validateRecurringScheduleTemplate: function() {
+    validateRecurringScheduleTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'validateRecurringScheduleTemplate', arguments );
+        return this.argumentsHandler(this.className, 'validateRecurringScheduleTemplate', arguments);
 
-	},
+    },
 
-	setRecurringScheduleTemplate: function() {
+    setRecurringScheduleTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'setRecurringScheduleTemplate', arguments );
+        return this.argumentsHandler(this.className, 'setRecurringScheduleTemplate', arguments);
 
-	},
+    },
 
-	deleteRecurringScheduleTemplate: function() {
+    deleteRecurringScheduleTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'deleteRecurringScheduleTemplate', arguments );
+        return this.argumentsHandler(this.className, 'deleteRecurringScheduleTemplate', arguments);
 
-	},
+    },
 
-	copyRecurringScheduleTemplate: function() {
-		return this.argumentsHandler( this.className, 'copyRecurringScheduleTemplate', arguments );
-	}
+    copyRecurringScheduleTemplate: function () {
+        return this.argumentsHandler(this.className, 'copyRecurringScheduleTemplate', arguments);
+    }
 
 
-} );
+});

@@ -1,56 +1,55 @@
-var APIUserDateTotal = ServiceCaller.extend( {
+var APIUserDateTotal = ServiceCaller.extend({
 
-	key_name: 'UserDateTotal',
-	className: 'APIUserDateTotal',
+    key_name: 'UserDateTotal',
+    className: 'APIUserDateTotal',
 
-	getUserDateTotalTotalData: function() {
+    getUserDateTotalTotalData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserDateTotalTotalData', arguments );
+        return this.argumentsHandler(this.className, 'getUserDateTotalTotalData', arguments);
 
-	},
+    },
 
-	getUserDateTotalData: function() {
+    getUserDateTotalData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserDateTotalData', arguments );
+        return this.argumentsHandler(this.className, 'getUserDateTotalData', arguments);
 
-	},
+    },
 
-	getCommonUserDateTotalData: function() {
+    getCommonUserDateTotalData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserDateTotalData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserDateTotalData', arguments);
 
-	},
+    },
 
-	getUserDateTotal: function() {
+    getUserDateTotal: function () {
 
-		return this.argumentsHandler( this.className, 'getUserDateTotal', arguments );
+        return this.argumentsHandler(this.className, 'getUserDateTotal', arguments);
 
-	},
+    },
 
-	setUserDateTotal: function() {
+    setUserDateTotal: function () {
 
-		return this.argumentsHandler( this.className, 'setUserDateTotal', arguments );
+        return this.argumentsHandler(this.className, 'setUserDateTotal', arguments);
 
-	},
+    },
 
-	getUserDateTotalDefaultData: function() {
+    getUserDateTotalDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserDateTotalDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserDateTotalDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserDateTotal: function() {
+    deleteUserDateTotal: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserDateTotal', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserDateTotal', arguments);
 
-	},
+    },
 
-	validateUserDateTotal: function() {
+    validateUserDateTotal: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserDateTotal', arguments );
+        return this.argumentsHandler(this.className, 'validateUserDateTotal', arguments);
 
-	}
+    }
 
 
-
-} );
+});

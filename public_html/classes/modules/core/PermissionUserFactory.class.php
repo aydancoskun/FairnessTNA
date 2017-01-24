@@ -19,150 +19,182 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class PermissionUserFactory extends Factory {
-	protected $table = 'permission_user';
-	protected $pk_sequence_name = 'permission_user_id_seq'; //PK Sequence name
+class PermissionUserFactory extends Factory
+{
+    public $user_obj = null;
+        public $permission_control_obj = null; //PK Sequence name
+    protected $table = 'permission_user';
+protected $pk_sequence_name = 'permission_user_id_seq';
 
-	var $user_obj = NULL;
-	var $permission_control_obj = NULL;
+    public function getPermissionControlObject()
+    {
+        return $this->getGenericObject('PermissionControlListFactory',
+            $this->getPermissionControl(), 'permission_control_obj');
+    }
 
-	function getPermissionControlObject() {
-		return $this->getGenericObject( 'PermissionControlListFactory',
-		$this->getPermissionControl(), 'permission_control_obj' );
-	}
+    public function getPermissionControl()
+    {
+        return (int)$this->data['permission_control_id'];
+    }
 
-	function getUserObject() {
-		return $this->getGenericObject( 'UserListFactory', $this->getUser(), 'user_obj' );
-	}
+    public function setPermissionControl($id)
+    {
+        $id = trim($id);
 
-	function getPermissionControl() {
-		return (int)$this->data['permission_control_id'];
-	}
+        $pclf = TTnew('PermissionControlListFactory');
 
-	function setPermissionControl($id) {
-		$id = trim($id);
+        if ($id != 0
+            or $this->Validator->isResultSetWithRows('permission_control',
+                $pclf->getByID($id),
+                TTi18n::gettext('Permission Group is
+															invalid'))
+        ) {
+            $this->data['permission_control_id'] = $id;
 
-		$pclf = TTnew( 'PermissionControlListFactory' );
+            return true;
+        }
 
-		if ( $id != 0
-				OR $this->Validator->isResultSetWithRows( 'permission_control',
-															$pclf->getByID($id),
-															TTi18n::gettext('Permission Group is
-															invalid') ) ) {
-			$this->data['permission_control_id'] = $id;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setUser($id)
+    {
+        $id = trim($id);
 
-		return FALSE;
-	}
+        $ulf = TTnew('UserListFactory');
 
-	function isUniqueUser($id) {
-		$pclf = TTnew( 'PermissionControlListFactory' );
+        if ($id != 0
+            and $this->Validator->isResultSetWithRows('user',
+                $ulf->getByID($id),
+                TTi18n::gettext('Selected Employee is invalid')
+            )
+            and $this->Validator->isTrue('user',
+                $this->isUniqueUser($id),
+                TTi18n::gettext('Selected Employee is already assigned to another Permission Group')
+            )
+        ) {
+            $this->data['user_id'] = $id;
 
-		$ph = array(
-					'id' => $id
-					);
+            return true;
+        }
 
-		$query = 'select a.id from '. $this->getTable() .' as a, '. $pclf->getTable() .' as b where a.permission_control_id = b.id AND a.user_id = ? AND b.deleted = 0';
-		$user_id = $this->db->GetOne($query, $ph);
-		Debug::Arr($user_id, 'Unique User ID: '. $user_id, __FILE__, __LINE__, __METHOD__, 10);
+        return false;
+    }
 
-		if ( $user_id === FALSE ) {
-			return TRUE;
-		}
+    public function isUniqueUser($id)
+    {
+        $pclf = TTnew('PermissionControlListFactory');
 
-		return FALSE;
-	}
+        $ph = array(
+            'id' => $id
+        );
 
-	function getUser() {
-		return (int)$this->data['user_id'];
-	}
-	function setUser($id) {
-		$id = trim($id);
+        $query = 'select a.id from ' . $this->getTable() . ' as a, ' . $pclf->getTable() . ' as b where a.permission_control_id = b.id AND a.user_id = ? AND b.deleted = 0';
+        $user_id = $this->db->GetOne($query, $ph);
+        Debug::Arr($user_id, 'Unique User ID: ' . $user_id, __FILE__, __LINE__, __METHOD__, 10);
 
-		$ulf = TTnew( 'UserListFactory' );
+        if ($user_id === false) {
+            return true;
+        }
 
-		if ( $id != 0
-				AND $this->Validator->isResultSetWithRows(	'user',
-															$ulf->getByID($id),
-															TTi18n::gettext('Selected Employee is invalid')
-															)
-				AND	$this->Validator->isTrue(		'user',
-													$this->isUniqueUser($id),
-													TTi18n::gettext('Selected Employee is already assigned to another Permission Group')
-													)
-			) {
+        return false;
+    }
 
-			$this->data['user_id'] = $id;
+    public function getDeleted()
+    {
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+    public function getCreatedDate()
+    {
+        return false;
+    }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getCreatedBy()
+    {
+        return false;
+    }
 
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getUpdatedDate()
+    {
+        return false;
+    }
 
-	function addLog( $log_action ) {
-		$u_obj = $this->getUserObject();
-		if ( is_object($u_obj) ) {
-			return TTLog::addEntry( $this->getPermissionControl(), $log_action, TTi18n::getText('Employee').': '. $u_obj->getFullName( FALSE, TRUE ), NULL, $this->getTable() );
-		}
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
+
+    public function addLog($log_action)
+    {
+        $u_obj = $this->getUserObject();
+        if (is_object($u_obj)) {
+            return TTLog::addEntry($this->getPermissionControl(), $log_action, TTi18n::getText('Employee') . ': ' . $u_obj->getFullName(false, true), null, $this->getTable());
+        }
+
+        return false;
+    }
+
+    public function getUserObject()
+    {
+        return $this->getGenericObject('UserListFactory', $this->getUser(), 'user_obj');
+    }
+
+    public function getUser()
+    {
+        return (int)$this->data['user_id'];
+    }
 }
-?>

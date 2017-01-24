@@ -1,49 +1,47 @@
-(function( $ ) {
+(function ($) {
 
-	$.fn.TImage = function( options ) {
+    $.fn.TImage = function (options) {
 
-		Global.addCss( 'global/widgets/filebrowser/TImageBrowser.css' );
-		var opts = $.extend( {}, $.fn.TImage.defaults, options );
+        Global.addCss('global/widgets/filebrowser/TImageBrowser.css');
+        var opts = $.extend({}, $.fn.TImage.defaults, options);
 
-		var $this = this;
-		var field;
+        var $this = this;
+        var field;
 
-		this.clearErrorStyle = function() {
+        this.clearErrorStyle = function () {
 
-		}
+        }
 
-		this.getField = function() {
-			return field;
-		}
+        this.getField = function () {
+            return field;
+        }
 
-		this.getValue = function() {
-			return	null;
-		}
+        this.getValue = function () {
+            return null;
+        }
 
-		this.setValue = function( val ) {
-			if ( !val ) {
-				this.attr( 'src', '' );
-				return;
-			}
-			var d = new Date();
-			this.attr( 'src', val + '&t=' + d.getTime() );
+        this.setValue = function (val) {
+            if (!val) {
+                this.attr('src', '');
+                return;
+            }
+            var d = new Date();
+            this.attr('src', val + '&t=' + d.getTime());
 
-		};
+        };
 
-		this.each( function() {
+        this.each(function () {
 
-			var o = $.meta ? $.extend( {}, opts, $( this ).data() ) : opts;
+            var o = $.meta ? $.extend({}, opts, $(this).data()) : opts;
 
-			field = o.field;
+            field = o.field;
 
-		} );
+        });
 
-		return this;
+        return this;
 
-	};
+    };
 
-	$.fn.TImage.defaults = {
+    $.fn.TImage.defaults = {};
 
-	};
-
-})( jQuery );
+})(jQuery);

@@ -1,43 +1,43 @@
-var APINotification = ServiceCaller.extend( {
+var APINotification = ServiceCaller.extend({
 
-	key_name: 'Notification',
-	className: 'APINotification',
+    key_name: 'Notification',
+    className: 'APINotification',
 
-	getNotificationDefaultData: function() {
+    getNotificationDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getNotificationDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getNotificationDefaultData', arguments);
 
-	},
+    },
 
-	getNotification: function() {
+    getNotification: function () {
 
-		return this.argumentsHandler( this.className, 'getNotifications', arguments );
+        return this.argumentsHandler(this.className, 'getNotifications', arguments);
 
-	},
+    },
 
-	getCommonNotificationData: function() {
+    getCommonNotificationData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonNotificationData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonNotificationData', arguments);
 
-	},
+    },
 
-	validateNotification: function() {
+    validateNotification: function () {
 
-		return this.argumentsHandler( this.className, 'validateNotification', arguments );
+        return this.argumentsHandler(this.className, 'validateNotification', arguments);
 
-	},
+    },
 
-	setNotification: function() {
+    setNotification: function () {
 
-		return this.argumentsHandler( this.className, 'setNotification', arguments );
+        return this.argumentsHandler(this.className, 'setNotification', arguments);
 
-	},
+    },
 
-	deleteNotification: function() {
+    deleteNotification: function () {
 
-		return this.argumentsHandler( this.className, 'deleteNotification', arguments );
+        return this.argumentsHandler(this.className, 'deleteNotification', arguments);
 
-	}
+    }
 
 
-} );
+});

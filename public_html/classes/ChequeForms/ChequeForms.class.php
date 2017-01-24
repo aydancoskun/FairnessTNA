@@ -19,76 +19,80 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package ChequeForms
  */
-class ChequeForms {
-	var $objs = NULL;
+class ChequeForms
+{
+    public $objs = null;
 
-	var $tcpdf_dir = '../tcpdf/'; //TCPDF class directory.
-	var $fpdi_dir = '../fpdi/'; //FPDI class directory.
+    public $tcpdf_dir = '../tcpdf/'; //TCPDF class directory.
+    public $fpdi_dir = '../fpdi/'; //FPDI class directory.
 
-	function __construct() {
-		return TRUE;
-	}
+    public function __construct()
+    {
+        return true;
+    }
 
-	function getFormObject( $form ) {
-		$class_name = 'ChequeForms';
-		$class_name .= '_'.$form;
-		
-        $class_directory = dirname( __FILE__ );
-		$class_file_name = $class_directory . DIRECTORY_SEPARATOR . strtolower($form) .'.class.php';
+    public function getFormObject($form)
+    {
+        $class_name = 'ChequeForms';
+        $class_name .= '_' . $form;
 
-		Debug::text('Class Directory: '. $class_directory, __FILE__, __LINE__, __METHOD__, 10);
-		Debug::text('Class File Name: '. $class_file_name, __FILE__, __LINE__, __METHOD__, 10);
-		Debug::text('Class Name: '. $class_name, __FILE__, __LINE__, __METHOD__, 10);
+        $class_directory = dirname(__FILE__);
+        $class_file_name = $class_directory . DIRECTORY_SEPARATOR . strtolower($form) . '.class.php';
 
-		if ( file_exists( $class_file_name ) ) {
-			include_once( $class_file_name );
+        Debug::text('Class Directory: ' . $class_directory, __FILE__, __LINE__, __METHOD__, 10);
+        Debug::text('Class File Name: ' . $class_file_name, __FILE__, __LINE__, __METHOD__, 10);
+        Debug::text('Class Name: ' . $class_name, __FILE__, __LINE__, __METHOD__, 10);
 
-			$obj = new $class_name;
-			$obj->setClassDirectory( $class_directory );
-			$obj->default_font = TTi18n::getPDFDefaultFont();
+        if (file_exists($class_file_name)) {
+            include_once($class_file_name);
 
-			return $obj;
-		} else {
-			Debug::text('Class File does not exist!', __FILE__, __LINE__, __METHOD__, 10);
-		}
+            $obj = new $class_name;
+            $obj->setClassDirectory($class_directory);
+            $obj->default_font = TTi18n::getPDFDefaultFont();
 
-		return FALSE;
-	}
+            return $obj;
+        } else {
+            Debug::text('Class File does not exist!', __FILE__, __LINE__, __METHOD__, 10);
+        }
 
-	function addForm( $obj ) {
-		if ( is_object( $obj ) ) {
-			$this->objs[] = $obj;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function addForm($obj)
+    {
+        if (is_object($obj)) {
+            $this->objs[] = $obj;
 
-		return FALSE;
-	}
+            return true;
+        }
 
-	function Output( $type ) {
-		$type = strtolower($type);
+        return false;
+    }
 
-		//Initialize PDF object so all subclasses can access it.
-		//Loop through all objects and combine the output from each into a single document.
-		if ( $type == 'pdf' ) {
+    public function Output($type)
+    {
+        $type = strtolower($type);
+
+        //Initialize PDF object so all subclasses can access it.
+        //Loop through all objects and combine the output from each into a single document.
+        if ($type == 'pdf') {
             $pdf = new TTPDF();
-			$pdf->setMargins(0, 0, 0, 0);
-			$pdf->SetAutoPageBreak(FALSE);
-			//$pdf->setFontSubsetting(FALSE);
+            $pdf->setMargins(0, 0, 0, 0);
+            $pdf->SetAutoPageBreak(false);
+            //$pdf->setFontSubsetting(FALSE);
 
-			foreach( (array)$this->objs as $obj ) {
-				$obj->setPDFObject( $pdf );
-				$obj->Output( $type );
-			}
+            foreach ((array)$this->objs as $obj) {
+                $obj->setPDFObject($pdf);
+                $obj->Output($type);
+            }
 
-			return $pdf->Output('', 'S');
-		}
-	}
+            return $pdf->Output('', 'S');
+        }
+    }
 }
-?>

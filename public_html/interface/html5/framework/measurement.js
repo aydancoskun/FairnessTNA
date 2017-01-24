@@ -14,7 +14,7 @@
  * @param {Object} ns
  * @returns {undefined}
  */
-(function(win, ns) {
+(function (win, ns) {
     "use strict";
 
     var UNIT = {
@@ -117,7 +117,7 @@
                 factor: 0.0254
             },
             //added by Josh Aug31, 16
-            'M':{
+            'M': {
                 key: UNIT.Distance.MILE,
                 base: 'm',
                 factor: 1609.344
@@ -171,7 +171,7 @@
             'f': {
                 key: UNIT.Temperature.FAHRENHEIT,
                 base: UNIT.Temperature.CELSIUS,
-                factor: function(value, reverse) {
+                factor: function (value, reverse) {
                     if (reverse) {
                         return value * 1.8 + 32;
                     }
@@ -182,7 +182,7 @@
             'k': {
                 key: UNIT.Temperature.KELVIN,
                 base: UNIT.Temperature.CELSIUS,
-                factor: function(value, reverse) {
+                factor: function (value, reverse) {
                     /**
                      * Really strange rounding error:
                      * (100 - 273.15) gives -173.14999999999998 (tested in Chrome 26.0.1410.63)
@@ -278,7 +278,7 @@
             outputUnit = null,
             self = this;
 
-        this.convert = function(value) {
+        this.convert = function (value) {
 
             if (DEFINITIONS[unitType]) {
                 var inputDef = DEFINITIONS[unitType][inputUnit],
@@ -332,7 +332,7 @@
         };
 
         this.inputUnit = null;
-        this.setInputUnit = function(unit) {
+        this.setInputUnit = function (unit) {
             inputUnit = unit || null;
             this.inputUnit = inputUnit;
 
@@ -340,7 +340,7 @@
         };
 
         this.outputUnit = null;
-        this.setOutputUnit = function(unit) {
+        this.setOutputUnit = function (unit) {
             outputUnit = unit || null;
             this.outputUnit = outputUnit;
 
@@ -355,7 +355,7 @@
          * @param {type} value
          * @returns {MeasurementConverter}
          */
-        var convert = function(value) {
+        var convert = function (value) {
             var valueToConvert = value,
                 converter = new MeasurementConverter(UnitType);
 
@@ -364,7 +364,7 @@
             }
 
             var easyApiConverter = {
-                from: function(inputUnit) {
+                from: function (inputUnit) {
                     converter.setInputUnit(inputUnit);
                     if (readyToConvert()) {
                         return converter.convert(valueToConvert);
@@ -372,7 +372,7 @@
 
                     return this;
                 },
-                to: function(outputUnit) {
+                to: function (outputUnit) {
                     converter.setOutputUnit(outputUnit);
                     if (readyToConvert()) {
                         return converter.convert(valueToConvert);
@@ -403,7 +403,7 @@
 
     // AMD definition - i.e. for require.js
     if (typeof win.define === "function" && win.define.amd) {
-        win.define("measurement", [], function() {
+        win.define("measurement", [], function () {
             return mjs;
         });
     } else if (win.module !== undefined && win.module.exports) {

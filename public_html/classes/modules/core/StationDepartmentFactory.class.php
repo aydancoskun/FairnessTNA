@@ -19,139 +19,172 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class StationDepartmentFactory extends Factory {
-	protected $table = 'station_department';
-	protected $pk_sequence_name = 'station_department_id_seq'; //PK Sequence name
+class StationDepartmentFactory extends Factory
+{
+    public $department_obj = null;
+        protected $table = 'station_department'; //PK Sequence name
+protected $pk_sequence_name = 'station_department_id_seq';
 
-	var $department_obj = NULL;
+    public function setStation($id)
+    {
+        $id = trim($id);
 
-	function getStation() {
-		if ( isset($this->data['station_id']) ) {
-			return (int)$this->data['station_id'];
-		}
-	}
-	function setStation($id) {
-		$id = trim($id);
+        if ($id == 0
+            or
+            $this->Validator->isNumeric('station',
+                $id,
+                TTi18n::gettext('Selected Station is invalid')
+            /*
+                            $this->Validator->isResultSetWithRows(	'station',
+                                                                $slf->getByID($id),
+                                                                TTi18n::gettext('Selected Station is invalid')
+            */
+            )
+        ) {
+            $this->data['station_id'] = $id;
 
-		if (	$id == 0
-				OR
-				$this->Validator->isNumeric(	'station',
-													$id,
-													TTi18n::gettext('Selected Station is invalid')
-/*
-				$this->Validator->isResultSetWithRows(	'station',
-													$slf->getByID($id),
-													TTi18n::gettext('Selected Station is invalid')
-*/
-															)
-			) {
+            return true;
+        }
 
-			$this->data['station_id'] = $id;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setDepartment($id)
+    {
+        $id = trim($id);
 
-		return FALSE;
-	}
+        $dlf = TTnew('DepartmentListFactory');
 
-	function getDepartmentObject() {
-		if ( is_object($this->department_obj) ) {
-			return $this->department_obj;
-		} else {
-			$dlf = TTnew( 'DepartmentListFactory' );
-			$dlf->getById( $this->getDepartment() );
-			if ( $dlf->getRecordCount() == 1 ) {
-				$this->department_obj = $dlf->getCurrent();
-				return $this->department_obj;
-			}
+        if ($this->Validator->isResultSetWithRows('department',
+            $dlf->getByID($id),
+            TTi18n::gettext('Selected Department is invalid')
+        )
+        ) {
+            $this->data['department_id'] = $id;
 
-			return FALSE;
-		}
-	}
-	function getDepartment() {
-		if ( isset($this->data['department_id']) ) {
-			return (int)$this->data['department_id'];
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setDepartment($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		$dlf = TTnew( 'DepartmentListFactory' );
+    public function getDeleted()
+    {
+        return false;
+    }
 
-		if ( $this->Validator->isResultSetWithRows(	'department',
-													$dlf->getByID($id),
-													TTi18n::gettext('Selected Department is invalid')
-													) ) {
-			$this->data['department_id'] = $id;
+    public function setDeleted($bool)
+    {
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function getCreatedDate()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getCreatedBy()
+    {
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getUpdatedDate()
+    {
+        return false;
+    }
 
-	function addLog( $log_action ) {
-		$d_obj = $this->getDepartmentObject();
-		if ( is_object($d_obj) ) {
-			return TTLog::addEntry( $this->getStation(), $log_action, TTi18n::getText('Department').': '. $d_obj->getName(), NULL, $this->getTable() );
-		}
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
+
+    public function addLog($log_action)
+    {
+        $d_obj = $this->getDepartmentObject();
+        if (is_object($d_obj)) {
+            return TTLog::addEntry($this->getStation(), $log_action, TTi18n::getText('Department') . ': ' . $d_obj->getName(), null, $this->getTable());
+        }
+
+        return false;
+    }
+
+    public function getDepartmentObject()
+    {
+        if (is_object($this->department_obj)) {
+            return $this->department_obj;
+        } else {
+            $dlf = TTnew('DepartmentListFactory');
+            $dlf->getById($this->getDepartment());
+            if ($dlf->getRecordCount() == 1) {
+                $this->department_obj = $dlf->getCurrent();
+                return $this->department_obj;
+            }
+
+            return false;
+        }
+    }
+
+    public function getDepartment()
+    {
+        if (isset($this->data['department_id'])) {
+            return (int)$this->data['department_id'];
+        }
+
+        return false;
+    }
+
+    public function getStation()
+    {
+        if (isset($this->data['station_id'])) {
+            return (int)$this->data['station_id'];
+        }
+    }
 }
-?>

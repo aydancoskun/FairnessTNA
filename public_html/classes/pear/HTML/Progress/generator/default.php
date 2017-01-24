@@ -40,13 +40,12 @@
  * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  */
-
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {
-    function _renderForm(&$page)
+    public function _renderForm(&$page)
     {
         $pageName = $page->getAttribute('name');
-        $tabPreview = array_slice ($page->controller->_tabs, -2, 1);
+        $tabPreview = array_slice($page->controller->_tabs, -2, 1);
 
         $header = '
 <style type="text/css">
@@ -107,19 +106,19 @@ input.flat {
 </script>
 ';
             $placeHolders = array('{%style%}', '{%javascript%}');
-            $htmlElement = array( $bar->getStyle(), $bar->getScript() );
+            $htmlElement = array($bar->getStyle(), $bar->getScript());
 
             $header = str_replace($placeHolders, $htmlElement, $header);
 
             $barElement = $page->getElement('progressBar');
-            $barElement->setText( $bar->toHtml() );
+            $barElement->setText($bar->toHtml());
         } else {
             $header = str_replace('{%style%}', '', $header);
         }
 
         $renderer = $page->defaultRenderer();
 
-        $renderer->setFormTemplate($header.'<table class="maintable"><form{attributes}>{content}</form></table>');
+        $renderer->setFormTemplate($header . '<table class="maintable"><form{attributes}>{content}</form></table>');
         $renderer->setHeaderTemplate('<tr><th colspan="2">{header}</th></tr>');
         $renderer->setGroupTemplate('<table><tr>{content}</tr></table>', 'name');
         $renderer->setGroupElementTemplate('<td>{element}<br /><span class="qfLabel">{label}</span></td>', 'name');
@@ -129,4 +128,3 @@ input.flat {
         echo $renderer->toHtml();
     }
 }
-?>

@@ -6,14 +6,13 @@ $gf = new GovernmentForms();
 $gf->tcpdf_dir = '../tcpdf';
 $gf->fpdi_dir = '../fpdi';
 
-$grid_obj = $gf->getFormObject( 'grid' );
-$grid_obj->setDebug(FALSE);
-$grid_obj->setShowBackground(TRUE);
+$grid_obj = $gf->getFormObject('grid');
+$grid_obj->setDebug(false);
+$grid_obj->setShowBackground(true);
 $grid_obj->setTemplate('../country/ca/templates/t4a-sum-11b.pdf');
 $grid_obj->setTemplatePages(2);
 
-$gf->addForm( $grid_obj );
+$gf->addForm($grid_obj);
 
-$output = $gf->output( 'PDF' );
-file_put_contents( 'grid.pdf', $output );
-?>
+$output = $gf->output('PDF');
+file_put_contents('grid.pdf', $output);

@@ -61,7 +61,8 @@ $GLOBALS['_Payment_Process_Transfirst'] = array(
  * @author Ian Eure <ieure@php.net>
  * @version @version@
  */
-class Payment_Process_Transfirst extends Payment_Process_Common {
+class Payment_Process_Transfirst extends Payment_Process_Common
+{
     /**
      * Front-end -> back-end field map.
      *
@@ -71,26 +72,26 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      * @see _prepare()
      * @access private
      */
-    var $_fieldMap = array(
+    public $_fieldMap = array(
         // Required
-        'login'             => "DPIAccountNum",
-        'password'          => "password",
-        'action'            => "transactionCode",
-        'invoiceNumber'     => "orderNum",
-        'customerId'        => "customerNum",
-        'amount'            => "transactionAmount",
+        'login' => "DPIAccountNum",
+        'password' => "password",
+        'action' => "transactionCode",
+        'invoiceNumber' => "orderNum",
+        'customerId' => "customerNum",
+        'amount' => "transactionAmount",
         'transactionSource' => "ECommerce",
         // Credit Card Type
-        'cardNumber'        => "cardAccountNum",
-        'expDate'           => "expirationDate",
-        'zip'               => "cardHolderZip",
+        'cardNumber' => "cardAccountNum",
+        'expDate' => "expirationDate",
+        'zip' => "cardHolderZip",
         // Common Type
 //         'name'              => "cardHolderName",
-        'address'           => "cardHolderAddress",
-        'city'              => "cardHolderCity",
-        'state'             => "cardHolderState",
-        'phone'             => "cardHolderPhone",
-        'email'             => "cardHolderEmail"
+        'address' => "cardHolderAddress",
+        'city' => "cardHolderCity",
+        'state' => "cardHolderState",
+        'phone' => "cardHolderPhone",
+        'email' => "cardHolderEmail"
     );
 
     /**
@@ -99,7 +100,7 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      * @see Payment_Process::setOptions()
      * @access private
      */
-    var $_defaultOptions = array(
+    public $_defaultOptions = array(
         'authorizeUri' => "https://epaysecure.transfirst.com/eLink/authpd.asp"
     );
 
@@ -109,47 +110,32 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      * @type boolean
      * @access private
      */
-    var $_processed = false;
+    public $_processed = false;
 
     /**
      * The response body sent back from the gateway.
      *
      * @access private
      */
-    var $_responseBody = '';
+    public $_responseBody = '';
 
-    /**
-     * Constructor.
-     *
-     * @param  array  $options  Class options to set.
-     * @see Payment_Process::setOptions()
-     * @return void
-     */
-    function __construct($options = false)
-    {
-        parent::__construct($options);
-        $this->_driver = 'Transfirst';
-        $this->_makeRequired('login', 'password', 'action', 'invoiceNumber', 'customerId', 'amount', 'cardNumber', 'expDate');
-    }
-
-    function Payment_Process_Transfirst($options = false)
+    public function Payment_Process_Transfirst($options = false)
     {
         $this->__construct($options);
     }
 
     /**
-     * Prepare the data.
+     * Constructor.
      *
-     * This function handles the 'testTransaction' option, which is specific to
-     * this processor.
+     * @param  array $options Class options to set.
+     * @see Payment_Process::setOptions()
+     * @return void
      */
-    function _prepare()
+    public function __construct($options = false)
     {
-        if ($this->_options['testTransaction']) {
-            $this->_data['testTransaction'] = $this->_options['testTransaction'];
-        }
-        $this->_handleCardHolderName();
-        return parent::_prepare();
+        parent::__construct($options);
+        $this->_driver = 'Transfirst';
+        $this->_makeRequired('login', 'password', 'action', 'invoiceNumber', 'customerId', 'amount', 'cardNumber', 'expDate');
     }
 
     /**
@@ -157,11 +143,11 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      *
      * @return mixed Payment_Process_Result on success, PEAR_Error on failure
      */
-    function &process()
+    public function &process()
     {
         // Sanity check
-        if(PEAR::isError($res = $this->validate())) {
-            return($res);
+        if (PEAR::isError($res = $this->validate())) {
+            return ($res);
         }
 
         // Prepare the data
@@ -208,33 +194,31 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
     }
 
     /**
-     * Get (completed) transaction status.
+     * Prepare the data.
      *
-     * @return string Two-digit status returned from gateway.
+     * This function handles the 'testTransaction' option, which is specific to
+     * this processor.
      */
-    function getStatus()
+    public function _prepare()
     {
-        if (!$this->_processed) {
-            return PEAR::raiseError('The transaction has not been processed yet.', PAYMENT_PROCESS_ERROR_INCOMPLETE);
+        if ($this->_options['testTransaction']) {
+            $this->_data['testTransaction'] = $this->_options['testTransaction'];
         }
-        return $this->_result->code;
+        $this->_handleCardHolderName();
+        return parent::_prepare();
     }
 
     /**
-     * Get transaction sequence.
+     * Map firstName & lastName
      *
-     * 'Sequence' is what Transfirst calls their transaction ID/approval code. This
-     * function returns that code from a processed transaction.
+     * P_P now has split firstName/lastName fields, instead of 'name.' This
+     * handles concatenating them into the Transfirst cardHolderName field.
      *
-     * @return mixed  Sequence ID, or PEAR_Error if the transaction hasn't been
-     *                processed.
+     * @return  void
      */
-    function getSequence()
+    public function _handleCardHolderName()
     {
-        if (!$this->_processed) {
-            return PEAR::raiseError('The transaction has not been processed yet.', PAYMENT_PROCESS_ERROR_INCOMPLETE);
-        }
-        return $this->_result->_sequenceNumber;
+        $this->_data['cardHolderName'] = $this->firstName . ' ' . $this->lastName;
     }
 
     /**
@@ -243,13 +227,27 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      * @access private
      * @return string The query string
      */
-    function _prepareQueryString()
+    public function _prepareQueryString()
     {
-        foreach($this->_data as $var => $value) {
-            if (strlen($value))
-                $tmp[] = urlencode($var).'='.urlencode($value);
+        foreach ($this->_data as $var => $value) {
+            if (strlen($value)) {
+                $tmp[] = urlencode($var) . '=' . urlencode($value);
+            }
         }
         return @implode('&', $tmp);
+    }
+
+    /**
+     * Get (completed) transaction status.
+     *
+     * @return string Two-digit status returned from gateway.
+     */
+    public function getStatus()
+    {
+        if (!$this->_processed) {
+            return PEAR::raiseError('The transaction has not been processed yet.', PAYMENT_PROCESS_ERROR_INCOMPLETE);
+        }
+        return $this->_result->code;
     }
 
     /*
@@ -262,11 +260,28 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
     */
 
     /**
+     * Get transaction sequence.
+     *
+     * 'Sequence' is what Transfirst calls their transaction ID/approval code. This
+     * function returns that code from a processed transaction.
+     *
+     * @return mixed  Sequence ID, or PEAR_Error if the transaction hasn't been
+     *                processed.
+     */
+    public function getSequence()
+    {
+        if (!$this->_processed) {
+            return PEAR::raiseError('The transaction has not been processed yet.', PAYMENT_PROCESS_ERROR_INCOMPLETE);
+        }
+        return $this->_result->_sequenceNumber;
+    }
+
+    /**
      * Handle transaction source.
      *
      * @access private
      */
-    function _handleTransactionSource()
+    public function _handleTransactionSource()
     {
         $specific = $this->_fieldMap['transactionSource'];
         if ($this->transactionSource == PAYMENT_PROCESS_SOURCE_ONLINE) {
@@ -283,7 +298,7 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      *
      * @access private
      */
-    function _handleExpDate()
+    public function _handleExpDate()
     {
         $specific = $this->_fieldMap['expDate'];
         if (isset($this->_data[$specific])) {
@@ -294,19 +309,6 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
     }
 
     /**
-     * Map firstName & lastName
-     *
-     * P_P now has split firstName/lastName fields, instead of 'name.' This
-     * handles concatenating them into the Transfirst cardHolderName field.
-     *
-     * @return  void
-     */
-    function _handleCardHolderName()
-    {
-        $this->_data['cardHolderName'] = $this->firstName . ' ' . $this->lastName;
-    }
-
-    /**
      * Validate the merchant account login.
      *
      * The Transfirst docs specify that the login is exactly eight digits.
@@ -314,7 +316,7 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      * @access private
      * @return boolean true if valid, false otherwise
      */
-    function _validateLogin()
+    public function _validateLogin()
     {
         return Validate::string($this->login, array(
             'format' => VALIDATE_NUM,
@@ -332,7 +334,7 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      * @access private
      * @return boolean true if valid, false otherwise
      */
-    function _validatePassword()
+    public function _validatePassword()
     {
         return Validate::string($this->password, array(
             'format' => VALIDATE_ALPHA . VALIDATE_NUM,
@@ -348,7 +350,7 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      *
      * @return boolean true on success, false otherwise
      */
-    function _validateInvoiceNumber()
+    public function _validateInvoiceNumber()
     {
         return Validate::string($this->invoiceNumber, array(
             'format' => VALIDATE_NUM . VALIDATE_ALPHA,
@@ -364,7 +366,7 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      *
      * @return boolean true on success, false otherwise
      */
-    function _validateCustomerId()
+    public function _validateCustomerId()
     {
         return Validate::string($this->customerId, array(
             'format' => VALIDATE_NUM . VALIDATE_ALPHA,
@@ -380,16 +382,17 @@ class Payment_Process_Transfirst extends Payment_Process_Common {
      *
      * @return boolean true on success, false otherwise.
      */
-    function _validateZip()
+    public function _validateZip()
     {
-        if(strlen($this->zip) || $this->performAvs) {
+        if (strlen($this->zip) || $this->performAvs) {
             return parent::_validateZip();
         }
         return true;
     }
 }
 
-class Payment_Process_Result_Transfirst extends Payment_Process_Result {
+class Payment_Process_Result_Transfirst extends Payment_Process_Result
+{
 
     /**
      * Transfirst status codes.
@@ -401,7 +404,7 @@ class Payment_Process_Result_Transfirst extends Payment_Process_Result {
      * @see getStatusText()
      * @access private
      */
-    var $_statusCodeMessages = array(
+    public $_statusCodeMessages = array(
         '00' => "Approved",
         '01' => "Refer to issuer",
         '02' => "Refer to issuer - Special condition",
@@ -453,7 +456,7 @@ class Payment_Process_Result_Transfirst extends Payment_Process_Result {
         'V9' => "Already posted"
     );
 
-    var $_avsCodeMap = array(
+    public $_avsCodeMap = array(
         'A' => "Address match",
         'E' => "Ineligible",
         'N' => "No match",
@@ -476,13 +479,13 @@ class Payment_Process_Result_Transfirst extends Payment_Process_Result {
      * @type array
      * @access private
      */
-    var $_statusCodeMap = array(
+    public $_statusCodeMap = array(
         '00' => PAYMENT_PROCESS_RESULT_APPROVED,
         '05' => PAYMENT_PROCESS_RESULT_DECLINED,
         'V7' => PAYMENT_PROCESS_RESULT_DECLINED
     );
 
-    var $_aciCodes = array(
+    public $_aciCodes = array(
         'A' => "CPS Qualified",
         'E' => "CPS Qualified  -  Card Acceptor Data was submitted in the authorization  request.",
         'M' => "Reserved - The card was not present and no AVS request for International transactions",
@@ -490,7 +493,7 @@ class Payment_Process_Result_Transfirst extends Payment_Process_Result {
         'V' => "CPS Qualified ? Included an address verification request in the authorization request."
     );
 
-    var $_authSourceCodes = array(
+    public $_authSourceCodes = array(
         ' ' => "Terminal doesn't support",
         '0' => "Exception File",
         '1' => "Stand in Processing, time-out response",
@@ -501,17 +504,17 @@ class Payment_Process_Result_Transfirst extends Payment_Process_Result {
         '9' => "Automated referral service (ARS) stand-in"
     );
 
-    var $_fieldMap = array(
-        0  => '_null',                    // TF Internal Message Format
-        1  => '_acctNo',                  // TF Account number
-        2  => '_transactionCode',         // The transaction code from the request message passed by the original request.
-        3  => 'transactionId',            // Assigned by TF used to uniquely identify transaction.
-        4  => '_mailOrder',               // Mail Order Identifier
-        5  => '_ccAcctNo',                // The credit card account number passed by the original request.
-        6  => '_ccExpDate',               // The Expiration Date passed by the original request. The field is formatted YYMM (Year, Month)
-        7  => '_authAmount',              // An eight-digit value, which denotes the dollar amount passed to TF, without a decimal. ( DDDDDDCC )
-        8  => '_authDate',                // A six-digit value, which denotes the date the authorization, was attempted.  The field is formatted YYMMDD. (Year, Month, Date)
-        9  => '_authTime',                // A six-digit value, which denotes the time the authorization, was attempted.  The field is formatted HHMMSS.  (Hour, Minute, Second)
+    public $_fieldMap = array(
+        0 => '_null',                    // TF Internal Message Format
+        1 => '_acctNo',                  // TF Account number
+        2 => '_transactionCode',         // The transaction code from the request message passed by the original request.
+        3 => 'transactionId',            // Assigned by TF used to uniquely identify transaction.
+        4 => '_mailOrder',               // Mail Order Identifier
+        5 => '_ccAcctNo',                // The credit card account number passed by the original request.
+        6 => '_ccExpDate',               // The Expiration Date passed by the original request. The field is formatted YYMM (Year, Month)
+        7 => '_authAmount',              // An eight-digit value, which denotes the dollar amount passed to TF, without a decimal. ( DDDDDDCC )
+        8 => '_authDate',                // A six-digit value, which denotes the date the authorization, was attempted.  The field is formatted YYMMDD. (Year, Month, Date)
+        9 => '_authTime',                // A six-digit value, which denotes the time the authorization, was attempted.  The field is formatted HHMMSS.  (Hour, Minute, Second)
         10 => 'messageCode',              // A two-digit value, which indicates the result of the authorization request.  Used to determine if the card was authorized, declined or timed out.
         11 => 'customerId',               // The Customer Number passed by the original request
         12 => 'invoiceNumber',            // The Order Number passed by the original request.
@@ -531,10 +534,10 @@ class Payment_Process_Result_Transfirst extends Payment_Process_Result {
     /**
      * Constructor.
      *
-     * @param  string  $rawResponse  The raw response from the gateway
+     * @param  string $rawResponse The raw response from the gateway
      * @return mixed boolean true on success, PEAR_Error on failure
      */
-    function Payment_Process_Result_Transfirst($rawResponse)
+    public function Payment_Process_Result_Transfirst($rawResponse)
     {
         $res = $this->_validateResponse($rawResponse);
         if (!$res || PEAR::isError($res)) {
@@ -548,19 +551,20 @@ class Payment_Process_Result_Transfirst extends Payment_Process_Result {
         $res = $this->_parseResponse();
     }
 
-    function getAuthSource()
+    /**
+     * Validate a R1 response.
+     *
+     * @return boolean
+     */
+    public function _validateResponse($resp)
     {
-        return @$this->_authSourceCodes[$this->_authSource];
-    }
+        if (strlen($resp) > 160) {
+            return false;
+        }
 
-    function getAuthCharacteristic()
-    {
-        return @$this->_aciCodes[$this->_authChar];
-    }
+        // FIXME - add more tests
 
-    function getCode()
-    {
-        return $this->_statusCodeMap[$this->messageCode];
+        return true;
     }
 
     /**
@@ -571,25 +575,23 @@ class Payment_Process_Result_Transfirst extends Payment_Process_Result {
      *
      * @return void
      */
-    function _parseResponse()
+    public function _parseResponse()
     {
         $this->_mapFields(explode('|', $this->_rawResponse));
     }
 
-    /**
-     * Validate a R1 response.
-     *
-     * @return boolean
-     */
-    function _validateResponse($resp)
+    public function getAuthSource()
     {
-        if (strlen($resp) > 160)
-            return false;
+        return @$this->_authSourceCodes[$this->_authSource];
+    }
 
-        // FIXME - add more tests
+    public function getAuthCharacteristic()
+    {
+        return @$this->_aciCodes[$this->_authChar];
+    }
 
-        return true;
+    public function getCode()
+    {
+        return $this->_statusCodeMap[$this->messageCode];
     }
 }
-
-?>

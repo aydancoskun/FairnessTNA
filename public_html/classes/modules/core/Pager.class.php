@@ -19,142 +19,153 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class Pager {
-	protected $rs = NULL;
-	protected $count_rows = TRUE; //Specify if we count the total rows or not.
+class Pager
+{
+    protected $rs = null;
+    protected $count_rows = true; //Specify if we count the total rows or not.
 
-	function __construct($arr) {
-		if ( isset($arr->rs) ) {
-			//If there is no RS to return, something is seriously wrong. Check interface.inc.php?
-			//Make sure the ListFactory function is doing a pageselect
-			$this->rs = $arr->rs;
+    public function __construct($arr)
+    {
+        if (isset($arr->rs)) {
+            //If there is no RS to return, something is seriously wrong. Check interface.inc.php?
+            //Make sure the ListFactory function is doing a pageselect
+            $this->rs = $arr->rs;
 
-			$this->count_rows = $arr->db->pageExecuteCountRows;
+            $this->count_rows = $arr->db->pageExecuteCountRows;
 
-			return TRUE;
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getPreviousPage() {
-		if ( is_object($this->rs) ) {
-			return (int)( $this->rs->absolutepage() - 1 );
-		}
+    public function getPageVariables()
+    {
+        //Make sure the ListFactory function is doing a pageselect
+        $paging_data = array(
+            'previous_page' => $this->getPreviousPage(),
+            'current_page' => $this->getCurrentPage(),
+            'next_page' => $this->getNextPage(),
+            'is_first_page' => $this->isFirstPage(),
+            'is_last_page' => $this->isLastPage(),
+            'last_page_number' => $this->LastPageNumber(),
+            'rows_per_page' => $this->getRowsPerPage(),
+            'total_rows' => $this->getTotalRows(),
+        );
+        //Debug::Arr($paging_data, ' Paging Data: Count Rows: '. (int)$this->count_rows, __FILE__, __LINE__, __METHOD__, 10);
+        return $paging_data;
+    }
 
-		return FALSE;
-	}
+    public function getPreviousPage()
+    {
+        if (is_object($this->rs)) {
+            return (int)($this->rs->absolutepage() - 1);
+        }
 
-	function getCurrentPage() {
-		if ( is_object($this->rs) ) {
-			return (int)$this->rs->absolutepage();
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getCurrentPage()
+    {
+        if (is_object($this->rs)) {
+            return (int)$this->rs->absolutepage();
+        }
 
-	function getNextPage() {
-		if ( is_object($this->rs) ) {
-			return (int)( $this->rs->absolutepage() + 1 );
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getNextPage()
+    {
+        if (is_object($this->rs)) {
+            return (int)($this->rs->absolutepage() + 1);
+        }
 
-	function isFirstPage() {
-		if ( is_object($this->rs) ) {
-			return (bool)$this->rs->atfirstpage();
-		}
+        return false;
+    }
 
-		return TRUE;
-	}
+    public function isFirstPage()
+    {
+        if (is_object($this->rs)) {
+            return (bool)$this->rs->atfirstpage();
+        }
 
-	function isLastPage() {
-		//If the first page is also the last, return true.
-		if ( $this->isFirstPage() AND $this->LastPageNumber() == 1) {
-			return TRUE;
-		}
+        return true;
+    }
 
-		if ( is_object($this->rs) ) {
-			return (bool)$this->rs->atlastpage();
-		}
+    public function isLastPage()
+    {
+        //If the first page is also the last, return true.
+        if ($this->isFirstPage() and $this->LastPageNumber() == 1) {
+            return true;
+        }
 
-		return TRUE;
-	}
+        if (is_object($this->rs)) {
+            return (bool)$this->rs->atlastpage();
+        }
 
-	function LastPageNumber() {
-		if ( is_object($this->rs) ) {
-			if ( $this->count_rows === FALSE ) {
-				if ( $this->getCurrentPage() < 0 ) {
-					//Only one page in result set.
-					return (int)$this->rs->lastpageno();
-				} else {
-					//More than one page in result set.
-					if ( $this->rs->atlastpage() == TRUE ) {
-						return (int)$this->getCurrentPage();
-					} else {
-						//Since we don't know what the actual last page is, just add 100 pages to the current one.
-						//The user may need to click this several times if there are more than 100 pages.
-						return (int)( $this->getCurrentPage() + 99 );
-					}
-				}
-			} else {
-				return (int)$this->rs->lastpageno();
-			}
-		}
+        return true;
+    }
 
-		return FALSE;
-	}
+    //Return maximum rows per page
 
-	//Return maximum rows per page
-	function getRowsPerPage() {
-		if ( is_object($this->rs) ) {
-			if ( isset($this->rs->rowsPerPage) ) {
-				return (int)$this->rs->rowsPerPage;
-			} else {
-				return (int)$this->rs->recordcount();
-			}
-		}
+    public function LastPageNumber()
+    {
+        if (is_object($this->rs)) {
+            if ($this->count_rows === false) {
+                if ($this->getCurrentPage() < 0) {
+                    //Only one page in result set.
+                    return (int)$this->rs->lastpageno();
+                } else {
+                    //More than one page in result set.
+                    if ($this->rs->atlastpage() == true) {
+                        return (int)$this->getCurrentPage();
+                    } else {
+                        //Since we don't know what the actual last page is, just add 100 pages to the current one.
+                        //The user may need to click this several times if there are more than 100 pages.
+                        return (int)($this->getCurrentPage() + 99);
+                    }
+                }
+            } else {
+                return (int)$this->rs->lastpageno();
+            }
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getTotalRows() {
-		if ( is_object($this->rs) ) {
-			if ( $this->count_rows === FALSE ) {
-				if ( $this->isLastPage() === TRUE ) {
-					return (int)( ( $this->getPreviousPage() * $this->getRowsPerPage() ) + $this->rs->recordcount() );
-				} else {
-					return FALSE;
-				}
-			} else {
-				return (int)$this->rs->maxrecordcount();
-			}
-		}
+    public function getRowsPerPage()
+    {
+        if (is_object($this->rs)) {
+            if (isset($this->rs->rowsPerPage)) {
+                return (int)$this->rs->rowsPerPage;
+            } else {
+                return (int)$this->rs->recordcount();
+            }
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getPageVariables() {
-		//Make sure the ListFactory function is doing a pageselect
-		$paging_data = array(
-							'previous_page'		=> $this->getPreviousPage(),
-							'current_page'		=> $this->getCurrentPage(),
-							'next_page'			=> $this->getNextPage(),
-							'is_first_page'		=> $this->isFirstPage(),
-							'is_last_page'		=> $this->isLastPage(),
-							'last_page_number'	=> $this->LastPageNumber(),
-							'rows_per_page'		=> $this->getRowsPerPage(),
-							'total_rows'		=> $this->getTotalRows(),
-							);
-		//Debug::Arr($paging_data, ' Paging Data: Count Rows: '. (int)$this->count_rows, __FILE__, __LINE__, __METHOD__, 10);
-		return $paging_data;
-	}
+    public function getTotalRows()
+    {
+        if (is_object($this->rs)) {
+            if ($this->count_rows === false) {
+                if ($this->isLastPage() === true) {
+                    return (int)(($this->getPreviousPage() * $this->getRowsPerPage()) + $this->rs->recordcount());
+                } else {
+                    return false;
+                }
+            } else {
+                return (int)$this->rs->maxrecordcount();
+            }
+        }
+
+        return false;
+    }
 }
-?>

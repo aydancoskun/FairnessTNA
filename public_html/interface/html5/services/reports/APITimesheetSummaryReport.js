@@ -1,56 +1,55 @@
-var APITimesheetSummaryReport = ServiceCaller.extend( {
+var APITimesheetSummaryReport = ServiceCaller.extend({
 
-	key_name: 'TimesheetSummaryReport',
-	className: 'APITimesheetSummaryReport',
+    key_name: 'TimesheetSummaryReport',
+    className: 'APITimesheetSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonTimesheetSummaryReportData: function() {
+    getCommonTimesheetSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonTimesheetSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonTimesheetSummaryReportData', arguments);
 
-	},
+    },
 
-	getTimesheetSummaryReport: function() {
+    getTimesheetSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getTimesheetSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getTimesheetSummaryReport', arguments);
 
-	},
+    },
 
-	setTimesheetSummaryReport: function() {
+    setTimesheetSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setTimesheetSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setTimesheetSummaryReport', arguments);
 
-	},
+    },
 
-	getTimesheetSummaryReportDefaultData: function() {
+    getTimesheetSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getTimesheetSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getTimesheetSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteTimesheetSummaryReport: function() {
+    deleteTimesheetSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteTimesheetSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteTimesheetSummaryReport', arguments);
 
-	},
+    },
 
-	validateTimesheetSummaryReport: function() {
+    validateTimesheetSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateTimesheetSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validateTimesheetSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

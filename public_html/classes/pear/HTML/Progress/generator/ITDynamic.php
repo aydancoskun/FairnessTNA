@@ -47,13 +47,12 @@ require_once 'HTML/Template/ITX.php';
  * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  */
-
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {
-    function _renderForm(&$page)
+    public function _renderForm(&$page)
     {
         $pageName = $page->getAttribute('name');
-        $tabPreview = array_slice ($page->controller->_tabs, -2, 1);
+        $tabPreview = array_slice($page->controller->_tabs, -2, 1);
 
         // can use either HTML_Template_Sigma or HTML_Template_ITX
         $tpl = new HTML_Template_ITX('./templates');
@@ -66,18 +65,18 @@ class ActionDisplay extends HTML_QuickForm_Action_Display
             $bar = $page->controller->createProgressBar();
 
             $tpl->setVariable(array(
-                'qf_style'  => $bar->getStyle(),
-                'qf_script' => $bar->getScript()
+                    'qf_style' => $bar->getStyle(),
+                    'qf_script' => $bar->getScript()
                 )
             );
 
             $barElement = $page->getElement('progressBar');
-            $barElement->setText( $bar->toHtml() );
+            $barElement->setText($bar->toHtml());
         }
 
         $renderer = new HTML_QuickForm_Renderer_ITDynamic($tpl);
         $renderer->setElementBlock(array(
-            'buttons'     => 'qf_buttons'
+            'buttons' => 'qf_buttons'
         ));
 
         $page->accept($renderer);
@@ -85,4 +84,3 @@ class ActionDisplay extends HTML_QuickForm_Action_Display
         $tpl->show();
     }
 }
-?>

@@ -21,9 +21,9 @@
 require_once('HTML/QuickForm/Rule.php');
 
 /**
-* Validates values using regular expressions
-* @version     1.0
-*/
+ * Validates values using regular expressions
+ * @version     1.0
+ */
 class HTML_QuickForm_Rule_Regex extends HTML_QuickForm_Rule
 {
     /**
@@ -35,23 +35,23 @@ class HTML_QuickForm_Rule_Regex extends HTML_QuickForm_Rule
      * @var     array
      * @access  private
      */
-    var $_data = array(
-                    'lettersonly'   => '/^[a-zA-Z]+$/',
-                    'alphanumeric'  => '/^[a-zA-Z0-9]+$/',
-                    'numeric'       => '/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/',
-                    'nopunctuation' => '/^[^().\/\*\^\?#!@$%+=,\"\'><~\[\]{}]+$/',
-                    'nonzero'       => '/^-?[1-9][0-9]*/'
-                    );
+    public $_data = array(
+        'lettersonly' => '/^[a-zA-Z]+$/',
+        'alphanumeric' => '/^[a-zA-Z0-9]+$/',
+        'numeric' => '/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/',
+        'nopunctuation' => '/^[^().\/\*\^\?#!@$%+=,\"\'><~\[\]{}]+$/',
+        'nonzero' => '/^-?[1-9][0-9]*/'
+    );
 
     /**
      * Validates a value using a regular expression
      *
-     * @param     string    $value      Value to be checked
-     * @param     string    $regex      Regular expression
+     * @param     string $value Value to be checked
+     * @param     string $regex Regular expression
      * @access    public
      * @return    boolean   true if value is valid
      */
-    function validate($value, $regex = null)
+    public function validate($value, $regex = null)
     {
         if (isset($this->_data[$this->name])) {
             if (!preg_match($this->_data[$this->name], $value)) {
@@ -68,22 +68,20 @@ class HTML_QuickForm_Rule_Regex extends HTML_QuickForm_Rule
     /**
      * Adds new regular expressions to the list
      *
-     * @param     string    $name       Name of rule
-     * @param     string    $pattern    Regular expression pattern
+     * @param     string $name Name of rule
+     * @param     string $pattern Regular expression pattern
      * @access    public
      */
-    function addData($name, $pattern)
+    public function addData($name, $pattern)
     {
         $this->_data[$name] = $pattern;
     } // end func addData
 
 
-    function getValidationScript($options = null)
+    public function getValidationScript($options = null)
     {
         $regex = isset($this->_data[$this->name]) ? $this->_data[$this->name] : $options;
 
         return array("  var regex = " . $regex . ";\n", "{jsVar} != '' && !regex.test({jsVar})");
     } // end func getValidationScript
-
-} // end class HTML_QuickForm_Rule_Regex
-?>
+} // end class HTML_QuickForm_Rule_Regex;

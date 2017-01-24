@@ -1,47 +1,47 @@
-var APIOtherField = ServiceCaller.extend( {
+var APIOtherField = ServiceCaller.extend({
 
-	key_name: 'OtherField',
-	className: 'APIOtherField',
+    key_name: 'OtherField',
+    className: 'APIOtherField',
 
-	getOtherFieldDefaultData: function() {
+    getOtherFieldDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getOtherFieldDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getOtherFieldDefaultData', arguments);
 
-	},
+    },
 
-	getOtherField: function() {
+    getOtherField: function () {
 
-		return this.argumentsHandler( this.className, 'getOtherField', arguments );
+        return this.argumentsHandler(this.className, 'getOtherField', arguments);
 
-	},
+    },
 
-	getCommonOtherFieldData: function() {
+    getCommonOtherFieldData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonOtherFieldData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonOtherFieldData', arguments);
 
-	},
+    },
 
-	validateOtherField: function() {
+    validateOtherField: function () {
 
-		return this.argumentsHandler( this.className, 'validateOtherField', arguments );
+        return this.argumentsHandler(this.className, 'validateOtherField', arguments);
 
-	},
+    },
 
-	setOtherField: function() {
+    setOtherField: function () {
 
-		return this.argumentsHandler( this.className, 'setOtherField', arguments );
+        return this.argumentsHandler(this.className, 'setOtherField', arguments);
 
-	},
+    },
 
-	exportOtherField: function() {
-		return this.argumentsHandler( this.className, 'exportOtherField', arguments );
-	},
+    exportOtherField: function () {
+        return this.argumentsHandler(this.className, 'exportOtherField', arguments);
+    },
 
-	deleteOtherField: function() {
+    deleteOtherField: function () {
 
-		return this.argumentsHandler( this.className, 'deleteOtherField', arguments );
+        return this.argumentsHandler(this.className, 'deleteOtherField', arguments);
 
-	}
+    }
 
 
-} );
+});

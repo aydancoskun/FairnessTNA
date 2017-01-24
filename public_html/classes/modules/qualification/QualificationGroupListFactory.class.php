@@ -19,246 +19,253 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Qualification
  */
-class QualificationGroupListFactory extends QualificationGroupFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class QualificationGroupListFactory extends QualificationGroupFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($id, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        if ($order == null) {
+            $order = array('name' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
+
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
-					where	id = ?
-						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
-
-		$this->ExecuteSQL( $query, $ph );
-
-		return $this;
-	}
-
-	function getByCompanyId($id, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
-
-		if ( $order == NULL ) {
-			$order = array( 'name' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
-
-		$ph = array(
-					'id' => (int)$id,
-					);
-
-
-		$query = '
-					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndCompanyId($id, $company_id, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByIdAndCompanyId($id, $company_id, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $company_id == '') {
-			return FALSE;
-		}
+        if ($company_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND	id = ?
 						AND deleted = 0';
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdArray( $id ) {
-		$this->getFastTreeObject()->setTree( $id );
+    public function getByCompanyIdArray($id)
+    {
+        $this->getFastTreeObject()->setTree($id);
 
-		$children = $this->getFastTreeObject()->getAllChildren(NULL, 'RECURSE');
+        $children = $this->getFastTreeObject()->getAllChildren(null, 'RECURSE');
 
-		if ( $children !== FALSE ) {
-			$qglf = new QualificationGroupListFactory();
+        if ($children !== false) {
+            $qglf = new QualificationGroupListFactory();
 
-			$nodes = array();
-			foreach ($children as $object_id => $level ) {
+            $nodes = array();
+            foreach ($children as $object_id => $level) {
+                if ($object_id !== 0) {
+                    $obj = $qglf->getById($object_id)->getCurrent();
 
-				if ( $object_id !== 0 ) {
-					$obj = $qglf->getById ( $object_id )->getCurrent();
+                    $nodes[] = array(
+                        'id' => $object_id,
+                        'name' => $obj->getName(),
+                        'level' => $level
+                    );
+                }
+            }
 
-					$nodes[] = array(
-									'id' => $object_id,
-									'name' => $obj->getName(),
-									'level' => $level
-									);
-				}
+            if (empty($nodes) == false) {
+                return $nodes;
+            }
+        }
 
-			}
+        return false;
+    }
 
-			if ( empty($nodes) == FALSE ) {
-				return $nodes;
-			}
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		return FALSE;
-	}
-
-	function getByCompanyIdAndGroupIdAndSubGroupsArray($id, $group_id, $include_sub_groups = TRUE ) {
-		$this->getFastTreeObject()->setTree( $id );
-
-		if ( $include_sub_groups == TRUE ) {
-			$recurse = 'RECURSE';
-		} else {
-			$recurse = FALSE;
-		}
-
-		$children = $this->getFastTreeObject()->getAllChildren( $group_id, $recurse);
-
-		if ( $children !== FALSE ) {
-			$nodes = array();
-			foreach ($children as $object_id => $level ) {
-				$nodes[] = $object_id;
-			}
-			unset($level);//code standards
-			
-			if ( empty($nodes) == FALSE ) {
-				return $nodes;
-			}
-		}
-
-		return FALSE;
-	}
-
-	function getArrayByListFactory($lf, $include_blank = TRUE ) {
-		if ( !is_object($lf) ) {
-			return FALSE;
-		}
-
-		$list = array();
-		if ( $include_blank == TRUE ) {
-			$list[0] = TTi18n::getText('-Default-');
-		}
-
-		foreach ($lf as $obj) {
-			$list[$obj->getID()] = $obj->getName();
-		}
-
-		if ( empty($list) == FALSE) {
-			return $list;
-		}
-
-		return FALSE;
-	}
-
-	function getArrayByNodes($nodes, $include_blank = TRUE, $sort_prefix = FALSE ) {
-		if ( !is_array( $nodes ) ) {
-			return FALSE;
-		}
-
-		$prefix = NULL;
-		$i = 0;
-		$retarr = array();
-		foreach($nodes as $node) {
-			if ( $sort_prefix == TRUE ) {
-				$prefix = '-'.str_pad( $i, 4, 0, STR_PAD_LEFT).'-';
-			}
-
-			$retarr[$prefix.$node['id']] = $node['text'];
-
-			$i++;
-		}
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		if ( empty($retarr) == FALSE ) {
-			return $retarr;
-		}
+        $query = '
+					select	*
+					from	' . $this->getTable() . '
+					where	id = ?
+						AND deleted = 0';
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		return FALSE;
-	}
+        $this->ExecuteSQL($query, $ph);
 
-	function getAPISearchByCompanyIdAndArrayCriteria( $company_id, $filter_data, $limit = NULL, $page = NULL, $where = NULL, $order = NULL ) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+        return $this;
+    }
 
-		if ( !is_array($order) ) {
-			//Use Filter Data ordering if its set.
-			if ( isset($filter_data['sort_column']) AND $filter_data['sort_order']) {
-				$order = array(Misc::trimSortPrefix($filter_data['sort_column']) => $filter_data['sort_order']);
-			}
-		}
+    public function getByCompanyIdAndGroupIdAndSubGroupsArray($id, $group_id, $include_sub_groups = true)
+    {
+        $this->getFastTreeObject()->setTree($id);
 
-		$additional_order_fields = array();
+        if ($include_sub_groups == true) {
+            $recurse = 'RECURSE';
+        } else {
+            $recurse = false;
+        }
+
+        $children = $this->getFastTreeObject()->getAllChildren($group_id, $recurse);
+
+        if ($children !== false) {
+            $nodes = array();
+            foreach ($children as $object_id => $level) {
+                $nodes[] = $object_id;
+            }
+            unset($level);//code standards
+
+            if (empty($nodes) == false) {
+                return $nodes;
+            }
+        }
+
+        return false;
+    }
+
+    public function getArrayByListFactory($lf, $include_blank = true)
+    {
+        if (!is_object($lf)) {
+            return false;
+        }
+
+        $list = array();
+        if ($include_blank == true) {
+            $list[0] = TTi18n::getText('-Default-');
+        }
+
+        foreach ($lf as $obj) {
+            $list[$obj->getID()] = $obj->getName();
+        }
+
+        if (empty($list) == false) {
+            return $list;
+        }
+
+        return false;
+    }
+
+    public function getArrayByNodes($nodes, $include_blank = true, $sort_prefix = false)
+    {
+        if (!is_array($nodes)) {
+            return false;
+        }
+
+        $prefix = null;
+        $i = 0;
+        $retarr = array();
+        foreach ($nodes as $node) {
+            if ($sort_prefix == true) {
+                $prefix = '-' . str_pad($i, 4, 0, STR_PAD_LEFT) . '-';
+            }
+
+            $retarr[$prefix . $node['id']] = $node['text'];
+
+            $i++;
+        }
 
 
-		if ( $order == NULL ) {
-			$order = array( 'name' => 'asc');
-			$strict = FALSE;
-		} else {
-			//Always sort by last name, first name after other columns
-			if ( !isset($order['name']) ) {
-				$order['name'] = 'asc';
-			}
-			$strict = TRUE;
-		}
-		//Debug::Arr($order, 'Order Data:', __FILE__, __LINE__, __METHOD__, 10);
-		//Debug::Arr($filter_data, 'Filter Data:', __FILE__, __LINE__, __METHOD__, 10);
+        if (empty($retarr) == false) {
+            return $retarr;
+        }
 
-		$uf = new UserFactory();
+        return false;
+    }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+    public function getAPISearchByCompanyIdAndArrayCriteria($company_id, $filter_data, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$query = '
+        if (!is_array($order)) {
+            //Use Filter Data ordering if its set.
+            if (isset($filter_data['sort_column']) and $filter_data['sort_order']) {
+                $order = array(Misc::trimSortPrefix($filter_data['sort_column']) => $filter_data['sort_order']);
+            }
+        }
+
+        $additional_order_fields = array();
+
+
+        if ($order == null) {
+            $order = array('name' => 'asc');
+            $strict = false;
+        } else {
+            //Always sort by last name, first name after other columns
+            if (!isset($order['name'])) {
+                $order['name'] = 'asc';
+            }
+            $strict = true;
+        }
+        //Debug::Arr($order, 'Order Data:', __FILE__, __LINE__, __METHOD__, 10);
+        //Debug::Arr($filter_data, 'Filter Data:', __FILE__, __LINE__, __METHOD__, 10);
+
+        $uf = new UserFactory();
+
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
+
+        $query = '
 					select	a.*,
 							y.first_name as created_by_first_name,
 							y.middle_name as created_by_middle_name,
@@ -266,32 +273,30 @@ class QualificationGroupListFactory extends QualificationGroupFactory implements
 							z.first_name as updated_by_first_name,
 							z.middle_name as updated_by_middle_name,
 							z.last_name as updated_by_last_name
-					from	'. $this->getTable() .' as a
-						LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
-						LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
+					from	' . $this->getTable() . ' as a
+						LEFT JOIN ' . $uf->getTable() . ' as y ON ( a.created_by = y.id AND y.deleted = 0 )
+						LEFT JOIN ' . $uf->getTable() . ' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
 					where	a.company_id = ?
 					';
 
-		$query .= ( isset($filter_data['permission_children_ids']) ) ? $this->getWhereClauseSQL( 'a.created_by', $filter_data['permission_children_ids'], 'numeric_list', $ph ) : NULL;
-		$query .= ( isset($filter_data['id']) ) ? $this->getWhereClauseSQL( 'a.id', $filter_data['id'], 'numeric_list', $ph ) : NULL;
-		$query .= ( isset($filter_data['exclude_id']) ) ? $this->getWhereClauseSQL( 'a.id', $filter_data['exclude_id'], 'not_numeric_list', $ph ) : NULL;
+        $query .= (isset($filter_data['permission_children_ids'])) ? $this->getWhereClauseSQL('a.created_by', $filter_data['permission_children_ids'], 'numeric_list', $ph) : null;
+        $query .= (isset($filter_data['id'])) ? $this->getWhereClauseSQL('a.id', $filter_data['id'], 'numeric_list', $ph) : null;
+        $query .= (isset($filter_data['exclude_id'])) ? $this->getWhereClauseSQL('a.id', $filter_data['exclude_id'], 'not_numeric_list', $ph) : null;
 
-		$query .= ( isset($filter_data['name']) ) ? $this->getWhereClauseSQL( 'a.name', $filter_data['name'], 'text', $ph ) : NULL;
+        $query .= (isset($filter_data['name'])) ? $this->getWhereClauseSQL('a.name', $filter_data['name'], 'text', $ph) : null;
 
-		$query .= ( isset($filter_data['created_date']) ) ? $this->getWhereClauseSQL( 'a.created_date', $filter_data['created_date'], 'date_range', $ph ) : NULL;
-		$query .= ( isset($filter_data['updated_date']) ) ? $this->getWhereClauseSQL( 'a.updated_date', $filter_data['updated_date'], 'date_range', $ph ) : NULL;
+        $query .= (isset($filter_data['created_date'])) ? $this->getWhereClauseSQL('a.created_date', $filter_data['created_date'], 'date_range', $ph) : null;
+        $query .= (isset($filter_data['updated_date'])) ? $this->getWhereClauseSQL('a.updated_date', $filter_data['updated_date'], 'date_range', $ph) : null;
 
-		$query .= ( isset($filter_data['created_by']) ) ? $this->getWhereClauseSQL( array('a.created_by', 'y.first_name', 'y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph ) : NULL;
-		$query .= ( isset($filter_data['updated_by']) ) ? $this->getWhereClauseSQL( array('a.updated_by', 'z.first_name', 'z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph ) : NULL;
+        $query .= (isset($filter_data['created_by'])) ? $this->getWhereClauseSQL(array('a.created_by', 'y.first_name', 'y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph) : null;
+        $query .= (isset($filter_data['updated_by'])) ? $this->getWhereClauseSQL(array('a.updated_by', 'z.first_name', 'z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph) : null;
 
-		$query .=	' AND a.deleted = 0 ';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict, $additional_order_fields );
+        $query .= ' AND a.deleted = 0 ';
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict, $additional_order_fields);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
-
+        return $this;
+    }
 }
-?>

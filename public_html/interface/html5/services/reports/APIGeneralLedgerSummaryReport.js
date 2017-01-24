@@ -1,56 +1,55 @@
-var APIGeneralLedgerSummaryReport = ServiceCaller.extend( {
+var APIGeneralLedgerSummaryReport = ServiceCaller.extend({
 
-	key_name: 'GeneralLedgerSummaryReport',
-	className: 'APIGeneralLedgerSummaryReport',
+    key_name: 'GeneralLedgerSummaryReport',
+    className: 'APIGeneralLedgerSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonGeneralLedgerSummaryReportData: function() {
+    getCommonGeneralLedgerSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonGeneralLedgerSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonGeneralLedgerSummaryReportData', arguments);
 
-	},
+    },
 
-	getGeneralLedgerSummaryReport: function() {
+    getGeneralLedgerSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getGeneralLedgerSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getGeneralLedgerSummaryReport', arguments);
 
-	},
+    },
 
-	setGeneralLedgerSummaryReport: function() {
+    setGeneralLedgerSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setGeneralLedgerSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setGeneralLedgerSummaryReport', arguments);
 
-	},
+    },
 
-	getGeneralLedgerSummaryReportDefaultData: function() {
+    getGeneralLedgerSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getGeneralLedgerSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getGeneralLedgerSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteGeneralLedgerSummaryReport: function() {
+    deleteGeneralLedgerSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteGeneralLedgerSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteGeneralLedgerSummaryReport', arguments);
 
-	},
+    },
 
-	validateGeneralLedgerSummaryReport: function() {
+    validateGeneralLedgerSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateGeneralLedgerSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validateGeneralLedgerSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

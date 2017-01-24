@@ -19,297 +19,314 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class UserSettingFactory extends Factory {
-	protected $table = 'user_setting';
-	protected $pk_sequence_name = 'user_setting_id_seq'; //PK Sequence name
+class UserSettingFactory extends Factory
+{
+    protected $table = 'user_setting';
+    protected $pk_sequence_name = 'user_setting_id_seq'; //PK Sequence name
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+    public static function getUserSetting($user_id, $name)
+    {
+        $uslf = new UserSettingListFactory();
+        $uslf->getByUserIdAndName($user_id, $name);
+        if ($uslf->getRecordCount() == 1) {
+            $us_obj = $uslf->getCurrent();
+            $retarr = $us_obj->getObjectAsArray();
+            return $retarr;
+        }
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'type':
-				$retval = array(
-								10 => TTi18n::gettext('Public'),
-								20 => TTi18n::gettext('Private'),
-									);
-				break;
-		}
+        return false;
+    }
 
-		return $retval;
-	}
+    public static function setUserSetting($user_id, $name, $value, $type_id = 10)
+    {
+        $row = array(
+            'user_id' => $user_id,
+            'name' => $name,
+            'value' => $value,
+            'type_id' => $type_id
+        );
+        $uslf = new UserSettingListFactory();
+        $uslf->getByUserIdAndName($user_id, $name);
+        if ($uslf->getRecordCount() == 1) {
+            $usf = $uslf->getCurrent();
+            $row = array_merge($usf->getObjectAsArray(), $row);
+        } else {
+            $usf = new UserSettingFactory();
+        }
 
-	function _getVariableToFunctionMap( $data ) {
-		$variable_function_map = array(
-										'id' => 'ID',
-										'user_id' => 'User',
-										'first_name' => FALSE,
-										'last_name' => FALSE,
-										'type_id' => 'Type',
-										'type' => FALSE,
-										'name' => 'Name',
-										'value' => 'Value',
-										'deleted' => 'Deleted',
-										);
-		return $variable_function_map;
-	}
+        Debug::Arr($row, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
+        $usf->setObjectFromArray($row);
+        if ($usf->isValid()) {
+            $usf->Save();
+        }
 
-	function isUniqueName($name) {
-		if ( $this->getUser() == FALSE ) {
-			return FALSE;
-		}
+        return false;
+    }
 
-		$name = trim($name);
-		if ( $name == '' ) {
-			return FALSE;
-		}
+    public function setObjectFromArray($data)
+    {
+        if (is_array($data)) {
+            $variable_function_map = $this->getVariableToFunctionMap();
+            foreach ($variable_function_map as $key => $function) {
+                if (isset($data[$key])) {
+                    $function = 'set' . $function;
+                    switch ($key) {
+                        default:
+                            if (method_exists($this, $function)) {
+                                $this->$function($data[$key]);
+                            }
+                            break;
+                    }
+                }
+            }
 
-		$ph = array(
-					'user_id' => (int)$this->getUser(),
-					'name' => TTi18n::strtolower($name),
-					);
+            $this->setCreatedAndUpdatedColumns($data);
 
-		$query = 'select id from '. $this->getTable() .'
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function deleteUserSetting($user_id, $name)
+    {
+        $uslf = new UserSettingListFactory();
+        $uslf->getByUserIdAndName($user_id, $name);
+        if ($uslf->getRecordCount() == 1) {
+            $usf = $uslf->getCurrent();
+            $usf->setDeleted(true);
+            if ($usf->isValid()) {
+                $usf->Save();
+            }
+        }
+
+        return false;
+    }
+
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'type':
+                $retval = array(
+                    10 => TTi18n::gettext('Public'),
+                    20 => TTi18n::gettext('Private'),
+                );
+                break;
+        }
+
+        return $retval;
+    }
+
+    public function _getVariableToFunctionMap($data)
+    {
+        $variable_function_map = array(
+            'id' => 'ID',
+            'user_id' => 'User',
+            'first_name' => false,
+            'last_name' => false,
+            'type_id' => 'Type',
+            'type' => false,
+            'name' => 'Name',
+            'value' => 'Value',
+            'deleted' => 'Deleted',
+        );
+        return $variable_function_map;
+    }
+
+    public function setUser($id)
+    {
+        $id = trim($id);
+
+        $ulf = TTnew('UserListFactory');
+
+        if ($this->Validator->isResultSetWithRows('user_id',
+            $ulf->getByID($id),
+            TTi18n::gettext('Invalid User')
+        )
+        ) {
+            $this->data['user_id'] = $id;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getType()
+    {
+        if (isset($this->data['type_id'])) {
+            return (int)$this->data['type_id'];
+        }
+
+        return false;
+    }
+
+    public function setType($type)
+    {
+        $type = trim($type);
+
+        if ($this->Validator->inArrayKey('type',
+            $type,
+            TTi18n::gettext('Incorrect Type'),
+            $this->getOptions('type'))
+        ) {
+            $this->data['type_id'] = $type;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function setName($value)
+    {
+        $value = trim($value);
+        if ($this->Validator->isLength('name',
+                $value,
+                TTi18n::gettext('Name is too short or too long'),
+                1, 250)
+            and $this->Validator->isTrue('name',
+                $this->isUniqueName($value),
+                TTi18n::gettext('Name already exists')
+            )
+        ) {
+            $this->data['name'] = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isUniqueName($name)
+    {
+        if ($this->getUser() == false) {
+            return false;
+        }
+
+        $name = trim($name);
+        if ($name == '') {
+            return false;
+        }
+
+        $ph = array(
+            'user_id' => (int)$this->getUser(),
+            'name' => TTi18n::strtolower($name),
+        );
+
+        $query = 'select id from ' . $this->getTable() . '
 					where user_id = ?
 						AND lower(name) = ?
 						AND deleted = 0';
-		$name_id = $this->db->GetOne($query, $ph);
-		Debug::Arr($name_id, 'Unique Name: '. $name, __FILE__, __LINE__, __METHOD__, 10);
+        $name_id = $this->db->GetOne($query, $ph);
+        Debug::Arr($name_id, 'Unique Name: ' . $name, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $name_id === FALSE ) {
-			return TRUE;
-		} else {
-			if ($name_id == $this->getId() ) {
-				return TRUE;
-			}
-		}
+        if ($name_id === false) {
+            return true;
+        } else {
+            if ($name_id == $this->getId()) {
+                return true;
+            }
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getUser() {
-		if ( isset($this->data['user_id']) ) {
-			return (int)$this->data['user_id'];
-		}
-		return FALSE;
-	}
-	function setUser($id) {
-		$id = trim($id);
+    public function getUser()
+    {
+        if (isset($this->data['user_id'])) {
+            return (int)$this->data['user_id'];
+        }
+        return false;
+    }
 
-		$ulf = TTnew( 'UserListFactory' );
+    public function setValue($value)
+    {
+        $value = trim($value);
+        if ($this->Validator->isLength('value',
+            $value,
+            TTi18n::gettext('Value is too short or too long'),
+            1, 4096)
+        ) {
+            $this->data['value'] = $value;
 
-		if ( $this->Validator->isResultSetWithRows(	'user_id',
-															$ulf->getByID($id),
-															TTi18n::gettext('Invalid User')
-															) ) {
-			$this->data['user_id'] = $id;
+            return true;
+        }
 
-			return TRUE;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
-	function getType() {
-		if ( isset($this->data['type_id']) ) {
-			return (int)$this->data['type_id'];
-		}
+    public function preSave()
+    {
+        return true;
+    }
 
-		return FALSE;
-	}
-	function setType($type) {
-		$type = trim($type);
+    public function postSave()
+    {
+        $this->removeCache($this->getUser() . $this->getName());
+        return true;
+    }
 
-		if ( $this->Validator->inArrayKey(	'type',
-											$type,
-											TTi18n::gettext('Incorrect Type'),
-											$this->getOptions('type')) ) {
+    public function getName()
+    {
+        if (isset($this->data['name'])) {
+            return $this->data['name'];
+        }
 
-			$this->data['type_id'] = $type;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function getObjectAsArray($include_columns = null)
+    {
+        $data = array();
+        $variable_function_map = $this->getVariableToFunctionMap();
+        if (is_array($variable_function_map)) {
+            foreach ($variable_function_map as $variable => $function_stub) {
+                if ($include_columns == null or (isset($include_columns[$variable]) and $include_columns[$variable] == true)) {
+                    $function = 'get' . $function_stub;
+                    switch ($variable) {
+                        case 'first_name':
+                        case 'last_name':
+                            $data[$variable] = $this->getColumn($variable);
+                            break;
+                        case 'type':
+                            $function = 'get' . $variable;
+                            if (method_exists($this, $function)) {
+                                $data[$variable] = Option::getByKey($this->$function(), $this->getOptions($variable));
+                            }
+                            break;
+                        default:
+                            if (method_exists($this, $function)) {
+                                $data[$variable] = $this->$function();
+                            }
+                            break;
+                    }
+                }
+            }
+            $this->getCreatedAndUpdatedColumns($data, $include_columns);
+        }
 
-		return FALSE;
-	}
+        return $data;
+    }
 
-	function getName() {
-		if ( isset($this->data['name']) ) {
-			return $this->data['name'];
-		}
+    public function addLog($log_action)
+    {
+        return TTLog::addEntry($this->getId(), $log_action, TTi18n::getText('User Setting - Name') . ': ' . $this->getName() . ' ' . TTi18n::getText('Value') . ': ' . $this->getValue(), null, $this->getTable());
+    }
 
-		return FALSE;
-	}
-	function setName($value) {
-		$value = trim($value);
-		if (	$this->Validator->isLength(	'name',
-											$value,
-											TTi18n::gettext('Name is too short or too long'),
-											1, 250)
-				AND $this->Validator->isTrue(	'name',
-											$this->isUniqueName($value),
-											TTi18n::gettext('Name already exists')
-											)
-						) {
+    public function getValue()
+    {
+        if (isset($this->data['value'])) {
+            return $this->data['value'];
+        }
 
-			$this->data['name'] = $value;
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function getValue() {
-		if ( isset($this->data['value']) ) {
-			return $this->data['value'];
-		}
-
-		return FALSE;
-	}
-	function setValue($value) {
-		$value = trim($value);
-		if (	$this->Validator->isLength(	'value',
-											$value,
-											TTi18n::gettext('Value is too short or too long'),
-											1, 4096)
-						) {
-
-			$this->data['value'] = $value;
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-
-	function preSave() {
-		return TRUE;
-	}
-
-	function postSave() {
-		$this->removeCache( $this->getUser().$this->getName() );
-		return TRUE;
-	}
-
-	function setObjectFromArray( $data ) {
-		if ( is_array( $data ) ) {
-			$variable_function_map = $this->getVariableToFunctionMap();
-			foreach( $variable_function_map as $key => $function ) {
-				if ( isset($data[$key]) ) {
-
-					$function = 'set'.$function;
-					switch( $key ) {
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$this->$function( $data[$key] );
-							}
-							break;
-					}
-				}
-			}
-
-			$this->setCreatedAndUpdatedColumns( $data );
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function getObjectAsArray( $include_columns = NULL ) {
-		$data = array();
-		$variable_function_map = $this->getVariableToFunctionMap();
-		if ( is_array( $variable_function_map ) ) {
-			foreach( $variable_function_map as $variable => $function_stub ) {
-				if ( $include_columns == NULL OR ( isset($include_columns[$variable]) AND $include_columns[$variable] == TRUE ) ) {
-
-					$function = 'get'.$function_stub;
-					switch( $variable ) {
-						case 'first_name':
-						case 'last_name':
-							$data[$variable] = $this->getColumn( $variable );
-							break;
-						case 'type':
-							$function = 'get'.$variable;
-							if ( method_exists( $this, $function ) ) {
-								$data[$variable] = Option::getByKey( $this->$function(), $this->getOptions( $variable ) );
-							}
-							break;
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$data[$variable] = $this->$function();
-							}
-							break;
-					}
-
-				}
-			}
-			$this->getCreatedAndUpdatedColumns( $data, $include_columns );
-		}
-
-		return $data;
-	}
-
-	function addLog( $log_action ) {
-		return TTLog::addEntry( $this->getId(), $log_action, TTi18n::getText('User Setting - Name').': '. $this->getName() .' '. TTi18n::getText('Value').': '. $this->getValue(), NULL, $this->getTable() );
-	}
-
-	static function getUserSetting( $user_id, $name ) {
-		$uslf = new UserSettingListFactory();
-		$uslf->getByUserIdAndName( $user_id, $name );
-		if ( $uslf->getRecordCount() == 1 ) {
-			$us_obj = $uslf->getCurrent();
-			$retarr = $us_obj->getObjectAsArray();
-			return $retarr;
-		}
-
-		return FALSE;
-	}
-
-	static function setUserSetting( $user_id, $name, $value, $type_id = 10 ) {
-		$row = array(
-			'user_id' => $user_id,
-			'name' => $name,
-			'value' => $value,
-			'type_id' => $type_id
-		);
-		$uslf = new UserSettingListFactory();
-		$uslf->getByUserIdAndName( $user_id, $name );
-		if ( $uslf->getRecordCount() == 1 ) {
-			$usf = $uslf->getCurrent();
-			$row = array_merge( $usf->getObjectAsArray(), $row );
-		} else {
-			$usf = new UserSettingFactory();
-		}
-
-		Debug::Arr($row, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
-		$usf->setObjectFromArray( $row );
-		if ( $usf->isValid() ) {
-			$usf->Save();
-		}
-
-		return FALSE;
-
-	}
-
-	static function deleteUserSetting( $user_id, $name ) {
-		$uslf = new UserSettingListFactory();
-		$uslf->getByUserIdAndName( $user_id, $name );
-		if ( $uslf->getRecordCount() == 1 ) {
-			$usf = $uslf->getCurrent();
-			$usf->setDeleted(TRUE);
-			if ( $usf->isValid() ) {
-				$usf->Save();
-			}
-		}
-
-		return FALSE;
-	}
+        return false;
+    }
 }
-?>

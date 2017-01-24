@@ -10,6 +10,4 @@ function smarty_function_DisplayBreadCrumbs($params, &$smarty)
     return BreadCrumb::Display();
 }
 
-/* vim: set expandtab: */
-
-?>
+/* vim: set expandtab: */;

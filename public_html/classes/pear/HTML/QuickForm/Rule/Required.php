@@ -21,20 +21,20 @@
 require_once('HTML/QuickForm/Rule.php');
 
 /**
-* Required elements validation
-* @version     1.0
-*/
+ * Required elements validation
+ * @version     1.0
+ */
 class HTML_QuickForm_Rule_Required extends HTML_QuickForm_Rule
 {
     /**
      * Checks if an element is empty
      *
-     * @param     string    $value      Value to check
-     * @param     mixed     $options    Not used yet
+     * @param     string $value Value to check
+     * @param     mixed $options Not used yet
      * @access    public
      * @return    boolean   true if value is not empty
      */
-    function validate($value, $options = null)
+    public function validate($value, $options = null)
     {
         if ($value == '') {
             return false;
@@ -43,10 +43,8 @@ class HTML_QuickForm_Rule_Required extends HTML_QuickForm_Rule
     } // end func validate
 
 
-    function getValidationScript($options = null)
+    public function getValidationScript($options = null)
     {
         return array('', "{jsVar} == ''");
     } // end func getValidationScript
-
-} // end class HTML_QuickForm_Rule_Required
-?>
+} // end class HTML_QuickForm_Rule_Required;

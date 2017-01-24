@@ -19,146 +19,151 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class Option {
-	static function getByKey($key, $options, $false = FALSE ) {
-		if ( isset($options[$key]) ) {
-			//Debug::text('Returning Value: '. $options[$key], __FILE__, __LINE__, __METHOD__, 9);
+class Option
+{
+    public static function getByKey($key, $options, $false = false)
+    {
+        if (isset($options[$key])) {
+            //Debug::text('Returning Value: '. $options[$key], __FILE__, __LINE__, __METHOD__, 9);
 
-			return $options[$key];
-		}
+            return $options[$key];
+        }
 
-		return $false;
-		//return FALSE;
-	}
+        return $false;
+        //return FALSE;
+    }
 
-	static function getByValue($value, $options, $value_is_translated = TRUE ) {
-		// I18n: Calling gettext on the value here enables a match with the translated value in the relevant factory.
-		//		 BUT... such string comparisons are messy and we really should be using getByKey for most everything.
-		//		 Exceptions can be made by passing false for $value_is_translated.
-		if ( $value_is_translated == TRUE ) {
-			$value = TTi18n::gettext( $value );
-		}
-		if ( is_array( $value ) ) {
-			return FALSE;
-		}
+    public static function getByValue($value, $options, $value_is_translated = true)
+    {
+        // I18n: Calling gettext on the value here enables a match with the translated value in the relevant factory.
+        //		 BUT... such string comparisons are messy and we really should be using getByKey for most everything.
+        //		 Exceptions can be made by passing false for $value_is_translated.
+        if ($value_is_translated == true) {
+            $value = TTi18n::gettext($value);
+        }
+        if (is_array($value)) {
+            return false;
+        }
 
-		if ( !is_array( $options ) ) {
-			return FALSE;
-		}
+        if (!is_array($options)) {
+            return false;
+        }
 
-		$flipped_options = array_flip($options);
+        $flipped_options = array_flip($options);
 
-		if ( isset($flipped_options[$value]) ) {
-			//Debug::text('Returning Key: '. $flipped_options[$value], __FILE__, __LINE__, __METHOD__, 9);
+        if (isset($flipped_options[$value])) {
+            //Debug::text('Returning Key: '. $flipped_options[$value], __FILE__, __LINE__, __METHOD__, 9);
 
-			return $flipped_options[$value];
-		}
+            return $flipped_options[$value];
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	static function getByFuzzyValue($value, $options, $value_is_translated = TRUE ) {
-		// I18n: Calling gettext on the value here enables a match with the translated value in the relevant factory.
-		//		 BUT... such string comparisons are messy and we really should be using getByKey for most everything.
-		//		 Exceptions can be made by passing false for $value_is_translated.
-		if ( $value_is_translated == TRUE ) {
-			$value = TTi18n::gettext( $value );
-		}
-		if ( is_array( $value ) ) {
-			return FALSE;
-		}
+    public static function getByFuzzyValue($value, $options, $value_is_translated = true)
+    {
+        // I18n: Calling gettext on the value here enables a match with the translated value in the relevant factory.
+        //		 BUT... such string comparisons are messy and we really should be using getByKey for most everything.
+        //		 Exceptions can be made by passing false for $value_is_translated.
+        if ($value_is_translated == true) {
+            $value = TTi18n::gettext($value);
+        }
+        if (is_array($value)) {
+            return false;
+        }
 
-		if ( !is_array( $options ) ) {
-			return FALSE;
-		}
+        if (!is_array($options)) {
+            return false;
+        }
 
-		$retarr = Misc::findClosestMatch( $value, $options, 10, FALSE );
-		//Debug::Arr($retarr, 'RetArr: ', __FILE__, __LINE__, __METHOD__, 10);
+        $retarr = Misc::findClosestMatch($value, $options, 10, false);
+        //Debug::Arr($retarr, 'RetArr: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		/*
-		//Convert SQL search value ie: 'test%test%' to a regular expression.
-		$value = str_replace('%', '.*', $value);
+        /*
+        //Convert SQL search value ie: 'test%test%' to a regular expression.
+        $value = str_replace('%', '.*', $value);
 
-		foreach( $options as $key => $option_value ) {
-			if ( preg_match('/^'.$value.'$/i', $option_value) ) {
-				$retarr[] = $key;
-			}
-		}
-		*/
+        foreach( $options as $key => $option_value ) {
+            if ( preg_match('/^'.$value.'$/i', $option_value) ) {
+                $retarr[] = $key;
+            }
+        }
+        */
 
-		if ( isset($retarr) ) {
-			return $retarr;
-		}
+        if (isset($retarr)) {
+            return $retarr;
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	//Takes $needles as an array, loops through them returning matching
-	//keys => value pairs from haystack
-	//Useful for filtering results to a select box, like status.
-	static function getByArray($needles, $haystack) {
+    //Takes $needles as an array, loops through them returning matching
+    //keys => value pairs from haystack
+    //Useful for filtering results to a select box, like status.
+    public static function getByArray($needles, $haystack)
+    {
+        if (!is_array($needles)) {
+            $needles = array($needles);
+        }
 
-		if (!is_array($needles) ) {
-			$needles = array($needles);
-		}
+        $needles = array_unique($needles);
 
-		$needles = array_unique($needles);
+        $retval = array();
+        foreach ($needles as $needle) {
+            if (isset($haystack[$needle])) {
+                $retval[$needle] = $haystack[$needle];
+            }
+        }
 
-		$retval = array();
-		foreach($needles as $needle) {
-			if ( isset($haystack[$needle]) ) {
-				$retval[$needle] = $haystack[$needle];
-			}
-		}
+        if (empty($retval) == false) {
+            return $retval;
+        }
 
-		if ( empty($retval) == FALSE ) {
-			return $retval;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public static function getArrayByBitMask($bitmask, $options)
+    {
+        $bitmask = (int)$bitmask;
 
-	static function getArrayByBitMask( $bitmask, $options ) {
-		$bitmask = (int)$bitmask;
+        $retarr = array();
+        if (is_numeric($bitmask) and is_array($options)) {
+            foreach ($options as $key => $value) {
+                //Debug::Text('Checking Bitmask: '. $bitmask .' mod '. $key .' != 0', __FILE__, __LINE__, __METHOD__, 10);
+                if (($bitmask & (int)$key) !== 0) {
+                    //Debug::Text('Found Bit: '. $key, __FILE__, __LINE__, __METHOD__, 10);
+                    $retarr[] = $key;
+                }
+            }
+            unset($value); //code standards
+        }
 
-		$retarr = array();
-		if ( is_numeric($bitmask) AND is_array($options) ) {
-			foreach( $options as $key => $value ) {
-				//Debug::Text('Checking Bitmask: '. $bitmask .' mod '. $key .' != 0', __FILE__, __LINE__, __METHOD__, 10);
-				if ( ($bitmask & (int)$key) !== 0 ) {
-					//Debug::Text('Found Bit: '. $key, __FILE__, __LINE__, __METHOD__, 10);
-					$retarr[] = $key;
-				}
-			}
-			unset($value); //code standards
-		}
+        if (empty($retarr) == false) {
+            return $retarr;
+        }
 
-		if ( empty($retarr) == FALSE ) {
-			return $retarr;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public static function getBitMaskByArray($keys, $options)
+    {
+        $retval = 0;
+        if (is_array($keys) and is_array($options)) {
+            foreach ($keys as $key) {
+                if (isset($options[$key])) {
+                    $retval |= $key;
+                } else {
+                    Debug::Text('Key is not a valid bitmask int: ' . $key, __FILE__, __LINE__, __METHOD__, 10);
+                }
+            }
+        }
 
-	static function getBitMaskByArray( $keys, $options ) {
-		$retval = 0;
-		if ( is_array($keys) AND is_array($options) ) {
-			foreach( $keys as $key ) {
-				if ( isset($options[$key]) ) {
-					$retval |= $key;
-				} else {
-					Debug::Text('Key is not a valid bitmask int: '. $key, __FILE__, __LINE__, __METHOD__, 10);
-				}
-			}
-		}
-
-		return $retval;
-	}
+        return $retval;
+    }
 }
-?>

@@ -43,13 +43,13 @@ class Image_Barcode extends PEAR
     /**
      * Draws a image barcode
      *
-     * @param  string $text     A text that should be in the image barcode
-     * @param  string $type     The barcode type. Supported types:
+     * @param  string $text A text that should be in the image barcode
+     * @param  string $type The barcode type. Supported types:
      *                          Code39 - Code 3 of 9
      *                          int25  - 2 Interleaved 5
      *                          ean13  - EAN 13
      *                          upca   - UPC-A
-     * @param  string $imgtype  The image type that will be generated
+     * @param  string $imgtype The image type that will be generated
      *
      * @return image            The corresponding image barcode
      *
@@ -58,23 +58,24 @@ class Image_Barcode extends PEAR
      * @author Marcelo Subtil Marcal <msmarcal@php.net>
      * @since  Image_Barcode 0.3
      */
-    function draw($text, $type = 'int25', $imgtype = 'png', $send_headers = TRUE, $print_text = TRUE, $height = NULL) {
+    public function draw($text, $type = 'int25', $imgtype = 'png', $send_headers = true, $print_text = true, $height = null)
+    {
         // Check if include file exists
-	//echo "PEAR_INSTALL_DIR: ". PEAR_INSTALL_DIR ."<br>\n";
+        //echo "PEAR_INSTALL_DIR: ". PEAR_INSTALL_DIR ."<br>\n";
         //$barcodepath = PEAR_INSTALL_DIR . DIRECTORY_SEPARATOR . "Image" . DIRECTORY_SEPARATOR . "Barcode";
-        $supportedtypes = array('Code39.php','code128.php');
-	/*
-        if ( $incdir = opendir($barcodepath) ) {
-            while ( false != ( $avaiabletype = readdir($incdir) ) ) {
-                if ( strstr($avaiabletype, ".php") ) {
-                    $supportedtypes[] = $avaiabletype;
+        $supportedtypes = array('Code39.php', 'code128.php');
+        /*
+            if ( $incdir = opendir($barcodepath) ) {
+                while ( false != ( $avaiabletype = readdir($incdir) ) ) {
+                    if ( strstr($avaiabletype, ".php") ) {
+                        $supportedtypes[] = $avaiabletype;
+                    }
                 }
+                closedir($incdir);
             }
-            closedir($incdir);
-        }
-	*/
-        if ( in_array($type . ".php", $supportedtypes) ) {
-            include_once(Environment::getBasePath() ."/classes/Image_Barcode/Barcode/${type}.php");
+        */
+        if (in_array($type . ".php", $supportedtypes)) {
+            include_once(Environment::getBasePath() . "/classes/Image_Barcode/Barcode/${type}.php");
         } else {
             return PEAR::raiseError("$type barcode is not supported");
         }
@@ -85,19 +86,16 @@ class Image_Barcode extends PEAR
             return PEAR::raiseError("Unable to include the Image/Barcode/${type}.php file");
         }
 
-        if (!in_array('draw',get_class_methods($classname))) {
+        if (!in_array('draw', get_class_methods($classname))) {
             return PEAR::raiseError("Unable to find create method in '$classname' class");
         }
 
         @$obj = new $classname;
-	$obj->send_headers = $send_headers;
-	$obj->_print_text = $print_text;
-	if ( $height != NULL AND $height > 0 ) {
-		$obj->_barcodeheight = $height;
-	}
+        $obj->send_headers = $send_headers;
+        $obj->_print_text = $print_text;
+        if ($height != null and $height > 0) {
+            $obj->_barcodeheight = $height;
+        }
         $obj->draw($text, $imgtype);
     }
-
 }
-
-?>

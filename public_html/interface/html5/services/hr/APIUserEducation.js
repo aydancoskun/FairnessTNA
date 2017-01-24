@@ -1,51 +1,51 @@
-var APIUserEducation = ServiceCaller.extend( {
+var APIUserEducation = ServiceCaller.extend({
 
-	key_name: 'UserEducation',
-	className: 'APIUserEducation',
+    key_name: 'UserEducation',
+    className: 'APIUserEducation',
 
-	getUserEducationDefaultData: function() {
+    getUserEducationDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserEducationDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserEducationDefaultData', arguments);
 
-	},
+    },
 
-	getUserEducation: function() {
+    getUserEducation: function () {
 
-		return this.argumentsHandler( this.className, 'getUserEducation', arguments );
+        return this.argumentsHandler(this.className, 'getUserEducation', arguments);
 
-	},
+    },
 
-	getCommonUserEducationData: function() {
+    getCommonUserEducationData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserEducationData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserEducationData', arguments);
 
-	},
+    },
 
-	validateUserEducation: function() {
+    validateUserEducation: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserEducation', arguments );
+        return this.argumentsHandler(this.className, 'validateUserEducation', arguments);
 
-	},
+    },
 
-	setUserEducation: function() {
+    setUserEducation: function () {
 
-		return this.argumentsHandler( this.className, 'setUserEducation', arguments );
+        return this.argumentsHandler(this.className, 'setUserEducation', arguments);
 
-	},
+    },
 
-	deleteUserEducation: function() {
+    deleteUserEducation: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserEducation', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserEducation', arguments);
 
-	},
+    },
 
-	copyUserEducation: function() {
-		return this.argumentsHandler( this.className, 'copyUserEducation', arguments );
-	},
+    copyUserEducation: function () {
+        return this.argumentsHandler(this.className, 'copyUserEducation', arguments);
+    },
 
-	exportUserEducation: function() {
-		return this.argumentsHandler( this.className, 'exportUserEducation', arguments );
-	}
+    exportUserEducation: function () {
+        return this.argumentsHandler(this.className, 'exportUserEducation', arguments);
+    }
 
 
-} );
+});

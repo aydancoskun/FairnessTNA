@@ -1,57 +1,57 @@
-var APIAccrualPolicy = ServiceCaller.extend( {
+var APIAccrualPolicy = ServiceCaller.extend({
 
-	key_name: 'AccrualPolicy',
-	className: 'APIAccrualPolicy',
+    key_name: 'AccrualPolicy',
+    className: 'APIAccrualPolicy',
 
-	recalculateAccrual: function() {
+    recalculateAccrual: function () {
 
-		return this.argumentsHandler( this.className, 'recalculateAccrual', arguments );
+        return this.argumentsHandler(this.className, 'recalculateAccrual', arguments);
 
-	},
+    },
 
-	getAccrualPolicyDefaultData: function() {
+    getAccrualPolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicyDefaultData', arguments);
 
-	},
+    },
 
-	getAccrualPolicy: function() {
+    getAccrualPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicy', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicy', arguments);
 
-	},
+    },
 
-	getCommonAccrualPolicyData: function() {
+    getCommonAccrualPolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonAccrualPolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonAccrualPolicyData', arguments);
 
-	},
+    },
 
-	validateAccrualPolicy: function() {
+    validateAccrualPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateAccrualPolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateAccrualPolicy', arguments);
 
-	},
+    },
 
-	setAccrualPolicy: function() {
+    setAccrualPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setAccrualPolicy', arguments );
+        return this.argumentsHandler(this.className, 'setAccrualPolicy', arguments);
 
-	},
+    },
 
-	deleteAccrualPolicy: function() {
+    deleteAccrualPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteAccrualPolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteAccrualPolicy', arguments);
 
-	},
+    },
 
-	copyAccrualPolicy: function() {
-		return this.argumentsHandler( this.className, 'copyAccrualPolicy', arguments );
-	},
+    copyAccrualPolicy: function () {
+        return this.argumentsHandler(this.className, 'copyAccrualPolicy', arguments);
+    },
 
-	exportAccrualPolicy: function() {
-		return this.argumentsHandler( this.className, 'exportAccrualPolicy', arguments );
-	}
+    exportAccrualPolicy: function () {
+        return this.argumentsHandler(this.className, 'exportAccrualPolicy', arguments);
+    }
 
 
-} );
+});

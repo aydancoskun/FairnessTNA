@@ -1,51 +1,51 @@
-var APIPayFormulaPolicy = ServiceCaller.extend( {
+var APIPayFormulaPolicy = ServiceCaller.extend({
 
-	key_name: 'PayFormulaPolicy',
-	className: 'APIPayFormulaPolicy',
+    key_name: 'PayFormulaPolicy',
+    className: 'APIPayFormulaPolicy',
 
-	getPayFormulaPolicyDefaultData: function() {
+    getPayFormulaPolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayFormulaPolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayFormulaPolicyDefaultData', arguments);
 
-	},
+    },
 
-	getPayFormulaPolicy: function() {
+    getPayFormulaPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getPayFormulaPolicy', arguments );
+        return this.argumentsHandler(this.className, 'getPayFormulaPolicy', arguments);
 
-	},
+    },
 
-	getCommonPayFormulaPolicyData: function() {
+    getCommonPayFormulaPolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayFormulaPolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayFormulaPolicyData', arguments);
 
-	},
+    },
 
-	validatePayFormulaPolicy: function() {
+    validatePayFormulaPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayFormulaPolicy', arguments );
+        return this.argumentsHandler(this.className, 'validatePayFormulaPolicy', arguments);
 
-	},
+    },
 
-	setPayFormulaPolicy: function() {
+    setPayFormulaPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setPayFormulaPolicy', arguments );
+        return this.argumentsHandler(this.className, 'setPayFormulaPolicy', arguments);
 
-	},
+    },
 
-	deletePayFormulaPolicy: function() {
+    deletePayFormulaPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayFormulaPolicy', arguments );
+        return this.argumentsHandler(this.className, 'deletePayFormulaPolicy', arguments);
 
-	},
+    },
 
-	copyPayFormulaPolicy: function() {
-		return this.argumentsHandler( this.className, 'copyPayFormulaPolicy', arguments );
-	},
+    copyPayFormulaPolicy: function () {
+        return this.argumentsHandler(this.className, 'copyPayFormulaPolicy', arguments);
+    },
 
-	exportPayFormulaPolicy: function() {
-		return this.argumentsHandler( this.className, 'exportPayFormulaPolicy', arguments );
-	}
+    exportPayFormulaPolicy: function () {
+        return this.argumentsHandler(this.className, 'exportPayFormulaPolicy', arguments);
+    }
 
 
-} );
+});

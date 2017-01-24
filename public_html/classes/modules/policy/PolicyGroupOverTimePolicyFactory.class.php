@@ -19,110 +19,141 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class PolicyGroupOverTimePolicyFactory extends Factory {
-	protected $table = 'policy_group_over_time_policy';
-	protected $pk_sequence_name = 'policy_group_over_time_policy_id_seq'; //PK Sequence name
-	function getPolicyGroup() {
-		if ( isset($this->data['policy_group_id']) ) {
-			return (int)$this->data['policy_group_id'];
-		}
+class PolicyGroupOverTimePolicyFactory extends Factory
+{
+    protected $table = 'policy_group_over_time_policy';
+    protected $pk_sequence_name = 'policy_group_over_time_policy_id_seq'; //PK Sequence name
 
-		return FALSE;
-	}
-	function setPolicyGroup($id) {
-		$id = trim($id);
+    public function getPolicyGroup()
+    {
+        if (isset($this->data['policy_group_id'])) {
+            return (int)$this->data['policy_group_id'];
+        }
 
-		$pglf = TTnew( 'PolicyGroupListFactory' );
+        return false;
+    }
 
-		if ( $this->Validator->isResultSetWithRows(	'policy_group',
-															$pglf->getByID($id),
-															TTi18n::gettext('Policy Group is invalid')
-															) ) {
-			$this->data['policy_group_id'] = $id;
+    public function setPolicyGroup($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $pglf = TTnew('PolicyGroupListFactory');
 
-		return FALSE;
-	}
+        if ($this->Validator->isResultSetWithRows('policy_group',
+            $pglf->getByID($id),
+            TTi18n::gettext('Policy Group is invalid')
+        )
+        ) {
+            $this->data['policy_group_id'] = $id;
 
-	function getOverTimePolicy() {
-		if ( isset($this->data['over_time_policy_id']) ) {
-			return (int)$this->data['over_time_policy_id'];
-		}
-	}
-	function setOverTimePolicy($id) {
-		$id = trim($id);
+            return true;
+        }
 
-		$otplf = TTnew( 'OverTimePolicyListFactory' );
+        return false;
+    }
 
-		if (	$id == 0
-				OR
-				$this->Validator->isResultSetWithRows(	'over_time_policy',
-													$otplf->getByID($id),
-													TTi18n::gettext('Selected Overtime Policy is invalid')
-															)
-			) {
+    public function getOverTimePolicy()
+    {
+        if (isset($this->data['over_time_policy_id'])) {
+            return (int)$this->data['over_time_policy_id'];
+        }
+    }
 
-			$this->data['over_time_policy_id'] = $id;
+    public function setOverTimePolicy($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $otplf = TTnew('OverTimePolicyListFactory');
 
-		return FALSE;
-	}
+        if ($id == 0
+            or
+            $this->Validator->isResultSetWithRows('over_time_policy',
+                $otplf->getByID($id),
+                TTi18n::gettext('Selected Overtime Policy is invalid')
+            )
+        ) {
+            $this->data['over_time_policy_id'] = $id;
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+            return true;
+        }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
+    public function getDeleted()
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedDate()
+    {
+        return false;
+    }
+
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 }
-?>

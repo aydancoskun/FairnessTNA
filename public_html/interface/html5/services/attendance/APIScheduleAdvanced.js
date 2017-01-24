@@ -1,16 +1,13 @@
-var APIScheduleAdvanced = ServiceCaller.extend( {
+var APIScheduleAdvanced = ServiceCaller.extend({
 
-	key_name: 'ScheduleAdvanced',
-	className: 'APIScheduleAdvanced',
+    key_name: 'ScheduleAdvanced',
+    className: 'APIScheduleAdvanced',
 
-	getScheduleAvailableUsers: function() {
+    getScheduleAvailableUsers: function () {
 
-		return this.argumentsHandler( this.className, 'getScheduleAvailableUsers', arguments );
+        return this.argumentsHandler(this.className, 'getScheduleAvailableUsers', arguments);
 
-	}
-
-
+    }
 
 
-
-} );
+});

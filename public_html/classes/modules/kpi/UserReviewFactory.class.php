@@ -19,286 +19,305 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\KPI
  */
-class UserReviewFactory extends Factory {
-	protected $table = 'user_review';
-	protected $pk_sequence_name = 'user_review_id_seq'; //PK Sequence name
-	protected $kpi_obj = NULL;
-	function _getFactoryOptions( $name, $parent = NULL ) {
+class UserReviewFactory extends Factory
+{
+    protected $table = 'user_review';
+    protected $pk_sequence_name = 'user_review_id_seq'; //PK Sequence name
+    protected $kpi_obj = null;
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'columns':
-				$retval = array(
-										'-2050-rating' => TTi18n::gettext('Rating'),
-										'-1200-note' => TTi18n::gettext('Note'),
-										'-1300-tag' => TTi18n::gettext('Tags'),
-										'-2000-created_by' => TTi18n::gettext('Created By'),
-										'-2010-created_date' => TTi18n::gettext('Created Date'),
-										'-2020-updated_by' => TTi18n::gettext('Updated By'),
-										'-2030-updated_date' => TTi18n::gettext('Updated Date'),
-							);
-				break;
-			case 'list_columns':
-				$retval = Misc::arrayIntersectByKey( $this->getOptions('default_display_columns'), Misc::trimSortPrefix( $this->getOptions('columns') ) );
-				break;
-			case 'default_display_columns': //Columns that are displayed by default.
-				$retval = array(
-								'rating',
-								'note'
-								);
-				break;
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'columns':
+                $retval = array(
+                    '-2050-rating' => TTi18n::gettext('Rating'),
+                    '-1200-note' => TTi18n::gettext('Note'),
+                    '-1300-tag' => TTi18n::gettext('Tags'),
+                    '-2000-created_by' => TTi18n::gettext('Created By'),
+                    '-2010-created_date' => TTi18n::gettext('Created Date'),
+                    '-2020-updated_by' => TTi18n::gettext('Updated By'),
+                    '-2030-updated_date' => TTi18n::gettext('Updated Date'),
+                );
+                break;
+            case 'list_columns':
+                $retval = Misc::arrayIntersectByKey($this->getOptions('default_display_columns'), Misc::trimSortPrefix($this->getOptions('columns')));
+                break;
+            case 'default_display_columns': //Columns that are displayed by default.
+                $retval = array(
+                    'rating',
+                    'note'
+                );
+                break;
 
-		}
+        }
 
-		return $retval;
-	}
+        return $retval;
+    }
 
-	function _getVariableToFunctionMap( $data ) {
-		$variable_function_map = array(
-										'id' => 'ID',
-										'user_review_control_id' => 'UserReviewControl',
-										'kpi_id' => 'KPI',
-										'name' => FALSE,
-										'type_id' => FALSE,
-										'status_id' => FALSE,
-										'minimum_rate' => FALSE,
-										'maximum_rate' => FALSE,
-										'description' => FALSE,
-										'rating' => 'Rating',
-										'note' => 'Note',
-										'tag' => 'Tag',
-										'deleted' => 'Deleted',
-										);
-		return $variable_function_map;
-	}
-	function getKPIObject() {
-		return $this->getGenericObject( 'KPIListFactory', $this->getKPI(), 'kpi_obj' );
-	}
+    public function _getVariableToFunctionMap($data)
+    {
+        $variable_function_map = array(
+            'id' => 'ID',
+            'user_review_control_id' => 'UserReviewControl',
+            'kpi_id' => 'KPI',
+            'name' => false,
+            'type_id' => false,
+            'status_id' => false,
+            'minimum_rate' => false,
+            'maximum_rate' => false,
+            'description' => false,
+            'rating' => 'Rating',
+            'note' => 'Note',
+            'tag' => 'Tag',
+            'deleted' => 'Deleted',
+        );
+        return $variable_function_map;
+    }
 
-	function getKPI() {
-		if ( isset($this->data['kpi_id']) ) {
-			return (int)$this->data['kpi_id'];
-		}
-		return FALSE;
-	}
+    public function setKPI($id)
+    {
+        $id = trim($id);
+        $klf = TTnew('KPIListFactory');
+        if ($this->Validator->isResultSetWithRows('kpi_id',
+            $klf->getById($id),
+            TTi18n::gettext('Invalid KPI')
+        )
+        ) {
+            $this->data['kpi_id'] = $id;
+            return true;
+        }
+        return false;
+    }
 
-	function setKPI($id) {
-		$id = trim($id);
-		$klf = TTnew( 'KPIListFactory' );
-		if ( $this->Validator->isResultSetWithRows( 'kpi_id',
-													$klf->getById($id),
-													TTi18n::gettext('Invalid KPI')
-														) ) {
-						$this->data['kpi_id'] = $id;
-						return TRUE;
-		}
-		return FALSE;
-	}
+    public function setUserReviewControl($id)
+    {
+        $id = trim($id);
 
-	function getUserReviewControl() {
-		if ( isset($this->data['user_review_control_id']) ) {
-			return (int)$this->data['user_review_control_id'];
-		}
-		return FALSE;
-	}
+        $urclf = TTnew('UserReviewControlListFactory');
 
-	function setUserReviewControl( $id ) {
-		$id = trim($id);
+        if ($this->Validator->isResultSetWithRows('user_review_control_id',
+            $urclf->getById($id),
+            TTi18n::gettext('Invalid review control')
+        )
+        ) {
+            $this->data['user_review_control_id'] = $id;
+            return true;
+        }
+        return false;
+    }
 
-		$urclf = TTnew('UserReviewControlListFactory');
+    public function getRating()
+    {
+        if (isset($this->data['rating'])) {
+            return $this->data['rating'];
+        }
+        return false;
+    }
 
-		if ( $this->Validator->isResultSetWithRows( 'user_review_control_id',
-													$urclf->getById($id),
-													TTi18n::gettext('Invalid review control')
-													) ) {
-						$this->data['user_review_control_id'] = $id;
-						return TRUE;
-		}
-		return FALSE;
-	}
+    public function setRating($value)
+    {
+        $value = trim($value);
 
-	function getRating() {
-		if ( isset($this->data['rating']) ) {
-			return $this->data['rating'];
-		}
-		return FALSE;
-	}
+        if ($value == '') {
+            $value = null;
+        }
+        if ($value == null
+            or
+            (
+                $this->Validator->isNumeric('rating',
+                    $value,
+                    TTi18n::gettext('Rating must only be digits')
+                )
+                and
+                $this->Validator->isLengthBeforeDecimal('rating',
+                    $value,
+                    TTi18n::gettext('Invalid Rating'),
+                    0,
+                    7
+                )
+                and
+                $this->Validator->isLengthAfterDecimal('rating',
+                    $value,
+                    TTi18n::gettext('Invalid Rating'),
+                    0,
+                    2
+                )
+            )
+        ) {
+            $this->data['rating'] = $value;
 
-	function setRating($value) {
-		$value = trim($value);
+            return true;
+        }
 
-		if ( $value == '' ) {
-			$value = NULL;
-		}
-		if ( 	$value == NULL
-				OR
-				(
-				$this->Validator->isNumeric(	'rating',
-													$value,
-													TTi18n::gettext('Rating must only be digits')
-										)
-				AND
-				$this->Validator->isLengthBeforeDecimal( 'rating',
-														$value,
-														TTi18n::gettext('Invalid Rating'),
-														0,
-														7
-										)
-				AND
-				$this->Validator->isLengthAfterDecimal( 'rating',
-														$value,
-														TTi18n::gettext('Invalid Rating'),
-														0,
-														2
-										)
-				)
-			) {
+        return false;
+    }
 
-			$this->data['rating'] = $value;
+    public function getNote()
+    {
+        if (isset($this->data['note'])) {
+            return $this->data['note'];
+        }
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setNote($note)
+    {
+        $note = trim($note);
 
-		return FALSE;
-	}
+        if ($note == ''
+            or
+            $this->Validator->isLength('note',
+                $note,
+                TTi18n::gettext('Note is too long'),
+                0, 4096)
+        ) {
+            $this->data['note'] = $note;
+            return true;
+        }
 
-	function getNote() {
-		if ( isset($this->data['note']) ) {
-			return $this->data['note'];
-		}
-		return FALSE;
-	}
-	function setNote($note) {
-		$note = trim($note);
+        return false;
+    }
 
-		if (	$note == ''
-				OR
-				$this->Validator->isLength( 'note',
-											$note,
-											TTi18n::gettext('Note is too long'),
-											0, 4096 )  ) {
-				$this->data['note'] = $note;
-				return	TRUE;
-		}
+    public function setTag($tags)
+    {
+        $tags = trim($tags);
 
-		return FALSE;
-	}
+        //Save the tags in temporary memory to be committed in postSave()
+        $this->tmp_data['tags'] = $tags;
 
-	function getTag() {
-		//Check to see if any temporary data is set for the tags, if not, make a call to the database instead.
-		//postSave() needs to get the tmp_data.
-		if ( isset($this->tmp_data['tags']) ) {
-			return $this->tmp_data['tags'];
-		} elseif ( is_object( $this->getKPIObject() ) AND $this->getKPIObject()->getCompany() > 0 AND $this->getID() > 0 ) {
-			return CompanyGenericTagMapListFactory::getStringByCompanyIDAndObjectTypeIDAndObjectID( $this->getKPIObject()->getCompany(), 330, $this->getID() );
-		}
+        return true;
+    }
 
-		return FALSE;
-	}
-	function setTag( $tags ) {
-		$tags = trim($tags);
+    public function Validate($ignore_warning = true)
+    {
+        //$this->setProvince( $this->getProvince() ); //Not sure why this was there, but it causes duplicate errors if the province is incorrect.
 
-		//Save the tags in temporary memory to be committed in postSave()
-		$this->tmp_data['tags'] = $tags;
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function preSave()
+    {
+        return true;
+    }
 
-	function Validate( $ignore_warning = TRUE ) {
-		//$this->setProvince( $this->getProvince() ); //Not sure why this was there, but it causes duplicate errors if the province is incorrect.
+    public function postSave()
+    {
+        $this->removeCache($this->getId());
 
-		return TRUE;
-	}
+        if ($this->getDeleted() == false) {
+            Debug::text('Setting Tags...', __FILE__, __LINE__, __METHOD__, 10);
+            CompanyGenericTagMapFactory::setTags($this->getKPIObject()->getCompany(), 330, $this->getID(), $this->getTag());
+        }
 
-	function preSave() {
-		return TRUE;
-	}
+        return true;
+    }
 
-	function postSave() {
-		$this->removeCache( $this->getId() );
+    public function getKPIObject()
+    {
+        return $this->getGenericObject('KPIListFactory', $this->getKPI(), 'kpi_obj');
+    }
 
-		if ( $this->getDeleted() == FALSE ) {
-			Debug::text('Setting Tags...', __FILE__, __LINE__, __METHOD__, 10);
-			CompanyGenericTagMapFactory::setTags( $this->getKPIObject()->getCompany(), 330, $this->getID(), $this->getTag() );
-		}
+    public function getKPI()
+    {
+        if (isset($this->data['kpi_id'])) {
+            return (int)$this->data['kpi_id'];
+        }
+        return false;
+    }
 
-		return TRUE;
-	}
+    public function getTag()
+    {
+        //Check to see if any temporary data is set for the tags, if not, make a call to the database instead.
+        //postSave() needs to get the tmp_data.
+        if (isset($this->tmp_data['tags'])) {
+            return $this->tmp_data['tags'];
+        } elseif (is_object($this->getKPIObject()) and $this->getKPIObject()->getCompany() > 0 and $this->getID() > 0) {
+            return CompanyGenericTagMapListFactory::getStringByCompanyIDAndObjectTypeIDAndObjectID($this->getKPIObject()->getCompany(), 330, $this->getID());
+        }
 
-	function setObjectFromArray( $data ) {
+        return false;
+    }
 
-		if ( is_array( $data ) ) {
-			$variable_function_map = $this->getVariableToFunctionMap();
-			foreach( $variable_function_map as $key => $function ) {
-				if ( isset($data[$key]) ) {
+    public function setObjectFromArray($data)
+    {
+        if (is_array($data)) {
+            $variable_function_map = $this->getVariableToFunctionMap();
+            foreach ($variable_function_map as $key => $function) {
+                if (isset($data[$key])) {
+                    $function = 'set' . $function;
+                    switch ($key) {
+                        default:
+                            if (method_exists($this, $function)) {
+                                $this->$function($data[$key]);
+                            }
+                            break;
+                    }
+                }
+            }
 
-					$function = 'set'.$function;
-					switch( $key ) {
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$this->$function( $data[$key] );
-							}
-							break;
-					}
-				}
-			}
+            $this->setCreatedAndUpdatedColumns($data);
 
-			$this->setCreatedAndUpdatedColumns( $data );
+            return true;
+        }
 
-			return TRUE;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getObjectAsArray($include_columns = null, $permission_children_ids = false)
+    {
+        $data = array();
+        $variable_function_map = $this->getVariableToFunctionMap();
+        if (is_array($variable_function_map)) {
+            foreach ($variable_function_map as $variable => $function_stub) {
+                if ($include_columns == null or (isset($include_columns[$variable]) and $include_columns[$variable] == true)) {
+                    $function = 'get' . $function_stub;
 
-	function getObjectAsArray( $include_columns = NULL, $permission_children_ids = FALSE  ) {
-		$data = array();
-		$variable_function_map = $this->getVariableToFunctionMap();
-		if ( is_array( $variable_function_map ) ) {
-			foreach( $variable_function_map as $variable => $function_stub ) {
-				if ( $include_columns == NULL OR ( isset($include_columns[$variable]) AND $include_columns[$variable] == TRUE ) ) {
+                    switch ($variable) {
+                        case 'name':
+                        case 'type_id':
+                        case 'status_id':
+                        case 'minimum_rate':
+                        case 'maximum_rate':
+                        case 'description':
+                            $data[$variable] = $this->getColumn($variable);
+                            break;
+                        default:
+                            if (method_exists($this, $function)) {
+                                $data[$variable] = $this->$function();
+                            }
+                            break;
+                    }
+                }
+            }
+            $this->getPermissionColumns($data, $this->getCreatedBy(), false, $permission_children_ids, $include_columns);
 
-					$function = 'get'.$function_stub;
+            $this->getCreatedAndUpdatedColumns($data, $include_columns);
+        }
 
-					switch( $variable ) {
-						case 'name':
-						case 'type_id':
-						case 'status_id':
-						case 'minimum_rate':
-						case 'maximum_rate':
-						case 'description':
-							$data[$variable] = $this->getColumn( $variable );
-							break;
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$data[$variable] = $this->$function();
-							}
-							break;
-					}
+        return $data;
+    }
 
-				}
-			}
-			$this->getPermissionColumns( $data, $this->getCreatedBy(), FALSE, $permission_children_ids, $include_columns );
+    public function addLog($log_action)
+    {
+        $kpi_obj = $this->getKPIObject();
+        if (is_object($kpi_obj)) {
+            return TTLog::addEntry($this->getUserReviewControl(), $log_action, TTi18n::getText('Employee Review KPI') . ' - ' . TTi18n::getText('KPI') . ': ' . $kpi_obj->getName(), null, $this->getTable(), $this);
+        }
+        return false;
+    }
 
-			$this->getCreatedAndUpdatedColumns( $data, $include_columns );
-		}
-
-		return $data;
-	}
-
-	function addLog( $log_action ) {
-		$kpi_obj = $this->getKPIObject();
-		if ( is_object($kpi_obj) ) {
-			return TTLog::addEntry( $this->getUserReviewControl(), $log_action, TTi18n::getText('Employee Review KPI') . ' - ' . TTi18n::getText('KPI') . ': ' . $kpi_obj->getName(), NULL, $this->getTable(), $this );
-		}
-		return FALSE;
-	}
-
+    public function getUserReviewControl()
+    {
+        if (isset($this->data['user_review_control_id'])) {
+            return (int)$this->data['user_review_control_id'];
+        }
+        return false;
+    }
 }
-?>

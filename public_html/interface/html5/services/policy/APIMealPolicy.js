@@ -1,51 +1,51 @@
-var APIMealPolicy = ServiceCaller.extend( {
+var APIMealPolicy = ServiceCaller.extend({
 
-	key_name: 'MealPolicy',
-	className: 'APIMealPolicy',
+    key_name: 'MealPolicy',
+    className: 'APIMealPolicy',
 
-	getMealPolicyDefaultData: function() {
+    getMealPolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getMealPolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getMealPolicyDefaultData', arguments);
 
-	},
+    },
 
-	getMealPolicy: function() {
+    getMealPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getMealPolicy', arguments );
+        return this.argumentsHandler(this.className, 'getMealPolicy', arguments);
 
-	},
+    },
 
-	getCommonMealPolicyData: function() {
+    getCommonMealPolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonMealPolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonMealPolicyData', arguments);
 
-	},
+    },
 
-	validateMealPolicy: function() {
+    validateMealPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateMealPolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateMealPolicy', arguments);
 
-	},
+    },
 
-	setMealPolicy: function() {
+    setMealPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setMealPolicy', arguments );
+        return this.argumentsHandler(this.className, 'setMealPolicy', arguments);
 
-	},
+    },
 
-	deleteMealPolicy: function() {
+    deleteMealPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteMealPolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteMealPolicy', arguments);
 
-	},
+    },
 
-	copyMealPolicy: function() {
-		return this.argumentsHandler( this.className, 'copyMealPolicy', arguments );
-	},
+    copyMealPolicy: function () {
+        return this.argumentsHandler(this.className, 'copyMealPolicy', arguments);
+    },
 
-	exportMealPolicy: function() {
-		return this.argumentsHandler( this.className, 'exportMealPolicy', arguments );
-	}
+    exportMealPolicy: function () {
+        return this.argumentsHandler(this.className, 'exportMealPolicy', arguments);
+    }
 
 
-} );
+});

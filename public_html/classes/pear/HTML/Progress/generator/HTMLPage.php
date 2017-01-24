@@ -42,22 +42,21 @@ require_once 'HTML/Page.php';
  * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  */
-
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {
-    function _renderForm(&$page)
+    public function _renderForm(&$page)
     {
         $pageName = $page->getAttribute('name');
-        $tabPreview = array_slice ($page->controller->_tabs, -2, 1);
+        $tabPreview = array_slice($page->controller->_tabs, -2, 1);
         $tab = '  ';
 
         $p = new HTML_Page(array(
-                 'lineend'  => OS_WINDOWS ? 'win' : 'unix',
-                 'tab'      => $tab,
-                 'doctype'  => "XHTML 1.0 Strict",
-                 'language' => 'en',
-                 'cache'    => 'false'
-             ));
+            'lineend' => OS_WINDOWS ? 'win' : 'unix',
+            'tab' => $tab,
+            'doctype' => "XHTML 1.0 Strict",
+            'language' => 'en',
+            'cache' => 'false'
+        ));
         $p->disableXmlProlog();
         $p->setTitle("PEAR::HTML_Progress - Generator");
         $p->setMetaData("author", "Laurent Laville");
@@ -108,11 +107,11 @@ input.flat {
             $ui = $bar->getUI();
             $ui->setTab($tab);
 
-            $p->addStyleDeclaration( $css . $bar->getStyle() );
-            $p->addScriptDeclaration( $bar->getScript() );
+            $p->addStyleDeclaration($css . $bar->getStyle());
+            $p->addScriptDeclaration($bar->getScript());
 
             $barElement = $page->getElement('progressBar');
-            $barElement->setText( $bar->toHtml() );
+            $barElement->setText($bar->toHtml());
         } else {
             $p->addStyleDeclaration($css);
         }
@@ -126,8 +125,7 @@ input.flat {
 
         $page->accept($renderer);
 
-        $p->addBodyContent( $renderer->toHtml() );
+        $p->addBodyContent($renderer->toHtml());
         $p->display();
     }
 }
-?>

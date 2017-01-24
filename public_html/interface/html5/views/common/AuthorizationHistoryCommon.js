@@ -22,9 +22,9 @@ AuthorizationHistory = {
      * @param $this
      * @returns {AuthorizationHistory}
      */
-    init: function(host){
+    init: function (host) {
         $('.authorization-grid-div').hide();
-        if ( host.is_add ) {
+        if (host.is_add) {
             return;
         }
 
@@ -40,19 +40,19 @@ AuthorizationHistory = {
         this.authorization_api = new (APIFactory.getAPIClass('APIAuthorization'))();
 
         var $this = this;
-        this.getAuthorizationHistoryColumns( function() {
-            $this.initAuthorizationHistoryLayout( function() {
+        this.getAuthorizationHistoryColumns(function () {
+            $this.initAuthorizationHistoryLayout(function () {
                 $this.setAuthorizationGridSize();
             });
-        } );
+        });
 
         return $this;
     },
 
-    initAuthorizationHistoryLayout: function(callback) {
+    initAuthorizationHistoryLayout: function (callback) {
         var $this = this;
-        this.getAuthorizationHistoryDefaultDisplayColumns( function() {
-            if ( !$this.host_view_controller.edit_view ) {
+        this.getAuthorizationHistoryDefaultDisplayColumns(function () {
+            if (!$this.host_view_controller.edit_view) {
                 return;
             }
             $this.setAuthorizationHistorySelectLayout();
@@ -60,7 +60,7 @@ AuthorizationHistory = {
             if (callback) {
                 callback();
             }
-        } );
+        });
     },
 
     /**
@@ -68,113 +68,117 @@ AuthorizationHistory = {
      *
      * @param callback
      */
-    initAuthorizationHistoryData: function(callback) {
+    initAuthorizationHistoryData: function (callback) {
         var filter = {};
         filter.filter_data = {};
 
-        filter.filter_columns = {'created_by':true,'created_date':true,'authorized':true};
+        filter.filter_columns = {'created_by': true, 'created_date': true, 'authorized': true};
         filter.filter_data.object_id = [this.host_view_controller.current_edit_record.id];
         filter.filter_data.object_type_id = this.host_view_controller.hierarchy_type_id ? this.host_view_controller.hierarchy_type_id : this.host_view_controller.current_edit_record.hierarchy_type_id;
 
         var $this = this;
-        this.authorization_api['get' + this.authorization_api.key_name]( filter, {onResult: function( result ) {
+        this.authorization_api['get' + this.authorization_api.key_name](filter, {
+            onResult: function (result) {
 
-            if ( !$this.host_view_controller.edit_view ) {
-                return;
+                if (!$this.host_view_controller.edit_view) {
+                    return;
+                }
+
+                var result_data = result.getResult();
+                if (result.isValid() && Global.isArray(result_data) && result_data.length >= 1) {
+                    result_data = Global.formatGridData(result_data, $this.authorization_api.key_name);
+
+                    $this.authorization_history_grid.clearGridData();
+
+                    $this.authorization_history_grid.setGridParam({data: result_data});
+                    $this.authorization_history_grid.trigger('reloadGrid');
+                    $($this.host_view_controller.edit_view.find('.authorization-grid-div')).show();
+                    $this.showAuthorizationHistoryGridBorders();
+                    $this.setAuthorizationGridSize();
+                } else {
+                    $($this.host_view_controller.edit_view.find('.authorization-grid-div')).hide();
+                }
+
             }
-
-            var result_data = result.getResult();
-            if ( result.isValid() && Global.isArray( result_data ) && result_data.length >= 1) {
-                result_data = Global.formatGridData( result_data, $this.authorization_api.key_name );
-
-                $this.authorization_history_grid.clearGridData();
-
-                $this.authorization_history_grid.setGridParam( {data: result_data} );
-                $this.authorization_history_grid.trigger( 'reloadGrid' );
-                $( $this.host_view_controller.edit_view.find( '.authorization-grid-div' ) ).show();
-                $this.showAuthorizationHistoryGridBorders();
-                $this.setAuthorizationGridSize();
-            } else {
-                $( $this.host_view_controller.edit_view.find( '.authorization-grid-div' ) ).hide();
-            }
-
-        }} );
+        });
     },
 
-    setAuthorizationGridSize: function() {
+    setAuthorizationGridSize: function () {
         var history_height_unit;
-        if ( (!this.authorization_history_grid || !this.authorization_history_grid.is( ':visible' )) ) {
+        if ((!this.authorization_history_grid || !this.authorization_history_grid.is(':visible'))) {
             return;
         }
-        history_height_unit = this.authorization_history_grid.getGridParam( 'data' ).length;
+        history_height_unit = this.authorization_history_grid.getGridParam('data').length;
         history_height_unit > 5 && (history_height_unit = 5);
-        this.authorization_history_grid.setGridWidth( $( this.host_view_controller.edit_view.find( '#authorization_history' ) ).width() );
-        this.authorization_history_grid.setGridHeight( history_height_unit * 25 );
+        this.authorization_history_grid.setGridWidth($(this.host_view_controller.edit_view.find('#authorization_history')).width());
+        this.authorization_history_grid.setGridHeight(history_height_unit * 25);
     },
 
-    buildAuthorizationDisplayColumns: function( apiDisplayColumnsArray ) {
+    buildAuthorizationDisplayColumns: function (apiDisplayColumnsArray) {
         var len = this.authorization_history_columns.length;
         var len1 = apiDisplayColumnsArray.length;
         var display_columns = [];
 
-        for ( var j = 0; j < len1; j++ ) {
-            for ( var i = 0; i < len; i++ ) {
-                if ( apiDisplayColumnsArray[j] === this.authorization_history_columns[i].value ) {
-                    display_columns.push( this.authorization_history_columns[i] );
+        for (var j = 0; j < len1; j++) {
+            for (var i = 0; i < len; i++) {
+                if (apiDisplayColumnsArray[j] === this.authorization_history_columns[i].value) {
+                    display_columns.push(this.authorization_history_columns[i]);
                 }
             }
         }
         return display_columns;
     },
 
-    showAuthorizationHistoryGridBorders: function() {
-        var top_border = this.host_view_controller.edit_view.find( '.grid-top-border' );
-        var bottom_border = this.host_view_controller.edit_view.find( '.grid-bottom-border' );
+    showAuthorizationHistoryGridBorders: function () {
+        var top_border = this.host_view_controller.edit_view.find('.grid-top-border');
+        var bottom_border = this.host_view_controller.edit_view.find('.grid-bottom-border');
 
-        top_border.css( 'display', 'block' );
-        bottom_border.css( 'display', 'block' );
+        top_border.css('display', 'block');
+        bottom_border.css('display', 'block');
     },
 
-    getAuthorizationHistoryDefaultDisplayColumns: function( callBack ) {
+    getAuthorizationHistoryDefaultDisplayColumns: function (callBack) {
         var $this = this;
-        this.authorization_api.getOptions( 'default_display_columns', {
-            onResult: function( columns_result ) {
+        this.authorization_api.getOptions('default_display_columns', {
+            onResult: function (columns_result) {
                 var columns_result_data = columns_result.getResult();
 
                 $this.authorization_history_default_display_columns = columns_result_data;
 
-                if ( callBack ) {
+                if (callBack) {
                     callBack();
                 }
 
             }
-        } );
+        });
     },
 
-    getAuthorizationHistoryColumns: function( callBack ) {
+    getAuthorizationHistoryColumns: function (callBack) {
         var $this = this;
-        this.authorization_api.getOptions( 'columns', {onResult: function( columns_result ) {
-            var columns_result_data = columns_result.getResult();
-            $this.authorization_history_columns = Global.buildColumnArray( columns_result_data );
+        this.authorization_api.getOptions('columns', {
+            onResult: function (columns_result) {
+                var columns_result_data = columns_result.getResult();
+                $this.authorization_history_columns = Global.buildColumnArray(columns_result_data);
 
-            if ( callBack ) {
-                callBack();
+                if (callBack) {
+                    callBack();
+                }
             }
-        }} );
+        });
     },
 
-    setAuthorizationHistorySelectLayout: function( column_start_from ) {
+    setAuthorizationHistorySelectLayout: function (column_start_from) {
         var $this = this;
-        var grid = this.host_view_controller.edit_view.find( '#grid' );
-        grid.attr( 'id', 'authorization_history_grid' );  //Grid's id is ScriptName + _grid
-        grid = this.host_view_controller.edit_view.find( '#authorization_history_grid' );
+        var grid = this.host_view_controller.edit_view.find('#grid');
+        grid.attr('id', 'authorization_history_grid');  //Grid's id is ScriptName + _grid
+        grid = this.host_view_controller.edit_view.find('#authorization_history_grid');
         var column_info_array = [];
-        var display_columns = this.buildAuthorizationDisplayColumns( this.authorization_history_default_display_columns );
+        var display_columns = this.buildAuthorizationDisplayColumns(this.authorization_history_default_display_columns);
 
         //Set Data Grid on List view
         var len = display_columns.length;
 
-        for ( var i = 0; i < len; i++ ) {
+        for (var i = 0; i < len; i++) {
             var view_column_data = display_columns[i];
 
             var column_info = {
@@ -185,13 +189,13 @@ AuthorizationHistory = {
                 sortable: false,
                 title: false
             };
-            column_info_array.push( column_info );
+            column_info_array.push(column_info);
         }
 
-        if ( true|| !this.authorization_history_grid ) {
+        if (true || !this.authorization_history_grid) {
             this.authorization_history_grid = grid;
 
-            this.authorization_history_grid = this.authorization_history_grid.jqGrid( {
+            this.authorization_history_grid = this.authorization_history_grid.jqGrid({
                 altRows: true,
                 data: [],
                 datatype: 'local',
@@ -202,15 +206,15 @@ AuthorizationHistory = {
                 colNames: [],
                 colModel: column_info_array
 
-            } );
+            });
 
         } else {
 
-            this.authorization_history_grid.jqGrid( 'GridUnload' );
+            this.authorization_history_grid.jqGrid('GridUnload');
             this.authorization_history_grid = null;
             this.authorization_history_grid = grid;
 
-            this.authorization_history_grid = this.authorization_history_grid.jqGrid( {
+            this.authorization_history_grid = this.authorization_history_grid.jqGrid({
                 altRows: true,
                 data: [],
                 datatype: 'local',
@@ -221,7 +225,7 @@ AuthorizationHistory = {
                 colNames: [],
                 colModel: column_info_array
 
-            } );
+            });
         }
     },
 

@@ -14,123 +14,154 @@ V5.20dev  ??-???-2014  (c) 2000-2014 John Lim (jlim#natsoft.com). All rights res
 */
 
 // security - hide paths
-if (!defined('ADODB_DIR')) die();
-
-include_once(ADODB_DIR."/drivers/adodb-mysql.inc.php");
-
-
-class ADODB_mysqlt extends ADODB_mysql {
-	var $databaseType = 'mysqlt';
-	var $ansiOuter = true; // for Version 3.23.17 or later
-	var $hasTransactions = true;
-	var $autoRollback = true; // apparently mysql does not autorollback properly
-
-	function ADODB_mysqlt()
-	{
-	global $ADODB_EXTENSION; if ($ADODB_EXTENSION) $this->rsPrefix .= 'ext_';
-	}
-
-	function BeginTrans()
-	{
-		if ($this->transOff) return true;
-		$this->transCnt += 1;
-		$this->Execute('SET AUTOCOMMIT=0');
-		$this->Execute('BEGIN');
-		return true;
-	}
-
-	function CommitTrans($ok=true)
-	{
-		if ($this->transOff) return true;
-		if (!$ok) return $this->RollbackTrans();
-
-		if ($this->transCnt) $this->transCnt -= 1;
-		$this->Execute('COMMIT');
-		$this->Execute('SET AUTOCOMMIT=1');
-		return true;
-	}
-
-	function RollbackTrans()
-	{
-		if ($this->transOff) return true;
-		if ($this->transCnt) $this->transCnt -= 1;
-		$this->Execute('ROLLBACK');
-		$this->Execute('SET AUTOCOMMIT=1');
-		return true;
-	}
-
-	function RowLock($tables,$where='',$col='1 as adodbignore')
-	{
-		if ($this->transCnt==0) $this->BeginTrans();
-		if ($where) $where = ' where '.$where;
-		$rs = $this->Execute("select $col from $tables $where for update");
-		return !empty($rs);
-	}
-
+if (!defined('ADODB_DIR')) {
+    die();
 }
 
-class ADORecordSet_mysqlt extends ADORecordSet_mysql{
-	var $databaseType = "mysqlt";
+include_once(ADODB_DIR . "/drivers/adodb-mysql.inc.php");
 
-	function ADORecordSet_mysqlt($queryID,$mode=false)
-	{
-		if ($mode === false) {
-			global $ADODB_FETCH_MODE;
-			$mode = $ADODB_FETCH_MODE;
-		}
 
-		switch ($mode)
-		{
-		case ADODB_FETCH_NUM: $this->fetchMode = MYSQL_NUM; break;
-		case ADODB_FETCH_ASSOC:$this->fetchMode = MYSQL_ASSOC; break;
+class ADODB_mysqlt extends ADODB_mysql
+{
+    public $databaseType = 'mysqlt';
+    public $ansiOuter = true; // for Version 3.23.17 or later
+    public $hasTransactions = true;
+    public $autoRollback = true; // apparently mysql does not autorollback properly
 
-		case ADODB_FETCH_DEFAULT:
-		case ADODB_FETCH_BOTH:
-		default: $this->fetchMode = MYSQL_BOTH; break;
-		}
+    public function ADODB_mysqlt()
+    {
+        global $ADODB_EXTENSION;
+        if ($ADODB_EXTENSION) {
+            $this->rsPrefix .= 'ext_';
+        }
+    }
 
-		$this->adodbFetchMode = $mode;
-		$this->ADORecordSet($queryID);
-	}
+    public function CommitTrans($ok = true)
+    {
+        if ($this->transOff) {
+            return true;
+        }
+        if (!$ok) {
+            return $this->RollbackTrans();
+        }
 
-	function MoveNext()
-	{
-		if (@$this->fields = mysql_fetch_array($this->_queryID,$this->fetchMode)) {
-			$this->_currentRow += 1;
-			return true;
-		}
-		if (!$this->EOF) {
-			$this->_currentRow += 1;
-			$this->EOF = true;
-		}
-		return false;
-	}
+        if ($this->transCnt) {
+            $this->transCnt -= 1;
+        }
+        $this->Execute('COMMIT');
+        $this->Execute('SET AUTOCOMMIT=1');
+        return true;
+    }
+
+    public function RollbackTrans()
+    {
+        if ($this->transOff) {
+            return true;
+        }
+        if ($this->transCnt) {
+            $this->transCnt -= 1;
+        }
+        $this->Execute('ROLLBACK');
+        $this->Execute('SET AUTOCOMMIT=1');
+        return true;
+    }
+
+    public function RowLock($tables, $where = '', $col = '1 as adodbignore')
+    {
+        if ($this->transCnt == 0) {
+            $this->BeginTrans();
+        }
+        if ($where) {
+            $where = ' where ' . $where;
+        }
+        $rs = $this->Execute("select $col from $tables $where for update");
+        return !empty($rs);
+    }
+
+    public function BeginTrans()
+    {
+        if ($this->transOff) {
+            return true;
+        }
+        $this->transCnt += 1;
+        $this->Execute('SET AUTOCOMMIT=0');
+        $this->Execute('BEGIN');
+        return true;
+    }
 }
 
-class ADORecordSet_ext_mysqlt extends ADORecordSet_mysqlt {
+class ADORecordSet_mysqlt extends ADORecordSet_mysql
+{
+    public $databaseType = "mysqlt";
 
-	function ADORecordSet_ext_mysqlt($queryID,$mode=false)
-	{
-		if ($mode === false) {
-			global $ADODB_FETCH_MODE;
-			$mode = $ADODB_FETCH_MODE;
-		}
-		switch ($mode)
-		{
-		case ADODB_FETCH_NUM: $this->fetchMode = MYSQL_NUM; break;
-		case ADODB_FETCH_ASSOC:$this->fetchMode = MYSQL_ASSOC; break;
+    public function ADORecordSet_mysqlt($queryID, $mode = false)
+    {
+        if ($mode === false) {
+            global $ADODB_FETCH_MODE;
+            $mode = $ADODB_FETCH_MODE;
+        }
 
-		case ADODB_FETCH_DEFAULT:
-		case ADODB_FETCH_BOTH:
-		default:
-			$this->fetchMode = MYSQL_BOTH; break;
-		}
-		$this->adodbFetchMode = $mode;
-		$this->ADORecordSet($queryID);
-	}
+        switch ($mode) {
+            case ADODB_FETCH_NUM:
+                $this->fetchMode = MYSQL_NUM;
+                break;
+            case ADODB_FETCH_ASSOC:
+                $this->fetchMode = MYSQL_ASSOC;
+                break;
 
-	function MoveNext()
-	{
-		return adodb_movenext($this);
-	}
+            case ADODB_FETCH_DEFAULT:
+            case ADODB_FETCH_BOTH:
+            default:
+                $this->fetchMode = MYSQL_BOTH;
+                break;
+        }
+
+        $this->adodbFetchMode = $mode;
+        $this->ADORecordSet($queryID);
+    }
+
+    public function MoveNext()
+    {
+        if (@$this->fields = mysql_fetch_array($this->_queryID, $this->fetchMode)) {
+            $this->_currentRow += 1;
+            return true;
+        }
+        if (!$this->EOF) {
+            $this->_currentRow += 1;
+            $this->EOF = true;
+        }
+        return false;
+    }
+}
+
+class ADORecordSet_ext_mysqlt extends ADORecordSet_mysqlt
+{
+    public function ADORecordSet_ext_mysqlt($queryID, $mode = false)
+    {
+        if ($mode === false) {
+            global $ADODB_FETCH_MODE;
+            $mode = $ADODB_FETCH_MODE;
+        }
+        switch ($mode) {
+            case ADODB_FETCH_NUM:
+                $this->fetchMode = MYSQL_NUM;
+                break;
+            case ADODB_FETCH_ASSOC:
+                $this->fetchMode = MYSQL_ASSOC;
+                break;
+
+            case ADODB_FETCH_DEFAULT:
+            case ADODB_FETCH_BOTH:
+            default:
+                $this->fetchMode = MYSQL_BOTH;
+                break;
+        }
+        $this->adodbFetchMode = $mode;
+        $this->ADORecordSet($queryID);
+    }
+
+    public function MoveNext()
+    {
+        return adodb_movenext($this);
+    }
 }

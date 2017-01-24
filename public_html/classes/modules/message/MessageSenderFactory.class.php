@@ -19,93 +19,106 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Message
  */
-class MessageSenderFactory extends Factory {
-	protected $table = 'message_sender';
-	protected $pk_sequence_name = 'message_sender_id_seq'; //PK Sequence name
-	protected $obj_handler = NULL;
+class MessageSenderFactory extends Factory
+{
+    protected $table = 'message_sender';
+    protected $pk_sequence_name = 'message_sender_id_seq'; //PK Sequence name
+    protected $obj_handler = null;
 
-	function getUser() {
-		return (int)$this->data['user_id'];
-	}
-	function setUser($id) {
-		$id = trim($id);
+    public function getUser()
+    {
+        return (int)$this->data['user_id'];
+    }
 
-		$ulf = TTnew( 'UserListFactory' );
+    public function setUser($id)
+    {
+        $id = trim($id);
 
-		if ( $id == 0
-				OR $this->Validator->isResultSetWithRows(	'user',
-															$ulf->getByID($id),
-															TTi18n::gettext('Invalid Employee')
-															) ) {
-			$this->data['user_id'] = $id;
+        $ulf = TTnew('UserListFactory');
 
-			return TRUE;
-		}
+        if ($id == 0
+            or $this->Validator->isResultSetWithRows('user',
+                $ulf->getByID($id),
+                TTi18n::gettext('Invalid Employee')
+            )
+        ) {
+            $this->data['user_id'] = $id;
 
-		return FALSE;
-	}
+            return true;
+        }
 
-	function getParent() {
-		if ( isset($this->data['parent_id']) ) {
-			return (int)$this->data['parent_id'];
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
-	function setParent($id) {
-		$id = trim($id);
+    public function getParent()
+    {
+        if (isset($this->data['parent_id'])) {
+            return (int)$this->data['parent_id'];
+        }
 
-		if ( empty($id) ) {
-			$id = 0;
-		}
+        return false;
+    }
 
-		$mslf = TTnew( 'MessageSenderListFactory' );
+    public function setParent($id)
+    {
+        $id = trim($id);
 
-		if ( $id == 0
-				OR $this->Validator->isResultSetWithRows(	'parent',
-															$mslf->getByID($id),
-															TTi18n::gettext('Parent is invalid')
-															) ) {
-			$this->data['parent_id'] = $id;
+        if (empty($id)) {
+            $id = 0;
+        }
 
-			return TRUE;
-		}
+        $mslf = TTnew('MessageSenderListFactory');
 
-		return FALSE;
-	}
+        if ($id == 0
+            or $this->Validator->isResultSetWithRows('parent',
+                $mslf->getByID($id),
+                TTi18n::gettext('Parent is invalid')
+            )
+        ) {
+            $this->data['parent_id'] = $id;
 
-	function getMessageControl() {
-		if ( isset($this->data['message_control_id']) ) {
-			return (int)$this->data['message_control_id'];
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setMessageControl($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		$mclf = TTnew( 'MessageControlListFactory' );
+    public function getMessageControl()
+    {
+        if (isset($this->data['message_control_id'])) {
+            return (int)$this->data['message_control_id'];
+        }
 
-		if ( $this->Validator->isResultSetWithRows(	'message_control_id',
-													$mclf->getByID($id),
-													TTi18n::gettext('Message Control is invalid')
-													) ) {
-			$this->data['message_control_id'] = $id;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setMessageControl($id)
+    {
+        $id = trim($id);
 
-		return FALSE;
-	}
+        $mclf = TTnew('MessageControlListFactory');
 
-	function postSave() {
-		return TRUE;
-	}
+        if ($this->Validator->isResultSetWithRows('message_control_id',
+            $mclf->getByID($id),
+            TTi18n::gettext('Message Control is invalid')
+        )
+        ) {
+            $this->data['message_control_id'] = $id;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function postSave()
+    {
+        return true;
+    }
 }
-?>

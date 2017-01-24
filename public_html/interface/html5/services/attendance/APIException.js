@@ -1,51 +1,51 @@
-var APIException = ServiceCaller.extend( {
+var APIException = ServiceCaller.extend({
 
-	key_name: 'Exception',
-	className: 'APIException',
+    key_name: 'Exception',
+    className: 'APIException',
 
-	getExceptionDefaultData: function() {
+    getExceptionDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getExceptionDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getExceptionDefaultData', arguments);
 
-	},
+    },
 
-	getException: function() {
+    getException: function () {
 
-		return this.argumentsHandler( this.className, 'getException', arguments );
+        return this.argumentsHandler(this.className, 'getException', arguments);
 
-	},
+    },
 
-	getCommonExceptionData: function() {
+    getCommonExceptionData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonExceptionData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonExceptionData', arguments);
 
-	},
+    },
 
-	validateException: function() {
+    validateException: function () {
 
-		return this.argumentsHandler( this.className, 'validateException', arguments );
+        return this.argumentsHandler(this.className, 'validateException', arguments);
 
-	},
+    },
 
-	setException: function() {
+    setException: function () {
 
-		return this.argumentsHandler( this.className, 'setException', arguments );
+        return this.argumentsHandler(this.className, 'setException', arguments);
 
-	},
+    },
 
-	deleteException: function() {
+    deleteException: function () {
 
-		return this.argumentsHandler( this.className, 'deleteException', arguments );
+        return this.argumentsHandler(this.className, 'deleteException', arguments);
 
-	},
+    },
 
-	copyException: function() {
-		return this.argumentsHandler( this.className, 'copyException', arguments );
-	},
+    copyException: function () {
+        return this.argumentsHandler(this.className, 'copyException', arguments);
+    },
 
-	exportException: function() {
-		return this.argumentsHandler( this.className, 'exportException', arguments );
-	},
+    exportException: function () {
+        return this.argumentsHandler(this.className, 'exportException', arguments);
+    },
 
 
-} );
+});

@@ -1,51 +1,51 @@
-var APIContributingPayCodePolicy = ServiceCaller.extend( {
+var APIContributingPayCodePolicy = ServiceCaller.extend({
 
-	key_name: 'ContributingPayCodePolicy',
-	className: 'APIContributingPayCodePolicy',
+    key_name: 'ContributingPayCodePolicy',
+    className: 'APIContributingPayCodePolicy',
 
-	getContributingPayCodePolicyDefaultData: function() {
+    getContributingPayCodePolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getContributingPayCodePolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getContributingPayCodePolicyDefaultData', arguments);
 
-	},
+    },
 
-	getContributingPayCodePolicy: function() {
+    getContributingPayCodePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getContributingPayCodePolicy', arguments );
+        return this.argumentsHandler(this.className, 'getContributingPayCodePolicy', arguments);
 
-	},
+    },
 
-	getCommonContributingPayCodePolicyData: function() {
+    getCommonContributingPayCodePolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonContributingPayCodePolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonContributingPayCodePolicyData', arguments);
 
-	},
+    },
 
-	validateContributingPayCodePolicy: function() {
+    validateContributingPayCodePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateContributingPayCodePolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateContributingPayCodePolicy', arguments);
 
-	},
+    },
 
-	setContributingPayCodePolicy: function() {
+    setContributingPayCodePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setContributingPayCodePolicy', arguments );
+        return this.argumentsHandler(this.className, 'setContributingPayCodePolicy', arguments);
 
-	},
+    },
 
-	deleteContributingPayCodePolicy: function() {
+    deleteContributingPayCodePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteContributingPayCodePolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteContributingPayCodePolicy', arguments);
 
-	},
+    },
 
-	copyContributingPayCodePolicy: function() {
-		return this.argumentsHandler( this.className, 'copyContributingPayCodePolicy', arguments );
-	},
+    copyContributingPayCodePolicy: function () {
+        return this.argumentsHandler(this.className, 'copyContributingPayCodePolicy', arguments);
+    },
 
-	exportContributingPayCodePolicy: function() {
-		return this.argumentsHandler( this.className, 'exportContributingPayCodePolicy', arguments );
-	}
+    exportContributingPayCodePolicy: function () {
+        return this.argumentsHandler(this.className, 'exportContributingPayCodePolicy', arguments);
+    }
 
 
-} );
+});

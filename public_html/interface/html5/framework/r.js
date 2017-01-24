@@ -24,9 +24,9 @@ var requirejs, require, define, xpcUtil;
         jsSuffixRegExp = /\.js$/,
         commandOption = '',
         useLibLoaded = {},
-    //Used by jslib/rhino/args.js
+        //Used by jslib/rhino/args.js
         rhinoArgs = args,
-    //Used by jslib/xpconnect/args.js
+        //Used by jslib/xpconnect/args.js
         xpconnectArgs = args,
         readFile = typeof readFileFunc !== 'undefined' ? readFileFunc : null;
 
@@ -257,14 +257,14 @@ var requirejs, require, define, xpcUtil;
             apsp = ap.splice,
             isBrowser = !!(typeof window !== 'undefined' && navigator && window.document),
             isWebWorker = !isBrowser && typeof importScripts !== 'undefined',
-        //PS3 indicates loaded and complete, but need to wait for complete
-        //specifically. Sequence is 'loading', 'loaded', execution,
-        // then 'complete'. The UA check is unfortunate, but not sure how
-        //to feature test w/o causing perf issues.
+            //PS3 indicates loaded and complete, but need to wait for complete
+            //specifically. Sequence is 'loading', 'loaded', execution,
+            // then 'complete'. The UA check is unfortunate, but not sure how
+            //to feature test w/o causing perf issues.
             readyRegExp = isBrowser && navigator.platform === 'PLAYSTATION 3' ?
                 /^complete$/ : /^(complete|loaded)$/,
             defContextName = '_',
-        //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
+            //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
             isOpera = typeof opera !== 'undefined' && opera.toString() === '[object Opera]',
             contexts = {},
             cfg = {},
@@ -439,9 +439,9 @@ var requirejs, require, define, xpcUtil;
                     config: {}
                 },
                 registry = {},
-            //registry of just enabled modules, to speed
-            //cycle breaking code when lots of modules
-            //are registered, but not activated.
+                //registry of just enabled modules, to speed
+                //cycle breaking code when lots of modules
+                //are registered, but not activated.
                 enabledRegistry = {},
                 undefEvents = {},
                 defQueue = [],
@@ -819,7 +819,7 @@ var requirejs, require, define, xpcUtil;
                                 // at the main module.
                                 c = pkg ? getOwn(config.config, mod.map.id + '/' + pkg.main) :
                                     getOwn(config.config, mod.map.id);
-                                return  c || {};
+                                return c || {};
                             },
                             exports: defined[mod.map.id]
                         });
@@ -864,7 +864,7 @@ var requirejs, require, define, xpcUtil;
             function checkLoaded() {
                 var map, modId, err, usingPathFallback,
                     waitInterval = config.waitSeconds * 1000,
-                //It is possible to disable the wait interval by using waitSeconds of 0.
+                    //It is possible to disable the wait interval by using waitSeconds of 0.
                     expired = waitInterval && (context.startTime + waitInterval) < new Date().getTime(),
                     noLoads = [],
                     reqCalls = [],
@@ -1165,7 +1165,7 @@ var requirejs, require, define, xpcUtil;
                 callPlugin: function () {
                     var map = this.map,
                         id = map.id,
-                    //Map already normalized the prefix.
+                        //Map already normalized the prefix.
                         pluginMap = makeModuleMap(map.prefix);
 
                     //Mark this as a dependency for this plugin, so it
@@ -1186,8 +1186,8 @@ var requirejs, require, define, xpcUtil;
                             //Normalize the ID if the plugin allows it.
                             if (plugin.normalize) {
                                 name = plugin.normalize(name, function (name) {
-                                    return normalize(name, parentName, true);
-                                }) || '';
+                                        return normalize(name, parentName, true);
+                                    }) || '';
                             }
 
                             //prefix and name should already be normalized, no need
@@ -1196,7 +1196,9 @@ var requirejs, require, define, xpcUtil;
                                 this.map.parentMap);
                             on(normalizedMap,
                                 'defined', bind(this, function (value) {
-                                    this.init([], function () { return value; }, null, {
+                                    this.init([], function () {
+                                        return value;
+                                    }, null, {
                                         enabled: true,
                                         ignore: true
                                     });
@@ -1220,7 +1222,9 @@ var requirejs, require, define, xpcUtil;
                         }
 
                         load = bind(this, function (value) {
-                            this.init([], function () { return value; }, null, {
+                            this.init([], function () {
+                                return value;
+                            }, null, {
                                 enabled: true
                             });
                         });
@@ -1277,7 +1281,7 @@ var requirejs, require, define, xpcUtil;
                             } catch (e) {
                                 return onError(makeError('fromtexteval',
                                     'fromText eval for ' + id +
-                                        ' failed: ' + e,
+                                    ' failed: ' + e,
                                     e,
                                     [id]));
                             }
@@ -1530,7 +1534,7 @@ var requirejs, require, define, xpcUtil;
                         each(cfg.packages, function (pkgObj) {
                             var location;
 
-                            pkgObj = typeof pkgObj === 'string' ? { name: pkgObj } : pkgObj;
+                            pkgObj = typeof pkgObj === 'string' ? {name: pkgObj} : pkgObj;
                             location = pkgObj.location;
 
                             //Create a brand new object on pkgs, since currentPackages can
@@ -1581,6 +1585,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return ret || (value.exports && getGlobal(value.exports));
                     }
+
                     return fn;
                 },
 
@@ -1674,7 +1679,7 @@ var requirejs, require, define, xpcUtil;
                             }
 
                             return context.nameToUrl(normalize(moduleNamePlusExt,
-                                relMap && relMap.id, true), ext,  true);
+                                relMap && relMap.id, true), ext, true);
                         },
 
                         defined: function (id) {
@@ -1848,7 +1853,7 @@ var requirejs, require, define, xpcUtil;
 
                     return config.urlArgs ? url +
                         ((url.indexOf('?') === -1 ? '?' : '&') +
-                            config.urlArgs) : url;
+                        config.urlArgs) : url;
                 },
 
                 //Delegates to req.load. Broken out as a separate function to
@@ -1970,8 +1975,10 @@ var requirejs, require, define, xpcUtil;
          * @param  {Function} fn function to execute later.
          */
         req.nextTick = typeof setTimeout !== 'undefined' ? function (fn) {
-            setTimeout(fn, 4);
-        } : function (fn) { fn(); };
+                setTimeout(fn, 4);
+            } : function (fn) {
+                fn();
+            };
 
         /**
          * Export require as a global, but only if it does not already exist.
@@ -2067,8 +2074,7 @@ var requirejs, require, define, xpcUtil;
                     //in IE8, node.attachEvent does not have toString()
                     //Note the test for "[native code" with no closing brace, see:
                     //https://github.com/jrburke/requirejs/issues/273
-                    !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
-                    !isOpera) {
+                    !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) && !isOpera) {
                     //Probably IE. IE (at least 6-8) do not fire
                     //script onload right after executing the script, so
                     //we cannot tie the anonymous define call to a name.
@@ -2122,7 +2128,7 @@ var requirejs, require, define, xpcUtil;
                 } catch (e) {
                     context.onError(makeError('importscripts',
                         'importScripts failed for ' +
-                            moduleName + ' at ' + url,
+                        moduleName + ' at ' + url,
                         e,
                         [moduleName]));
                 }
@@ -2166,7 +2172,7 @@ var requirejs, require, define, xpcUtil;
                         //baseUrl.
                         src = mainScript.split('/');
                         mainScript = src.pop();
-                        subPath = src.length ? src.join('/')  + '/' : './';
+                        subPath = src.length ? src.join('/') + '/' : './';
 
                         cfg.baseUrl = subPath;
                     }
@@ -2278,7 +2284,6 @@ var requirejs, require, define, xpcUtil;
     }(this));
 
 
-
     this.requirejsVars = {
         require: require,
         requirejs: require,
@@ -2364,7 +2369,7 @@ var requirejs, require, define, xpcUtil;
                 fs = nodeReq('fs'),
                 path = nodeReq('path'),
                 vm = nodeReq('vm'),
-            //In Node 0.7+ existsSync is on fs.
+                //In Node 0.7+ existsSync is on fs.
                 exists = fs.existsSync || path.existsSync,
                 hasOwn = Object.prototype.hasOwnProperty;
 
@@ -2597,7 +2602,8 @@ var requirejs, require, define, xpcUtil;
                     });
                 }
             });
-        }());/**
+        }());
+        /**
          * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
          * Available via the MIT or new BSD license.
          * see: http://github.com/jrburke/requirejs for details
@@ -2624,11 +2630,11 @@ var requirejs, require, define, xpcUtil;
                     return lang.ostring.call(it) === "[object Array]";
                 },
 
-                isFunction: function(it) {
+                isFunction: function (it) {
                     return lang.ostring.call(it) === "[object Function]";
                 },
 
-                isRegExp: function(it) {
+                isRegExp: function (it) {
                     return it && it instanceof RegExp;
                 },
 
@@ -2645,10 +2651,10 @@ var requirejs, require, define, xpcUtil;
                     return hasProp(obj, prop) && obj[prop];
                 },
 
-                _mixin: function(dest, source, override){
+                _mixin: function (dest, source, override) {
                     var name;
                     for (name in source) {
-                        if(source.hasOwnProperty(name)
+                        if (source.hasOwnProperty(name)
                             && (override || !dest.hasOwnProperty(name))) {
                             dest[name] = source[name];
                         }
@@ -2661,13 +2667,15 @@ var requirejs, require, define, xpcUtil;
                  * mixin({}, obj1, obj2) is allowed. If the last argument is a boolean,
                  * then the source objects properties are force copied over to dest.
                  */
-                mixin: function(dest){
+                mixin: function (dest) {
                     var parameters = Array.prototype.slice.call(arguments),
                         override, i, l;
 
-                    if (!dest) { dest = {}; }
+                    if (!dest) {
+                        dest = {};
+                    }
 
-                    if (parameters.length > 2 && typeof arguments[parameters.length-1] === 'boolean') {
+                    if (parameters.length > 2 && typeof arguments[parameters.length - 1] === 'boolean') {
                         override = parameters.pop();
                     }
 
@@ -2679,7 +2687,9 @@ var requirejs, require, define, xpcUtil;
 
                 delegate: (function () {
                     // boodman/crockford delegation w/ cornford optimization
-                    function TMP() {}
+                    function TMP() {
+                    }
+
                     return function (obj, props) {
                         TMP.prototype = obj;
                         var tmp = new TMP();
@@ -2925,19 +2935,21 @@ var requirejs, require, define, xpcUtil;
             prim.nextTick = typeof setImmediate === 'function' ? setImmediate :
                 (typeof process !== 'undefined' && process.nextTick ?
                     process.nextTick : (typeof setTimeout !== 'undefined' ?
-                    function (fn) {
-                        setTimeout(fn, 0);
-                    } : function (fn) {
-                    fn();
-                }));
+                        function (fn) {
+                            setTimeout(fn, 0);
+                        } : function (fn) {
+                            fn();
+                        }));
 
             if (typeof define === 'function' && define.amd) {
-                define('prim', function () { return prim; });
+                define('prim', function () {
+                    return prim;
+                });
             } else if (typeof module !== 'undefined' && module.exports) {
                 module.exports = prim;
             }
         }());
-        if(env === 'browser') {
+        if (env === 'browser') {
             /**
              * @license RequireJS Copyright (c) 2012, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -2954,7 +2966,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'node') {
+        if (env === 'node') {
             /**
              * @license RequireJS Copyright (c) 2012, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -2971,7 +2983,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'rhino') {
+        if (env === 'rhino') {
             /**
              * @license RequireJS Copyright (c) 2012, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -2988,7 +3000,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'xpconnect') {
+        if (env === 'xpconnect') {
             /**
              * @license RequireJS Copyright (c) 2013, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3005,7 +3017,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'browser') {
+        if (env === 'browser') {
             /**
              * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3022,7 +3034,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'node') {
+        if (env === 'node') {
             /**
              * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3046,7 +3058,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'rhino') {
+        if (env === 'rhino') {
             /**
              * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3071,7 +3083,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'xpconnect') {
+        if (env === 'xpconnect') {
             /**
              * @license Copyright (c) 2013, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3096,7 +3108,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'browser') {
+        if (env === 'browser') {
             /**
              * @license RequireJS Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3116,7 +3128,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'node') {
+        if (env === 'node') {
             /**
              * @license RequireJS Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3137,7 +3149,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'rhino') {
+        if (env === 'rhino') {
             /**
              * @license RequireJS Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3153,7 +3165,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'xpconnect') {
+        if (env === 'xpconnect') {
             /**
              * @license RequireJS Copyright (c) 2013, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3169,7 +3181,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'browser') {
+        if (env === 'browser') {
             /**
              * @license Copyright (c) 2012, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3347,7 +3359,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'node') {
+        if (env === 'node') {
             /**
              * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3477,8 +3489,7 @@ var requirejs, require, define, xpcUtil;
                                         ok = !filePath.match(regExpExclude);
                                     }
 
-                                    if (ok && (!file.exclusionRegExp ||
-                                        !file.exclusionRegExp.test(fileName))) {
+                                    if (ok && (!file.exclusionRegExp || !file.exclusionRegExp.test(fileName))) {
                                         files.push(filePath);
                                     }
                                 } else if (stat.isDirectory() &&
@@ -3644,7 +3655,7 @@ var requirejs, require, define, xpcUtil;
                             }
 
                             //If directory is now empty, remove it.
-                            if (fs.readdirSync(startDir).length ===  0) {
+                            if (fs.readdirSync(startDir).length === 0) {
                                 file.deleteFile(startDir);
                             }
                         }
@@ -3657,7 +3668,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'rhino') {
+        if (env === 'rhino') {
             /**
              * @license RequireJS Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3751,8 +3762,7 @@ var requirejs, require, define, xpcUtil;
                                         ok = !filePath.match(regExpExclude);
                                     }
 
-                                    if (ok && (!file.exclusionRegExp ||
-                                        !file.exclusionRegExp.test(fileObj.getName()))) {
+                                    if (ok && (!file.exclusionRegExp || !file.exclusionRegExp.test(fileObj.getName()))) {
                                         files.push(filePath);
                                     }
                                 } else if (fileObj.isDirectory() &&
@@ -3951,7 +3961,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'xpconnect') {
+        if (env === 'xpconnect') {
             /**
              * @license RequireJS Copyright (c) 2013, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -3966,7 +3976,7 @@ var requirejs, require, define, xpcUtil;
                 var file,
                     Cc = Components.classes,
                     Ci = Components.interfaces,
-                //Depends on xpcUtil which is set up in x.js
+                    //Depends on xpcUtil which is set up in x.js
                     xpfile = xpcUtil.xpfile;
 
                 function mkFullDir(dirObj) {
@@ -4057,8 +4067,7 @@ var requirejs, require, define, xpcUtil;
                                         ok = !filePath.match(regExpExclude);
                                     }
 
-                                    if (ok && (!file.exclusionRegExp ||
-                                        !file.exclusionRegExp.test(fileObj.leafName))) {
+                                    if (ok && (!file.exclusionRegExp || !file.exclusionRegExp.test(fileObj.leafName))) {
                                         files.push(filePath);
                                     }
                                 } else if (fileObj.isDirectory() &&
@@ -4213,7 +4222,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'browser') {
+        if (env === 'browser') {
             /*global process */
             define('browser/quit', function () {
                 'use strict';
@@ -4222,7 +4231,7 @@ var requirejs, require, define, xpcUtil;
             });
         }
 
-        if(env === 'node') {
+        if (env === 'node') {
             /*global process */
             define('node/quit', function () {
                 'use strict';
@@ -4249,7 +4258,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'rhino') {
+        if (env === 'rhino') {
             /*global quit */
             define('rhino/quit', function () {
                 'use strict';
@@ -4260,7 +4269,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'xpconnect') {
+        if (env === 'xpconnect') {
             /*global quit */
             define('xpconnect/quit', function () {
                 'use strict';
@@ -4271,7 +4280,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'browser') {
+        if (env === 'browser') {
             /**
              * @license RequireJS Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -4291,7 +4300,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'node') {
+        if (env === 'node') {
             /**
              * @license RequireJS Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -4311,7 +4320,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'rhino') {
+        if (env === 'rhino') {
             /**
              * @license RequireJS Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -4327,7 +4336,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'xpconnect') {
+        if (env === 'xpconnect') {
             /**
              * @license RequireJS Copyright (c) 2013, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -4361,7 +4370,7 @@ var requirejs, require, define, xpcUtil;
                 level: 0,
                 logPrefix: "",
 
-                logLevel: function( level ) {
+                logLevel: function (level) {
                     this.level = level;
                 },
 
@@ -4405,7 +4414,7 @@ var requirejs, require, define, xpcUtil;
 //like Node's fs and path.
 
 //Commit 465a4eae86c7bae191b1ee427571543ace777117 on July 19, 2012
-        define('esprima', ['exports'], function(exports) {
+        define('esprima', ['exports'], function (exports) {
             /*
              Copyright (C) 2012 Ariya Hidayat <ariya.hidayat@gmail.com>
              Copyright (C) 2012 Mathias Bynens <mathias@qiwi.be>
@@ -4536,38 +4545,38 @@ var requirejs, require, define, xpcUtil;
 
                 // Error messages should be identical to V8.
                 Messages = {
-                    UnexpectedToken:  'Unexpected token %0',
-                    UnexpectedNumber:  'Unexpected number',
-                    UnexpectedString:  'Unexpected string',
-                    UnexpectedIdentifier:  'Unexpected identifier',
-                    UnexpectedReserved:  'Unexpected reserved word',
-                    UnexpectedEOS:  'Unexpected end of input',
-                    NewlineAfterThrow:  'Illegal newline after throw',
+                    UnexpectedToken: 'Unexpected token %0',
+                    UnexpectedNumber: 'Unexpected number',
+                    UnexpectedString: 'Unexpected string',
+                    UnexpectedIdentifier: 'Unexpected identifier',
+                    UnexpectedReserved: 'Unexpected reserved word',
+                    UnexpectedEOS: 'Unexpected end of input',
+                    NewlineAfterThrow: 'Illegal newline after throw',
                     InvalidRegExp: 'Invalid regular expression',
-                    UnterminatedRegExp:  'Invalid regular expression: missing /',
-                    InvalidLHSInAssignment:  'Invalid left-hand side in assignment',
-                    InvalidLHSInForIn:  'Invalid left-hand side in for-in',
-                    NoCatchOrFinally:  'Missing catch or finally after try',
+                    UnterminatedRegExp: 'Invalid regular expression: missing /',
+                    InvalidLHSInAssignment: 'Invalid left-hand side in assignment',
+                    InvalidLHSInForIn: 'Invalid left-hand side in for-in',
+                    NoCatchOrFinally: 'Missing catch or finally after try',
                     UnknownLabel: 'Undefined label \'%0\'',
                     Redeclaration: '%0 \'%1\' has already been declared',
                     IllegalContinue: 'Illegal continue statement',
                     IllegalBreak: 'Illegal break statement',
                     IllegalReturn: 'Illegal return statement',
-                    StrictModeWith:  'Strict mode code may not include a with statement',
-                    StrictCatchVariable:  'Catch variable may not be eval or arguments in strict mode',
-                    StrictVarName:  'Variable name may not be eval or arguments in strict mode',
-                    StrictParamName:  'Parameter name eval or arguments is not allowed in strict mode',
+                    StrictModeWith: 'Strict mode code may not include a with statement',
+                    StrictCatchVariable: 'Catch variable may not be eval or arguments in strict mode',
+                    StrictVarName: 'Variable name may not be eval or arguments in strict mode',
+                    StrictParamName: 'Parameter name eval or arguments is not allowed in strict mode',
                     StrictParamDupe: 'Strict mode function may not have duplicate parameter names',
-                    StrictFunctionName:  'Function name may not be eval or arguments in strict mode',
-                    StrictOctalLiteral:  'Octal literals are not allowed in strict mode.',
-                    StrictDelete:  'Delete of an unqualified identifier in strict mode.',
-                    StrictDuplicateProperty:  'Duplicate data property in object literal not allowed in strict mode',
-                    AccessorDataProperty:  'Object literal may not have data and accessor property with the same name',
-                    AccessorGetSet:  'Object literal may not have multiple get/set accessors with the same name',
-                    StrictLHSAssignment:  'Assignment to eval or arguments is not allowed in strict mode',
-                    StrictLHSPostfix:  'Postfix increment/decrement may not have eval or arguments operand in strict mode',
-                    StrictLHSPrefix:  'Prefix increment/decrement may not have eval or arguments operand in strict mode',
-                    StrictReservedWord:  'Use of future reserved word in strict mode'
+                    StrictFunctionName: 'Function name may not be eval or arguments in strict mode',
+                    StrictOctalLiteral: 'Octal literals are not allowed in strict mode.',
+                    StrictDelete: 'Delete of an unqualified identifier in strict mode.',
+                    StrictDuplicateProperty: 'Duplicate data property in object literal not allowed in strict mode',
+                    AccessorDataProperty: 'Object literal may not have data and accessor property with the same name',
+                    AccessorGetSet: 'Object literal may not have multiple get/set accessors with the same name',
+                    StrictLHSAssignment: 'Assignment to eval or arguments is not allowed in strict mode',
+                    StrictLHSPostfix: 'Postfix increment/decrement may not have eval or arguments operand in strict mode',
+                    StrictLHSPrefix: 'Prefix increment/decrement may not have eval or arguments operand in strict mode',
+                    StrictReservedWord: 'Use of future reserved word in strict mode'
                 };
 
                 // See also tools/generate-unicode-regex.py.
@@ -4616,7 +4625,7 @@ var requirejs, require, define, xpcUtil;
                     return (ch === ' ') || (ch === '\u0009') || (ch === '\u000B') ||
                         (ch === '\u000C') || (ch === '\u00A0') ||
                         (ch.charCodeAt(0) >= 0x1680 &&
-                            '\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFF'.indexOf(ch) >= 0);
+                        '\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFF'.indexOf(ch) >= 0);
                 }
 
                 // 7.3 Line Terminators
@@ -4804,7 +4813,7 @@ var requirejs, require, define, xpcUtil;
                             ++index;
                         } else if (isLineTerminator(ch)) {
                             ++index;
-                            if (ch ===  '\r' && source[index] === '\n') {
+                            if (ch === '\r' && source[index] === '\n') {
                                 ++index;
                             }
                             ++lineNumber;
@@ -5330,7 +5339,7 @@ var requirejs, require, define, xpcUtil;
                                 }
                             } else {
                                 ++lineNumber;
-                                if (ch ===  '\r' && source[index] === '\n') {
+                                if (ch === '\r' && source[index] === '\n') {
                                     ++index;
                                 }
                             }
@@ -5801,7 +5810,7 @@ var requirejs, require, define, xpcUtil;
                             if (token.type !== Token.Identifier) {
                                 throwUnexpected(lex());
                             }
-                            param = [ parseVariableIdentifier() ];
+                            param = [parseVariableIdentifier()];
                             expect(')');
                             return {
                                 type: Syntax.Property,
@@ -6201,6 +6210,7 @@ var requirejs, require, define, xpcUtil;
 
                     return expr;
                 }
+
                 // 11.8 Relational Operators
 
                 function parseRelationalExpression() {
@@ -6388,7 +6398,7 @@ var requirejs, require, define, xpcUtil;
                     if (match(',')) {
                         expr = {
                             type: Syntax.SequenceExpression,
-                            expressions: [ expr ]
+                            expressions: [expr]
                         };
 
                         while (index < length) {
@@ -7549,7 +7559,7 @@ var requirejs, require, define, xpcUtil;
                             ++index;
                         } else if (isLineTerminator(ch)) {
                             ++index;
-                            if (ch ===  '\r' && source[index] === '\n') {
+                            if (ch === '\r' && source[index] === '\n') {
                                 ++index;
                             }
                             ++lineNumber;
@@ -7976,7 +7986,8 @@ var requirejs, require, define, xpcUtil;
             }(typeof exports === 'undefined' ? (esprima = {}) : exports));
             /* vim: set sw=4 ts=4 et tw=80 : */
 
-        });define('uglifyjs/consolidator', ["require", "exports", "module", "./parse-js", "./process"], function(require, exports, module) {
+        });
+        define('uglifyjs/consolidator', ["require", "exports", "module", "./parse-js", "./process"], function (require, exports, module) {
             /**
              * @preserve Copyright 2012 Robert Gust-Bardon <http://robert.gust-bardon.org/>.
              * All rights reserved.
@@ -8067,7 +8078,7 @@ var requirejs, require, define, xpcUtil;
 // TODO(user) Unconsolidation.
 // TODO(user) Consolidation of ECMA-262 6th Edition programs.
 // TODO(user) Rewrite in ECMA-262 6th Edition.
-            exports['ast_consolidate'] = function(oAbstractSyntaxTree) {
+            exports['ast_consolidate'] = function (oAbstractSyntaxTree) {
                 'use strict';
                 /*jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true,
                  latedef:true, newcap:true, noarge:true, noempty:true, nonew:true,
@@ -8080,7 +8091,7 @@ var requirejs, require, define, xpcUtil;
                      * @constructor
                      * @nosideeffects
                      */
-                        TSourceElementsData = function() {
+                    TSourceElementsData = function () {
                         /**
                          * The category of the elements.
                          * @type {number}
@@ -8096,7 +8107,7 @@ var requirejs, require, define, xpcUtil;
                         this.aCount[EPrimaryExpressionCategories.N_IDENTIFIER_NAMES] = {};
                         this.aCount[EPrimaryExpressionCategories.N_STRING_LITERALS] = {};
                         this.aCount[EPrimaryExpressionCategories.N_NULL_AND_BOOLEAN_LITERALS] =
-                        {};
+                            {};
                         /**
                          * Identifier names found within the elements.
                          * @type {!Array.<string>}
@@ -8115,7 +8126,7 @@ var requirejs, require, define, xpcUtil;
                      * @constructor
                      * @nosideeffects
                      */
-                        TPrimitiveValue = function() {
+                    TPrimitiveValue = function () {
                         /**
                          * The difference in the number of terminal symbols between the original
                          * source text and the one with the primitive value consolidated. If the
@@ -8136,7 +8147,7 @@ var requirejs, require, define, xpcUtil;
                      * @constructor
                      * @nosideeffects
                      */
-                        TSolution = function() {
+                    TSolution = function () {
                         /**
                          * An object whose keys are prefixed representation Strings of each
                          * primitive value that could be consolidated within the elements and
@@ -8160,7 +8171,7 @@ var requirejs, require, define, xpcUtil;
                      * @namespace
                      * @type {!TProcessor}
                      */
-                        oProcessor = (/** @type {!TProcessor} */ require('./process')),
+                    oProcessor = (/** @type {!TProcessor} */ require('./process')),
                     /**
                      * A record consisting of a number of constants that represent the
                      * difference in the number of terminal symbols between a source text with
@@ -8168,7 +8179,7 @@ var requirejs, require, define, xpcUtil;
                      * @namespace
                      * @type {!Object.<string, number>}
                      */
-                        oWeights = {
+                    oWeights = {
                         /**
                          * The difference in the number of punctuators required by the bracket
                          * notation and the dot notation.
@@ -8209,7 +8220,7 @@ var requirejs, require, define, xpcUtil;
                      * @namespace
                      * @enum {number}
                      */
-                        EPrimaryExpressionCategories = {
+                    EPrimaryExpressionCategories = {
                         /**
                          * Identifier names used as property accessors.
                          * @type {number}
@@ -8236,7 +8247,7 @@ var requirejs, require, define, xpcUtil;
                      * @namespace
                      * @enum {string}
                      */
-                        EValuePrefixes = {
+                    EValuePrefixes = {
                         /**
                          * Identifies String values.
                          * @type {string}
@@ -8254,7 +8265,7 @@ var requirejs, require, define, xpcUtil;
                      * @namespace
                      * @enum {number}
                      */
-                        ESourceElementCategories = {
+                    ESourceElementCategories = {
                         /**
                          * Identifies a source element that includes the <a href=
                          * "http://es5.github.com/#x12.10">{@code with}</a> statement.
@@ -8285,7 +8296,7 @@ var requirejs, require, define, xpcUtil;
                      * @const
                      * @type {!Array.<string>}
                      */
-                        A_OTHER_SUBSTITUTABLE_LITERALS = [
+                    A_OTHER_SUBSTITUTABLE_LITERALS = [
                         'null',   // The null literal.
                         'false',  // The Boolean literal {@code false}.
                         'true'    // The Boolean literal {@code true}.
@@ -8304,42 +8315,42 @@ var requirejs, require, define, xpcUtil;
                              * Indicates whether the syntactic code unit represents global code.
                              * @type {boolean}
                              */
-                                bIsGlobal = 'toplevel' === oSyntacticCodeUnit[0],
+                            bIsGlobal = 'toplevel' === oSyntacticCodeUnit[0],
                             /**
                              * Indicates whether the whole scope is being examined.
                              * @type {boolean}
                              */
-                                bIsWhollyExaminable = !bIsGlobal,
+                            bIsWhollyExaminable = !bIsGlobal,
                             /**
                              * An array-like object representing source elements that constitute a
                              * syntactic code unit.
                              * @type {!TSyntacticCodeUnit}
                              */
-                                oSourceElements,
+                            oSourceElements,
                             /**
                              * A record consisting of data about the source element that is
                              * currently being examined.
                              * @type {!TSourceElementsData}
                              */
-                                oSourceElementData,
+                            oSourceElementData,
                             /**
                              * The scope of the syntactic code unit.
                              * @type {!TScope}
                              */
-                                oScope,
+                            oScope,
                             /**
                              * An instance of an object that allows the traversal of an <abbr
                              * title="abstract syntax tree">AST</abbr>.
                              * @type {!TWalker}
                              */
-                                oWalker,
+                            oWalker,
                             /**
                              * An object encompassing collections of functions used during the
                              * traversal of an <abbr title="abstract syntax tree">AST</abbr>.
                              * @namespace
                              * @type {!Object.<string, !Object.<string, function(...[*])>>}
                              */
-                                oWalkers = {
+                            oWalkers = {
                                 /**
                                  * A collection of functions used during the surveyance of source
                                  * elements.
@@ -8357,10 +8368,9 @@ var requirejs, require, define, xpcUtil;
                                      * @param {!Array.<string>} aFormalParameterList Formal parameters.
                                      * @param {!TSyntacticCodeUnit} oFunctionBody Function code.
                                      */
-                                    'defun': function(
-                                        sIdentifier,
-                                        aFormalParameterList,
-                                        oFunctionBody) {
+                                    'defun': function (sIdentifier,
+                                                       aFormalParameterList,
+                                                       oFunctionBody) {
                                         fClassifyAsExcludable();
                                         fAddIdentifier(sIdentifier);
                                         aFormalParameterList.forEach(fAddIdentifier);
@@ -8377,7 +8387,7 @@ var requirejs, require, define, xpcUtil;
                                      *     "abstract syntax tree">AST</abbr> with its nonterminal
                                      *     MemberExpression traversed.
                                      */
-                                    'dot': function(oExpression, sIdentifierName) {
+                                    'dot': function (oExpression, sIdentifierName) {
                                         fCountPrimaryExpression(
                                             EPrimaryExpressionCategories.N_IDENTIFIER_NAMES,
                                             EValuePrefixes.S_STRING + sIdentifierName);
@@ -8391,10 +8401,9 @@ var requirejs, require, define, xpcUtil;
                                      * @param {!Array.<string>} aFormalParameterList Formal parameters.
                                      * @param {!TSyntacticCodeUnit} oFunctionBody Function code.
                                      */
-                                    'function': function(
-                                        sIdentifier,
-                                        aFormalParameterList,
-                                        oFunctionBody) {
+                                    'function': function (sIdentifier,
+                                                          aFormalParameterList,
+                                                          oFunctionBody) {
                                         if ('string' === typeof sIdentifier) {
                                             fAddIdentifier(sIdentifier);
                                         }
@@ -8406,7 +8415,7 @@ var requirejs, require, define, xpcUtil;
                                      * as containing the {@code eval} identifier name.
                                      * @param {string} sIdentifier The identifier encountered.
                                      */
-                                    'name': function(sIdentifier) {
+                                    'name': function (sIdentifier) {
                                         if (-1 !== A_OTHER_SUBSTITUTABLE_LITERALS.indexOf(sIdentifier)) {
                                             fCountPrimaryExpression(
                                                 EPrimaryExpressionCategories.N_NULL_AND_BOOLEAN_LITERALS,
@@ -8426,7 +8435,7 @@ var requirejs, require, define, xpcUtil;
                                      * @param {TSyntacticCodeUnit} oExpression The expression whose
                                      *     value is to be returned.
                                      */
-                                    'return': function(oExpression) {
+                                    'return': function (oExpression) {
                                         fClassifyAsExcludable();
                                     },
                                     /**
@@ -8435,7 +8444,7 @@ var requirejs, require, define, xpcUtil;
                                      * @param {string} sStringValue The String value of the string
                                      *     literal encountered.
                                      */
-                                    'string': function(sStringValue) {
+                                    'string': function (sStringValue) {
                                         if (sStringValue.length > 0) {
                                             fCountPrimaryExpression(
                                                 EPrimaryExpressionCategories.N_STRING_LITERALS,
@@ -8452,7 +8461,7 @@ var requirejs, require, define, xpcUtil;
                                      * @param {TSyntacticCodeUnit} oFinally An optional block of code
                                      *     to be evaluated regardless of whether an exception occurs.
                                      */
-                                    'try': function(oTry, aCatch, oFinally) {
+                                    'try': function (oTry, aCatch, oFinally) {
                                         if (Array.isArray(aCatch)) {
                                             fAddIdentifier(aCatch[0]);
                                         }
@@ -8465,7 +8474,7 @@ var requirejs, require, define, xpcUtil;
                                      * @param {!Array.<!Array>} aVariableDeclarationList Variable
                                      *     declarations.
                                      */
-                                    'var': function(aVariableDeclarationList) {
+                                    'var': function (aVariableDeclarationList) {
                                         fClassifyAsExcludable();
                                         aVariableDeclarationList.forEach(fAddVariable);
                                     },
@@ -8481,7 +8490,7 @@ var requirejs, require, define, xpcUtil;
                                      *     executed in the augmented lexical environment.
                                      * @return {!Array} An empty array to stop the traversal.
                                      */
-                                    'with': function(oExpression, oStatement) {
+                                    'with': function (oExpression, oStatement) {
                                         oSourceElementData.nCategory = ESourceElementCategories.N_WITH;
                                         return [];
                                     }
@@ -8502,7 +8511,7 @@ var requirejs, require, define, xpcUtil;
                                      *     its scope.
                                      * @return {!Array} An empty array to stop the traversal.
                                      */
-                                    'defun': function() {
+                                    'defun': function () {
                                         fExamineSyntacticCodeUnit(this);
                                         return [];
                                     },
@@ -8514,7 +8523,7 @@ var requirejs, require, define, xpcUtil;
                                      *     its scope.
                                      * @return {!Array} An empty array to stop the traversal.
                                      */
-                                    'function': function() {
+                                    'function': function () {
                                         fExamineSyntacticCodeUnit(this);
                                         return [];
                                     }
@@ -8525,27 +8534,27 @@ var requirejs, require, define, xpcUtil;
                              * Records containing data about source elements.
                              * @type {Array.<TSourceElementsData>}
                              */
-                                aSourceElementsData = [],
+                            aSourceElementsData = [],
                             /**
                              * The index (in the source text order) of the source element
                              * immediately following a <a href="http://es5.github.com/#x14.1"
                              * >Directive Prologue</a>.
                              * @type {number}
                              */
-                                nAfterDirectivePrologue = 0,
+                            nAfterDirectivePrologue = 0,
                             /**
                              * The index (in the source text order) of the source element that is
                              * currently being considered.
                              * @type {number}
                              */
-                                nPosition,
+                            nPosition,
                             /**
                              * The index (in the source text order) of the source element that is
                              * the last element of the range of source elements that is currently
                              * being considered.
                              * @type {(undefined|number)}
                              */
-                                nTo,
+                            nTo,
                             /**
                              * Initiates the traversal of a source element.
                              * @param {!TWalker} oWalker An instance of an object that allows the
@@ -8555,12 +8564,12 @@ var requirejs, require, define, xpcUtil;
                              * @return {function(): !TSyntacticCodeUnit} A function that is able to
                              *     initiate the traversal from a given source element.
                              */
-                                cContext = function(oWalker, oSourceElement) {
+                            cContext = function (oWalker, oSourceElement) {
                                 /**
                                  * @return {!TSyntacticCodeUnit} A function that is able to
                                  *     initiate the traversal from a given source element.
                                  */
-                                var fLambda = function() {
+                                var fLambda = function () {
                                     return oWalker.walk(oSourceElement);
                                 };
 
@@ -8571,7 +8580,7 @@ var requirejs, require, define, xpcUtil;
                              * contain a {@code with} statement or the {@code eval} identifier
                              * name.
                              */
-                                fClassifyAsExcludable = function() {
+                            fClassifyAsExcludable = function () {
                                 if (oSourceElementData.nCategory ===
                                     ESourceElementCategories.N_OTHER) {
                                     oSourceElementData.nCategory =
@@ -8582,7 +8591,7 @@ var requirejs, require, define, xpcUtil;
                              * Adds an identifier to the list of identifier names found.
                              * @param {string} sIdentifier The identifier to be added.
                              */
-                                fAddIdentifier = function(sIdentifier) {
+                            fAddIdentifier = function (sIdentifier) {
                                 if (-1 === oSourceElementData.aIdentifiers.indexOf(sIdentifier)) {
                                     oSourceElementData.aIdentifiers.push(sIdentifier);
                                 }
@@ -8592,7 +8601,7 @@ var requirejs, require, define, xpcUtil;
                              * found.
                              * @param {!Array} aVariableDeclaration A variable declaration.
                              */
-                                fAddVariable = function(aVariableDeclaration) {
+                            fAddVariable = function (aVariableDeclaration) {
                                 fAddIdentifier(/** @type {string} */ aVariableDeclaration[0]);
                             },
                             /**
@@ -8602,7 +8611,7 @@ var requirejs, require, define, xpcUtil;
                              * @param {string} sName The prefixed String representation attributed
                              *     to the primary expression.
                              */
-                                fCountPrimaryExpression = function(nCategory, sName) {
+                            fCountPrimaryExpression = function (nCategory, sName) {
                                 if (!oSourceElementData.aCount[nCategory].hasOwnProperty(sName)) {
                                     oSourceElementData.aCount[nCategory][sName] = 0;
                                     if (-1 === oSourceElementData.aPrimitiveValues.indexOf(sName)) {
@@ -8624,19 +8633,19 @@ var requirejs, require, define, xpcUtil;
                              *     are consolidated.
                              * @see TPrimitiveValue#nSaving
                              */
-                                fExamineSourceElements = function(nFrom, nTo, bEnclose) {
+                            fExamineSourceElements = function (nFrom, nTo, bEnclose) {
                                 var _,
                                     /**
                                      * The index of the last mangled name.
                                      * @type {number}
                                      */
-                                        nIndex = oScope.cname,
+                                    nIndex = oScope.cname,
                                     /**
                                      * The index of the source element that is currently being
                                      * considered.
                                      * @type {number}
                                      */
-                                        nPosition,
+                                    nPosition,
                                     /**
                                      * A collection of functions used during the consolidation of
                                      * primitive values and identifier names used as property
@@ -8644,7 +8653,7 @@ var requirejs, require, define, xpcUtil;
                                      * @namespace
                                      * @type {!Object.<string, function(...[*])>}
                                      */
-                                        oWalkersTransformers = {
+                                    oWalkersTransformers = {
                                         /**
                                          * If the String value that is equivalent to the sequence of
                                          * terminal symbols that constitute the encountered identifier
@@ -8661,7 +8670,7 @@ var requirejs, require, define, xpcUtil;
                                          *     the one encountered.
                                          * @see TPrimitiveValue#nSaving
                                          */
-                                        'dot': function(oExpression, sIdentifierName) {
+                                        'dot': function (oExpression, sIdentifierName) {
                                             /**
                                              * The prefixed String value that is equivalent to the
                                              * sequence of terminal symbols that constitute the
@@ -8672,7 +8681,7 @@ var requirejs, require, define, xpcUtil;
 
                                             return oSolutionBest.oPrimitiveValues.hasOwnProperty(
                                                 sPrefixed) &&
-                                                oSolutionBest.oPrimitiveValues[sPrefixed].nSaving > 0 ?
+                                            oSolutionBest.oPrimitiveValues[sPrefixed].nSaving > 0 ?
                                                 ['sub',
                                                     oWalker.walk(oExpression),
                                                     ['name',
@@ -8689,7 +8698,7 @@ var requirejs, require, define, xpcUtil;
                                          *     the one encountered.
                                          * @see TPrimitiveValue#nSaving
                                          */
-                                        'name': function(sIdentifier) {
+                                        'name': function (sIdentifier) {
                                             /**
                                              * The prefixed representation String of the identifier.
                                              * @type {string}
@@ -8699,7 +8708,7 @@ var requirejs, require, define, xpcUtil;
                                             return [
                                                 'name',
                                                 oSolutionBest.oPrimitiveValues.hasOwnProperty(sPrefixed) &&
-                                                    oSolutionBest.oPrimitiveValues[sPrefixed].nSaving > 0 ?
+                                                oSolutionBest.oPrimitiveValues[sPrefixed].nSaving > 0 ?
                                                     oSolutionBest.oPrimitiveValues[sPrefixed].sName :
                                                     sIdentifier
                                             ];
@@ -8715,7 +8724,7 @@ var requirejs, require, define, xpcUtil;
                                          *     the one encountered.
                                          * @see TPrimitiveValue#nSaving
                                          */
-                                        'string': function(sStringValue) {
+                                        'string': function (sStringValue) {
                                             /**
                                              * The prefixed representation String of the primitive value
                                              * of the literal.
@@ -8726,7 +8735,7 @@ var requirejs, require, define, xpcUtil;
 
                                             return oSolutionBest.oPrimitiveValues.hasOwnProperty(
                                                 sPrefixed) &&
-                                                oSolutionBest.oPrimitiveValues[sPrefixed].nSaving > 0 ?
+                                            oSolutionBest.oPrimitiveValues[sPrefixed].nSaving > 0 ?
                                                 ['name',
                                                     oSolutionBest.oPrimitiveValues[sPrefixed].sName] :
                                                 ['string', sStringValue];
@@ -8739,7 +8748,7 @@ var requirejs, require, define, xpcUtil;
                                      * in comparison to the original source text.
                                      * @type {!TSolution}
                                      */
-                                        oSolutionBest = new TSolution(),
+                                    oSolutionBest = new TSolution(),
                                     /**
                                      * Data representing an ongoing attempt to find a better
                                      * reduction of the number of the terminal symbols in comparison
@@ -8748,32 +8757,32 @@ var requirejs, require, define, xpcUtil;
                                      * @type {!TSolution}
                                      * @see oSolutionBest
                                      */
-                                        oSolutionCandidate = new TSolution(),
+                                    oSolutionCandidate = new TSolution(),
                                     /**
                                      * A record consisting of data about the range of source elements
                                      * that is currently being examined.
                                      * @type {!TSourceElementsData}
                                      */
-                                        oSourceElementsData = new TSourceElementsData(),
+                                    oSourceElementsData = new TSourceElementsData(),
                                     /**
                                      * Variable declarations for each primitive value that is to be
                                      * consolidated within the elements.
                                      * @type {!Array.<!Array>}
                                      */
-                                        aVariableDeclarations = [],
+                                    aVariableDeclarations = [],
                                     /**
                                      * Augments a list with a prefixed representation String.
                                      * @param {!Array.<string>} aList A list that is to be augmented.
                                      * @return {function(string)} A function that augments a list
                                      *     with a prefixed representation String.
                                      */
-                                        cAugmentList = function(aList) {
+                                    cAugmentList = function (aList) {
                                         /**
                                          * @param {string} sPrefixed Prefixed representation String of
                                          *     a primitive value that could be consolidated within the
                                          *     elements.
                                          */
-                                        var fLambda = function(sPrefixed) {
+                                        var fLambda = function (sPrefixed) {
                                             if (-1 === aList.indexOf(sPrefixed)) {
                                                 aList.push(sPrefixed);
                                             }
@@ -8795,14 +8804,14 @@ var requirejs, require, define, xpcUtil;
                                      *     addition.
                                      * @see cAddOccurrencesInCategory
                                      */
-                                        cAddOccurrences = function(nPosition, nCategory) {
+                                    cAddOccurrences = function (nPosition, nCategory) {
                                         /**
                                          * @param {string} sPrefixed The prefixed representation String
                                          *     of a primitive value.
                                          */
-                                        var fLambda = function(sPrefixed) {
+                                        var fLambda = function (sPrefixed) {
                                             if (!oSourceElementsData.aCount[nCategory].hasOwnProperty(
-                                                sPrefixed)) {
+                                                    sPrefixed)) {
                                                 oSourceElementsData.aCount[nCategory][sPrefixed] = 0;
                                             }
                                             oSourceElementsData.aCount[nCategory][sPrefixed] +=
@@ -8824,12 +8833,12 @@ var requirejs, require, define, xpcUtil;
                                      *     addition.
                                      * @see fAddOccurrences
                                      */
-                                        cAddOccurrencesInCategory = function(nPosition) {
+                                    cAddOccurrencesInCategory = function (nPosition) {
                                         /**
                                          * @param {number} nCategory The category of the primary
                                          *     expression from which the primitive value is derived.
                                          */
-                                        var fLambda = function(nCategory) {
+                                        var fLambda = function (nCategory) {
                                             Object.keys(
                                                 aSourceElementsData[nPosition].aCount[nCategory]
                                             ).forEach(cAddOccurrences(nPosition, nCategory));
@@ -8846,7 +8855,7 @@ var requirejs, require, define, xpcUtil;
                                      * @param {number} nPosition The index (in the source text order)
                                      *     of a source element.
                                      */
-                                        fAddOccurrences = function(nPosition) {
+                                    fAddOccurrences = function (nPosition) {
                                         Object.keys(aSourceElementsData[nPosition].aCount).forEach(
                                             cAddOccurrencesInCategory(nPosition));
                                     },
@@ -8858,7 +8867,7 @@ var requirejs, require, define, xpcUtil;
                                      *     elements.
                                      * @see aVariableDeclarations
                                      */
-                                        cAugmentVariableDeclarations = function(sPrefixed) {
+                                    cAugmentVariableDeclarations = function (sPrefixed) {
                                         if (oSolutionBest.oPrimitiveValues[sPrefixed].nSaving > 0) {
                                             aVariableDeclarations.push([
                                                 oSolutionBest.oPrimitiveValues[sPrefixed].sName,
@@ -8892,7 +8901,7 @@ var requirejs, require, define, xpcUtil;
                                      *     </dl>
                                      * @see TSolution.oPrimitiveValues
                                      */
-                                        cSortPrimitiveValues = function(sPrefixed0, sPrefixed1) {
+                                    cSortPrimitiveValues = function (sPrefixed0, sPrefixed1) {
                                         /**
                                          * The difference between:
                                          * <ol>
@@ -8907,7 +8916,7 @@ var requirejs, require, define, xpcUtil;
                                          */
                                         var nDifference =
                                             oSolutionCandidate.oPrimitiveValues[sPrefixed0].nSaving -
-                                                oSolutionCandidate.oPrimitiveValues[sPrefixed1].nSaving;
+                                            oSolutionCandidate.oPrimitiveValues[sPrefixed1].nSaving;
 
                                         return nDifference > 0 ? -1 : nDifference < 0 ? 1 : 0;
                                     },
@@ -8918,19 +8927,19 @@ var requirejs, require, define, xpcUtil;
                                      * @param {string} sPrefixed The prefixed representation String
                                      *     of a primitive value that is being evaluated.
                                      */
-                                        fEvaluatePrimitiveValue = function(sPrefixed) {
+                                    fEvaluatePrimitiveValue = function (sPrefixed) {
                                         var _,
                                             /**
                                              * The index of the last mangled name.
                                              * @type {number}
                                              */
-                                                nIndex,
+                                            nIndex,
                                             /**
                                              * The representation String of the primitive value that is
                                              * being evaluated.
                                              * @type {string}
                                              */
-                                                sName =
+                                            sName =
                                                 sPrefixed.substring(EValuePrefixes.S_SYMBOLIC.length),
                                             /**
                                              * The number of source characters taken up by the
@@ -8938,7 +8947,7 @@ var requirejs, require, define, xpcUtil;
                                              * being evaluated.
                                              * @type {number}
                                              */
-                                                nLengthOriginal = sName.length,
+                                            nLengthOriginal = sName.length,
                                             /**
                                              * The number of source characters taken up by the
                                              * identifier name that could substitute the primitive
@@ -8946,7 +8955,7 @@ var requirejs, require, define, xpcUtil;
                                              * substituted.
                                              * @type {number}
                                              */
-                                                nLengthSubstitution,
+                                            nLengthSubstitution,
                                             /**
                                              * The number of source characters taken up by by the
                                              * representation String of the primitive value that is
@@ -8954,7 +8963,7 @@ var requirejs, require, define, xpcUtil;
                                              * literal.
                                              * @type {number}
                                              */
-                                                nLengthString = oProcessor.make_string(sName).length;
+                                            nLengthString = oProcessor.make_string(sName).length;
 
                                         oSolutionCandidate.oPrimitiveValues[sPrefixed] =
                                             new TPrimitiveValue();
@@ -8970,38 +8979,37 @@ var requirejs, require, define, xpcUtil;
                                             // foo:null, or foo:null;
                                             oSolutionCandidate.oPrimitiveValues[sPrefixed].nSaving -=
                                                 nLengthSubstitution + nLengthOriginal +
-                                                    oWeights.N_VARIABLE_DECLARATION;
+                                                oWeights.N_VARIABLE_DECLARATION;
                                             // null vs foo
                                             oSolutionCandidate.oPrimitiveValues[sPrefixed].nSaving +=
                                                 oSourceElementsData.aCount[
-                                                    EPrimaryExpressionCategories.
-                                                        N_NULL_AND_BOOLEAN_LITERALS][sPrefixed] *
-                                                    (nLengthOriginal - nLengthSubstitution);
+                                                    EPrimaryExpressionCategories.N_NULL_AND_BOOLEAN_LITERALS][sPrefixed] *
+                                                (nLengthOriginal - nLengthSubstitution);
                                         } else {
                                             // foo:'fromCharCode';
                                             oSolutionCandidate.oPrimitiveValues[sPrefixed].nSaving -=
                                                 nLengthSubstitution + nLengthString +
-                                                    oWeights.N_VARIABLE_DECLARATION;
+                                                oWeights.N_VARIABLE_DECLARATION;
                                             // .fromCharCode vs [foo]
                                             if (oSourceElementsData.aCount[
-                                                EPrimaryExpressionCategories.N_IDENTIFIER_NAMES
-                                                ].hasOwnProperty(sPrefixed)) {
+                                                    EPrimaryExpressionCategories.N_IDENTIFIER_NAMES
+                                                    ].hasOwnProperty(sPrefixed)) {
                                                 oSolutionCandidate.oPrimitiveValues[sPrefixed].nSaving +=
                                                     oSourceElementsData.aCount[
                                                         EPrimaryExpressionCategories.N_IDENTIFIER_NAMES
                                                         ][sPrefixed] *
-                                                        (nLengthOriginal - nLengthSubstitution -
-                                                            oWeights.N_PROPERTY_ACCESSOR);
+                                                    (nLengthOriginal - nLengthSubstitution -
+                                                    oWeights.N_PROPERTY_ACCESSOR);
                                             }
                                             // 'fromCharCode' vs foo
                                             if (oSourceElementsData.aCount[
-                                                EPrimaryExpressionCategories.N_STRING_LITERALS
-                                                ].hasOwnProperty(sPrefixed)) {
+                                                    EPrimaryExpressionCategories.N_STRING_LITERALS
+                                                    ].hasOwnProperty(sPrefixed)) {
                                                 oSolutionCandidate.oPrimitiveValues[sPrefixed].nSaving +=
                                                     oSourceElementsData.aCount[
                                                         EPrimaryExpressionCategories.N_STRING_LITERALS
                                                         ][sPrefixed] *
-                                                        (nLengthString - nLengthSubstitution);
+                                                    (nLengthString - nLengthSubstitution);
                                             }
                                         }
                                         if (oSolutionCandidate.oPrimitiveValues[sPrefixed].nSaving >
@@ -9017,7 +9025,7 @@ var requirejs, require, define, xpcUtil;
                                      * @param {!Array} aVariableDeclaration A variable declaration
                                      *     with an initialiser.
                                      */
-                                        cAddVariableDeclaration = function(aVariableDeclaration) {
+                                    cAddVariableDeclaration = function (aVariableDeclaration) {
                                         (/** @type {!Array} */ oSourceElements[nFrom][1]).unshift(
                                             aVariableDeclaration);
                                     };
@@ -9125,7 +9133,7 @@ var requirejs, require, define, xpcUtil;
                         oScope = bIsGlobal ? oSyntacticCodeUnit.scope : oSourceElements.scope;
                         // Skip a Directive Prologue.
                         while (nAfterDirectivePrologue < oSourceElements.length &&
-                            'directive' === oSourceElements[nAfterDirectivePrologue][0]) {
+                        'directive' === oSourceElements[nAfterDirectivePrologue][0]) {
                             nAfterDirectivePrologue += 1;
                             aSourceElementsData.push(null);
                         }
@@ -9197,7 +9205,7 @@ var requirejs, require, define, xpcUtil;
             /* vim: set ft=javascript fenc=utf-8 et ts=2 sts=2 sw=2: */
             /* :mode=javascript:noTabs=true:tabSize=2:indentSize=2:deepIndent=true: */
         });
-        define('uglifyjs/parse-js', ["exports"], function(exports) {
+        define('uglifyjs/parse-js', ["exports"], function (exports) {
             /***********************************************************************
 
              A JavaScript tokenizer / parser / beautifier / compressor.
@@ -9463,7 +9471,7 @@ var requirejs, require, define, xpcUtil;
                 this.stack = new Error().stack;
             };
 
-            JS_Parse_Error.prototype.toString = function() {
+            JS_Parse_Error.prototype.toString = function () {
                 return this.message + " (line: " + this.line + ", col: " + this.col + ", pos: " + this.pos + ")" + "\n\n" + this.stack;
             };
 
@@ -9480,19 +9488,21 @@ var requirejs, require, define, xpcUtil;
             function tokenizer($TEXT) {
 
                 var S = {
-                    text            : $TEXT.replace(/\r\n?|[\n\u2028\u2029]/g, "\n").replace(/^\uFEFF/, ''),
-                    pos             : 0,
-                    tokpos          : 0,
-                    line            : 0,
-                    tokline         : 0,
-                    col             : 0,
-                    tokcol          : 0,
-                    newline_before  : false,
-                    regex_allowed   : false,
-                    comments_before : []
+                    text: $TEXT.replace(/\r\n?|[\n\u2028\u2029]/g, "\n").replace(/^\uFEFF/, ''),
+                    pos: 0,
+                    tokpos: 0,
+                    line: 0,
+                    tokline: 0,
+                    col: 0,
+                    tokcol: 0,
+                    newline_before: false,
+                    regex_allowed: false,
+                    comments_before: []
                 };
 
-                function peek() { return S.text.charAt(S.pos); };
+                function peek() {
+                    return S.text.charAt(S.pos);
+                };
 
                 function next(signal_eof, in_string) {
                     var ch = S.text.charAt(S.pos++);
@@ -9526,16 +9536,16 @@ var requirejs, require, define, xpcUtil;
 
                 function token(type, value, is_comment) {
                     S.regex_allowed = ((type == "operator" && !HOP(UNARY_POSTFIX, value)) ||
-                        (type == "keyword" && HOP(KEYWORDS_BEFORE_EXPRESSION, value)) ||
-                        (type == "punc" && HOP(PUNC_BEFORE_EXPRESSION, value)));
+                    (type == "keyword" && HOP(KEYWORDS_BEFORE_EXPRESSION, value)) ||
+                    (type == "punc" && HOP(PUNC_BEFORE_EXPRESSION, value)));
                     var ret = {
-                        type   : type,
-                        value  : value,
-                        line   : S.tokline,
-                        col    : S.tokcol,
-                        pos    : S.tokpos,
-                        endpos : S.pos,
-                        nlb    : S.newline_before
+                        type: type,
+                        value: value,
+                        line: S.tokline,
+                        col: S.tokcol,
+                        pos: S.tokpos,
+                        endpos: S.pos,
+                        nlb: S.newline_before
                     };
                     if (!is_comment) {
                         ret.comments_before = S.comments_before;
@@ -9569,7 +9579,7 @@ var requirejs, require, define, xpcUtil;
 
                 function read_num(prefix) {
                     var has_e = false, after_e = false, has_x = false, has_dot = prefix == ".";
-                    var num = read_while(function(ch, i){
+                    var num = read_while(function (ch, i) {
                         if (ch == "x" || ch == "X") {
                             if (has_x) return false;
                             return has_x = true;
@@ -9604,17 +9614,28 @@ var requirejs, require, define, xpcUtil;
                 function read_escaped_char(in_string) {
                     var ch = next(true, in_string);
                     switch (ch) {
-                        case "n" : return "\n";
-                        case "r" : return "\r";
-                        case "t" : return "\t";
-                        case "b" : return "\b";
-                        case "v" : return "\u000b";
-                        case "f" : return "\f";
-                        case "0" : return "\0";
-                        case "x" : return String.fromCharCode(hex_bytes(2));
-                        case "u" : return String.fromCharCode(hex_bytes(4));
-                        case "\n": return "";
-                        default  : return ch;
+                        case "n" :
+                            return "\n";
+                        case "r" :
+                            return "\r";
+                        case "t" :
+                            return "\t";
+                        case "b" :
+                            return "\b";
+                        case "v" :
+                            return "\u000b";
+                        case "f" :
+                            return "\f";
+                        case "0" :
+                            return "\0";
+                        case "x" :
+                            return String.fromCharCode(hex_bytes(2));
+                        case "u" :
+                            return String.fromCharCode(hex_bytes(4));
+                        case "\n":
+                            return "";
+                        default  :
+                            return ch;
                     }
                 };
 
@@ -9630,15 +9651,15 @@ var requirejs, require, define, xpcUtil;
                 };
 
                 function read_string() {
-                    return with_eof_error("Unterminated string constant", function(){
+                    return with_eof_error("Unterminated string constant", function () {
                         var quote = next(), ret = "";
-                        for (;;) {
+                        for (; ;) {
                             var ch = next(true);
                             if (ch == "\\") {
                                 // read OctalEscapeSequence (XXX: deprecated if "strict mode")
                                 // https://github.com/mishoo/UglifyJS/issues/178
                                 var octal_len = 0, first = null;
-                                ch = read_while(function(ch){
+                                ch = read_while(function (ch) {
                                     if (ch >= "0" && ch <= "7") {
                                         if (!first) {
                                             first = ch;
@@ -9675,7 +9696,7 @@ var requirejs, require, define, xpcUtil;
 
                 function read_multiline_comment() {
                     next();
-                    return with_eof_error("Unterminated multiline comment", function(){
+                    return with_eof_error("Unterminated multiline comment", function () {
                         var i = find("*/", true),
                             text = S.text.substring(S.pos, i);
                         S.pos = i + 2;
@@ -9717,7 +9738,7 @@ var requirejs, require, define, xpcUtil;
                 };
 
                 function read_regexp(regexp) {
-                    return with_eof_error("Unterminated regular expression", function(){
+                    return with_eof_error("Unterminated regular expression", function () {
                         var prev_backslash = false, ch, in_class = false;
                         while ((ch = next(true))) if (prev_backslash) {
                             regexp += "\\" + ch;
@@ -9736,7 +9757,7 @@ var requirejs, require, define, xpcUtil;
                             regexp += ch;
                         }
                         var mods = read_name();
-                        return token("regexp", [ regexp, mods ]);
+                        return token("regexp", [regexp, mods]);
                     });
                 };
 
@@ -9782,16 +9803,16 @@ var requirejs, require, define, xpcUtil;
                     return !HOP(KEYWORDS, word)
                         ? token("name", word)
                         : HOP(OPERATORS, word)
-                        ? token("operator", word)
-                        : HOP(KEYWORDS_ATOM, word)
-                        ? token("atom", word)
-                        : token("keyword", word);
+                            ? token("operator", word)
+                            : HOP(KEYWORDS_ATOM, word)
+                                ? token("atom", word)
+                                : token("keyword", word);
                 };
 
                 function with_eof_error(eof_error, cont) {
                     try {
                         return cont();
-                    } catch(ex) {
+                    } catch (ex) {
                         if (ex === EX_EOF) parse_error(eof_error);
                         else throw ex;
                     }
@@ -9814,7 +9835,7 @@ var requirejs, require, define, xpcUtil;
                     parse_error("Unexpected character '" + ch + "'");
                 };
 
-                next_token.context = function(nc) {
+                next_token.context = function (nc) {
                     if (nc) S = nc;
                     return S;
                 };
@@ -9837,9 +9858,9 @@ var requirejs, require, define, xpcUtil;
                 "+"
             ]);
 
-            var UNARY_POSTFIX = array_to_hash([ "--", "++" ]);
+            var UNARY_POSTFIX = array_to_hash(["--", "++"]);
 
-            var ASSIGNMENT = (function(a, ret, i){
+            var ASSIGNMENT = (function (a, ret, i) {
                 while (i < a.length) {
                     ret[a[i]] = a[i].substr(0, a[i].length - 1);
                     i++;
@@ -9847,11 +9868,11 @@ var requirejs, require, define, xpcUtil;
                 return ret;
             })(
                 ["+=", "-=", "/=", "*=", "%=", ">>=", "<<=", ">>>=", "|=", "^=", "&="],
-                { "=": true },
+                {"=": true},
                 0
             );
 
-            var PRECEDENCE = (function(a, ret){
+            var PRECEDENCE = (function (a, ret) {
                 for (var i = 0, n = 1; i < a.length; ++i, ++n) {
                     var b = a[i];
                     for (var j = 0; j < b.length; ++j) {
@@ -9875,9 +9896,9 @@ var requirejs, require, define, xpcUtil;
                 {}
             );
 
-            var STATEMENTS_WITH_LABELS = array_to_hash([ "for", "do", "while", "switch" ]);
+            var STATEMENTS_WITH_LABELS = array_to_hash(["for", "do", "while", "switch"]);
 
-            var ATOMIC_START_TOKEN = array_to_hash([ "atom", "num", "string", "regexp", "name" ]);
+            var ATOMIC_START_TOKEN = array_to_hash(["atom", "num", "string", "regexp", "name"]);
 
             /* -----[ Parser ]----- */
 
@@ -9887,19 +9908,21 @@ var requirejs, require, define, xpcUtil;
                 this.end = end;
             };
 
-            NodeWithToken.prototype.toString = function() { return this.name; };
+            NodeWithToken.prototype.toString = function () {
+                return this.name;
+            };
 
             function parse($TEXT, exigent_mode, embed_tokens) {
 
                 var S = {
-                    input         : typeof $TEXT == "string" ? tokenizer($TEXT, true) : $TEXT,
-                    token         : null,
-                    prev          : null,
-                    peeked        : null,
-                    in_function   : 0,
-                    in_directives : true,
-                    in_loop       : 0,
-                    labels        : []
+                    input: typeof $TEXT == "string" ? tokenizer($TEXT, true) : $TEXT,
+                    token: null,
+                    prev: null,
+                    peeked: null,
+                    in_function: 0,
+                    in_directives: true,
+                    in_loop: 0,
+                    labels: []
                 };
 
                 S.token = next();
@@ -9908,7 +9931,9 @@ var requirejs, require, define, xpcUtil;
                     return is_token(S.token, type, value);
                 };
 
-                function peek() { return S.peeked || (S.peeked = S.input()); };
+                function peek() {
+                    return S.peeked || (S.peeked = S.input());
+                };
 
                 function next() {
                     S.prev = S.token;
@@ -9919,7 +9944,7 @@ var requirejs, require, define, xpcUtil;
                         S.token = S.input();
                     }
                     S.in_directives = S.in_directives && (
-                        S.token.type == "string" || is("punc", ";")
+                            S.token.type == "string" || is("punc", ";")
                         );
                     return S.token;
                 };
@@ -9953,11 +9978,13 @@ var requirejs, require, define, xpcUtil;
                     token_error(S.token, "Unexpected token " + S.token.type + ", expected " + type);
                 };
 
-                function expect(punc) { return expect_token("punc", punc); };
+                function expect(punc) {
+                    return expect_token("punc", punc);
+                };
 
                 function can_insert_semicolon() {
                     return !exigent_mode && (
-                        S.token.nlb || is("eof") || is("punc", "}")
+                            S.token.nlb || is("eof") || is("punc", "}")
                         );
                 };
 
@@ -9982,7 +10009,7 @@ var requirejs, require, define, xpcUtil;
                 };
 
                 function maybe_embed_tokens(parser) {
-                    if (embed_tokens) return function() {
+                    if (embed_tokens) return function () {
                         var start = S.token;
                         var ast = parser.apply(this, arguments);
                         ast[0] = add_tokens(ast[0], start, prev());
@@ -9991,7 +10018,7 @@ var requirejs, require, define, xpcUtil;
                     else return parser;
                 };
 
-                var statement = maybe_embed_tokens(function() {
+                var statement = maybe_embed_tokens(function () {
                     if (is("operator", "/") || is("operator", "/=")) {
                         S.peeked = null;
                         S.token = S.input(S.token.value.substr(1)); // force regexp
@@ -10040,7 +10067,7 @@ var requirejs, require, define, xpcUtil;
                                     return as("debugger");
 
                                 case "do":
-                                    return (function(body){
+                                    return (function (body) {
                                         expect_token("keyword", "while");
                                         return as("do", prog1(parenthesised, semicolon), body);
                                     })(in_loop(statement));
@@ -10061,8 +10088,8 @@ var requirejs, require, define, xpcUtil;
                                         is("punc", ";")
                                             ? (next(), null)
                                             : can_insert_semicolon()
-                                            ? null
-                                            : prog1(expression, semicolon));
+                                                ? null
+                                                : prog1(expression, semicolon));
 
                                 case "switch":
                                     return as("switch", parenthesised(), switch_block_());
@@ -10155,7 +10182,7 @@ var requirejs, require, define, xpcUtil;
                     return as("for-in", init, lhs, obj, in_loop(statement));
                 };
 
-                var function_ = function(in_statement) {
+                var function_ = function (in_statement) {
                     var name = is("name") ? prog1(S.token.value, next) : null;
                     if (in_statement && !name)
                         unexpected();
@@ -10163,7 +10190,7 @@ var requirejs, require, define, xpcUtil;
                     return as(in_statement ? "defun" : "function",
                         name,
                         // arguments
-                        (function(first, a){
+                        (function (first, a) {
                             while (!is("punc", ")")) {
                                 if (first) first = false; else expect(",");
                                 if (!is("name")) unexpected();
@@ -10174,7 +10201,7 @@ var requirejs, require, define, xpcUtil;
                             return a;
                         })(true, []),
                         // body
-                        (function(){
+                        (function () {
                             ++S.in_function;
                             var loop = S.in_loop;
                             S.in_directives = true;
@@ -10206,7 +10233,7 @@ var requirejs, require, define, xpcUtil;
                     return a;
                 };
 
-                var switch_block_ = curry(in_loop, function(){
+                var switch_block_ = curry(in_loop, function () {
                     expect("{");
                     var a = [], cur = null;
                     while (!is("punc", "}")) {
@@ -10214,14 +10241,14 @@ var requirejs, require, define, xpcUtil;
                         if (is("keyword", "case")) {
                             next();
                             cur = [];
-                            a.push([ expression(), cur ]);
+                            a.push([expression(), cur]);
                             expect(":");
                         }
                         else if (is("keyword", "default")) {
                             next();
                             expect(":");
                             cur = [];
-                            a.push([ null, cur ]);
+                            a.push([null, cur]);
                         }
                         else {
                             if (!cur) unexpected();
@@ -10242,7 +10269,7 @@ var requirejs, require, define, xpcUtil;
                         var name = S.token.value;
                         next();
                         expect(")");
-                        bcatch = [ name, block_() ];
+                        bcatch = [name, block_()];
                     }
                     if (is("keyword", "finally")) {
                         next();
@@ -10255,16 +10282,16 @@ var requirejs, require, define, xpcUtil;
 
                 function vardefs(no_in) {
                     var a = [];
-                    for (;;) {
+                    for (; ;) {
                         if (!is("name"))
                             unexpected();
                         var name = S.token.value;
                         next();
                         if (is("operator", "=")) {
                             next();
-                            a.push([ name, expression(false, no_in) ]);
+                            a.push([name, expression(false, no_in)]);
                         } else {
-                            a.push([ name ]);
+                            a.push([name]);
                         }
                         if (!is("punc", ","))
                             break;
@@ -10292,7 +10319,7 @@ var requirejs, require, define, xpcUtil;
                     return subscripts(as("new", newexp, args), true);
                 };
 
-                var expr_atom = maybe_embed_tokens(function(allow_calls) {
+                var expr_atom = maybe_embed_tokens(function (allow_calls) {
                     if (is("operator", "new")) {
                         next();
                         return new_();
@@ -10330,7 +10357,7 @@ var requirejs, require, define, xpcUtil;
                         if (first) first = false; else expect(",");
                         if (allow_trailing_comma && is("punc", closing)) break;
                         if (is("punc", ",") && allow_empty) {
-                            a.push([ "atom", "undefined" ]);
+                            a.push(["atom", "undefined"]);
                         } else {
                             a.push(expression(false));
                         }
@@ -10353,10 +10380,10 @@ var requirejs, require, define, xpcUtil;
                         var type = S.token.type;
                         var name = as_property_name();
                         if (type == "name" && (name == "get" || name == "set") && !is("punc", ":")) {
-                            a.push([ as_name(), function_(false), name ]);
+                            a.push([as_name(), function_(false), name]);
                         } else {
                             expect(":");
-                            a.push([ name, expression(false) ]);
+                            a.push([name, expression(false)]);
                         }
                     }
                     next();
@@ -10449,7 +10476,7 @@ var requirejs, require, define, xpcUtil;
 
                 function is_assignable(expr) {
                     if (!exigent_mode) return true;
-                    switch (expr[0]+"") {
+                    switch (expr[0] + "") {
                         case "dot":
                         case "sub":
                         case "new":
@@ -10472,7 +10499,7 @@ var requirejs, require, define, xpcUtil;
                     return left;
                 };
 
-                var expression = maybe_embed_tokens(function(commas, no_in) {
+                var expression = maybe_embed_tokens(function (commas, no_in) {
                     if (arguments.length == 0)
                         commas = true;
                     var expr = maybe_assign(no_in);
@@ -10492,7 +10519,7 @@ var requirejs, require, define, xpcUtil;
                     }
                 };
 
-                return as("toplevel", (function(a){
+                return as("toplevel", (function (a) {
                     while (!is("eof"))
                         a.push(statement());
                     return a;
@@ -10504,7 +10531,9 @@ var requirejs, require, define, xpcUtil;
 
             function curry(f) {
                 var args = slice(arguments, 1);
-                return function() { return f.apply(this, args.concat(slice(arguments))); };
+                return function () {
+                    return f.apply(this, args.concat(slice(arguments)));
+                };
             };
 
             function prog1(ret) {
@@ -10541,7 +10570,8 @@ var requirejs, require, define, xpcUtil;
                 return Object.prototype.hasOwnProperty.call(obj, prop);
             };
 
-            var warn = function() {};
+            var warn = function () {
+            };
 
             /* -----[ Exports ]----- */
 
@@ -10560,14 +10590,15 @@ var requirejs, require, define, xpcUtil;
             exports.is_alphanumeric_char = is_alphanumeric_char;
             exports.is_identifier_start = is_identifier_start;
             exports.is_identifier_char = is_identifier_char;
-            exports.set_logger = function(logger) {
+            exports.set_logger = function (logger) {
                 warn = logger;
             };
 
 // Local variables:
 // js-indent-level: 4
 // End:
-        });define('uglifyjs/squeeze-more', ["require", "exports", "module", "./parse-js", "./squeeze-more"], function(require, exports, module) {
+        });
+        define('uglifyjs/squeeze-more', ["require", "exports", "module", "./parse-js", "./squeeze-more"], function (require, exports, module) {
             var jsp = require("./parse-js"),
                 pro = require("./process"),
                 slice = jsp.slice,
@@ -10579,6 +10610,7 @@ var requirejs, require, define, xpcUtil;
 
             function ast_squeeze_more(ast) {
                 var w = pro.ast_walker(), walk = w.walk, scope;
+
                 function with_scope(s, cont) {
                     var save = scope, ret;
                     scope = s;
@@ -10587,56 +10619,56 @@ var requirejs, require, define, xpcUtil;
                     return ret;
                 };
                 function _lambda(name, args, body) {
-                    return [ this[0], name, args, with_scope(body.scope, curry(MAP, body, walk)) ];
+                    return [this[0], name, args, with_scope(body.scope, curry(MAP, body, walk))];
                 };
                 return w.with_walkers({
-                    "toplevel": function(body) {
-                        return [ this[0], with_scope(this.scope, curry(MAP, body, walk)) ];
+                    "toplevel": function (body) {
+                        return [this[0], with_scope(this.scope, curry(MAP, body, walk))];
                     },
                     "function": _lambda,
                     "defun": _lambda,
-                    "new": function(ctor, args) {
+                    "new": function (ctor, args) {
                         if (ctor[0] == "name") {
                             if (ctor[1] == "Array" && !scope.has("Array")) {
                                 if (args.length != 1) {
-                                    return [ "array", args ];
+                                    return ["array", args];
                                 } else {
-                                    return walk([ "call", [ "name", "Array" ], args ]);
+                                    return walk(["call", ["name", "Array"], args]);
                                 }
                             } else if (ctor[1] == "Object" && !scope.has("Object")) {
                                 if (!args.length) {
-                                    return [ "object", [] ];
+                                    return ["object", []];
                                 } else {
-                                    return walk([ "call", [ "name", "Object" ], args ]);
+                                    return walk(["call", ["name", "Object"], args]);
                                 }
                             } else if ((ctor[1] == "RegExp" || ctor[1] == "Function" || ctor[1] == "Error") && !scope.has(ctor[1])) {
-                                return walk([ "call", [ "name", ctor[1] ], args]);
+                                return walk(["call", ["name", ctor[1]], args]);
                             }
                         }
                     },
-                    "call": function(expr, args) {
+                    "call": function (expr, args) {
                         if (expr[0] == "dot" && expr[1][0] == "string" && args.length == 1
                             && (args[0][1] > 0 && expr[2] == "substring" || expr[2] == "substr")) {
-                            return [ "call", [ "dot", expr[1], "slice"], args];
+                            return ["call", ["dot", expr[1], "slice"], args];
                         }
                         if (expr[0] == "dot" && expr[2] == "toString" && args.length == 0) {
                             // foo.toString()  ==>  foo+""
                             if (expr[1][0] == "string") return expr[1];
-                            return [ "binary", "+", expr[1], [ "string", "" ]];
+                            return ["binary", "+", expr[1], ["string", ""]];
                         }
                         if (expr[0] == "name") {
                             if (expr[1] == "Array" && args.length != 1 && !scope.has("Array")) {
-                                return [ "array", args ];
+                                return ["array", args];
                             }
                             if (expr[1] == "Object" && !args.length && !scope.has("Object")) {
-                                return [ "object", [] ];
+                                return ["object", []];
                             }
                             if (expr[1] == "String" && !scope.has("String")) {
-                                return [ "binary", "+", args[0], [ "string", "" ]];
+                                return ["binary", "+", args[0], ["string", ""]];
                             }
                         }
                     }
-                }, function() {
+                }, function () {
                     return walk(pro.ast_add_scope(ast));
                 });
             };
@@ -10647,7 +10679,7 @@ var requirejs, require, define, xpcUtil;
 // js-indent-level: 4
 // End:
         });
-        define('uglifyjs/process', ["require", "exports", "module", "./parse-js", "./squeeze-more"], function(require, exports, module) {
+        define('uglifyjs/process', ["require", "exports", "module", "./parse-js", "./squeeze-more"], function (require, exports, module) {
             /***********************************************************************
 
              A JavaScript tokenizer / parser / beautifier / compressor.
@@ -10720,148 +10752,149 @@ var requirejs, require, define, xpcUtil;
 
             function ast_walker() {
                 function _vardefs(defs) {
-                    return [ this[0], MAP(defs, function(def){
-                        var a = [ def[0] ];
+                    return [this[0], MAP(defs, function (def) {
+                        var a = [def[0]];
                         if (def.length > 1)
                             a[1] = walk(def[1]);
                         return a;
-                    }) ];
+                    })];
                 };
                 function _block(statements) {
-                    var out = [ this[0] ];
+                    var out = [this[0]];
                     if (statements != null)
                         out.push(MAP(statements, walk));
                     return out;
                 };
                 var walkers = {
-                    "string": function(str) {
-                        return [ this[0], str ];
+                    "string": function (str) {
+                        return [this[0], str];
                     },
-                    "num": function(num) {
-                        return [ this[0], num ];
+                    "num": function (num) {
+                        return [this[0], num];
                     },
-                    "name": function(name) {
-                        return [ this[0], name ];
+                    "name": function (name) {
+                        return [this[0], name];
                     },
-                    "toplevel": function(statements) {
-                        return [ this[0], MAP(statements, walk) ];
+                    "toplevel": function (statements) {
+                        return [this[0], MAP(statements, walk)];
                     },
                     "block": _block,
                     "splice": _block,
                     "var": _vardefs,
                     "const": _vardefs,
-                    "try": function(t, c, f) {
+                    "try": function (t, c, f) {
                         return [
                             this[0],
                             MAP(t, walk),
-                            c != null ? [ c[0], MAP(c[1], walk) ] : null,
+                            c != null ? [c[0], MAP(c[1], walk)] : null,
                             f != null ? MAP(f, walk) : null
                         ];
                     },
-                    "throw": function(expr) {
-                        return [ this[0], walk(expr) ];
+                    "throw": function (expr) {
+                        return [this[0], walk(expr)];
                     },
-                    "new": function(ctor, args) {
-                        return [ this[0], walk(ctor), MAP(args, walk) ];
+                    "new": function (ctor, args) {
+                        return [this[0], walk(ctor), MAP(args, walk)];
                     },
-                    "switch": function(expr, body) {
-                        return [ this[0], walk(expr), MAP(body, function(branch){
-                            return [ branch[0] ? walk(branch[0]) : null,
-                                MAP(branch[1], walk) ];
-                        }) ];
+                    "switch": function (expr, body) {
+                        return [this[0], walk(expr), MAP(body, function (branch) {
+                            return [branch[0] ? walk(branch[0]) : null,
+                                MAP(branch[1], walk)];
+                        })];
                     },
-                    "break": function(label) {
-                        return [ this[0], label ];
+                    "break": function (label) {
+                        return [this[0], label];
                     },
-                    "continue": function(label) {
-                        return [ this[0], label ];
+                    "continue": function (label) {
+                        return [this[0], label];
                     },
-                    "conditional": function(cond, t, e) {
-                        return [ this[0], walk(cond), walk(t), walk(e) ];
+                    "conditional": function (cond, t, e) {
+                        return [this[0], walk(cond), walk(t), walk(e)];
                     },
-                    "assign": function(op, lvalue, rvalue) {
-                        return [ this[0], op, walk(lvalue), walk(rvalue) ];
+                    "assign": function (op, lvalue, rvalue) {
+                        return [this[0], op, walk(lvalue), walk(rvalue)];
                     },
-                    "dot": function(expr) {
-                        return [ this[0], walk(expr) ].concat(slice(arguments, 1));
+                    "dot": function (expr) {
+                        return [this[0], walk(expr)].concat(slice(arguments, 1));
                     },
-                    "call": function(expr, args) {
-                        return [ this[0], walk(expr), MAP(args, walk) ];
+                    "call": function (expr, args) {
+                        return [this[0], walk(expr), MAP(args, walk)];
                     },
-                    "function": function(name, args, body) {
-                        return [ this[0], name, args.slice(), MAP(body, walk) ];
+                    "function": function (name, args, body) {
+                        return [this[0], name, args.slice(), MAP(body, walk)];
                     },
-                    "debugger": function() {
-                        return [ this[0] ];
+                    "debugger": function () {
+                        return [this[0]];
                     },
-                    "defun": function(name, args, body) {
-                        return [ this[0], name, args.slice(), MAP(body, walk) ];
+                    "defun": function (name, args, body) {
+                        return [this[0], name, args.slice(), MAP(body, walk)];
                     },
-                    "if": function(conditional, t, e) {
-                        return [ this[0], walk(conditional), walk(t), walk(e) ];
+                    "if": function (conditional, t, e) {
+                        return [this[0], walk(conditional), walk(t), walk(e)];
                     },
-                    "for": function(init, cond, step, block) {
-                        return [ this[0], walk(init), walk(cond), walk(step), walk(block) ];
+                    "for": function (init, cond, step, block) {
+                        return [this[0], walk(init), walk(cond), walk(step), walk(block)];
                     },
-                    "for-in": function(vvar, key, hash, block) {
-                        return [ this[0], walk(vvar), walk(key), walk(hash), walk(block) ];
+                    "for-in": function (vvar, key, hash, block) {
+                        return [this[0], walk(vvar), walk(key), walk(hash), walk(block)];
                     },
-                    "while": function(cond, block) {
-                        return [ this[0], walk(cond), walk(block) ];
+                    "while": function (cond, block) {
+                        return [this[0], walk(cond), walk(block)];
                     },
-                    "do": function(cond, block) {
-                        return [ this[0], walk(cond), walk(block) ];
+                    "do": function (cond, block) {
+                        return [this[0], walk(cond), walk(block)];
                     },
-                    "return": function(expr) {
-                        return [ this[0], walk(expr) ];
+                    "return": function (expr) {
+                        return [this[0], walk(expr)];
                     },
-                    "binary": function(op, left, right) {
-                        return [ this[0], op, walk(left), walk(right) ];
+                    "binary": function (op, left, right) {
+                        return [this[0], op, walk(left), walk(right)];
                     },
-                    "unary-prefix": function(op, expr) {
-                        return [ this[0], op, walk(expr) ];
+                    "unary-prefix": function (op, expr) {
+                        return [this[0], op, walk(expr)];
                     },
-                    "unary-postfix": function(op, expr) {
-                        return [ this[0], op, walk(expr) ];
+                    "unary-postfix": function (op, expr) {
+                        return [this[0], op, walk(expr)];
                     },
-                    "sub": function(expr, subscript) {
-                        return [ this[0], walk(expr), walk(subscript) ];
+                    "sub": function (expr, subscript) {
+                        return [this[0], walk(expr), walk(subscript)];
                     },
-                    "object": function(props) {
-                        return [ this[0], MAP(props, function(p){
+                    "object": function (props) {
+                        return [this[0], MAP(props, function (p) {
                             return p.length == 2
-                                ? [ p[0], walk(p[1]) ]
-                                : [ p[0], walk(p[1]), p[2] ]; // get/set-ter
-                        }) ];
+                                ? [p[0], walk(p[1])]
+                                : [p[0], walk(p[1]), p[2]]; // get/set-ter
+                        })];
                     },
-                    "regexp": function(rx, mods) {
-                        return [ this[0], rx, mods ];
+                    "regexp": function (rx, mods) {
+                        return [this[0], rx, mods];
                     },
-                    "array": function(elements) {
-                        return [ this[0], MAP(elements, walk) ];
+                    "array": function (elements) {
+                        return [this[0], MAP(elements, walk)];
                     },
-                    "stat": function(stat) {
-                        return [ this[0], walk(stat) ];
+                    "stat": function (stat) {
+                        return [this[0], walk(stat)];
                     },
-                    "seq": function() {
-                        return [ this[0] ].concat(MAP(slice(arguments), walk));
+                    "seq": function () {
+                        return [this[0]].concat(MAP(slice(arguments), walk));
                     },
-                    "label": function(name, block) {
-                        return [ this[0], name, walk(block) ];
+                    "label": function (name, block) {
+                        return [this[0], name, walk(block)];
                     },
-                    "with": function(expr, block) {
-                        return [ this[0], walk(expr), walk(block) ];
+                    "with": function (expr, block) {
+                        return [this[0], walk(expr), walk(block)];
                     },
-                    "atom": function(name) {
-                        return [ this[0], name ];
+                    "atom": function (name) {
+                        return [this[0], name];
                     },
-                    "directive": function(dir) {
-                        return [ this[0], dir ];
+                    "directive": function (dir) {
+                        return [this[0], dir];
                     }
                 };
 
                 var user = {};
                 var stack = [];
+
                 function walk(ast) {
                     if (ast == null)
                         return null;
@@ -10892,7 +10925,7 @@ var requirejs, require, define, xpcUtil;
                     }
                 };
 
-                function with_walkers(walkers, cont){
+                function with_walkers(walkers, cont) {
                     var save = {}, i;
                     for (i in walkers) if (HOP(walkers, i)) {
                         save[i] = user[i];
@@ -10910,10 +10943,10 @@ var requirejs, require, define, xpcUtil;
                     walk: walk,
                     dive: dive,
                     with_walkers: with_walkers,
-                    parent: function() {
+                    parent: function () {
                         return stack[stack.length - 2]; // last one is current node
                     },
-                    stack: function() {
+                    stack: function () {
                         return stack;
                     }
                 };
@@ -10947,9 +10980,9 @@ var requirejs, require, define, xpcUtil;
                     return "etnrisouaflchpdvmgybwESxTNCkLAOM_DPHBjFIqRUzWXV$JKQGYZ0516372984";
             }
 
-            var base54 = (function(){
+            var base54 = (function () {
                 var DIGITS = base54_digits();
-                return function(num) {
+                return function (num) {
                     var ret = "", base = 54;
                     do {
                         ret += DIGITS.charAt(num % base);
@@ -10961,17 +10994,17 @@ var requirejs, require, define, xpcUtil;
             })();
 
             Scope.prototype = {
-                has: function(name) {
+                has: function (name) {
                     for (var s = this; s; s = s.parent)
                         if (HOP(s.names, name))
                             return s;
                 },
-                has_mangled: function(mname) {
+                has_mangled: function (mname) {
                     for (var s = this; s; s = s.parent)
                         if (HOP(s.rev_mangled, mname))
                             return s;
                 },
-                toJSON: function() {
+                toJSON: function () {
                     return {
                         names: this.names,
                         uses_eval: this.uses_eval,
@@ -10979,7 +11012,7 @@ var requirejs, require, define, xpcUtil;
                     };
                 },
 
-                next_mangled: function() {
+                next_mangled: function () {
                     // we must be careful that the new mangled name:
                     //
                     // 1. doesn't shadow a mangled name from a parent
@@ -10994,7 +11027,7 @@ var requirejs, require, define, xpcUtil;
                     //
                     // 3. doesn't shadow a name that is referenced but not
                     //    defined (possibly global defined elsewhere).
-                    for (;;) {
+                    for (; ;) {
                         var m = base54(++this.cname), prior;
 
                         // case 1.
@@ -11018,11 +11051,11 @@ var requirejs, require, define, xpcUtil;
                         return m;
                     }
                 },
-                set_mangle: function(name, m) {
+                set_mangle: function (name, m) {
                     this.rev_mangled[m] = name;
                     return this.mangled[name] = m;
                 },
-                get_mangled: function(name, newMangle) {
+                get_mangled: function (name, newMangle) {
                     if (this.uses_eval || this.uses_with) return name; // no mangle if eval or with is in use
                     var s = this.has(name);
                     if (!s) return name; // not in visible scope, no mangle
@@ -11030,17 +11063,17 @@ var requirejs, require, define, xpcUtil;
                     if (!newMangle) return name;                      // not found and no mangling requested
                     return s.set_mangle(name, s.next_mangled());
                 },
-                references: function(name) {
+                references: function (name) {
                     return name && !this.parent || this.uses_with || this.uses_eval || this.refs[name];
                 },
-                define: function(name, type) {
+                define: function (name, type) {
                     if (name != null) {
                         if (type == "var" || !HOP(this.names, name))
                             this.names[name] = type || "var";
                         return name;
                     }
                 },
-                active_directive: function(dir) {
+                active_directive: function (dir) {
                     return member(dir, this.directives) || this.parent && this.parent.active_directive(dir);
                 }
             };
@@ -11070,16 +11103,18 @@ var requirejs, require, define, xpcUtil;
 
                 function _lambda(name, args, body) {
                     var is_defun = this[0] == "defun";
-                    return [ this[0], is_defun ? define(name, "defun") : name, args, with_new_scope(function(){
+                    return [this[0], is_defun ? define(name, "defun") : name, args, with_new_scope(function () {
                         if (!is_defun) define(name, "lambda");
-                        MAP(args, function(name){ define(name, "arg") });
+                        MAP(args, function (name) {
+                            define(name, "arg")
+                        });
                         return MAP(body, walk);
                     })];
                 };
 
                 function _vardefs(type) {
-                    return function(defs) {
-                        MAP(defs, function(d){
+                    return function (defs) {
+                        MAP(defs, function (d) {
                             define(d[0], type);
                             if (d[1]) reference(d[0]);
                         });
@@ -11091,34 +11126,36 @@ var requirejs, require, define, xpcUtil;
                         current_scope.labels.refs[label] = true;
                 };
 
-                return with_new_scope(function(){
+                return with_new_scope(function () {
                     // process AST
                     var ret = w.with_walkers({
                         "function": _lambda,
                         "defun": _lambda,
-                        "label": function(name, stat) { current_scope.labels.define(name) },
+                        "label": function (name, stat) {
+                            current_scope.labels.define(name)
+                        },
                         "break": _breacont,
                         "continue": _breacont,
-                        "with": function(expr, block) {
+                        "with": function (expr, block) {
                             for (var s = current_scope; s; s = s.parent)
                                 s.uses_with = true;
                         },
                         "var": _vardefs("var"),
                         "const": _vardefs("const"),
-                        "try": function(t, c, f) {
+                        "try": function (t, c, f) {
                             if (c != null) return [
                                 this[0],
                                 MAP(t, walk),
-                                [ define(c[0], "catch"), MAP(c[1], walk) ],
+                                [define(c[0], "catch"), MAP(c[1], walk)],
                                 f != null ? MAP(f, walk) : null
                             ];
                         },
-                        "name": function(name) {
+                        "name": function (name) {
                             if (name == "eval")
                                 having_eval.push(current_scope);
                             reference(name);
                         }
-                    }, function(){
+                    }, function () {
                         return walk(ast);
                     });
 
@@ -11128,7 +11165,7 @@ var requirejs, require, define, xpcUtil;
                     // scopes where eval was detected and their parents
                     // are marked with uses_eval, unless they define the
                     // "eval" name.
-                    MAP(having_eval, function(scope){
+                    MAP(having_eval, function (scope) {
                         if (!scope.has("eval")) while (scope) {
                             scope.uses_eval = true;
                             scope = scope.parent;
@@ -11162,11 +11199,11 @@ var requirejs, require, define, xpcUtil;
             function ast_mangle(ast, options) {
                 var w = ast_walker(), walk = w.walk, scope;
                 options = defaults(options, {
-                    mangle       : true,
-                    toplevel     : false,
-                    defines      : null,
-                    except       : null,
-                    no_functions : false
+                    mangle: true,
+                    toplevel: false,
+                    defines: null,
+                    except: null,
+                    no_functions: false
                 });
 
                 function get_mangled(name, newMangle) {
@@ -11208,11 +11245,13 @@ var requirejs, require, define, xpcUtil;
                             else name = null;
                         }
                     }
-                    body = with_scope(body.scope, function(){
-                        args = MAP(args, function(name){ return get_mangled(name) });
+                    body = with_scope(body.scope, function () {
+                        args = MAP(args, function (name) {
+                            return get_mangled(name)
+                        });
                         return MAP(body, walk);
                     }, extra);
-                    return [ this[0], name, args, body ];
+                    return [this[0], name, args, body];
                 };
 
                 function with_scope(s, cont, extra) {
@@ -11231,18 +11270,18 @@ var requirejs, require, define, xpcUtil;
                 };
 
                 function _vardefs(defs) {
-                    return [ this[0], MAP(defs, function(d){
-                        return [ get_mangled(d[0]), walk(d[1]) ];
-                    }) ];
+                    return [this[0], MAP(defs, function (d) {
+                        return [get_mangled(d[0]), walk(d[1])];
+                    })];
                 };
 
                 function _breacont(label) {
-                    if (label) return [ this[0], scope.labels.get_mangled(label) ];
+                    if (label) return [this[0], scope.labels.get_mangled(label)];
                 };
 
                 return w.with_walkers({
                     "function": _lambda,
-                    "defun": function() {
+                    "defun": function () {
                         // move function declarations to the top when
                         // they are not in some block.
                         var ast = _lambda.apply(this, arguments);
@@ -11254,7 +11293,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return ast;
                     },
-                    "label": function(label, stat) {
+                    "label": function (label, stat) {
                         if (scope.labels.refs[label]) return [
                             this[0],
                             scope.labels.get_mangled(label, true),
@@ -11266,25 +11305,25 @@ var requirejs, require, define, xpcUtil;
                     "continue": _breacont,
                     "var": _vardefs,
                     "const": _vardefs,
-                    "name": function(name) {
-                        return get_define(name) || [ this[0], get_mangled(name) ];
+                    "name": function (name) {
+                        return get_define(name) || [this[0], get_mangled(name)];
                     },
-                    "try": function(t, c, f) {
-                        return [ this[0],
+                    "try": function (t, c, f) {
+                        return [this[0],
                             MAP(t, walk),
-                            c != null ? [ get_mangled(c[0]), MAP(c[1], walk) ] : null,
-                            f != null ? MAP(f, walk) : null ];
+                            c != null ? [get_mangled(c[0]), MAP(c[1], walk)] : null,
+                            f != null ? MAP(f, walk) : null];
                     },
-                    "toplevel": function(body) {
+                    "toplevel": function (body) {
                         var self = this;
-                        return with_scope(self.scope, function(){
-                            return [ self[0], MAP(body, walk) ];
+                        return with_scope(self.scope, function () {
+                            return [self[0], MAP(body, walk)];
                         });
                     },
-                    "directive": function() {
+                    "directive": function () {
                         return MAP.at_top(this);
                     }
-                }, function() {
+                }, function () {
                     return walk(ast_add_scope(ast));
                 });
             };
@@ -11300,7 +11339,8 @@ var requirejs, require, define, xpcUtil;
              - if (foo) return bar(); else something();  ==> {if(foo)return bar();something()}
              ]----- */
 
-            var warn = function(){};
+            var warn = function () {
+            };
 
             function best_of(ast1, ast2) {
                 return gen_code(ast1).length > gen_code(ast2[0] == "stat" ? ast2[1] : ast2).length ? ast2 : ast1;
@@ -11324,27 +11364,27 @@ var requirejs, require, define, xpcUtil;
 
             function boolean_expr(expr) {
                 return ( (expr[0] == "unary-prefix"
-                    && member(expr[1], [ "!", "delete" ])) ||
+                    && member(expr[1], ["!", "delete"])) ||
 
                     (expr[0] == "binary"
-                        && member(expr[1], [ "in", "instanceof", "==", "!=", "===", "!==", "<", "<=", ">=", ">" ])) ||
+                    && member(expr[1], ["in", "instanceof", "==", "!=", "===", "!==", "<", "<=", ">=", ">"])) ||
 
                     (expr[0] == "binary"
-                        && member(expr[1], [ "&&", "||" ])
-                        && boolean_expr(expr[2])
-                        && boolean_expr(expr[3])) ||
+                    && member(expr[1], ["&&", "||"])
+                    && boolean_expr(expr[2])
+                    && boolean_expr(expr[3])) ||
 
                     (expr[0] == "conditional"
-                        && boolean_expr(expr[2])
-                        && boolean_expr(expr[3])) ||
+                    && boolean_expr(expr[2])
+                    && boolean_expr(expr[3])) ||
 
                     (expr[0] == "assign"
-                        && expr[1] === true
-                        && boolean_expr(expr[3])) ||
+                    && expr[1] === true
+                    && boolean_expr(expr[3])) ||
 
                     (expr[0] == "seq"
-                        && boolean_expr(expr[expr.length - 1]))
-                    );
+                    && boolean_expr(expr[expr.length - 1]))
+                );
             };
 
             function empty(b) {
@@ -11353,12 +11393,12 @@ var requirejs, require, define, xpcUtil;
 
             function is_string(node) {
                 return (node[0] == "string" ||
-                    node[0] == "unary-prefix" && node[1] == "typeof" ||
-                    node[0] == "binary" && node[1] == "+" &&
-                        (is_string(node[2]) || is_string(node[3])));
+                node[0] == "unary-prefix" && node[1] == "typeof" ||
+                node[0] == "binary" && node[1] == "+" &&
+                (is_string(node[2]) || is_string(node[3])));
             };
 
-            var when_constant = (function(){
+            var when_constant = (function () {
 
                 var $NOT_CONSTANT = {};
 
@@ -11372,64 +11412,104 @@ var requirejs, require, define, xpcUtil;
                         case "name":
                         case "atom":
                             switch (expr[1]) {
-                                case "true": return true;
-                                case "false": return false;
-                                case "null": return null;
+                                case "true":
+                                    return true;
+                                case "false":
+                                    return false;
+                                case "null":
+                                    return null;
                             }
                             break;
                         case "unary-prefix":
                             switch (expr[1]) {
-                                case "!": return !evaluate(expr[2]);
-                                case "typeof": return typeof evaluate(expr[2]);
-                                case "~": return ~evaluate(expr[2]);
-                                case "-": return -evaluate(expr[2]);
-                                case "+": return +evaluate(expr[2]);
+                                case "!":
+                                    return !evaluate(expr[2]);
+                                case "typeof":
+                                    return typeof evaluate(expr[2]);
+                                case "~":
+                                    return ~evaluate(expr[2]);
+                                case "-":
+                                    return -evaluate(expr[2]);
+                                case "+":
+                                    return +evaluate(expr[2]);
                             }
                             break;
                         case "binary":
                             var left = expr[2], right = expr[3];
                             switch (expr[1]) {
-                                case "&&"         : return evaluate(left) &&         evaluate(right);
-                                case "||"         : return evaluate(left) ||         evaluate(right);
-                                case "|"          : return evaluate(left) |          evaluate(right);
-                                case "&"          : return evaluate(left) &          evaluate(right);
-                                case "^"          : return evaluate(left) ^          evaluate(right);
-                                case "+"          : return evaluate(left) +          evaluate(right);
-                                case "*"          : return evaluate(left) *          evaluate(right);
-                                case "/"          : return evaluate(left) /          evaluate(right);
-                                case "%"          : return evaluate(left) %          evaluate(right);
-                                case "-"          : return evaluate(left) -          evaluate(right);
-                                case "<<"         : return evaluate(left) <<         evaluate(right);
-                                case ">>"         : return evaluate(left) >>         evaluate(right);
-                                case ">>>"        : return evaluate(left) >>>        evaluate(right);
-                                case "=="         : return evaluate(left) ==         evaluate(right);
-                                case "==="        : return evaluate(left) ===        evaluate(right);
-                                case "!="         : return evaluate(left) !=         evaluate(right);
-                                case "!=="        : return evaluate(left) !==        evaluate(right);
-                                case "<"          : return evaluate(left) <          evaluate(right);
-                                case "<="         : return evaluate(left) <=         evaluate(right);
-                                case ">"          : return evaluate(left) >          evaluate(right);
-                                case ">="         : return evaluate(left) >=         evaluate(right);
-                                case "in"         : return evaluate(left) in         evaluate(right);
-                                case "instanceof" : return evaluate(left) instanceof evaluate(right);
+                                case "&&"         :
+                                    return evaluate(left) && evaluate(right);
+                                case "||"         :
+                                    return evaluate(left) || evaluate(right);
+                                case "|"          :
+                                    return evaluate(left) | evaluate(right);
+                                case "&"          :
+                                    return evaluate(left) & evaluate(right);
+                                case "^"          :
+                                    return evaluate(left) ^ evaluate(right);
+                                case "+"          :
+                                    return evaluate(left) + evaluate(right);
+                                case "*"          :
+                                    return evaluate(left) * evaluate(right);
+                                case "/"          :
+                                    return evaluate(left) / evaluate(right);
+                                case "%"          :
+                                    return evaluate(left) % evaluate(right);
+                                case "-"          :
+                                    return evaluate(left) - evaluate(right);
+                                case "<<"         :
+                                    return evaluate(left) << evaluate(right);
+                                case ">>"         :
+                                    return evaluate(left) >> evaluate(right);
+                                case ">>>"        :
+                                    return evaluate(left) >>> evaluate(right);
+                                case "=="         :
+                                    return evaluate(left) == evaluate(right);
+                                case "==="        :
+                                    return evaluate(left) === evaluate(right);
+                                case "!="         :
+                                    return evaluate(left) != evaluate(right);
+                                case "!=="        :
+                                    return evaluate(left) !== evaluate(right);
+                                case "<"          :
+                                    return evaluate(left) < evaluate(right);
+                                case "<="         :
+                                    return evaluate(left) <= evaluate(right);
+                                case ">"          :
+                                    return evaluate(left) > evaluate(right);
+                                case ">="         :
+                                    return evaluate(left) >= evaluate(right);
+                                case "in"         :
+                                    return evaluate(left) in evaluate(right);
+                                case "instanceof" :
+                                    return evaluate(left) instanceof evaluate(right);
                             }
                     }
                     throw $NOT_CONSTANT;
                 };
 
-                return function(expr, yes, no) {
+                return function (expr, yes, no) {
                     try {
                         var val = evaluate(expr), ast;
                         switch (typeof val) {
-                            case "string": ast =  [ "string", val ]; break;
-                            case "number": ast =  [ "num", val ]; break;
-                            case "boolean": ast =  [ "name", String(val) ]; break;
+                            case "string":
+                                ast = ["string", val];
+                                break;
+                            case "number":
+                                ast = ["num", val];
+                                break;
+                            case "boolean":
+                                ast = ["name", String(val)];
+                                break;
                             default:
-                                if (val === null) { ast = [ "atom", "null" ]; break; }
+                                if (val === null) {
+                                    ast = ["atom", "null"];
+                                    break;
+                                }
                                 throw new Error("Can't handle constant of type: " + (typeof val));
                         }
                         return yes.call(expr, ast, val);
-                    } catch(ex) {
+                    } catch (ex) {
                         if (ex === $NOT_CONSTANT) {
                             if (expr[0] == "binary"
                                 && (expr[1] == "===" || expr[1] == "!==")
@@ -11442,10 +11522,10 @@ var requirejs, require, define, xpcUtil;
                                 // the whole expression is not constant but the lval may be...
                                 try {
                                     var lval = evaluate(expr[2]);
-                                    expr = ((expr[1] == "&&" && (lval ? expr[3] : lval))    ||
-                                        (expr[1] == "||" && (lval ? lval    : expr[3])) ||
-                                        expr);
-                                } catch(ex2) {
+                                    expr = ((expr[1] == "&&" && (lval ? expr[3] : lval)) ||
+                                    (expr[1] == "||" && (lval ? lval : expr[3])) ||
+                                    expr);
+                                } catch (ex2) {
                                     // IGNORE... lval is not constant
                                 }
                             }
@@ -11496,14 +11576,14 @@ var requirejs, require, define, xpcUtil;
                         var conditional = walk(fi[1]);
 
                         var e_body = redo_if(statements.slice(i + 1));
-                        var e = e_body.length == 1 ? e_body[0] : [ "block", e_body ];
+                        var e = e_body.length == 1 ? e_body[0] : ["block", e_body];
 
-                        return statements.slice(0, i).concat([ [
+                        return statements.slice(0, i).concat([[
                             fi[0],          // "if"
                             conditional,    // conditional
                             t,              // then
                             e               // else
-                        ] ]);
+                        ]]);
                     }
 
                     return statements;
@@ -11511,11 +11591,11 @@ var requirejs, require, define, xpcUtil;
 
                 function redo_if_lambda(name, args, body) {
                     body = redo_if(body);
-                    return [ this[0], name, args, body ];
+                    return [this[0], name, args, body];
                 };
 
                 function redo_if_block(statements) {
-                    return [ this[0], statements != null ? redo_if(statements) : null ];
+                    return [this[0], statements != null ? redo_if(statements) : null];
                 };
 
                 return w.with_walkers({
@@ -11523,18 +11603,18 @@ var requirejs, require, define, xpcUtil;
                     "function": redo_if_lambda,
                     "block": redo_if_block,
                     "splice": redo_if_block,
-                    "toplevel": function(statements) {
-                        return [ this[0], redo_if(statements) ];
+                    "toplevel": function (statements) {
+                        return [this[0], redo_if(statements)];
                     },
-                    "try": function(t, c, f) {
+                    "try": function (t, c, f) {
                         return [
                             this[0],
                             redo_if(t),
-                            c != null ? [ c[0], redo_if(c[1]) ] : null,
+                            c != null ? [c[0], redo_if(c[1])] : null,
                             f != null ? redo_if(f) : null
                         ];
                     }
-                }, function() {
+                }, function () {
                     return walk(ast);
                 });
             };
@@ -11542,9 +11622,16 @@ var requirejs, require, define, xpcUtil;
             function for_side_effects(ast, handler) {
                 var w = ast_walker(), walk = w.walk;
                 var $stop = {}, $restart = {};
-                function stop() { throw $stop };
-                function restart() { throw $restart };
-                function found(){ return handler.call(this, this, w, stop, restart) };
+
+                function stop() {
+                    throw $stop
+                };
+                function restart() {
+                    throw $restart
+                };
+                function found() {
+                    return handler.call(this, this, w, stop, restart)
+                };
                 function unary(op) {
                     if (op == "++" || op == "--")
                         return found.apply(this, arguments);
@@ -11574,11 +11661,11 @@ var requirejs, require, define, xpcUtil;
                     "conditional": found,
                     "binary": binary,
                     "defun": found
-                }, function(){
+                }, function () {
                     while (true) try {
                         walk(ast);
                         break;
-                    } catch(ex) {
+                    } catch (ex) {
                         if (ex === $stop) break;
                         if (ex === $restart) continue;
                         throw ex;
@@ -11588,21 +11675,22 @@ var requirejs, require, define, xpcUtil;
 
             function ast_lift_variables(ast) {
                 var w = ast_walker(), walk = w.walk, scope;
+
                 function do_body(body, env) {
                     var _scope = scope;
                     scope = env;
                     body = MAP(body, walk);
-                    var hash = {}, names = MAP(env.names, function(type, name){
+                    var hash = {}, names = MAP(env.names, function (type, name) {
                         if (type != "var") return MAP.skip;
                         if (!env.references(name)) return MAP.skip;
                         hash[name] = true;
-                        return [ name ];
+                        return [name];
                     });
                     if (names.length > 0) {
                         // looking for assignments to any of these variables.
                         // we can save considerable space by moving the definitions
                         // in the var declaration.
-                        for_side_effects([ "block", body ], function(ast, walker, stop, restart) {
+                        for_side_effects(["block", body], function (ast, walker, stop, restart) {
                             if (ast[0] == "assign"
                                 && ast[1] === true
                                 && ast[2][0] == "name"
@@ -11634,7 +11722,7 @@ var requirejs, require, define, xpcUtil;
                             }
                             stop();
                         });
-                        body.unshift([ "var", names ]);
+                        body.unshift(["var", names]);
                     }
                     scope = _scope;
                     return body;
@@ -11644,36 +11732,36 @@ var requirejs, require, define, xpcUtil;
                     for (var i = defs.length; --i >= 0;) {
                         var d = defs[i];
                         if (!d[1]) continue;
-                        d = [ "assign", true, [ "name", d[0] ], d[1] ];
+                        d = ["assign", true, ["name", d[0]], d[1]];
                         if (ret == null) ret = d;
-                        else ret = [ "seq", d, ret ];
+                        else ret = ["seq", d, ret];
                     }
                     if (ret == null && w.parent()[0] != "for") {
                         if (w.parent()[0] == "for-in")
-                            return [ "name", defs[0][0] ];
+                            return ["name", defs[0][0]];
                         return MAP.skip;
                     }
-                    return [ "stat", ret ];
+                    return ["stat", ret];
                 };
                 function _toplevel(body) {
-                    return [ this[0], do_body(body, this.scope) ];
+                    return [this[0], do_body(body, this.scope)];
                 };
                 return w.with_walkers({
-                    "function": function(name, args, body){
+                    "function": function (name, args, body) {
                         for (var i = args.length; --i >= 0 && !body.scope.references(args[i]);)
                             args.pop();
                         if (!body.scope.references(name)) name = null;
-                        return [ this[0], name, args, do_body(body, body.scope) ];
+                        return [this[0], name, args, do_body(body, body.scope)];
                     },
-                    "defun": function(name, args, body){
+                    "defun": function (name, args, body) {
                         if (!scope.references(name)) return MAP.skip;
                         for (var i = args.length; --i >= 0 && !body.scope.references(args[i]);)
                             args.pop();
-                        return [ this[0], name, args, do_body(body, body.scope) ];
+                        return [this[0], name, args, do_body(body, body.scope)];
                     },
                     "var": _vardefs,
                     "toplevel": _toplevel
-                }, function(){
+                }, function () {
                     return walk(ast_add_scope(ast));
                 });
             };
@@ -11686,17 +11774,17 @@ var requirejs, require, define, xpcUtil;
 
             function squeeze_1(ast, options) {
                 options = defaults(options, {
-                    make_seqs   : true,
-                    dead_code   : true,
-                    no_warnings : false,
-                    keep_comps  : true,
-                    unsafe      : false
+                    make_seqs: true,
+                    dead_code: true,
+                    no_warnings: false,
+                    keep_comps: true,
+                    unsafe: false
                 });
 
                 var w = ast_walker(), walk = w.walk, scope;
 
                 function negate(c) {
-                    var not_c = [ "unary-prefix", "!", c ];
+                    var not_c = ["unary-prefix", "!", c];
                     switch (c[0]) {
                         case "unary-prefix":
                             return c[1] == "!" && boolean_expr(c[2]) ? c[2] : not_c;
@@ -11705,22 +11793,32 @@ var requirejs, require, define, xpcUtil;
                             c[c.length - 1] = negate(c[c.length - 1]);
                             return c;
                         case "conditional":
-                            return best_of(not_c, [ "conditional", c[1], negate(c[2]), negate(c[3]) ]);
+                            return best_of(not_c, ["conditional", c[1], negate(c[2]), negate(c[3])]);
                         case "binary":
                             var op = c[1], left = c[2], right = c[3];
                             if (!options.keep_comps) switch (op) {
-                                case "<="  : return [ "binary", ">", left, right ];
-                                case "<"   : return [ "binary", ">=", left, right ];
-                                case ">="  : return [ "binary", "<", left, right ];
-                                case ">"   : return [ "binary", "<=", left, right ];
+                                case "<="  :
+                                    return ["binary", ">", left, right];
+                                case "<"   :
+                                    return ["binary", ">=", left, right];
+                                case ">="  :
+                                    return ["binary", "<", left, right];
+                                case ">"   :
+                                    return ["binary", "<=", left, right];
                             }
                             switch (op) {
-                                case "=="  : return [ "binary", "!=", left, right ];
-                                case "!="  : return [ "binary", "==", left, right ];
-                                case "===" : return [ "binary", "!==", left, right ];
-                                case "!==" : return [ "binary", "===", left, right ];
-                                case "&&"  : return best_of(not_c, [ "binary", "||", negate(left), negate(right) ]);
-                                case "||"  : return best_of(not_c, [ "binary", "&&", negate(left), negate(right) ]);
+                                case "=="  :
+                                    return ["binary", "!=", left, right];
+                                case "!="  :
+                                    return ["binary", "==", left, right];
+                                case "===" :
+                                    return ["binary", "!==", left, right];
+                                case "!==" :
+                                    return ["binary", "===", left, right];
+                                case "&&"  :
+                                    return best_of(not_c, ["binary", "||", negate(left), negate(right)]);
+                                case "||"  :
+                                    return best_of(not_c, ["binary", "&&", negate(left), negate(right)]);
                             }
                             break;
                     }
@@ -11728,20 +11826,20 @@ var requirejs, require, define, xpcUtil;
                 };
 
                 function make_conditional(c, t, e) {
-                    var make_real_conditional = function() {
+                    var make_real_conditional = function () {
                         if (c[0] == "unary-prefix" && c[1] == "!") {
-                            return e ? [ "conditional", c[2], e, t ] : [ "binary", "||", c[2], t ];
+                            return e ? ["conditional", c[2], e, t] : ["binary", "||", c[2], t];
                         } else {
                             return e ? best_of(
-                                [ "conditional", c, t, e ],
-                                [ "conditional", negate(c), e, t ]
-                            ) : [ "binary", "&&", c, t ];
+                                    ["conditional", c, t, e],
+                                    ["conditional", negate(c), e, t]
+                                ) : ["binary", "&&", c, t];
                         }
                     };
                     // shortcut the conditional if the expression has a constant value
-                    return when_constant(c, function(ast, val){
+                    return when_constant(c, function (ast, val) {
                         warn_unreachable(val ? e : t);
-                        return          (val ? t : e);
+                        return (val ? t : e);
                     }, make_real_conditional);
                 };
 
@@ -11750,13 +11848,13 @@ var requirejs, require, define, xpcUtil;
                         if (block[1].length == 1)
                             block = block[1][0];
                         else if (block[1].length == 0)
-                            block = [ "block" ];
+                            block = ["block"];
                     }
                     return block;
                 };
 
                 function _lambda(name, args, body) {
-                    return [ this[0], name, args, tighten(body, "lambda") ];
+                    return [this[0], name, args, tighten(body, "lambda")];
                 };
 
                 // this function does a few things:
@@ -11768,7 +11866,7 @@ var requirejs, require, define, xpcUtil;
                 function tighten(statements, block_type) {
                     statements = MAP(statements, walk);
 
-                    statements = statements.reduce(function(a, stat){
+                    statements = statements.reduce(function (a, stat) {
                         if (stat[0] == "block") {
                             if (stat[1]) {
                                 a.push.apply(a, stat[1]);
@@ -11779,8 +11877,8 @@ var requirejs, require, define, xpcUtil;
                         return a;
                     }, []);
 
-                    statements = (function(a, prev){
-                        statements.forEach(function(cur){
+                    statements = (function (a, prev) {
+                        statements.forEach(function (cur) {
                             if (prev && ((cur[0] == "var" && prev[0] == "var") ||
                                 (cur[0] == "const" && prev[0] == "const"))) {
                                 prev[1] = prev[1].concat(cur[1]);
@@ -11792,8 +11890,8 @@ var requirejs, require, define, xpcUtil;
                         return a;
                     })([]);
 
-                    if (options.dead_code) statements = (function(a, has_quit){
-                        statements.forEach(function(st){
+                    if (options.dead_code) statements = (function (a, has_quit) {
+                        statements.forEach(function (st) {
                             if (has_quit) {
                                 if (st[0] == "function" || st[0] == "defun") {
                                     a.push(st);
@@ -11801,10 +11899,10 @@ var requirejs, require, define, xpcUtil;
                                 else if (st[0] == "var" || st[0] == "const") {
                                     if (!options.no_warnings)
                                         warn("Variables declared in unreachable code");
-                                    st[1] = MAP(st[1], function(def){
+                                    st[1] = MAP(st[1], function (def) {
                                         if (def[1] && !options.no_warnings)
-                                            warn_unreachable([ "assign", true, [ "name", def[0] ], def[1] ]);
-                                        return [ def[0] ];
+                                            warn_unreachable(["assign", true, ["name", def[0]], def[1]]);
+                                        return [def[0]];
                                     });
                                     a.push(st);
                                 }
@@ -11813,30 +11911,29 @@ var requirejs, require, define, xpcUtil;
                             }
                             else {
                                 a.push(st);
-                                if (member(st[0], [ "return", "throw", "break", "continue" ]))
+                                if (member(st[0], ["return", "throw", "break", "continue"]))
                                     has_quit = true;
                             }
                         });
                         return a;
                     })([]);
 
-                    if (options.make_seqs) statements = (function(a, prev) {
-                        statements.forEach(function(cur){
+                    if (options.make_seqs) statements = (function (a, prev) {
+                        statements.forEach(function (cur) {
                             if (prev && prev[0] == "stat" && cur[0] == "stat") {
-                                prev[1] = [ "seq", prev[1], cur[1] ];
+                                prev[1] = ["seq", prev[1], cur[1]];
                             } else {
                                 a.push(cur);
                                 prev = cur;
                             }
                         });
                         if (a.length >= 2
-                            && a[a.length-2][0] == "stat"
-                            && (a[a.length-1][0] == "return" || a[a.length-1][0] == "throw")
-                            && a[a.length-1][1])
-                        {
+                            && a[a.length - 2][0] == "stat"
+                            && (a[a.length - 1][0] == "return" || a[a.length - 1][0] == "throw")
+                            && a[a.length - 1][1]) {
                             a.splice(a.length - 2, 2,
-                                [ a[a.length-1][0],
-                                    [ "seq", a[a.length-2][1], a[a.length-1][1] ]]);
+                                [a[a.length - 1][0],
+                                    ["seq", a[a.length - 2][1], a[a.length - 1][1]]]);
                         }
                         return a;
                     })([]);
@@ -11866,29 +11963,29 @@ var requirejs, require, define, xpcUtil;
                 };
 
                 function make_if(c, t, e) {
-                    return when_constant(c, function(ast, val){
+                    return when_constant(c, function (ast, val) {
                         if (val) {
                             t = walk(t);
                             warn_unreachable(e);
-                            return t || [ "block" ];
+                            return t || ["block"];
                         } else {
                             e = walk(e);
                             warn_unreachable(t);
-                            return e || [ "block" ];
+                            return e || ["block"];
                         }
-                    }, function() {
+                    }, function () {
                         return make_real_if(c, t, e);
                     });
                 };
 
                 function abort_else(c, t, e) {
-                    var ret = [ [ "if", negate(c), e ] ];
+                    var ret = [["if", negate(c), e]];
                     if (t[0] == "block") {
                         if (t[1]) ret = ret.concat(t[1]);
                     } else {
                         ret.push(t);
                     }
-                    return walk([ "block", ret ]);
+                    return walk(["block", ret]);
                 };
 
                 function make_real_if(c, t, e) {
@@ -11897,7 +11994,7 @@ var requirejs, require, define, xpcUtil;
                     e = walk(e);
 
                     if (empty(e) && empty(t))
-                        return [ "stat", c ];
+                        return ["stat", c];
 
                     if (empty(t)) {
                         c = negate(c);
@@ -11907,7 +12004,7 @@ var requirejs, require, define, xpcUtil;
                         e = null;
                     } else {
                         // if we have both else and then, maybe it makes sense to switch them?
-                        (function(){
+                        (function () {
                             var a = gen_code(c);
                             var n = negate(c);
                             var b = gen_code(n);
@@ -11919,33 +12016,33 @@ var requirejs, require, define, xpcUtil;
                             }
                         })();
                     }
-                    var ret = [ "if", c, t, e ];
+                    var ret = ["if", c, t, e];
                     if (t[0] == "if" && empty(t[3]) && empty(e)) {
-                        ret = best_of(ret, walk([ "if", [ "binary", "&&", c, t[1] ], t[2] ]));
+                        ret = best_of(ret, walk(["if", ["binary", "&&", c, t[1]], t[2]]));
                     }
                     else if (t[0] == "stat") {
                         if (e) {
                             if (e[0] == "stat")
-                                ret = best_of(ret, [ "stat", make_conditional(c, t[1], e[1]) ]);
+                                ret = best_of(ret, ["stat", make_conditional(c, t[1], e[1])]);
                             else if (aborts(e))
                                 ret = abort_else(c, t, e);
                         }
                         else {
-                            ret = best_of(ret, [ "stat", make_conditional(c, t[1]) ]);
+                            ret = best_of(ret, ["stat", make_conditional(c, t[1])]);
                         }
                     }
                     else if (e && t[0] == e[0] && (t[0] == "return" || t[0] == "throw") && t[1] && e[1]) {
-                        ret = best_of(ret, [ t[0], make_conditional(c, t[1], e[1] ) ]);
+                        ret = best_of(ret, [t[0], make_conditional(c, t[1], e[1])]);
                     }
                     else if (e && aborts(t)) {
-                        ret = [ [ "if", c, t ] ];
+                        ret = [["if", c, t]];
                         if (e[0] == "block") {
                             if (e[1]) ret = ret.concat(e[1]);
                         }
                         else {
                             ret.push(e);
                         }
-                        ret = walk([ "block", ret ]);
+                        ret = walk(["block", ret]);
                     }
                     else if (t && aborts(e)) {
                         ret = abort_else(c, t, e);
@@ -11954,123 +12051,127 @@ var requirejs, require, define, xpcUtil;
                 };
 
                 function _do_while(cond, body) {
-                    return when_constant(cond, function(cond, val){
+                    return when_constant(cond, function (cond, val) {
                         if (!val) {
                             warn_unreachable(body);
-                            return [ "block" ];
+                            return ["block"];
                         } else {
-                            return [ "for", null, null, null, walk(body) ];
+                            return ["for", null, null, null, walk(body)];
                         }
                     });
                 };
 
                 return w.with_walkers({
-                    "sub": function(expr, subscript) {
+                    "sub": function (expr, subscript) {
                         if (subscript[0] == "string") {
                             var name = subscript[1];
                             if (is_identifier(name))
-                                return [ "dot", walk(expr), name ];
+                                return ["dot", walk(expr), name];
                             else if (/^[1-9][0-9]*$/.test(name) || name === "0")
-                                return [ "sub", walk(expr), [ "num", parseInt(name, 10) ] ];
+                                return ["sub", walk(expr), ["num", parseInt(name, 10)]];
                         }
                     },
                     "if": make_if,
-                    "toplevel": function(body) {
-                        return [ "toplevel", tighten(body) ];
+                    "toplevel": function (body) {
+                        return ["toplevel", tighten(body)];
                     },
-                    "switch": function(expr, body) {
+                    "switch": function (expr, body) {
                         var last = body.length - 1;
-                        return [ "switch", walk(expr), MAP(body, function(branch, i){
+                        return ["switch", walk(expr), MAP(body, function (branch, i) {
                             var block = tighten(branch[1]);
                             if (i == last && block.length > 0) {
                                 var node = block[block.length - 1];
                                 if (node[0] == "break" && !node[1])
                                     block.pop();
                             }
-                            return [ branch[0] ? walk(branch[0]) : null, block ];
-                        }) ];
+                            return [branch[0] ? walk(branch[0]) : null, block];
+                        })];
                     },
                     "function": _lambda,
                     "defun": _lambda,
-                    "block": function(body) {
-                        if (body) return rmblock([ "block", tighten(body) ]);
+                    "block": function (body) {
+                        if (body) return rmblock(["block", tighten(body)]);
                     },
-                    "binary": function(op, left, right) {
-                        return when_constant([ "binary", op, walk(left), walk(right) ], function yes(c){
+                    "binary": function (op, left, right) {
+                        return when_constant(["binary", op, walk(left), walk(right)], function yes(c) {
                             return best_of(walk(c), this);
                         }, function no() {
-                            return function(){
-                                if(op != "==" && op != "!=") return;
-                                var l = walk(left), r = walk(right);
-                                if(l && l[0] == "unary-prefix" && l[1] == "!" && l[2][0] == "num")
-                                    left = ['num', +!l[2][1]];
-                                else if (r && r[0] == "unary-prefix" && r[1] == "!" && r[2][0] == "num")
-                                    right = ['num', +!r[2][1]];
-                                return ["binary", op, left, right];
-                            }() || this;
+                            return function () {
+                                    if (op != "==" && op != "!=") return;
+                                    var l = walk(left), r = walk(right);
+                                    if (l && l[0] == "unary-prefix" && l[1] == "!" && l[2][0] == "num")
+                                        left = ['num', +!l[2][1]];
+                                    else if (r && r[0] == "unary-prefix" && r[1] == "!" && r[2][0] == "num")
+                                        right = ['num', +!r[2][1]];
+                                    return ["binary", op, left, right];
+                                }() || this;
                         });
                     },
-                    "conditional": function(c, t, e) {
+                    "conditional": function (c, t, e) {
                         return make_conditional(walk(c), walk(t), walk(e));
                     },
-                    "try": function(t, c, f) {
+                    "try": function (t, c, f) {
                         return [
                             "try",
                             tighten(t),
-                            c != null ? [ c[0], tighten(c[1]) ] : null,
+                            c != null ? [c[0], tighten(c[1])] : null,
                             f != null ? tighten(f) : null
                         ];
                     },
-                    "unary-prefix": function(op, expr) {
+                    "unary-prefix": function (op, expr) {
                         expr = walk(expr);
-                        var ret = [ "unary-prefix", op, expr ];
+                        var ret = ["unary-prefix", op, expr];
                         if (op == "!")
                             ret = best_of(ret, negate(expr));
-                        return when_constant(ret, function(ast, val){
+                        return when_constant(ret, function (ast, val) {
                             return walk(ast); // it's either true or false, so minifies to !0 or !1
-                        }, function() { return ret });
+                        }, function () {
+                            return ret
+                        });
                     },
-                    "name": function(name) {
+                    "name": function (name) {
                         switch (name) {
-                            case "true": return [ "unary-prefix", "!", [ "num", 0 ]];
-                            case "false": return [ "unary-prefix", "!", [ "num", 1 ]];
+                            case "true":
+                                return ["unary-prefix", "!", ["num", 0]];
+                            case "false":
+                                return ["unary-prefix", "!", ["num", 1]];
                         }
                     },
                     "while": _do_while,
-                    "assign": function(op, lvalue, rvalue) {
+                    "assign": function (op, lvalue, rvalue) {
                         lvalue = walk(lvalue);
                         rvalue = walk(rvalue);
-                        var okOps = [ '+', '-', '/', '*', '%', '>>', '<<', '>>>', '|', '^', '&' ];
-                        if (op === true && lvalue[0] === "name" && rvalue[0] === "binary" &&
-                            ~okOps.indexOf(rvalue[1]) && rvalue[2][0] === "name" &&
+                        var okOps = ['+', '-', '/', '*', '%', '>>', '<<', '>>>', '|', '^', '&'];
+                        if (op === true && lvalue[0] === "name" && rvalue[0] === "binary" && ~okOps.indexOf(rvalue[1]) && rvalue[2][0] === "name" &&
                             rvalue[2][1] === lvalue[1]) {
-                            return [ this[0], rvalue[1], lvalue, rvalue[3] ]
+                            return [this[0], rvalue[1], lvalue, rvalue[3]]
                         }
-                        return [ this[0], op, lvalue, rvalue ];
+                        return [this[0], op, lvalue, rvalue];
                     },
-                    "call": function(expr, args) {
+                    "call": function (expr, args) {
                         expr = walk(expr);
                         if (options.unsafe && expr[0] == "dot" && expr[1][0] == "string" && expr[2] == "toString") {
                             return expr[1];
                         }
-                        return [ this[0], expr,  MAP(args, walk) ];
+                        return [this[0], expr, MAP(args, walk)];
                     },
                     "num": function (num) {
                         if (!isFinite(num))
-                            return [ "binary", "/", num === 1 / 0
-                                ? [ "num", 1 ] : num === -1 / 0
-                                ? [ "unary-prefix", "-", [ "num", 1 ] ]
-                                : [ "num", 0 ], [ "num", 0 ] ];
+                            return ["binary", "/", num === 1 / 0
+                                ? ["num", 1] : num === -1 / 0
+                                    ? ["unary-prefix", "-", ["num", 1]]
+                                    : ["num", 0], ["num", 0]];
 
-                        return [ this[0], num ];
+                        return [this[0], num];
                     }
-                }, function() {
+                }, function () {
                     return walk(prepare_ifs(walk(prepare_ifs(ast))));
                 });
             };
 
             function squeeze_2(ast, options) {
                 var w = ast_walker(), walk = w.walk, scope;
+
                 function with_scope(s, cont) {
                     var save = scope, ret;
                     scope = s;
@@ -12079,20 +12180,20 @@ var requirejs, require, define, xpcUtil;
                     return ret;
                 };
                 function lambda(name, args, body) {
-                    return [ this[0], name, args, with_scope(body.scope, curry(MAP, body, walk)) ];
+                    return [this[0], name, args, with_scope(body.scope, curry(MAP, body, walk))];
                 };
                 return w.with_walkers({
-                    "directive": function(dir) {
+                    "directive": function (dir) {
                         if (scope.active_directive(dir))
-                            return [ "block" ];
+                            return ["block"];
                         scope.directives.push(dir);
                     },
-                    "toplevel": function(body) {
-                        return [ this[0], with_scope(this.scope, curry(MAP, body, walk)) ];
+                    "toplevel": function (body) {
+                        return [this[0], with_scope(this.scope, curry(MAP, body, walk))];
                     },
                     "function": lambda,
                     "defun": lambda
-                }, function(){
+                }, function () {
                     return walk(ast_add_scope(ast));
                 });
             };
@@ -12113,18 +12214,30 @@ var requirejs, require, define, xpcUtil;
 
             function make_string(str, ascii_only) {
                 var dq = 0, sq = 0;
-                str = str.replace(/[\\\b\f\n\r\t\x22\x27\u2028\u2029\0]/g, function(s){
+                str = str.replace(/[\\\b\f\n\r\t\x22\x27\u2028\u2029\0]/g, function (s) {
                     switch (s) {
-                        case "\\": return "\\\\";
-                        case "\b": return "\\b";
-                        case "\f": return "\\f";
-                        case "\n": return "\\n";
-                        case "\r": return "\\r";
-                        case "\u2028": return "\\u2028";
-                        case "\u2029": return "\\u2029";
-                        case '"': ++dq; return '"';
-                        case "'": ++sq; return "'";
-                        case "\0": return "\\0";
+                        case "\\":
+                            return "\\\\";
+                        case "\b":
+                            return "\\b";
+                        case "\f":
+                            return "\\f";
+                        case "\n":
+                            return "\\n";
+                        case "\r":
+                            return "\\r";
+                        case "\u2028":
+                            return "\\u2028";
+                        case "\u2029":
+                            return "\\u2029";
+                        case '"':
+                            ++dq;
+                            return '"';
+                        case "'":
+                            ++sq;
+                            return "'";
+                        case "\0":
+                            return "\\0";
                     }
                     return s;
                 });
@@ -12134,23 +12247,23 @@ var requirejs, require, define, xpcUtil;
             };
 
             function to_ascii(str) {
-                return str.replace(/[\u0080-\uffff]/g, function(ch) {
+                return str.replace(/[\u0080-\uffff]/g, function (ch) {
                     var code = ch.charCodeAt(0).toString(16);
                     while (code.length < 4) code = "0" + code;
                     return "\\u" + code;
                 });
             };
 
-            var SPLICE_NEEDS_BRACKETS = jsp.array_to_hash([ "if", "while", "do", "for", "for-in", "with" ]);
+            var SPLICE_NEEDS_BRACKETS = jsp.array_to_hash(["if", "while", "do", "for", "for-in", "with"]);
 
             function gen_code(ast, options) {
                 options = defaults(options, {
-                    indent_start : 0,
-                    indent_level : 4,
-                    quote_keys   : false,
-                    space_colon  : false,
-                    beautify     : false,
-                    ascii_only   : false,
+                    indent_start: 0,
+                    indent_level: 4,
+                    quote_keys: false,
+                    space_colon: false,
+                    beautify: false,
+                    ascii_only: false,
                     inline_script: false
                 });
                 var beautify = !!options.beautify;
@@ -12183,8 +12296,12 @@ var requirejs, require, define, xpcUtil;
                 function with_indent(cont, incr) {
                     if (incr == null) incr = 1;
                     indentation += incr;
-                    try { return cont.apply(null, slice(arguments, 1)); }
-                    finally { indentation -= incr; }
+                    try {
+                        return cont.apply(null, slice(arguments, 1));
+                    }
+                    finally {
+                        indentation -= incr;
+                    }
                 };
 
                 function last_char(str) {
@@ -12205,9 +12322,9 @@ var requirejs, require, define, xpcUtil;
                         b.push(a[i]);
                         if (next &&
                             ((is_identifier_char(last_char(a[i])) && (is_identifier_char(first_char(next))
-                                || first_char(next) == "\\")) ||
-                                (/[\+\-]$/.test(a[i].toString()) && /^[\+\-]/.test(next.toString()) ||
-                                    last_char(a[i]) == "/" && first_char(next) == "/"))) {
+                            || first_char(next) == "\\")) ||
+                            (/[\+\-]$/.test(a[i].toString()) && /^[\+\-]/.test(next.toString()) ||
+                            last_char(a[i]) == "/" && first_char(next) == "/"))) {
                             b.push(" ");
                         }
                     }
@@ -12237,7 +12354,7 @@ var requirejs, require, define, xpcUtil;
                         a = a[0];
                         return a.length <= b.length ? a : b;
                     }
-                    return best_of([ a[0], best_of(a.slice(1)) ]);
+                    return best_of([a[0], best_of(a.slice(1))]);
                 };
 
                 function needs_parens(expr) {
@@ -12266,7 +12383,7 @@ var requirejs, require, define, xpcUtil;
                 };
 
                 function make_num(num) {
-                    var str = num.toString(10), a = [ str.replace(/^0\./, ".").replace('e+', 'e') ], m;
+                    var str = num.toString(10), a = [str.replace(/^0\./, ".").replace('e+', 'e')], m;
                     if (Math.floor(num) === num) {
                         if (num >= 0) {
                             a.push("0x" + num.toString(16).toLowerCase(), // probably pointless
@@ -12291,86 +12408,92 @@ var requirejs, require, define, xpcUtil;
                     "string": encode_string,
                     "num": make_num,
                     "name": make_name,
-                    "debugger": function(){ return "debugger;" },
-                    "toplevel": function(statements) {
+                    "debugger": function () {
+                        return "debugger;"
+                    },
+                    "toplevel": function (statements) {
                         return make_block_statements(statements)
                             .join(newline + newline);
                     },
-                    "splice": function(statements) {
+                    "splice": function (statements) {
                         var parent = w.parent();
                         if (HOP(SPLICE_NEEDS_BRACKETS, parent)) {
                             // we need block brackets in this case
                             return make_block.apply(this, arguments);
                         } else {
                             return MAP(make_block_statements(statements, true),
-                                function(line, i) {
+                                function (line, i) {
                                     // the first line is already indented
                                     return i > 0 ? indent(line) : line;
                                 }).join(newline);
                         }
                     },
                     "block": make_block,
-                    "var": function(defs) {
+                    "var": function (defs) {
                         return "var " + add_commas(MAP(defs, make_1vardef)) + ";";
                     },
-                    "const": function(defs) {
+                    "const": function (defs) {
                         return "const " + add_commas(MAP(defs, make_1vardef)) + ";";
                     },
-                    "try": function(tr, ca, fi) {
-                        var out = [ "try", make_block(tr) ];
+                    "try": function (tr, ca, fi) {
+                        var out = ["try", make_block(tr)];
                         if (ca) out.push("catch", "(" + ca[0] + ")", make_block(ca[1]));
                         if (fi) out.push("finally", make_block(fi));
                         return add_spaces(out);
                     },
-                    "throw": function(expr) {
-                        return add_spaces([ "throw", make(expr) ]) + ";";
+                    "throw": function (expr) {
+                        return add_spaces(["throw", make(expr)]) + ";";
                     },
-                    "new": function(ctor, args) {
-                        args = args.length > 0 ? "(" + add_commas(MAP(args, function(expr){
-                            return parenthesize(expr, "seq");
-                        })) + ")" : "";
-                        return add_spaces([ "new", parenthesize(ctor, "seq", "binary", "conditional", "assign", function(expr){
+                    "new": function (ctor, args) {
+                        args = args.length > 0 ? "(" + add_commas(MAP(args, function (expr) {
+                                return parenthesize(expr, "seq");
+                            })) + ")" : "";
+                        return add_spaces(["new", parenthesize(ctor, "seq", "binary", "conditional", "assign", function (expr) {
                             var w = ast_walker(), has_call = {};
                             try {
                                 w.with_walkers({
-                                    "call": function() { throw has_call },
-                                    "function": function() { return this }
-                                }, function(){
+                                    "call": function () {
+                                        throw has_call
+                                    },
+                                    "function": function () {
+                                        return this
+                                    }
+                                }, function () {
                                     w.walk(expr);
                                 });
-                            } catch(ex) {
+                            } catch (ex) {
                                 if (ex === has_call)
                                     return true;
                                 throw ex;
                             }
-                        }) + args ]);
+                        }) + args]);
                     },
-                    "switch": function(expr, body) {
-                        return add_spaces([ "switch", "(" + make(expr) + ")", make_switch_block(body) ]);
+                    "switch": function (expr, body) {
+                        return add_spaces(["switch", "(" + make(expr) + ")", make_switch_block(body)]);
                     },
-                    "break": function(label) {
+                    "break": function (label) {
                         var out = "break";
                         if (label != null)
                             out += " " + make_name(label);
                         return out + ";";
                     },
-                    "continue": function(label) {
+                    "continue": function (label) {
                         var out = "continue";
                         if (label != null)
                             out += " " + make_name(label);
                         return out + ";";
                     },
-                    "conditional": function(co, th, el) {
-                        return add_spaces([ parenthesize(co, "assign", "seq", "conditional"), "?",
+                    "conditional": function (co, th, el) {
+                        return add_spaces([parenthesize(co, "assign", "seq", "conditional"), "?",
                             parenthesize(th, "seq"), ":",
-                            parenthesize(el, "seq") ]);
+                            parenthesize(el, "seq")]);
                     },
-                    "assign": function(op, lvalue, rvalue) {
+                    "assign": function (op, lvalue, rvalue) {
                         if (op && op !== true) op += "=";
                         else op = "=";
-                        return add_spaces([ make(lvalue), op, parenthesize(rvalue, "seq") ]);
+                        return add_spaces([make(lvalue), op, parenthesize(rvalue, "seq")]);
                     },
-                    "dot": function(expr) {
+                    "dot": function (expr) {
                         var out = make(expr), i = 1;
                         if (expr[0] == "num") {
                             if (!/[a-f.]/i.test(out))
@@ -12381,25 +12504,25 @@ var requirejs, require, define, xpcUtil;
                             out += "." + make_name(arguments[i++]);
                         return out;
                     },
-                    "call": function(func, args) {
+                    "call": function (func, args) {
                         var f = make(func);
                         if (f.charAt(0) != "(" && needs_parens(func))
                             f = "(" + f + ")";
-                        return f + "(" + add_commas(MAP(args, function(expr){
-                            return parenthesize(expr, "seq");
-                        })) + ")";
+                        return f + "(" + add_commas(MAP(args, function (expr) {
+                                return parenthesize(expr, "seq");
+                            })) + ")";
                     },
                     "function": make_function,
                     "defun": make_function,
-                    "if": function(co, th, el) {
-                        var out = [ "if", "(" + make(co) + ")", el ? make_then(th) : make(th) ];
+                    "if": function (co, th, el) {
+                        var out = ["if", "(" + make(co) + ")", el ? make_then(th) : make(th)];
                         if (el) {
                             out.push("else", make(el));
                         }
                         return add_spaces(out);
                     },
-                    "for": function(init, cond, step, block) {
-                        var out = [ "for" ];
+                    "for": function (init, cond, step, block) {
+                        var out = ["for"];
                         init = (init != null ? make(init) : "").replace(/;*\s*$/, ";" + space);
                         cond = (cond != null ? make(cond) : "").replace(/;*\s*$/, ";" + space);
                         step = (step != null ? make(step) : "").replace(/;*\s*$/, "");
@@ -12408,121 +12531,122 @@ var requirejs, require, define, xpcUtil;
                         out.push("(" + args + ")", make(block));
                         return add_spaces(out);
                     },
-                    "for-in": function(vvar, key, hash, block) {
-                        return add_spaces([ "for", "(" +
-                            (vvar ? make(vvar).replace(/;+$/, "") : make(key)),
+                    "for-in": function (vvar, key, hash, block) {
+                        return add_spaces(["for", "(" +
+                        (vvar ? make(vvar).replace(/;+$/, "") : make(key)),
                             "in",
-                            make(hash) + ")", make(block) ]);
+                            make(hash) + ")", make(block)]);
                     },
-                    "while": function(condition, block) {
-                        return add_spaces([ "while", "(" + make(condition) + ")", make(block) ]);
+                    "while": function (condition, block) {
+                        return add_spaces(["while", "(" + make(condition) + ")", make(block)]);
                     },
-                    "do": function(condition, block) {
-                        return add_spaces([ "do", make(block), "while", "(" + make(condition) + ")" ]) + ";";
+                    "do": function (condition, block) {
+                        return add_spaces(["do", make(block), "while", "(" + make(condition) + ")"]) + ";";
                     },
-                    "return": function(expr) {
-                        var out = [ "return" ];
+                    "return": function (expr) {
+                        var out = ["return"];
                         if (expr != null) out.push(make(expr));
                         return add_spaces(out) + ";";
                     },
-                    "binary": function(operator, lvalue, rvalue) {
+                    "binary": function (operator, lvalue, rvalue) {
                         var left = make(lvalue), right = make(rvalue);
                         // XXX: I'm pretty sure other cases will bite here.
                         //      we need to be smarter.
                         //      adding parens all the time is the safest bet.
-                        if (member(lvalue[0], [ "assign", "conditional", "seq" ]) ||
+                        if (member(lvalue[0], ["assign", "conditional", "seq"]) ||
                             lvalue[0] == "binary" && PRECEDENCE[operator] > PRECEDENCE[lvalue[1]] ||
                             lvalue[0] == "function" && needs_parens(this)) {
                             left = "(" + left + ")";
                         }
-                        if (member(rvalue[0], [ "assign", "conditional", "seq" ]) ||
-                            rvalue[0] == "binary" && PRECEDENCE[operator] >= PRECEDENCE[rvalue[1]] &&
-                                !(rvalue[1] == operator && member(operator, [ "&&", "||", "*" ]))) {
+                        if (member(rvalue[0], ["assign", "conditional", "seq"]) ||
+                            rvalue[0] == "binary" && PRECEDENCE[operator] >= PRECEDENCE[rvalue[1]] && !(rvalue[1] == operator && member(operator, ["&&", "||", "*"]))) {
                             right = "(" + right + ")";
                         }
                         else if (!beautify && options.inline_script && (operator == "<" || operator == "<<")
                             && rvalue[0] == "regexp" && /^script/i.test(rvalue[1])) {
                             right = " " + right;
                         }
-                        return add_spaces([ left, operator, right ]);
+                        return add_spaces([left, operator, right]);
                     },
-                    "unary-prefix": function(operator, expr) {
+                    "unary-prefix": function (operator, expr) {
                         var val = make(expr);
                         if (!(expr[0] == "num" || (expr[0] == "unary-prefix" && !HOP(OPERATORS, operator + expr[1])) || !needs_parens(expr)))
                             val = "(" + val + ")";
                         return operator + (jsp.is_alphanumeric_char(operator.charAt(0)) ? " " : "") + val;
                     },
-                    "unary-postfix": function(operator, expr) {
+                    "unary-postfix": function (operator, expr) {
                         var val = make(expr);
                         if (!(expr[0] == "num" || (expr[0] == "unary-postfix" && !HOP(OPERATORS, operator + expr[1])) || !needs_parens(expr)))
                             val = "(" + val + ")";
                         return val + operator;
                     },
-                    "sub": function(expr, subscript) {
+                    "sub": function (expr, subscript) {
                         var hash = make(expr);
                         if (needs_parens(expr))
                             hash = "(" + hash + ")";
                         return hash + "[" + make(subscript) + "]";
                     },
-                    "object": function(props) {
+                    "object": function (props) {
                         var obj_needs_parens = needs_parens(this);
                         if (props.length == 0)
                             return obj_needs_parens ? "({})" : "{}";
-                        var out = "{" + newline + with_indent(function(){
-                            return MAP(props, function(p){
-                                if (p.length == 3) {
-                                    // getter/setter.  The name is in p[0], the arg.list in p[1][2], the
-                                    // body in p[1][3] and type ("get" / "set") in p[2].
-                                    return indent(make_function(p[0], p[1][2], p[1][3], p[2], true));
-                                }
-                                var key = p[0], val = parenthesize(p[1], "seq");
-                                if (options.quote_keys) {
-                                    key = encode_string(key);
-                                } else if ((typeof key == "number" || !beautify && +key + "" == key)
-                                    && parseFloat(key) >= 0) {
-                                    key = make_num(+key);
-                                } else if (!is_identifier(key)) {
-                                    key = encode_string(key);
-                                }
-                                return indent(add_spaces(beautify && options.space_colon
-                                    ? [ key, ":", val ]
-                                    : [ key + ":", val ]));
-                            }).join("," + newline);
-                        }) + newline + indent("}");
+                        var out = "{" + newline + with_indent(function () {
+                                return MAP(props, function (p) {
+                                    if (p.length == 3) {
+                                        // getter/setter.  The name is in p[0], the arg.list in p[1][2], the
+                                        // body in p[1][3] and type ("get" / "set") in p[2].
+                                        return indent(make_function(p[0], p[1][2], p[1][3], p[2], true));
+                                    }
+                                    var key = p[0], val = parenthesize(p[1], "seq");
+                                    if (options.quote_keys) {
+                                        key = encode_string(key);
+                                    } else if ((typeof key == "number" || !beautify && +key + "" == key)
+                                        && parseFloat(key) >= 0) {
+                                        key = make_num(+key);
+                                    } else if (!is_identifier(key)) {
+                                        key = encode_string(key);
+                                    }
+                                    return indent(add_spaces(beautify && options.space_colon
+                                        ? [key, ":", val]
+                                        : [key + ":", val]));
+                                }).join("," + newline);
+                            }) + newline + indent("}");
                         return obj_needs_parens ? "(" + out + ")" : out;
                     },
-                    "regexp": function(rx, mods) {
+                    "regexp": function (rx, mods) {
                         if (options.ascii_only) rx = to_ascii(rx);
                         return "/" + rx + "/" + mods;
                     },
-                    "array": function(elements) {
+                    "array": function (elements) {
                         if (elements.length == 0) return "[]";
-                        return add_spaces([ "[", add_commas(MAP(elements, function(el, i){
+                        return add_spaces(["[", add_commas(MAP(elements, function (el, i) {
                             if (!beautify && el[0] == "atom" && el[1] == "undefined") return i === elements.length - 1 ? "," : "";
                             return parenthesize(el, "seq");
-                        })), "]" ]);
+                        })), "]"]);
                     },
-                    "stat": function(stmt) {
+                    "stat": function (stmt) {
                         return stmt != null
                             ? make(stmt).replace(/;*\s*$/, ";")
                             : ";";
                     },
-                    "seq": function() {
+                    "seq": function () {
                         return add_commas(MAP(slice(arguments), make));
                     },
-                    "label": function(name, block) {
-                        return add_spaces([ make_name(name), ":", make(block) ]);
+                    "label": function (name, block) {
+                        return add_spaces([make_name(name), ":", make(block)]);
                     },
-                    "with": function(expr, block) {
-                        return add_spaces([ "with", "(" + make(expr) + ")", make(block) ]);
+                    "with": function (expr, block) {
+                        return add_spaces(["with", "(" + make(expr) + ")", make(block)]);
                     },
-                    "atom": function(name) {
+                    "atom": function (name) {
                         return make_name(name);
                     },
-                    "directive": function(dir) {
+                    "directive": function (dir) {
                         return make_string(dir) + ";";
                     }
-                }, function(){ return make(ast) });
+                }, function () {
+                    return make(ast)
+                });
 
                 // The squeezer replaces "block"-s that contain only a single
                 // statement with the statement itself; technically, the AST
@@ -12538,7 +12662,7 @@ var requirejs, require, define, xpcUtil;
                         // IE croaks with "syntax error" on code like this:
                         //     if (foo) do ... while(cond); else ...
                         // we need block brackets around do/while
-                        return make_block([ th ]);
+                        return make_block([th]);
                     }
                     var b = th;
                     while (true) {
@@ -12546,7 +12670,7 @@ var requirejs, require, define, xpcUtil;
                         if (type == "if") {
                             if (!b[3])
                             // no else, we must add the block
-                                return make([ "block", [ th ]]);
+                                return make(["block", [th]]);
                             b = b[3];
                         }
                         else if (type == "while" || type == "do") b = b[2];
@@ -12562,7 +12686,7 @@ var requirejs, require, define, xpcUtil;
                         out += " " + make_name(name);
                     }
                     out += "(" + add_commas(MAP(args, make_name)) + ")";
-                    out = add_spaces([ out, make_block(body) ]);
+                    out = add_spaces([out, make_block(body)]);
                     return (!no_parens && needs_parens(this)) ? "(" + out + ")" : out;
                 };
 
@@ -12603,43 +12727,44 @@ var requirejs, require, define, xpcUtil;
                 function make_switch_block(body) {
                     var n = body.length;
                     if (n == 0) return "{}";
-                    return "{" + newline + MAP(body, function(branch, i){
-                        var has_body = branch[1].length > 0, code = with_indent(function(){
-                            return indent(branch[0]
-                                ? add_spaces([ "case", make(branch[0]) + ":" ])
-                                : "default:");
-                        }, 0.5) + (has_body ? newline + with_indent(function(){
-                            return make_block_statements(branch[1]).join(newline);
-                        }) : "");
-                        if (!beautify && has_body && i < n - 1)
-                            code += ";";
-                        return code;
-                    }).join(newline) + newline + indent("}");
+                    return "{" + newline + MAP(body, function (branch, i) {
+                            var has_body = branch[1].length > 0, code = with_indent(function () {
+                                    return indent(branch[0]
+                                        ? add_spaces(["case", make(branch[0]) + ":"])
+                                        : "default:");
+                                }, 0.5) + (has_body ? newline + with_indent(function () {
+                                        return make_block_statements(branch[1]).join(newline);
+                                    }) : "");
+                            if (!beautify && has_body && i < n - 1)
+                                code += ";";
+                            return code;
+                        }).join(newline) + newline + indent("}");
                 };
 
                 function make_block(statements) {
                     if (!statements) return ";";
                     if (statements.length == 0) return "{}";
-                    return "{" + newline + with_indent(function(){
-                        return make_block_statements(statements).join(newline);
-                    }) + newline + indent("}");
+                    return "{" + newline + with_indent(function () {
+                            return make_block_statements(statements).join(newline);
+                        }) + newline + indent("}");
                 };
 
                 function make_1vardef(def) {
                     var name = def[0], val = def[1];
                     if (val != null)
-                        name = add_spaces([ make_name(name), "=", parenthesize(val, "seq") ]);
+                        name = add_spaces([make_name(name), "=", parenthesize(val, "seq")]);
                     return name;
                 };
 
             };
 
             function split_lines(code, max_line_length) {
-                var splits = [ 0 ];
-                jsp.parse(function(){
+                var splits = [0];
+                jsp.parse(function () {
                     var next_token = jsp.tokenizer(code);
                     var last_split = 0;
                     var prev_token;
+
                     function current_length(tok) {
                         return tok.pos - last_split;
                     };
@@ -12647,7 +12772,7 @@ var requirejs, require, define, xpcUtil;
                         last_split = tok.pos;
                         splits.push(last_split);
                     };
-                    function custom(){
+                    function custom() {
                         var tok = next_token.apply(this, arguments);
                         out: {
                             if (prev_token) {
@@ -12667,12 +12792,12 @@ var requirejs, require, define, xpcUtil;
                         prev_token = tok;
                         return tok;
                     };
-                    custom.context = function() {
+                    custom.context = function () {
                         return next_token.context.apply(this, arguments);
                     };
                     return custom;
                 }());
-                return splits.map(function(pos, i){
+                return splits.map(function (pos, i) {
                     return code.substring(pos, splits[i + 1] || code.length);
                 }).join("\n");
             };
@@ -12714,9 +12839,10 @@ var requirejs, require, define, xpcUtil;
 
             var MAP;
 
-            (function(){
-                MAP = function(a, f, o) {
+            (function () {
+                MAP = function (a, f, o) {
                     var ret = [], top = [], i;
+
                     function doit() {
                         var val = f.call(o, a[i], i);
                         if (val instanceof AtTop) {
@@ -12739,11 +12865,20 @@ var requirejs, require, define, xpcUtil;
                     else for (i in a) if (HOP(a, i)) doit();
                     return top.concat(ret);
                 };
-                MAP.at_top = function(val) { return new AtTop(val) };
-                MAP.splice = function(val) { return new Splice(val) };
+                MAP.at_top = function (val) {
+                    return new AtTop(val)
+                };
+                MAP.splice = function (val) {
+                    return new Splice(val)
+                };
                 var skip = MAP.skip = {};
-                function AtTop(val) { this.v = val };
-                function Splice(val) { this.v = val };
+
+                function AtTop(val) {
+                    this.v = val
+                };
+                function Splice(val) {
+                    this.v = val
+                };
             })();
 
             /* -----[ Exports ]----- */
@@ -12754,7 +12889,9 @@ var requirejs, require, define, xpcUtil;
             exports.ast_lift_variables = ast_lift_variables;
             exports.gen_code = gen_code;
             exports.ast_add_scope = ast_add_scope;
-            exports.set_logger = function(logger) { warn = logger };
+            exports.set_logger = function (logger) {
+                warn = logger
+            };
             exports.make_string = make_string;
             exports.split_lines = split_lines;
             exports.MAP = MAP;
@@ -12766,9 +12903,9 @@ var requirejs, require, define, xpcUtil;
 // js-indent-level: 4
 // End:
         });
-        define('uglifyjs/index', ["require", "exports", "module", "./parse-js", "./process", "./consolidator"], function(require, exports, module) {
+        define('uglifyjs/index', ["require", "exports", "module", "./parse-js", "./process", "./consolidator"], function (require, exports, module) {
 //convienence function(src, [options]);
-            function uglify(orig_code, options){
+            function uglify(orig_code, options) {
                 options || (options = {});
                 var jsp = uglify.parser;
                 var pro = uglify.uglify;
@@ -12785,7 +12922,8 @@ var requirejs, require, define, xpcUtil;
             uglify.consolidator = require("./consolidator");
 
             module.exports = uglify
-        });/* -*- Mode: js; js-indent-level: 2; -*- */
+        });
+        /* -*- Mode: js; js-indent-level: 2; -*- */
         /*
          * Copyright 2011 Mozilla Foundation and contributors
          * Licensed under the New BSD license. See LICENSE or:
@@ -14113,7 +14251,7 @@ var requirejs, require, define, xpcUtil;
              */
             SourceNode.prototype.prepend = function SourceNode_prepend(aChunk) {
                 if (Array.isArray(aChunk)) {
-                    for (var i = aChunk.length-1; i >= 0; i--) {
+                    for (var i = aChunk.length - 1; i >= 0; i--) {
                         this.prepend(aChunk[i]);
                     }
                 }
@@ -14142,10 +14280,12 @@ var requirejs, require, define, xpcUtil;
                     }
                     else {
                         if (chunk !== '') {
-                            aFn(chunk, { source: this.source,
+                            aFn(chunk, {
+                                source: this.source,
                                 line: this.line,
                                 column: this.column,
-                                name: this.name });
+                                name: this.name
+                            });
                         }
                     }
                 }, this);
@@ -14163,7 +14303,7 @@ var requirejs, require, define, xpcUtil;
                 var len = this.children.length;
                 if (len > 0) {
                     newChildren = [];
-                    for (i = 0; i < len-1; i++) {
+                    for (i = 0; i < len - 1; i++) {
                         newChildren.push(this.children[i]);
                         newChildren.push(aSep);
                     }
@@ -14288,7 +14428,7 @@ var requirejs, require, define, xpcUtil;
                     map.setSourceContent(sourceFile, sourceContent);
                 });
 
-                return { code: generated.code, map: map };
+                return {code: generated.code, map: map};
             };
 
             exports.SourceNode = SourceNode;
@@ -14322,6 +14462,7 @@ var requirejs, require, define, xpcUtil;
                     throw new Error('"' + aName + '" is a required argument.');
                 }
             }
+
             exports.getArg = getArg;
 
             var urlRegexp = /([\w+\-.]+):\/\/((\w+:\w+)@)?([\w.]+)?(:(\d+))?(\S+)?/;
@@ -14353,6 +14494,7 @@ var requirejs, require, define, xpcUtil;
 
                 return aRoot.replace(/\/$/, '') + '/' + aPath;
             }
+
             exports.join = join;
 
             /**
@@ -14367,11 +14509,13 @@ var requirejs, require, define, xpcUtil;
             function toSetString(aStr) {
                 return '$' + aStr;
             }
+
             exports.toSetString = toSetString;
 
             function fromSetString(aStr) {
                 return aStr.substr(1);
             }
+
             exports.fromSetString = fromSetString;
 
             function relative(aRoot, aPath) {
@@ -14380,6 +14524,7 @@ var requirejs, require, define, xpcUtil;
                     ? aPath.substr(aRoot.length + 1)
                     : aPath;
             }
+
             exports.relative = relative;
 
         });
@@ -14399,7 +14544,7 @@ var requirejs, require, define, xpcUtil;
 //Distributed under the BSD license:
 //Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
         define('uglifyjs2', ['exports', 'source-map', 'logger', 'env!env/file'], function (exports, MOZ_SourceMap, logger, rjsFile) {
-            (function(exports, global) {
+            (function (exports, global) {
                 global["UglifyJS"] = exports;
                 "use strict";
                 function array_to_hash(a) {
@@ -14407,21 +14552,26 @@ var requirejs, require, define, xpcUtil;
                     for (var i = 0; i < a.length; ++i) ret[a[i]] = true;
                     return ret;
                 }
+
                 function slice(a, start) {
                     return Array.prototype.slice.call(a, start || 0);
                 }
+
                 function characters(str) {
                     return str.split("");
                 }
+
                 function member(name, array) {
-                    for (var i = array.length; --i >= 0; ) if (array[i] == name) return true;
+                    for (var i = array.length; --i >= 0;) if (array[i] == name) return true;
                     return false;
                 }
+
                 function find_if(func, array) {
                     for (var i = 0, n = array.length; i < n; ++i) {
                         if (func(array[i])) return array[i];
                     }
                 }
+
                 function repeat_string(str, i) {
                     if (i <= 0) return "";
                     if (i == 1) return str;
@@ -14430,10 +14580,12 @@ var requirejs, require, define, xpcUtil;
                     if (i & 1) d += str;
                     return d;
                 }
+
                 function DefaultsError(msg, defs) {
                     this.msg = msg;
                     this.defs = defs;
                 }
+
                 function defaults(args, defs, croak) {
                     if (args === true) args = {};
                     var ret = args || {};
@@ -14443,16 +14595,21 @@ var requirejs, require, define, xpcUtil;
                     }
                     return ret;
                 }
+
                 function merge(obj, ext) {
                     for (var i in ext) if (ext.hasOwnProperty(i)) {
                         obj[i] = ext[i];
                     }
                     return obj;
                 }
-                function noop() {}
-                var MAP = function() {
+
+                function noop() {
+                }
+
+                var MAP = function () {
                     function MAP(a, f, backwards) {
                         var ret = [], top = [], i;
+
                         function doit() {
                             var val = f(a[i], i);
                             var is_last = val instanceof Last;
@@ -14473,9 +14630,10 @@ var requirejs, require, define, xpcUtil;
                             }
                             return is_last;
                         }
+
                         if (a instanceof Array) {
                             if (backwards) {
-                                for (i = a.length; --i >= 0; ) if (doit()) break;
+                                for (i = a.length; --i >= 0;) if (doit()) break;
                                 ret.reverse();
                                 top.reverse();
                             } else {
@@ -14486,40 +14644,49 @@ var requirejs, require, define, xpcUtil;
                         }
                         return top.concat(ret);
                     }
-                    MAP.at_top = function(val) {
+
+                    MAP.at_top = function (val) {
                         return new AtTop(val);
                     };
-                    MAP.splice = function(val) {
+                    MAP.splice = function (val) {
                         return new Splice(val);
                     };
-                    MAP.last = function(val) {
+                    MAP.last = function (val) {
                         return new Last(val);
                     };
                     var skip = MAP.skip = {};
+
                     function AtTop(val) {
                         this.v = val;
                     }
+
                     function Splice(val) {
                         this.v = val;
                     }
+
                     function Last(val) {
                         this.v = val;
                     }
+
                     return MAP;
                 }();
+
                 function push_uniq(array, el) {
                     if (array.indexOf(el) < 0) array.push(el);
                 }
+
                 function string_template(text, props) {
-                    return text.replace(/\{(.+?)\}/g, function(str, p) {
+                    return text.replace(/\{(.+?)\}/g, function (str, p) {
                         return props[p];
                     });
                 }
+
                 function remove(array, el) {
-                    for (var i = array.length; --i >= 0; ) {
+                    for (var i = array.length; --i >= 0;) {
                         if (array[i] === el) array.splice(i, 1);
                     }
                 }
+
                 function mergeSort(array, cmp) {
                     if (array.length < 2) return array.slice();
                     function merge(a, b) {
@@ -14531,6 +14698,7 @@ var requirejs, require, define, xpcUtil;
                         if (bi < b.length) r.push.apply(r, b.slice(bi));
                         return r;
                     }
+
                     function _ms(a) {
                         if (a.length <= 1) return a;
                         var m = Math.floor(a.length / 2), left = a.slice(0, m), right = a.slice(m);
@@ -14538,18 +14706,22 @@ var requirejs, require, define, xpcUtil;
                         right = _ms(right);
                         return merge(left, right);
                     }
+
                     return _ms(array);
                 }
+
                 function set_difference(a, b) {
-                    return a.filter(function(el) {
+                    return a.filter(function (el) {
                         return b.indexOf(el) < 0;
                     });
                 }
+
                 function set_intersection(a, b) {
-                    return a.filter(function(el) {
+                    return a.filter(function (el) {
                         return b.indexOf(el) >= 0;
                     });
                 }
+
                 function makePredicate(words) {
                     if (!(words instanceof Array)) words = words.split(" ");
                     var f = "", cats = [];
@@ -14558,7 +14730,7 @@ var requirejs, require, define, xpcUtil;
                             cats[j].push(words[i]);
                             continue out;
                         }
-                        cats.push([ words[i] ]);
+                        cats.push([words[i]]);
                     }
                     function compareTo(arr) {
                         if (arr.length == 1) return f += "return str === " + JSON.stringify(arr[0]) + ";";
@@ -14566,8 +14738,9 @@ var requirejs, require, define, xpcUtil;
                         for (var i = 0; i < arr.length; ++i) f += "case " + JSON.stringify(arr[i]) + ":";
                         f += "return true}return false;";
                     }
+
                     if (cats.length > 3) {
-                        cats.sort(function(a, b) {
+                        cats.sort(function (a, b) {
                             return b.length - a.length;
                         });
                         f += "switch(str.length){";
@@ -14582,44 +14755,46 @@ var requirejs, require, define, xpcUtil;
                     }
                     return new Function("str", f);
                 }
+
                 function Dictionary() {
                     this._values = Object.create(null);
                     this._size = 0;
                 }
+
                 Dictionary.prototype = {
-                    set: function(key, val) {
+                    set: function (key, val) {
                         if (!this.has(key)) ++this._size;
                         this._values["$" + key] = val;
                         return this;
                     },
-                    add: function(key, val) {
+                    add: function (key, val) {
                         if (this.has(key)) {
                             this.get(key).push(val);
                         } else {
-                            this.set(key, [ val ]);
+                            this.set(key, [val]);
                         }
                         return this;
                     },
-                    get: function(key) {
+                    get: function (key) {
                         return this._values["$" + key];
                     },
-                    del: function(key) {
+                    del: function (key) {
                         if (this.has(key)) {
                             --this._size;
                             delete this._values["$" + key];
                         }
                         return this;
                     },
-                    has: function(key) {
+                    has: function (key) {
                         return "$" + key in this._values;
                     },
-                    each: function(f) {
+                    each: function (f) {
                         for (var i in this._values) f(this._values[i], i.substr(1));
                     },
-                    size: function() {
+                    size: function () {
                         return this._size;
                     },
-                    map: function(f) {
+                    map: function (f) {
                         var ret = [];
                         for (var i in this._values) ret.push(f(this._values[i], i.substr(1)));
                         return ret;
@@ -14632,7 +14807,7 @@ var requirejs, require, define, xpcUtil;
                     var self_props = props;
                     if (base && base.PROPS) props = props.concat(base.PROPS);
                     var code = "return function AST_" + type + "(props){ if (props) { ";
-                    for (var i = props.length; --i >= 0; ) {
+                    for (var i = props.length; --i >= 0;) {
                         code += "this." + props[i] + " = props." + props[i] + ";";
                     }
                     var proto = base && new base();
@@ -14658,14 +14833,15 @@ var requirejs, require, define, xpcUtil;
                             ctor.prototype[i] = methods[i];
                         }
                     }
-                    ctor.DEFMETHOD = function(name, method) {
+                    ctor.DEFMETHOD = function (name, method) {
                         this.prototype[name] = method;
                     };
                     return ctor;
                 }
+
                 var AST_Token = DEFNODE("Token", "type value line col pos endpos nlb comments_before file", {}, null);
                 var AST_Node = DEFNODE("Node", "start end", {
-                    clone: function() {
+                    clone: function () {
                         return new this.CTOR(this);
                     },
                     $documentation: "Base class of all AST nodes",
@@ -14673,15 +14849,15 @@ var requirejs, require, define, xpcUtil;
                         start: "[AST_Token] The first token of this node",
                         end: "[AST_Token] The last token of this node"
                     },
-                    _walk: function(visitor) {
+                    _walk: function (visitor) {
                         return visitor._visit(this);
                     },
-                    walk: function(visitor) {
+                    walk: function (visitor) {
                         return this._walk(visitor);
                     }
                 }, null);
                 AST_Node.warn_function = null;
-                AST_Node.warn = function(txt, props) {
+                AST_Node.warn = function (txt, props) {
                     if (AST_Node.warn_function) AST_Node.warn_function(string_template(txt, props));
                 };
                 var AST_Statement = DEFNODE("Statement", null, {
@@ -14702,26 +14878,28 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         body: "[AST_Node] an expression node (should not be instanceof AST_Statement)"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.body._walk(visitor);
                         });
                     }
                 }, AST_Statement);
+
                 function walk_body(node, visitor) {
                     if (node.body instanceof AST_Statement) {
                         node.body._walk(visitor);
-                    } else node.body.forEach(function(stat) {
+                    } else node.body.forEach(function (stat) {
                         stat._walk(visitor);
                     });
                 }
+
                 var AST_Block = DEFNODE("Block", "body", {
                     $documentation: "A body of statements (usually bracketed)",
                     $propdoc: {
                         body: "[AST_Statement*] an array of statements"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             walk_body(this, visitor);
                         });
                     }
@@ -14731,7 +14909,7 @@ var requirejs, require, define, xpcUtil;
                 }, AST_Block);
                 var AST_EmptyStatement = DEFNODE("EmptyStatement", null, {
                     $documentation: "The empty statement (empty block or simply a semicolon)",
-                    _walk: function(visitor) {
+                    _walk: function (visitor) {
                         return visitor._visit(this);
                     }
                 }, AST_Statement);
@@ -14740,8 +14918,8 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         body: "[AST_Statement] the body; this should always be present, even if it's an AST_EmptyStatement"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.body._walk(visitor);
                         });
                     }
@@ -14751,8 +14929,8 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         label: "[AST_Label] a label definition"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.label._walk(visitor);
                             this.body._walk(visitor);
                         });
@@ -14763,8 +14941,8 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         condition: "[AST_Node] the loop condition.  Should not be instanceof AST_Statement"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.condition._walk(visitor);
                             this.body._walk(visitor);
                         });
@@ -14783,8 +14961,8 @@ var requirejs, require, define, xpcUtil;
                         condition: "[AST_Node?] the `for` termination clause, or null if empty",
                         step: "[AST_Node?] the `for` update clause, or null if empty"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             if (this.init) this.init._walk(visitor);
                             if (this.condition) this.condition._walk(visitor);
                             if (this.step) this.step._walk(visitor);
@@ -14799,8 +14977,8 @@ var requirejs, require, define, xpcUtil;
                         name: "[AST_SymbolRef?] the loop variable, only if `init` is AST_Var",
                         object: "[AST_Node] the object that we're looping through"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.init._walk(visitor);
                             this.object._walk(visitor);
                             this.body._walk(visitor);
@@ -14812,8 +14990,8 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         expression: "[AST_Node] the `with` expression"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.expression._walk(visitor);
                             this.body._walk(visitor);
                         });
@@ -14837,11 +15015,11 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         globals: "[Object/S] a map of name -> SymbolDef for all undeclared names"
                     },
-                    wrap_enclose: function(arg_parameter_pairs) {
+                    wrap_enclose: function (arg_parameter_pairs) {
                         var self = this;
                         var args = [];
                         var parameters = [];
-                        arg_parameter_pairs.forEach(function(pair) {
+                        arg_parameter_pairs.forEach(function (pair) {
                             var split = pair.split(":");
                             args.push(split[0]);
                             parameters.push(split[1]);
@@ -14855,16 +15033,16 @@ var requirejs, require, define, xpcUtil;
                         }));
                         return wrapped_tl;
                     },
-                    wrap_commonjs: function(name, export_all) {
+                    wrap_commonjs: function (name, export_all) {
                         var self = this;
                         var to_export = [];
                         if (export_all) {
                             self.figure_out_scope();
-                            self.walk(new TreeWalker(function(node) {
+                            self.walk(new TreeWalker(function (node) {
                                 if (node instanceof AST_SymbolDeclaration && node.definition().global) {
-                                    if (!find_if(function(n) {
-                                        return n.name == node.name;
-                                    }, to_export)) to_export.push(node);
+                                    if (!find_if(function (n) {
+                                            return n.name == node.name;
+                                        }, to_export)) to_export.push(node);
                                 }
                             }));
                         }
@@ -14879,7 +15057,7 @@ var requirejs, require, define, xpcUtil;
 
                                     case "$EXPORTS":
                                         var body = [];
-                                        to_export.forEach(function(sym) {
+                                        to_export.forEach(function (sym) {
                                             body.push(new AST_SimpleStatement({
                                                 body: new AST_Assign({
                                                     left: new AST_Sub({
@@ -14909,10 +15087,10 @@ var requirejs, require, define, xpcUtil;
                         argnames: "[AST_SymbolFunarg*] array of function arguments",
                         uses_arguments: "[boolean/S] tells whether this function accesses the arguments array"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             if (this.name) this.name._walk(visitor);
-                            this.argnames.forEach(function(arg) {
+                            this.argnames.forEach(function (arg) {
                                 arg._walk(visitor);
                             });
                             walk_body(this, visitor);
@@ -14936,10 +15114,10 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         value: "[AST_Node?] the value returned or thrown by this statement; could be null for AST_Return"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, this.value && function() {
-                            this.value._walk(visitor);
-                        });
+                    _walk: function (visitor) {
+                        return visitor._visit(this, this.value && function () {
+                                this.value._walk(visitor);
+                            });
                     }
                 }, AST_Jump);
                 var AST_Return = DEFNODE("Return", null, {
@@ -14953,10 +15131,10 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         label: "[AST_LabelRef?] the label, or null if none"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, this.label && function() {
-                            this.label._walk(visitor);
-                        });
+                    _walk: function (visitor) {
+                        return visitor._visit(this, this.label && function () {
+                                this.label._walk(visitor);
+                            });
                     }
                 }, AST_Jump);
                 var AST_Break = DEFNODE("Break", null, {
@@ -14971,8 +15149,8 @@ var requirejs, require, define, xpcUtil;
                         condition: "[AST_Node] the `if` condition",
                         alternative: "[AST_Statement?] the `else` part, or null if not present"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.condition._walk(visitor);
                             this.body._walk(visitor);
                             if (this.alternative) this.alternative._walk(visitor);
@@ -14984,8 +15162,8 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         expression: "[AST_Node] the `switch` â€œdiscriminantâ€"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.expression._walk(visitor);
                             walk_body(this, visitor);
                         });
@@ -15002,8 +15180,8 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         expression: "[AST_Node] the `case` expression"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.expression._walk(visitor);
                             walk_body(this, visitor);
                         });
@@ -15015,8 +15193,8 @@ var requirejs, require, define, xpcUtil;
                         bcatch: "[AST_Catch?] the catch block, or null if not present",
                         bfinally: "[AST_Finally?] the finally block, or null if not present"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             walk_body(this, visitor);
                             if (this.bcatch) this.bcatch._walk(visitor);
                             if (this.bfinally) this.bfinally._walk(visitor);
@@ -15028,8 +15206,8 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         argname: "[AST_SymbolCatch] symbol for the exception"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.argname._walk(visitor);
                             walk_body(this, visitor);
                         });
@@ -15043,9 +15221,9 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         definitions: "[AST_VarDef*] array of variable definitions"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
-                            this.definitions.forEach(function(def) {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
+                            this.definitions.forEach(function (def) {
                                 def._walk(visitor);
                             });
                         });
@@ -15063,8 +15241,8 @@ var requirejs, require, define, xpcUtil;
                         name: "[AST_SymbolVar|AST_SymbolConst] name of the variable",
                         value: "[AST_Node?] initializer, or null of there's no initializer"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.name._walk(visitor);
                             if (this.value) this.value._walk(visitor);
                         });
@@ -15076,10 +15254,10 @@ var requirejs, require, define, xpcUtil;
                         expression: "[AST_Node] expression to invoke as function",
                         args: "[AST_Node*] array of arguments"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.expression._walk(visitor);
-                            this.args.forEach(function(arg) {
+                            this.args.forEach(function (arg) {
                                 arg._walk(visitor);
                             });
                         });
@@ -15094,17 +15272,17 @@ var requirejs, require, define, xpcUtil;
                         car: "[AST_Node] first element in sequence",
                         cdr: "[AST_Node] second element in sequence"
                     },
-                    $cons: function(x, y) {
+                    $cons: function (x, y) {
                         var seq = new AST_Seq(x);
                         seq.car = x;
                         seq.cdr = y;
                         return seq;
                     },
-                    $from_array: function(array) {
+                    $from_array: function (array) {
                         if (array.length == 0) return null;
                         if (array.length == 1) return array[0].clone();
                         var list = null;
-                        for (var i = array.length; --i >= 0; ) {
+                        for (var i = array.length; --i >= 0;) {
                             list = AST_Seq.cons(array[i], list);
                         }
                         var p = list;
@@ -15117,7 +15295,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return list;
                     },
-                    to_array: function() {
+                    to_array: function () {
                         var p = this, a = [];
                         while (p) {
                             a.push(p.car);
@@ -15129,7 +15307,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return a;
                     },
-                    add: function(node) {
+                    add: function (node) {
                         var p = this;
                         while (p) {
                             if (!(p.cdr instanceof AST_Seq)) {
@@ -15139,8 +15317,8 @@ var requirejs, require, define, xpcUtil;
                             p = p.cdr;
                         }
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.car._walk(visitor);
                             if (this.cdr) this.cdr._walk(visitor);
                         });
@@ -15155,16 +15333,16 @@ var requirejs, require, define, xpcUtil;
                 });
                 var AST_Dot = DEFNODE("Dot", null, {
                     $documentation: "A dotted property access expression",
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.expression._walk(visitor);
                         });
                     }
                 }, AST_PropAccess);
                 var AST_Sub = DEFNODE("Sub", null, {
                     $documentation: 'Index-style property access, i.e. `a["foo"]`',
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.expression._walk(visitor);
                             this.property._walk(visitor);
                         });
@@ -15176,8 +15354,8 @@ var requirejs, require, define, xpcUtil;
                         operator: "[string] the operator",
                         expression: "[AST_Node] expression that this unary operator applies to"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.expression._walk(visitor);
                         });
                     }
@@ -15195,8 +15373,8 @@ var requirejs, require, define, xpcUtil;
                         operator: "[string] the operator",
                         right: "[AST_Node] right-hand side expression"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.left._walk(visitor);
                             this.right._walk(visitor);
                         });
@@ -15209,8 +15387,8 @@ var requirejs, require, define, xpcUtil;
                         consequent: "[AST_Node]",
                         alternative: "[AST_Node]"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.condition._walk(visitor);
                             this.consequent._walk(visitor);
                             this.alternative._walk(visitor);
@@ -15225,9 +15403,9 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         elements: "[AST_Node*] array of elements"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
-                            this.elements.forEach(function(el) {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
+                            this.elements.forEach(function (el) {
                                 el._walk(visitor);
                             });
                         });
@@ -15238,9 +15416,9 @@ var requirejs, require, define, xpcUtil;
                     $propdoc: {
                         properties: "[AST_ObjectProperty*] array of properties"
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
-                            this.properties.forEach(function(prop) {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
+                            this.properties.forEach(function (prop) {
                                 prop._walk(visitor);
                             });
                         });
@@ -15252,8 +15430,8 @@ var requirejs, require, define, xpcUtil;
                         key: "[string] the property name; it's always a plain string in our AST, no matter if it was a string, number or identifier in original code",
                         value: "[AST_Node] property value.  For setters and getters this is an AST_Function."
                     },
-                    _walk: function(visitor) {
-                        return visitor._visit(this, function() {
+                    _walk: function (visitor) {
+                        return visitor._visit(this, function () {
                             this.value._walk(visitor);
                         });
                     }
@@ -15319,7 +15497,7 @@ var requirejs, require, define, xpcUtil;
                 }, AST_Symbol);
                 var AST_Constant = DEFNODE("Constant", null, {
                     $documentation: "Base class for all constants",
-                    getValue: function() {
+                    getValue: function () {
                         return this.value;
                     }
                 });
@@ -15354,11 +15532,13 @@ var requirejs, require, define, xpcUtil;
                 }, AST_Atom);
                 var AST_Undefined = DEFNODE("Undefined", null, {
                     $documentation: "The `undefined` value",
-                    value: function() {}()
+                    value: function () {
+                    }()
                 }, AST_Atom);
                 var AST_Hole = DEFNODE("Hole", null, {
                     $documentation: "A hole in an array",
-                    value: function() {}()
+                    value: function () {
+                    }()
                 }, AST_Atom);
                 var AST_Infinity = DEFNODE("Infinity", null, {
                     $documentation: "The `Infinity` value",
@@ -15375,42 +15555,44 @@ var requirejs, require, define, xpcUtil;
                     $documentation: "The `true` atom",
                     value: true
                 }, AST_Boolean);
+
                 function TreeWalker(callback) {
                     this.visit = callback;
                     this.stack = [];
                 }
+
                 TreeWalker.prototype = {
-                    _visit: function(node, descend) {
+                    _visit: function (node, descend) {
                         this.stack.push(node);
-                        var ret = this.visit(node, descend ? function() {
-                            descend.call(node);
-                        } : noop);
+                        var ret = this.visit(node, descend ? function () {
+                                descend.call(node);
+                            } : noop);
                         if (!ret && descend) {
                             descend.call(node);
                         }
                         this.stack.pop();
                         return ret;
                     },
-                    parent: function(n) {
+                    parent: function (n) {
                         return this.stack[this.stack.length - 2 - (n || 0)];
                     },
-                    push: function(node) {
+                    push: function (node) {
                         this.stack.push(node);
                     },
-                    pop: function() {
+                    pop: function () {
                         return this.stack.pop();
                     },
-                    self: function() {
+                    self: function () {
                         return this.stack[this.stack.length - 1];
                     },
-                    find_parent: function(type) {
+                    find_parent: function (type) {
                         var stack = this.stack;
-                        for (var i = stack.length; --i >= 0; ) {
+                        for (var i = stack.length; --i >= 0;) {
                             var x = stack[i];
                             if (x instanceof type) return x;
                         }
                     },
-                    in_boolean_context: function() {
+                    in_boolean_context: function () {
                         var stack = this.stack;
                         var i = stack.length, self = stack[--i];
                         while (i > 0) {
@@ -15422,17 +15604,17 @@ var requirejs, require, define, xpcUtil;
                             self = p;
                         }
                     },
-                    loopcontrol_target: function(label) {
+                    loopcontrol_target: function (label) {
                         var stack = this.stack;
                         if (label) {
-                            for (var i = stack.length; --i >= 0; ) {
+                            for (var i = stack.length; --i >= 0;) {
                                 var x = stack[i];
                                 if (x instanceof AST_LabeledStatement && x.label.name == label.name) {
                                     return x.body;
                                 }
                             }
                         } else {
-                            for (var i = stack.length; --i >= 0; ) {
+                            for (var i = stack.length; --i >= 0;) {
                                 var x = stack[i];
                                 if (x instanceof AST_Switch || x instanceof AST_For || x instanceof AST_ForIn || x instanceof AST_DWLoop) return x;
                             }
@@ -15452,7 +15634,7 @@ var requirejs, require, define, xpcUtil;
                 var RE_HEX_NUMBER = /^0x[0-9a-f]+$/i;
                 var RE_OCT_NUMBER = /^0[0-7]+$/;
                 var RE_DEC_NUMBER = /^\d*\.?\d*(?:e[+-]?\d*(?:\d\.?|\.?\d)\d*)?$/i;
-                var OPERATORS = makePredicate([ "in", "instanceof", "typeof", "new", "void", "delete", "++", "--", "+", "-", "!", "~", "&", "|", "^", "*", "/", "%", ">>", "<<", ">>>", "<", ">", "<=", ">=", "==", "===", "!=", "!==", "?", "=", "+=", "-=", "/=", "*=", "%=", ">>=", "<<=", ">>>=", "|=", "^=", "&=", "&&", "||" ]);
+                var OPERATORS = makePredicate(["in", "instanceof", "typeof", "new", "void", "delete", "++", "--", "+", "-", "!", "~", "&", "|", "^", "*", "/", "%", ">>", "<<", ">>>", "<", ">", "<=", ">=", "==", "===", "!=", "!==", "?", "=", "+=", "-=", "/=", "*=", "%=", ">>=", "<<=", ">>>=", "|=", "^=", "&=", "&&", "||"]);
                 var WHITESPACE_CHARS = makePredicate(characters(" Â \n\r	\fâ€‹á Žâ€€â€â€‚â€ƒâ€„â€…â€†â€‡â€ˆâ€‰â€Šâ€¯âŸã€€"));
                 var PUNC_BEFORE_EXPRESSION = makePredicate(characters("[{(,.;:"));
                 var PUNC_CHARS = makePredicate(characters("[]{}(),;:"));
@@ -15463,31 +15645,40 @@ var requirejs, require, define, xpcUtil;
                     space_combining_mark: new RegExp("[\\u0903\\u093E-\\u0940\\u0949-\\u094C\\u094E\\u0982\\u0983\\u09BE-\\u09C0\\u09C7\\u09C8\\u09CB\\u09CC\\u09D7\\u0A03\\u0A3E-\\u0A40\\u0A83\\u0ABE-\\u0AC0\\u0AC9\\u0ACB\\u0ACC\\u0B02\\u0B03\\u0B3E\\u0B40\\u0B47\\u0B48\\u0B4B\\u0B4C\\u0B57\\u0BBE\\u0BBF\\u0BC1\\u0BC2\\u0BC6-\\u0BC8\\u0BCA-\\u0BCC\\u0BD7\\u0C01-\\u0C03\\u0C41-\\u0C44\\u0C82\\u0C83\\u0CBE\\u0CC0-\\u0CC4\\u0CC7\\u0CC8\\u0CCA\\u0CCB\\u0CD5\\u0CD6\\u0D02\\u0D03\\u0D3E-\\u0D40\\u0D46-\\u0D48\\u0D4A-\\u0D4C\\u0D57\\u0D82\\u0D83\\u0DCF-\\u0DD1\\u0DD8-\\u0DDF\\u0DF2\\u0DF3\\u0F3E\\u0F3F\\u0F7F\\u102B\\u102C\\u1031\\u1038\\u103B\\u103C\\u1056\\u1057\\u1062-\\u1064\\u1067-\\u106D\\u1083\\u1084\\u1087-\\u108C\\u108F\\u109A-\\u109C\\u17B6\\u17BE-\\u17C5\\u17C7\\u17C8\\u1923-\\u1926\\u1929-\\u192B\\u1930\\u1931\\u1933-\\u1938\\u19B0-\\u19C0\\u19C8\\u19C9\\u1A19-\\u1A1B\\u1A55\\u1A57\\u1A61\\u1A63\\u1A64\\u1A6D-\\u1A72\\u1B04\\u1B35\\u1B3B\\u1B3D-\\u1B41\\u1B43\\u1B44\\u1B82\\u1BA1\\u1BA6\\u1BA7\\u1BAA\\u1C24-\\u1C2B\\u1C34\\u1C35\\u1CE1\\u1CF2\\uA823\\uA824\\uA827\\uA880\\uA881\\uA8B4-\\uA8C3\\uA952\\uA953\\uA983\\uA9B4\\uA9B5\\uA9BA\\uA9BB\\uA9BD-\\uA9C0\\uAA2F\\uAA30\\uAA33\\uAA34\\uAA4D\\uAA7B\\uABE3\\uABE4\\uABE6\\uABE7\\uABE9\\uABEA\\uABEC]"),
                     connector_punctuation: new RegExp("[\\u005F\\u203F\\u2040\\u2054\\uFE33\\uFE34\\uFE4D-\\uFE4F\\uFF3F]")
                 };
+
                 function is_letter(code) {
                     return code >= 97 && code <= 122 || code >= 65 && code <= 90 || code >= 170 && UNICODE.letter.test(String.fromCharCode(code));
                 }
+
                 function is_digit(code) {
                     return code >= 48 && code <= 57;
                 }
+
                 function is_alphanumeric_char(code) {
                     return is_digit(code) || is_letter(code);
                 }
+
                 function is_unicode_combining_mark(ch) {
                     return UNICODE.non_spacing_mark.test(ch) || UNICODE.space_combining_mark.test(ch);
                 }
+
                 function is_unicode_connector_punctuation(ch) {
                     return UNICODE.connector_punctuation.test(ch);
                 }
+
                 function is_identifier(name) {
                     return !RESERVED_WORDS(name) && /^[a-z_$][a-z0-9_$]*$/i.test(name);
                 }
+
                 function is_identifier_start(code) {
                     return code == 36 || code == 95 || is_letter(code);
                 }
+
                 function is_identifier_char(ch) {
                     var code = ch.charCodeAt(0);
                     return is_identifier_start(code) || is_digit(code) || code == 8204 || code == 8205 || is_unicode_combining_mark(ch) || is_unicode_connector_punctuation(ch);
                 }
+
                 function is_identifier_string(str) {
                     var i = str.length;
                     if (i == 0) return false;
@@ -15496,6 +15687,7 @@ var requirejs, require, define, xpcUtil;
                     }
                     return true;
                 }
+
                 function parse_js_number(num) {
                     if (RE_HEX_NUMBER.test(num)) {
                         return parseInt(num.substr(2), 16);
@@ -15505,6 +15697,7 @@ var requirejs, require, define, xpcUtil;
                         return parseFloat(num);
                     }
                 }
+
                 function JS_Parse_Error(message, line, col, pos) {
                     this.message = message;
                     this.line = line;
@@ -15512,16 +15705,20 @@ var requirejs, require, define, xpcUtil;
                     this.pos = pos;
                     this.stack = new Error().stack;
                 }
-                JS_Parse_Error.prototype.toString = function() {
+
+                JS_Parse_Error.prototype.toString = function () {
                     return this.message + " (line: " + this.line + ", col: " + this.col + ", pos: " + this.pos + ")" + "\n\n" + this.stack;
                 };
                 function js_error(message, filename, line, col, pos) {
                     throw new JS_Parse_Error(message, line, col, pos);
                 }
+
                 function is_token(token, type, val) {
                     return token.type == type && (val == null || token.value == val);
                 }
+
                 var EX_EOF = {};
+
                 function tokenizer($TEXT, filename) {
                     var S = {
                         text: $TEXT.replace(/\r\n?|[\n\u2028\u2029]/g, "\n").replace(/\uFEFF/g, ""),
@@ -15536,9 +15733,11 @@ var requirejs, require, define, xpcUtil;
                         regex_allowed: false,
                         comments_before: []
                     };
+
                     function peek() {
                         return S.text.charAt(S.pos);
                     }
+
                     function next(signal_eof, in_string) {
                         var ch = S.text.charAt(S.pos++);
                         if (signal_eof && !ch) throw EX_EOF;
@@ -15551,16 +15750,19 @@ var requirejs, require, define, xpcUtil;
                         }
                         return ch;
                     }
+
                     function find(what, signal_eof) {
                         var pos = S.text.indexOf(what, S.pos);
                         if (signal_eof && pos == -1) throw EX_EOF;
                         return pos;
                     }
+
                     function start_token() {
                         S.tokline = S.line;
                         S.tokcol = S.col;
                         S.tokpos = S.pos;
                     }
+
                     function token(type, value, is_comment) {
                         S.regex_allowed = type == "operator" && !UNARY_POSTFIX[value] || type == "keyword" && KEYWORDS_BEFORE_EXPRESSION(value) || type == "punc" && PUNC_BEFORE_EXPRESSION(value);
                         var ret = {
@@ -15583,20 +15785,24 @@ var requirejs, require, define, xpcUtil;
                         S.newline_before = false;
                         return new AST_Token(ret);
                     }
+
                     function skip_whitespace() {
                         while (WHITESPACE_CHARS(peek())) next();
                     }
+
                     function read_while(pred) {
                         var ret = "", ch, i = 0;
                         while ((ch = peek()) && pred(ch, i++)) ret += next();
                         return ret;
                     }
+
                     function parse_error(err) {
                         js_error(err, filename, S.tokline, S.tokcol, S.tokpos);
                     }
+
                     function read_num(prefix) {
                         var has_e = false, after_e = false, has_x = false, has_dot = prefix == ".";
-                        var num = read_while(function(ch, i) {
+                        var num = read_while(function (ch, i) {
                             var code = ch.charCodeAt(0);
                             switch (code) {
                                 case 120:
@@ -15626,6 +15832,7 @@ var requirejs, require, define, xpcUtil;
                             parse_error("Invalid syntax: " + num);
                         }
                     }
+
                     function read_escaped_char(in_string) {
                         var ch = next(true, in_string);
                         switch (ch.charCodeAt(0)) {
@@ -15663,22 +15870,24 @@ var requirejs, require, define, xpcUtil;
                                 return ch;
                         }
                     }
+
                     function hex_bytes(n) {
                         var num = 0;
-                        for (;n > 0; --n) {
+                        for (; n > 0; --n) {
                             var digit = parseInt(next(true), 16);
                             if (isNaN(digit)) parse_error("Invalid hex-character pattern in string");
                             num = num << 4 | digit;
                         }
                         return num;
                     }
-                    var read_string = with_eof_error("Unterminated string constant", function() {
+
+                    var read_string = with_eof_error("Unterminated string constant", function () {
                         var quote = next(), ret = "";
-                        for (;;) {
+                        for (; ;) {
                             var ch = next(true);
                             if (ch == "\\") {
                                 var octal_len = 0, first = null;
-                                ch = read_while(function(ch) {
+                                ch = read_while(function (ch) {
                                     if (ch >= "0" && ch <= "7") {
                                         if (!first) {
                                             first = ch;
@@ -15693,6 +15902,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return token("string", ret);
                     });
+
                     function read_line_comment() {
                         next();
                         var i = find("\n"), ret;
@@ -15705,7 +15915,8 @@ var requirejs, require, define, xpcUtil;
                         }
                         return token("comment1", ret, true);
                     }
-                    var read_multiline_comment = with_eof_error("Unterminated multiline comment", function() {
+
+                    var read_multiline_comment = with_eof_error("Unterminated multiline comment", function () {
                         next();
                         var i = find("*/", true);
                         var text = S.text.substring(S.pos, i);
@@ -15717,6 +15928,7 @@ var requirejs, require, define, xpcUtil;
                         S.newline_before = S.newline_before || text.indexOf("\n") >= 0;
                         return token("comment2", text, true);
                     });
+
                     function read_name() {
                         var backslash = false, name = "", ch, escaped = false, hex;
                         while ((ch = peek()) != null) {
@@ -15736,7 +15948,8 @@ var requirejs, require, define, xpcUtil;
                         }
                         return name;
                     }
-                    var read_regexp = with_eof_error("Unterminated regular expression", function(regexp) {
+
+                    var read_regexp = with_eof_error("Unterminated regular expression", function (regexp) {
                         var prev_backslash = false, ch, in_class = false;
                         while (ch = next(true)) if (prev_backslash) {
                             regexp += "\\" + ch;
@@ -15757,6 +15970,7 @@ var requirejs, require, define, xpcUtil;
                         var mods = read_name();
                         return token("regexp", new RegExp(regexp, mods));
                     });
+
                     function read_operator(prefix) {
                         function grow(op) {
                             if (!peek()) return op;
@@ -15768,8 +15982,10 @@ var requirejs, require, define, xpcUtil;
                                 return op;
                             }
                         }
+
                         return token("operator", grow(prefix || next()));
                     }
+
                     function handle_slash() {
                         next();
                         var regex_allowed = S.regex_allowed;
@@ -15786,16 +16002,19 @@ var requirejs, require, define, xpcUtil;
                         }
                         return S.regex_allowed ? read_regexp("") : read_operator("/");
                     }
+
                     function handle_dot() {
                         next();
                         return is_digit(peek().charCodeAt(0)) ? read_num(".") : token("punc", ".");
                     }
+
                     function read_word() {
                         var word = read_name();
                         return KEYWORDS_ATOM(word) ? token("atom", word) : !KEYWORDS(word) ? token("name", word) : OPERATORS(word) ? token("operator", word) : token("keyword", word);
                     }
+
                     function with_eof_error(eof_error, cont) {
-                        return function(x) {
+                        return function (x) {
                             try {
                                 return cont(x);
                             } catch (ex) {
@@ -15803,6 +16022,7 @@ var requirejs, require, define, xpcUtil;
                             }
                         };
                     }
+
                     function next_token(force_regexp) {
                         if (force_regexp != null) return read_regexp(force_regexp);
                         skip_whitespace();
@@ -15827,16 +16047,18 @@ var requirejs, require, define, xpcUtil;
                         if (code == 92 || is_identifier_start(code)) return read_word();
                         parse_error("Unexpected character '" + ch + "'");
                     }
-                    next_token.context = function(nc) {
+
+                    next_token.context = function (nc) {
                         if (nc) S = nc;
                         return S;
                     };
                     return next_token;
                 }
-                var UNARY_PREFIX = makePredicate([ "typeof", "void", "delete", "--", "++", "!", "~", "-", "+" ]);
-                var UNARY_POSTFIX = makePredicate([ "--", "++" ]);
-                var ASSIGNMENT = makePredicate([ "=", "+=", "-=", "/=", "*=", "%=", ">>=", "<<=", ">>>=", "|=", "^=", "&=" ]);
-                var PRECEDENCE = function(a, ret) {
+
+                var UNARY_PREFIX = makePredicate(["typeof", "void", "delete", "--", "++", "!", "~", "-", "+"]);
+                var UNARY_POSTFIX = makePredicate(["--", "++"]);
+                var ASSIGNMENT = makePredicate(["=", "+=", "-=", "/=", "*=", "%=", ">>=", "<<=", ">>>=", "|=", "^=", "&="]);
+                var PRECEDENCE = function (a, ret) {
                     for (var i = 0, n = 1; i < a.length; ++i, ++n) {
                         var b = a[i];
                         for (var j = 0; j < b.length; ++j) {
@@ -15844,9 +16066,10 @@ var requirejs, require, define, xpcUtil;
                         }
                     }
                     return ret;
-                }([ [ "||" ], [ "&&" ], [ "|" ], [ "^" ], [ "&" ], [ "==", "===", "!=", "!==" ], [ "<", ">", "<=", ">=", "in", "instanceof" ], [ ">>", "<<", ">>>" ], [ "+", "-" ], [ "*", "/", "%" ] ], {});
-                var STATEMENTS_WITH_LABELS = array_to_hash([ "for", "do", "while", "switch" ]);
-                var ATOMIC_START_TOKEN = array_to_hash([ "atom", "num", "string", "regexp", "name" ]);
+                }([["||"], ["&&"], ["|"], ["^"], ["&"], ["==", "===", "!=", "!=="], ["<", ">", "<=", ">=", "in", "instanceof"], [">>", "<<", ">>>"], ["+", "-"], ["*", "/", "%"]], {});
+                var STATEMENTS_WITH_LABELS = array_to_hash(["for", "do", "while", "switch"]);
+                var ATOMIC_START_TOKEN = array_to_hash(["atom", "num", "string", "regexp", "name"]);
+
                 function parse($TEXT, options) {
                     options = defaults(options, {
                         strict: false,
@@ -15867,9 +16090,11 @@ var requirejs, require, define, xpcUtil;
                     function is(type, value) {
                         return is_token(S.token, type, value);
                     }
+
                     function peek() {
                         return S.peeked || (S.peeked = S.input());
                     }
+
                     function next() {
                         S.prev = S.token;
                         if (S.peeked) {
@@ -15881,43 +16106,53 @@ var requirejs, require, define, xpcUtil;
                         S.in_directives = S.in_directives && (S.token.type == "string" || is("punc", ";"));
                         return S.token;
                     }
+
                     function prev() {
                         return S.prev;
                     }
+
                     function croak(msg, line, col, pos) {
                         var ctx = S.input.context();
                         js_error(msg, ctx.filename, line != null ? line : ctx.tokline, col != null ? col : ctx.tokcol, pos != null ? pos : ctx.tokpos);
                     }
+
                     function token_error(token, msg) {
                         croak(msg, token.line, token.col);
                     }
+
                     function unexpected(token) {
                         if (token == null) token = S.token;
                         token_error(token, "Unexpected token: " + token.type + " (" + token.value + ")");
                     }
+
                     function expect_token(type, val) {
                         if (is(type, val)) {
                             return next();
                         }
                         token_error(S.token, "Unexpected token " + S.token.type + " Â«" + S.token.value + "Â»" + ", expected " + type + " Â«" + val + "Â»");
                     }
+
                     function expect(punc) {
                         return expect_token("punc", punc);
                     }
+
                     function can_insert_semicolon() {
                         return !options.strict && (S.token.nlb || is("eof") || is("punc", "}"));
                     }
+
                     function semicolon() {
                         if (is("punc", ";")) next(); else if (!can_insert_semicolon()) unexpected();
                     }
+
                     function parenthesised() {
                         expect("(");
                         var exp = expression(true);
                         expect(")");
                         return exp;
                     }
+
                     function embed_tokens(parser) {
-                        return function() {
+                        return function () {
                             var start = S.token;
                             var expr = parser();
                             var end = prev();
@@ -15926,7 +16161,8 @@ var requirejs, require, define, xpcUtil;
                             return expr;
                         };
                     }
-                    var statement = embed_tokens(function() {
+
+                    var statement = embed_tokens(function () {
                         var tmp;
                         if (is("operator", "/") || is("operator", "/=")) {
                             S.peeked = null;
@@ -16008,7 +16244,7 @@ var requirejs, require, define, xpcUtil;
                                         if (S.in_function == 0) croak("'return' outside of function");
                                         return new AST_Return({
                                             value: is("punc", ";") ? (next(), null) : can_insert_semicolon() ? null : (tmp = expression(true),
-                                                semicolon(), tmp)
+                                                        semicolon(), tmp)
                                         });
 
                                     case "switch":
@@ -16043,11 +16279,12 @@ var requirejs, require, define, xpcUtil;
                                 }
                         }
                     });
+
                     function labeled_statement() {
                         var label = as_symbol(AST_Label);
-                        if (find_if(function(l) {
-                            return l.name == label.name;
-                        }, S.labels)) {
+                        if (find_if(function (l) {
+                                return l.name == label.name;
+                            }, S.labels)) {
                             croak("Label " + label.name + " defined twice");
                         }
                         expect(":");
@@ -16059,26 +16296,29 @@ var requirejs, require, define, xpcUtil;
                             label: label
                         });
                     }
+
                     function simple_statement(tmp) {
                         return new AST_SimpleStatement({
                             body: (tmp = expression(true), semicolon(), tmp)
                         });
                     }
+
                     function break_cont(type) {
                         var label = null;
                         if (!can_insert_semicolon()) {
                             label = as_symbol(AST_LabelRef, true);
                         }
                         if (label != null) {
-                            if (!find_if(function(l) {
-                                return l.name == label.name;
-                            }, S.labels)) croak("Undefined label " + label.name);
+                            if (!find_if(function (l) {
+                                    return l.name == label.name;
+                                }, S.labels)) croak("Undefined label " + label.name);
                         } else if (S.in_loop == 0) croak(type.TYPE + " not inside a loop or switch");
                         semicolon();
                         return new type({
                             label: label
                         });
                     }
+
                     function for_() {
                         expect("(");
                         var init = null;
@@ -16092,6 +16332,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return regular_for(init);
                     }
+
                     function regular_for(init) {
                         expect(";");
                         var test = is("punc", ";") ? null : expression(true);
@@ -16105,6 +16346,7 @@ var requirejs, require, define, xpcUtil;
                             body: in_loop(statement)
                         });
                     }
+
                     function for_in(init) {
                         var lhs = init instanceof AST_Var ? init.definitions[0].name : null;
                         var obj = expression(true);
@@ -16116,7 +16358,8 @@ var requirejs, require, define, xpcUtil;
                             body: in_loop(statement)
                         });
                     }
-                    var function_ = function(in_statement, ctor) {
+
+                    var function_ = function (in_statement, ctor) {
                         var is_accessor = ctor === AST_Accessor;
                         var name = is("name") ? as_symbol(in_statement ? AST_SymbolDefun : is_accessor ? AST_SymbolAccessor : AST_SymbolLambda) : is_accessor && (is("string") || is("num")) ? as_atom_node() : null;
                         if (in_statement && !name) unexpected();
@@ -16124,7 +16367,7 @@ var requirejs, require, define, xpcUtil;
                         if (!ctor) ctor = in_statement ? AST_Defun : AST_Function;
                         return new ctor({
                             name: name,
-                            argnames: function(first, a) {
+                            argnames: function (first, a) {
                                 while (!is("punc", ")")) {
                                     if (first) first = false; else expect(",");
                                     a.push(as_symbol(AST_SymbolFunarg));
@@ -16132,7 +16375,7 @@ var requirejs, require, define, xpcUtil;
                                 next();
                                 return a;
                             }(true, []),
-                            body: function(loop, labels) {
+                            body: function (loop, labels) {
                                 ++S.in_function;
                                 S.in_directives = true;
                                 S.in_loop = 0;
@@ -16145,6 +16388,7 @@ var requirejs, require, define, xpcUtil;
                             }(S.in_loop, S.labels)
                         });
                     };
+
                     function if_() {
                         var cond = parenthesised(), body = statement(), belse = null;
                         if (is("keyword", "else")) {
@@ -16157,6 +16401,7 @@ var requirejs, require, define, xpcUtil;
                             alternative: belse
                         });
                     }
+
                     function block_() {
                         expect("{");
                         var a = [];
@@ -16167,6 +16412,7 @@ var requirejs, require, define, xpcUtil;
                         next();
                         return a;
                     }
+
                     function switch_body_() {
                         expect("{");
                         var a = [], cur = null, branch = null, tmp;
@@ -16199,6 +16445,7 @@ var requirejs, require, define, xpcUtil;
                         next();
                         return a;
                     }
+
                     function try_() {
                         var body = block_(), bcatch = null, bfinally = null;
                         if (is("keyword", "catch")) {
@@ -16230,9 +16477,10 @@ var requirejs, require, define, xpcUtil;
                             bfinally: bfinally
                         });
                     }
+
                     function vardefs(no_in, in_const) {
                         var a = [];
-                        for (;;) {
+                        for (; ;) {
                             a.push(new AST_VarDef({
                                 start: S.token,
                                 name: as_symbol(in_const ? AST_SymbolConst : AST_SymbolVar),
@@ -16244,21 +16492,22 @@ var requirejs, require, define, xpcUtil;
                         }
                         return a;
                     }
-                    var var_ = function(no_in) {
+
+                    var var_ = function (no_in) {
                         return new AST_Var({
                             start: prev(),
                             definitions: vardefs(no_in, false),
                             end: prev()
                         });
                     };
-                    var const_ = function() {
+                    var const_ = function () {
                         return new AST_Const({
                             start: prev(),
                             definitions: vardefs(false, true),
                             end: prev()
                         });
                     };
-                    var new_ = function() {
+                    var new_ = function () {
                         var start = S.token;
                         expect_token("operator", "new");
                         var newexp = expr_atom(false), args;
@@ -16275,6 +16524,7 @@ var requirejs, require, define, xpcUtil;
                             end: prev()
                         }), true);
                     };
+
                     function as_atom_node() {
                         var tok = S.token, ret;
                         switch (tok.type) {
@@ -16333,7 +16583,8 @@ var requirejs, require, define, xpcUtil;
                         next();
                         return ret;
                     }
-                    var expr_atom = function(allow_calls) {
+
+                    var expr_atom = function (allow_calls) {
                         if (is("operator", "new")) {
                             return new_();
                         }
@@ -16368,6 +16619,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         unexpected();
                     };
+
                     function expr_list(closing, allow_trailing_comma, allow_empty) {
                         var first = true, a = [];
                         while (!is("punc", closing)) {
@@ -16385,13 +16637,14 @@ var requirejs, require, define, xpcUtil;
                         next();
                         return a;
                     }
-                    var array_ = embed_tokens(function() {
+
+                    var array_ = embed_tokens(function () {
                         expect("[");
                         return new AST_Array({
                             elements: expr_list("]", !options.strict, true)
                         });
                     });
-                    var object_ = embed_tokens(function() {
+                    var object_ = embed_tokens(function () {
                         expect("{");
                         var first = true, a = [];
                         while (!is("punc", "}")) {
@@ -16433,6 +16686,7 @@ var requirejs, require, define, xpcUtil;
                             properties: a
                         });
                     });
+
                     function as_property_name() {
                         var tmp = S.token;
                         next();
@@ -16449,6 +16703,7 @@ var requirejs, require, define, xpcUtil;
                                 unexpected();
                         }
                     }
+
                     function as_name() {
                         var tmp = S.token;
                         next();
@@ -16463,6 +16718,7 @@ var requirejs, require, define, xpcUtil;
                                 unexpected();
                         }
                     }
+
                     function as_symbol(type, noerror) {
                         if (!is("name")) {
                             if (!noerror) croak("Name expected");
@@ -16477,7 +16733,8 @@ var requirejs, require, define, xpcUtil;
                         next();
                         return sym;
                     }
-                    var subscripts = function(expr, allow_calls) {
+
+                    var subscripts = function (expr, allow_calls) {
                         var start = expr.start;
                         if (is("punc", ".")) {
                             next();
@@ -16510,7 +16767,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return expr;
                     };
-                    var maybe_unary = function(allow_calls) {
+                    var maybe_unary = function (allow_calls) {
                         var start = S.token;
                         if (is("operator") && UNARY_PREFIX(start.value)) {
                             next();
@@ -16528,6 +16785,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return val;
                     };
+
                     function make_unary(ctor, op, expr) {
                         if ((op == "++" || op == "--") && !is_assignable(expr)) croak("Invalid use of " + op + " operator");
                         return new ctor({
@@ -16535,7 +16793,8 @@ var requirejs, require, define, xpcUtil;
                             expression: expr
                         });
                     }
-                    var expr_op = function(left, min_prec, no_in) {
+
+                    var expr_op = function (left, min_prec, no_in) {
                         var op = is("operator") ? S.token.value : null;
                         if (op == "in" && no_in) op = null;
                         var prec = op != null ? PRECEDENCE[op] : null;
@@ -16552,10 +16811,12 @@ var requirejs, require, define, xpcUtil;
                         }
                         return left;
                     };
+
                     function expr_ops(no_in) {
                         return expr_op(maybe_unary(true), 0, no_in);
                     }
-                    var maybe_conditional = function(no_in) {
+
+                    var maybe_conditional = function (no_in) {
                         var start = S.token;
                         var expr = expr_ops(no_in);
                         if (is("operator", "?")) {
@@ -16572,12 +16833,14 @@ var requirejs, require, define, xpcUtil;
                         }
                         return expr;
                     };
+
                     function is_assignable(expr) {
                         if (!options.strict) return true;
                         if (expr instanceof AST_This) return false;
                         return expr instanceof AST_PropAccess || expr instanceof AST_Symbol;
                     }
-                    var maybe_assign = function(no_in) {
+
+                    var maybe_assign = function (no_in) {
                         var start = S.token;
                         var left = maybe_conditional(no_in), val = S.token.value;
                         if (is("operator") && ASSIGNMENT(val)) {
@@ -16595,7 +16858,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return left;
                     };
-                    var expression = function(commas, no_in) {
+                    var expression = function (commas, no_in) {
                         var start = S.token;
                         var expr = maybe_assign(no_in);
                         if (commas && is("punc", ",")) {
@@ -16609,13 +16872,15 @@ var requirejs, require, define, xpcUtil;
                         }
                         return expr;
                     };
+
                     function in_loop(cont) {
                         ++S.in_loop;
                         var ret = cont();
                         --S.in_loop;
                         return ret;
                     }
-                    return function() {
+
+                    return function () {
                         var start = S.token;
                         var body = [];
                         while (!is("eof")) body.push(statement());
@@ -16634,16 +16899,18 @@ var requirejs, require, define, xpcUtil;
                         return toplevel;
                     }();
                 }
+
                 "use strict";
                 function TreeTransformer(before, after) {
                     TreeWalker.call(this);
                     this.before = before;
                     this.after = after;
                 }
+
                 TreeTransformer.prototype = new TreeWalker();
-                (function(undefined) {
+                (function (undefined) {
                     function _(node, descend) {
-                        node.DEFMETHOD("transform", function(tw, in_list) {
+                        node.DEFMETHOD("transform", function (tw, in_list) {
                             var x, y;
                             tw.push(this);
                             if (tw.before) x = tw.before(this, descend, in_list);
@@ -16662,121 +16929,123 @@ var requirejs, require, define, xpcUtil;
                             return x;
                         });
                     }
+
                     function do_list(list, tw) {
-                        return MAP(list, function(node) {
+                        return MAP(list, function (node) {
                             return node.transform(tw, true);
                         });
                     }
+
                     _(AST_Node, noop);
-                    _(AST_LabeledStatement, function(self, tw) {
+                    _(AST_LabeledStatement, function (self, tw) {
                         self.label = self.label.transform(tw);
                         self.body = self.body.transform(tw);
                     });
-                    _(AST_SimpleStatement, function(self, tw) {
+                    _(AST_SimpleStatement, function (self, tw) {
                         self.body = self.body.transform(tw);
                     });
-                    _(AST_Block, function(self, tw) {
+                    _(AST_Block, function (self, tw) {
                         self.body = do_list(self.body, tw);
                     });
-                    _(AST_DWLoop, function(self, tw) {
+                    _(AST_DWLoop, function (self, tw) {
                         self.condition = self.condition.transform(tw);
                         self.body = self.body.transform(tw);
                     });
-                    _(AST_For, function(self, tw) {
+                    _(AST_For, function (self, tw) {
                         if (self.init) self.init = self.init.transform(tw);
                         if (self.condition) self.condition = self.condition.transform(tw);
                         if (self.step) self.step = self.step.transform(tw);
                         self.body = self.body.transform(tw);
                     });
-                    _(AST_ForIn, function(self, tw) {
+                    _(AST_ForIn, function (self, tw) {
                         self.init = self.init.transform(tw);
                         self.object = self.object.transform(tw);
                         self.body = self.body.transform(tw);
                     });
-                    _(AST_With, function(self, tw) {
+                    _(AST_With, function (self, tw) {
                         self.expression = self.expression.transform(tw);
                         self.body = self.body.transform(tw);
                     });
-                    _(AST_Exit, function(self, tw) {
+                    _(AST_Exit, function (self, tw) {
                         if (self.value) self.value = self.value.transform(tw);
                     });
-                    _(AST_LoopControl, function(self, tw) {
+                    _(AST_LoopControl, function (self, tw) {
                         if (self.label) self.label = self.label.transform(tw);
                     });
-                    _(AST_If, function(self, tw) {
+                    _(AST_If, function (self, tw) {
                         self.condition = self.condition.transform(tw);
                         self.body = self.body.transform(tw);
                         if (self.alternative) self.alternative = self.alternative.transform(tw);
                     });
-                    _(AST_Switch, function(self, tw) {
+                    _(AST_Switch, function (self, tw) {
                         self.expression = self.expression.transform(tw);
                         self.body = do_list(self.body, tw);
                     });
-                    _(AST_Case, function(self, tw) {
+                    _(AST_Case, function (self, tw) {
                         self.expression = self.expression.transform(tw);
                         self.body = do_list(self.body, tw);
                     });
-                    _(AST_Try, function(self, tw) {
+                    _(AST_Try, function (self, tw) {
                         self.body = do_list(self.body, tw);
                         if (self.bcatch) self.bcatch = self.bcatch.transform(tw);
                         if (self.bfinally) self.bfinally = self.bfinally.transform(tw);
                     });
-                    _(AST_Catch, function(self, tw) {
+                    _(AST_Catch, function (self, tw) {
                         self.argname = self.argname.transform(tw);
                         self.body = do_list(self.body, tw);
                     });
-                    _(AST_Definitions, function(self, tw) {
+                    _(AST_Definitions, function (self, tw) {
                         self.definitions = do_list(self.definitions, tw);
                     });
-                    _(AST_VarDef, function(self, tw) {
+                    _(AST_VarDef, function (self, tw) {
                         if (self.value) self.value = self.value.transform(tw);
                     });
-                    _(AST_Lambda, function(self, tw) {
+                    _(AST_Lambda, function (self, tw) {
                         if (self.name) self.name = self.name.transform(tw);
                         self.argnames = do_list(self.argnames, tw);
                         self.body = do_list(self.body, tw);
                     });
-                    _(AST_Call, function(self, tw) {
+                    _(AST_Call, function (self, tw) {
                         self.expression = self.expression.transform(tw);
                         self.args = do_list(self.args, tw);
                     });
-                    _(AST_Seq, function(self, tw) {
+                    _(AST_Seq, function (self, tw) {
                         self.car = self.car.transform(tw);
                         self.cdr = self.cdr.transform(tw);
                     });
-                    _(AST_Dot, function(self, tw) {
+                    _(AST_Dot, function (self, tw) {
                         self.expression = self.expression.transform(tw);
                     });
-                    _(AST_Sub, function(self, tw) {
+                    _(AST_Sub, function (self, tw) {
                         self.expression = self.expression.transform(tw);
                         self.property = self.property.transform(tw);
                     });
-                    _(AST_Unary, function(self, tw) {
+                    _(AST_Unary, function (self, tw) {
                         self.expression = self.expression.transform(tw);
                     });
-                    _(AST_Binary, function(self, tw) {
+                    _(AST_Binary, function (self, tw) {
                         self.left = self.left.transform(tw);
                         self.right = self.right.transform(tw);
                     });
-                    _(AST_Conditional, function(self, tw) {
+                    _(AST_Conditional, function (self, tw) {
                         self.condition = self.condition.transform(tw);
                         self.consequent = self.consequent.transform(tw);
                         self.alternative = self.alternative.transform(tw);
                     });
-                    _(AST_Array, function(self, tw) {
+                    _(AST_Array, function (self, tw) {
                         self.elements = do_list(self.elements, tw);
                     });
-                    _(AST_Object, function(self, tw) {
+                    _(AST_Object, function (self, tw) {
                         self.properties = do_list(self.properties, tw);
                     });
-                    _(AST_ObjectProperty, function(self, tw) {
+                    _(AST_ObjectProperty, function (self, tw) {
                         self.value = self.value.transform(tw);
                     });
                 })();
                 "use strict";
                 function SymbolDef(scope, index, orig) {
                     this.name = orig.name;
-                    this.orig = [ orig ];
+                    this.orig = [orig];
                     this.scope = scope;
                     this.references = [];
                     this.global = false;
@@ -16785,11 +17054,12 @@ var requirejs, require, define, xpcUtil;
                     this.constant = false;
                     this.index = index;
                 }
+
                 SymbolDef.prototype = {
-                    unmangleable: function(options) {
+                    unmangleable: function (options) {
                         return this.global && !(options && options.toplevel) || this.undeclared || !(options && options.eval) && (this.scope.uses_eval || this.scope.uses_with);
                     },
-                    mangle: function(options) {
+                    mangle: function (options) {
                         if (!this.mangled_name && !this.unmangleable(options)) {
                             var s = this.scope;
                             if (this.orig[0] instanceof AST_SymbolLambda && !options.screw_ie8) s = s.parent_scope;
@@ -16797,12 +17067,12 @@ var requirejs, require, define, xpcUtil;
                         }
                     }
                 };
-                AST_Toplevel.DEFMETHOD("figure_out_scope", function() {
+                AST_Toplevel.DEFMETHOD("figure_out_scope", function () {
                     var self = this;
                     var scope = self.parent_scope = null;
                     var labels = new Dictionary();
                     var nesting = 0;
-                    var tw = new TreeWalker(function(node, descend) {
+                    var tw = new TreeWalker(function (node, descend) {
                         if (node instanceof AST_Scope) {
                             node.init_scope_vars(nesting);
                             var save_scope = node.parent_scope = scope;
@@ -16864,7 +17134,7 @@ var requirejs, require, define, xpcUtil;
                     self.walk(tw);
                     var func = null;
                     var globals = self.globals = new Dictionary();
-                    var tw = new TreeWalker(function(node, descend) {
+                    var tw = new TreeWalker(function (node, descend) {
                         if (node instanceof AST_Lambda) {
                             var prev_func = func;
                             func = node;
@@ -16904,7 +17174,7 @@ var requirejs, require, define, xpcUtil;
                     });
                     self.walk(tw);
                 });
-                AST_Scope.DEFMETHOD("init_scope_vars", function(nesting) {
+                AST_Scope.DEFMETHOD("init_scope_vars", function (nesting) {
                     this.directives = [];
                     this.variables = new Dictionary();
                     this.functions = new Dictionary();
@@ -16915,14 +17185,14 @@ var requirejs, require, define, xpcUtil;
                     this.cname = -1;
                     this.nesting = nesting;
                 });
-                AST_Scope.DEFMETHOD("strict", function() {
+                AST_Scope.DEFMETHOD("strict", function () {
                     return this.has_directive("use strict");
                 });
-                AST_Lambda.DEFMETHOD("init_scope_vars", function() {
+                AST_Lambda.DEFMETHOD("init_scope_vars", function () {
                     AST_Scope.prototype.init_scope_vars.apply(this, arguments);
                     this.uses_arguments = false;
                 });
-                AST_SymbolRef.DEFMETHOD("reference", function() {
+                AST_SymbolRef.DEFMETHOD("reference", function () {
                     var def = this.definition();
                     def.references.push(this);
                     var s = this.scope;
@@ -16933,23 +17203,23 @@ var requirejs, require, define, xpcUtil;
                     }
                     this.frame = this.scope.nesting - def.scope.nesting;
                 });
-                AST_Label.DEFMETHOD("init_scope_vars", function() {
+                AST_Label.DEFMETHOD("init_scope_vars", function () {
                     this.references = [];
                 });
-                AST_LabelRef.DEFMETHOD("reference", function() {
+                AST_LabelRef.DEFMETHOD("reference", function () {
                     this.thedef.references.push(this);
                 });
-                AST_Scope.DEFMETHOD("find_variable", function(name) {
+                AST_Scope.DEFMETHOD("find_variable", function (name) {
                     if (name instanceof AST_Symbol) name = name.name;
                     return this.variables.get(name) || this.parent_scope && this.parent_scope.find_variable(name);
                 });
-                AST_Scope.DEFMETHOD("has_directive", function(value) {
+                AST_Scope.DEFMETHOD("has_directive", function (value) {
                     return this.parent_scope && this.parent_scope.has_directive(value) || (this.directives.indexOf(value) >= 0 ? this : null);
                 });
-                AST_Scope.DEFMETHOD("def_function", function(symbol) {
+                AST_Scope.DEFMETHOD("def_function", function (symbol) {
                     this.functions.set(symbol.name, this.def_variable(symbol));
                 });
-                AST_Scope.DEFMETHOD("def_variable", function(symbol) {
+                AST_Scope.DEFMETHOD("def_variable", function (symbol) {
                     var def;
                     if (!this.variables.has(symbol.name)) {
                         def = new SymbolDef(this, this.variables.size(), symbol);
@@ -16961,12 +17231,12 @@ var requirejs, require, define, xpcUtil;
                     }
                     return symbol.thedef = def;
                 });
-                AST_Scope.DEFMETHOD("next_mangled", function(options) {
+                AST_Scope.DEFMETHOD("next_mangled", function (options) {
                     var ext = this.enclosed;
                     out: while (true) {
                         var m = base54(++this.cname);
                         if (!is_identifier(m)) continue;
-                        for (var i = ext.length; --i >= 0; ) {
+                        for (var i = ext.length; --i >= 0;) {
                             var sym = ext[i];
                             var name = sym.mangled_name || sym.unmangleable(options) && sym.name;
                             if (m == name) continue out;
@@ -16974,38 +17244,38 @@ var requirejs, require, define, xpcUtil;
                         return m;
                     }
                 });
-                AST_Scope.DEFMETHOD("references", function(sym) {
+                AST_Scope.DEFMETHOD("references", function (sym) {
                     if (sym instanceof AST_Symbol) sym = sym.definition();
                     return this.enclosed.indexOf(sym) < 0 ? null : sym;
                 });
-                AST_Symbol.DEFMETHOD("unmangleable", function(options) {
+                AST_Symbol.DEFMETHOD("unmangleable", function (options) {
                     return this.definition().unmangleable(options);
                 });
-                AST_SymbolAccessor.DEFMETHOD("unmangleable", function() {
+                AST_SymbolAccessor.DEFMETHOD("unmangleable", function () {
                     return true;
                 });
-                AST_Label.DEFMETHOD("unmangleable", function() {
+                AST_Label.DEFMETHOD("unmangleable", function () {
                     return false;
                 });
-                AST_Symbol.DEFMETHOD("unreferenced", function() {
+                AST_Symbol.DEFMETHOD("unreferenced", function () {
                     return this.definition().references.length == 0 && !(this.scope.uses_eval || this.scope.uses_with);
                 });
-                AST_Symbol.DEFMETHOD("undeclared", function() {
+                AST_Symbol.DEFMETHOD("undeclared", function () {
                     return this.definition().undeclared;
                 });
-                AST_LabelRef.DEFMETHOD("undeclared", function() {
+                AST_LabelRef.DEFMETHOD("undeclared", function () {
                     return false;
                 });
-                AST_Label.DEFMETHOD("undeclared", function() {
+                AST_Label.DEFMETHOD("undeclared", function () {
                     return false;
                 });
-                AST_Symbol.DEFMETHOD("definition", function() {
+                AST_Symbol.DEFMETHOD("definition", function () {
                     return this.thedef;
                 });
-                AST_Symbol.DEFMETHOD("global", function() {
+                AST_Symbol.DEFMETHOD("global", function () {
                     return this.definition().global;
                 });
-                AST_Toplevel.DEFMETHOD("_default_mangler_options", function(options) {
+                AST_Toplevel.DEFMETHOD("_default_mangler_options", function (options) {
                     return defaults(options, {
                         except: [],
                         eval: false,
@@ -17014,11 +17284,11 @@ var requirejs, require, define, xpcUtil;
                         screw_ie8: false
                     });
                 });
-                AST_Toplevel.DEFMETHOD("mangle_names", function(options) {
+                AST_Toplevel.DEFMETHOD("mangle_names", function (options) {
                     options = this._default_mangler_options(options);
                     var lname = -1;
                     var to_mangle = [];
-                    var tw = new TreeWalker(function(node, descend) {
+                    var tw = new TreeWalker(function (node, descend) {
                         if (node instanceof AST_LabeledStatement) {
                             var save_nesting = lname;
                             descend();
@@ -17027,12 +17297,12 @@ var requirejs, require, define, xpcUtil;
                         }
                         if (node instanceof AST_Scope) {
                             var p = tw.parent(), a = [];
-                            node.variables.each(function(symbol) {
+                            node.variables.each(function (symbol) {
                                 if (options.except.indexOf(symbol.name) < 0) {
                                     a.push(symbol);
                                 }
                             });
-                            if (options.sort) a.sort(function(a, b) {
+                            if (options.sort) a.sort(function (a, b) {
                                 return b.references.length - a.references.length;
                             });
                             to_mangle.push.apply(to_mangle, a);
@@ -17046,13 +17316,13 @@ var requirejs, require, define, xpcUtil;
                         }
                     });
                     this.walk(tw);
-                    to_mangle.forEach(function(def) {
+                    to_mangle.forEach(function (def) {
                         def.mangle(options);
                     });
                 });
-                AST_Toplevel.DEFMETHOD("compute_char_frequency", function(options) {
+                AST_Toplevel.DEFMETHOD("compute_char_frequency", function (options) {
                     options = this._default_mangler_options(options);
-                    var tw = new TreeWalker(function(node) {
+                    var tw = new TreeWalker(function (node) {
                         if (node instanceof AST_Constant) base54.consider(node.print_to_string()); else if (node instanceof AST_Return) base54.consider("return"); else if (node instanceof AST_Throw) base54.consider("throw"); else if (node instanceof AST_Continue) base54.consider("continue"); else if (node instanceof AST_Break) base54.consider("break"); else if (node instanceof AST_Debugger) base54.consider("debugger"); else if (node instanceof AST_Directive) base54.consider(node.value); else if (node instanceof AST_While) base54.consider("while"); else if (node instanceof AST_Do) base54.consider("do while"); else if (node instanceof AST_If) {
                             base54.consider("if");
                             if (node.alternative) base54.consider("else");
@@ -17061,26 +17331,28 @@ var requirejs, require, define, xpcUtil;
                     this.walk(tw);
                     base54.sort();
                 });
-                var base54 = function() {
+                var base54 = function () {
                     var string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_0123456789";
                     var chars, frequency;
+
                     function reset() {
                         frequency = Object.create(null);
-                        chars = string.split("").map(function(ch) {
+                        chars = string.split("").map(function (ch) {
                             return ch.charCodeAt(0);
                         });
-                        chars.forEach(function(ch) {
+                        chars.forEach(function (ch) {
                             frequency[ch] = 0;
                         });
                     }
-                    base54.consider = function(str) {
-                        for (var i = str.length; --i >= 0; ) {
+
+                    base54.consider = function (str) {
+                        for (var i = str.length; --i >= 0;) {
                             var code = str.charCodeAt(i);
                             if (code in frequency) ++frequency[code];
                         }
                     };
-                    base54.sort = function() {
-                        chars = mergeSort(chars, function(a, b) {
+                    base54.sort = function () {
+                        chars = mergeSort(chars, function (a, b) {
                             if (is_digit(a) && !is_digit(b)) return 1;
                             if (is_digit(b) && !is_digit(a)) return -1;
                             return frequency[b] - frequency[a];
@@ -17088,10 +17360,10 @@ var requirejs, require, define, xpcUtil;
                     };
                     base54.reset = reset;
                     reset();
-                    base54.get = function() {
+                    base54.get = function () {
                         return chars;
                     };
-                    base54.freq = function() {
+                    base54.freq = function () {
                         return frequency;
                     };
                     function base54(num) {
@@ -17103,9 +17375,10 @@ var requirejs, require, define, xpcUtil;
                         } while (num > 0);
                         return ret;
                     }
+
                     return base54;
                 }();
-                AST_Toplevel.DEFMETHOD("scope_warnings", function(options) {
+                AST_Toplevel.DEFMETHOD("scope_warnings", function (options) {
                     options = defaults(options, {
                         undeclared: false,
                         unreferenced: true,
@@ -17114,7 +17387,7 @@ var requirejs, require, define, xpcUtil;
                         nested_defuns: true,
                         eval: true
                     });
-                    var tw = new TreeWalker(function(node) {
+                    var tw = new TreeWalker(function (node) {
                         if (options.undeclared && node instanceof AST_SymbolRef && node.undeclared()) {
                             AST_Node.warn("Undeclared symbol: {name} [{file}:{line},{col}]", {
                                 name: node.name,
@@ -17192,8 +17465,9 @@ var requirejs, require, define, xpcUtil;
                     var current_line = 1;
                     var current_pos = 0;
                     var OUTPUT = "";
+
                     function to_ascii(str, identifier) {
-                        return str.replace(/[\u0080-\uffff]/g, function(ch) {
+                        return str.replace(/[\u0080-\uffff]/g, function (ch) {
                             var code = ch.charCodeAt(0).toString(16);
                             if (code.length <= 2 && !identifier) {
                                 while (code.length < 2) code = "0" + code;
@@ -17204,9 +17478,10 @@ var requirejs, require, define, xpcUtil;
                             }
                         });
                     }
+
                     function make_string(str) {
                         var dq = 0, sq = 0;
-                        str = str.replace(/[\\\b\f\n\r\t\x22\x27\u2028\u2029\0]/g, function(s) {
+                        str = str.replace(/[\\\b\f\n\r\t\x22\x27\u2028\u2029\0]/g, function (s) {
                             switch (s) {
                                 case "\\":
                                     return "\\\\";
@@ -17245,29 +17520,37 @@ var requirejs, require, define, xpcUtil;
                         if (options.ascii_only) str = to_ascii(str);
                         if (dq > sq) return "'" + str.replace(/\x27/g, "\\'") + "'"; else return '"' + str.replace(/\x22/g, '\\"') + '"';
                     }
+
                     function encode_string(str) {
                         var ret = make_string(str);
                         if (options.inline_script) ret = ret.replace(/<\x2fscript([>\/\t\n\f\r ])/gi, "<\\/script$1");
                         return ret;
                     }
+
                     function make_name(name) {
                         name = name.toString();
                         if (options.ascii_only) name = to_ascii(name, true);
                         return name;
                     }
+
                     function make_indent(back) {
                         return repeat_string(" ", options.indent_start + indentation - back * options.indent_level);
                     }
+
                     var might_need_space = false;
                     var might_need_semicolon = false;
                     var last = null;
+
                     function last_char() {
                         return last.charAt(last.length - 1);
                     }
+
                     function maybe_newline() {
                         if (options.max_line_len && current_col > options.max_line_len) print("\n");
                     }
+
                     var requireSemicolonChars = makePredicate("( [ + * / - , .");
+
                     function print(str) {
                         str = String(str);
                         var ch = str.charAt(0);
@@ -17318,101 +17601,112 @@ var requirejs, require, define, xpcUtil;
                         last = str;
                         OUTPUT += str;
                     }
-                    var space = options.beautify ? function() {
-                        print(" ");
-                    } : function() {
-                        might_need_space = true;
-                    };
-                    var indent = options.beautify ? function(half) {
-                        if (options.beautify) {
-                            print(make_indent(half ? .5 : 0));
-                        }
-                    } : noop;
-                    var with_indent = options.beautify ? function(col, cont) {
-                        if (col === true) col = next_indent();
-                        var save_indentation = indentation;
-                        indentation = col;
-                        var ret = cont();
-                        indentation = save_indentation;
-                        return ret;
-                    } : function(col, cont) {
-                        return cont();
-                    };
-                    var newline = options.beautify ? function() {
-                        print("\n");
-                    } : noop;
-                    var semicolon = options.beautify ? function() {
-                        print(";");
-                    } : function() {
-                        might_need_semicolon = true;
-                    };
+
+                    var space = options.beautify ? function () {
+                            print(" ");
+                        } : function () {
+                            might_need_space = true;
+                        };
+                    var indent = options.beautify ? function (half) {
+                            if (options.beautify) {
+                                print(make_indent(half ? .5 : 0));
+                            }
+                        } : noop;
+                    var with_indent = options.beautify ? function (col, cont) {
+                            if (col === true) col = next_indent();
+                            var save_indentation = indentation;
+                            indentation = col;
+                            var ret = cont();
+                            indentation = save_indentation;
+                            return ret;
+                        } : function (col, cont) {
+                            return cont();
+                        };
+                    var newline = options.beautify ? function () {
+                            print("\n");
+                        } : noop;
+                    var semicolon = options.beautify ? function () {
+                            print(";");
+                        } : function () {
+                            might_need_semicolon = true;
+                        };
+
                     function force_semicolon() {
                         might_need_semicolon = false;
                         print(";");
                     }
+
                     function next_indent() {
                         return indentation + options.indent_level;
                     }
+
                     function with_block(cont) {
                         var ret;
                         print("{");
                         newline();
-                        with_indent(next_indent(), function() {
+                        with_indent(next_indent(), function () {
                             ret = cont();
                         });
                         indent();
                         print("}");
                         return ret;
                     }
+
                     function with_parens(cont) {
                         print("(");
                         var ret = cont();
                         print(")");
                         return ret;
                     }
+
                     function with_square(cont) {
                         print("[");
                         var ret = cont();
                         print("]");
                         return ret;
                     }
+
                     function comma() {
                         print(",");
                         space();
                     }
+
                     function colon() {
                         print(":");
                         if (options.space_colon) space();
                     }
-                    var add_mapping = options.source_map ? function(token, name) {
-                        try {
-                            if (token) options.source_map.add(token.file || "?", current_line, current_col, token.line, token.col, !name && token.type == "name" ? token.value : name);
-                        } catch (ex) {
-                            AST_Node.warn("Couldn't figure out mapping for {file}:{line},{col} â†’ {cline},{ccol} [{name}]", {
-                                file: token.file,
-                                line: token.line,
-                                col: token.col,
-                                cline: current_line,
-                                ccol: current_col,
-                                name: name || ""
-                            });
-                        }
-                    } : noop;
+
+                    var add_mapping = options.source_map ? function (token, name) {
+                            try {
+                                if (token) options.source_map.add(token.file || "?", current_line, current_col, token.line, token.col, !name && token.type == "name" ? token.value : name);
+                            } catch (ex) {
+                                AST_Node.warn("Couldn't figure out mapping for {file}:{line},{col} â†’ {cline},{ccol} [{name}]", {
+                                    file: token.file,
+                                    line: token.line,
+                                    col: token.col,
+                                    cline: current_line,
+                                    ccol: current_col,
+                                    name: name || ""
+                                });
+                            }
+                        } : noop;
+
                     function get() {
                         return OUTPUT;
                     }
+
                     var stack = [];
                     return {
                         get: get,
                         toString: get,
                         indent: indent,
-                        indentation: function() {
+                        indentation: function () {
                             return indentation;
                         },
-                        current_width: function() {
+                        current_width: function () {
                             return current_col - indentation;
                         },
-                        should_break: function() {
+                        should_break: function () {
                             return options.width && this.current_width() >= options.width;
                         },
                         newline: newline,
@@ -17420,16 +17714,16 @@ var requirejs, require, define, xpcUtil;
                         space: space,
                         comma: comma,
                         colon: colon,
-                        last: function() {
+                        last: function () {
                             return last;
                         },
                         semicolon: semicolon,
                         force_semicolon: force_semicolon,
                         to_ascii: to_ascii,
-                        print_name: function(name) {
+                        print_name: function (name) {
                             print(make_name(name));
                         },
-                        print_string: function(str) {
+                        print_string: function (str) {
                             print(encode_string(str));
                         },
                         next_indent: next_indent,
@@ -17438,43 +17732,45 @@ var requirejs, require, define, xpcUtil;
                         with_parens: with_parens,
                         with_square: with_square,
                         add_mapping: add_mapping,
-                        option: function(opt) {
+                        option: function (opt) {
                             return options[opt];
                         },
-                        line: function() {
+                        line: function () {
                             return current_line;
                         },
-                        col: function() {
+                        col: function () {
                             return current_col;
                         },
-                        pos: function() {
+                        pos: function () {
                             return current_pos;
                         },
-                        push_node: function(node) {
+                        push_node: function (node) {
                             stack.push(node);
                         },
-                        pop_node: function() {
+                        pop_node: function () {
                             return stack.pop();
                         },
-                        stack: function() {
+                        stack: function () {
                             return stack;
                         },
-                        parent: function(n) {
+                        parent: function (n) {
                             return stack[stack.length - 2 - (n || 0)];
                         }
                     };
                 }
-                (function() {
+
+                (function () {
                     function DEFPRINT(nodetype, generator) {
                         nodetype.DEFMETHOD("_codegen", generator);
                     }
-                    AST_Node.DEFMETHOD("print", function(stream, force_parens) {
+
+                    AST_Node.DEFMETHOD("print", function (stream, force_parens) {
                         var self = this, generator = self._codegen;
                         stream.push_node(self);
                         var needs_parens = self.needs_parens(stream);
                         var fc = self instanceof AST_Function && !stream.option("beautify");
                         if (force_parens || needs_parens && !fc) {
-                            stream.with_parens(function() {
+                            stream.with_parens(function () {
                                 self.add_comments(stream);
                                 self.add_source_map(stream);
                                 generator(self, stream);
@@ -17487,12 +17783,12 @@ var requirejs, require, define, xpcUtil;
                         }
                         stream.pop_node();
                     });
-                    AST_Node.DEFMETHOD("print_to_string", function(options) {
+                    AST_Node.DEFMETHOD("print_to_string", function (options) {
                         var s = OutputStream(options);
                         this.print(s);
                         return s.get();
                     });
-                    AST_Node.DEFMETHOD("add_comments", function(output) {
+                    AST_Node.DEFMETHOD("add_comments", function (output) {
                         var c = output.option("comments"), self = this;
                         if (c) {
                             var start = self.start;
@@ -17504,15 +17800,15 @@ var requirejs, require, define, xpcUtil;
                                     self.value.start.comments_before = [];
                                 }
                                 if (c.test) {
-                                    comments = comments.filter(function(comment) {
+                                    comments = comments.filter(function (comment) {
                                         return c.test(comment.value);
                                     });
                                 } else if (typeof c == "function") {
-                                    comments = comments.filter(function(comment) {
+                                    comments = comments.filter(function (comment) {
                                         return c(self, comment);
                                     });
                                 }
-                                comments.forEach(function(c) {
+                                comments.forEach(function (c) {
                                     if (c.type == "comment1") {
                                         output.print("//" + c.value + "\n");
                                         output.indent();
@@ -17532,24 +17828,25 @@ var requirejs, require, define, xpcUtil;
                     function PARENS(nodetype, func) {
                         nodetype.DEFMETHOD("needs_parens", func);
                     }
-                    PARENS(AST_Node, function() {
+
+                    PARENS(AST_Node, function () {
                         return false;
                     });
-                    PARENS(AST_Function, function(output) {
+                    PARENS(AST_Function, function (output) {
                         return first_in_statement(output);
                     });
-                    PARENS(AST_Object, function(output) {
+                    PARENS(AST_Object, function (output) {
                         return first_in_statement(output);
                     });
-                    PARENS(AST_Unary, function(output) {
+                    PARENS(AST_Unary, function (output) {
                         var p = output.parent();
                         return p instanceof AST_PropAccess && p.expression === this;
                     });
-                    PARENS(AST_Seq, function(output) {
+                    PARENS(AST_Seq, function (output) {
                         var p = output.parent();
                         return p instanceof AST_Call || p instanceof AST_Unary || p instanceof AST_Binary || p instanceof AST_VarDef || p instanceof AST_Dot || p instanceof AST_Array || p instanceof AST_ObjectProperty || p instanceof AST_Conditional;
                     });
-                    PARENS(AST_Binary, function(output) {
+                    PARENS(AST_Binary, function (output) {
                         var p = output.parent();
                         if (p instanceof AST_Call && p.expression === this) return true;
                         if (p instanceof AST_Unary) return true;
@@ -17562,11 +17859,11 @@ var requirejs, require, define, xpcUtil;
                             }
                         }
                     });
-                    PARENS(AST_PropAccess, function(output) {
+                    PARENS(AST_PropAccess, function (output) {
                         var p = output.parent();
                         if (p instanceof AST_New && p.expression === this) {
                             try {
-                                this.walk(new TreeWalker(function(node) {
+                                this.walk(new TreeWalker(function (node) {
                                     if (node instanceof AST_Call) throw p;
                                 }));
                             } catch (ex) {
@@ -17575,19 +17872,19 @@ var requirejs, require, define, xpcUtil;
                             }
                         }
                     });
-                    PARENS(AST_Call, function(output) {
+                    PARENS(AST_Call, function (output) {
                         var p = output.parent();
                         return p instanceof AST_New && p.expression === this;
                     });
-                    PARENS(AST_New, function(output) {
+                    PARENS(AST_New, function (output) {
                         var p = output.parent();
                         if (no_constructor_parens(this, output) && (p instanceof AST_PropAccess || p instanceof AST_Call && p.expression === this)) return true;
                     });
-                    PARENS(AST_Number, function(output) {
+                    PARENS(AST_Number, function (output) {
                         var p = output.parent();
                         if (this.getValue() < 0 && p instanceof AST_PropAccess && p.expression === this) return true;
                     });
-                    PARENS(AST_NaN, function(output) {
+                    PARENS(AST_NaN, function (output) {
                         var p = output.parent();
                         if (p instanceof AST_PropAccess && p.expression === this) return true;
                     });
@@ -17599,19 +17896,20 @@ var requirejs, require, define, xpcUtil;
                         if (p instanceof AST_Conditional && p.condition === this) return true;
                         if (p instanceof AST_PropAccess && p.expression === this) return true;
                     }
+
                     PARENS(AST_Assign, assign_and_conditional_paren_rules);
                     PARENS(AST_Conditional, assign_and_conditional_paren_rules);
-                    DEFPRINT(AST_Directive, function(self, output) {
+                    DEFPRINT(AST_Directive, function (self, output) {
                         output.print_string(self.value);
                         output.semicolon();
                     });
-                    DEFPRINT(AST_Debugger, function(self, output) {
+                    DEFPRINT(AST_Debugger, function (self, output) {
                         output.print("debugger");
                         output.semicolon();
                     });
                     function display_body(body, is_toplevel, output) {
                         var last = body.length - 1;
-                        body.forEach(function(stmt, i) {
+                        body.forEach(function (stmt, i) {
                             if (!(stmt instanceof AST_EmptyStatement)) {
                                 output.indent();
                                 stmt.print(output);
@@ -17622,62 +17920,64 @@ var requirejs, require, define, xpcUtil;
                             }
                         });
                     }
-                    AST_StatementWithBody.DEFMETHOD("_do_print_body", function(output) {
+
+                    AST_StatementWithBody.DEFMETHOD("_do_print_body", function (output) {
                         force_statement(this.body, output);
                     });
-                    DEFPRINT(AST_Statement, function(self, output) {
+                    DEFPRINT(AST_Statement, function (self, output) {
                         self.body.print(output);
                         output.semicolon();
                     });
-                    DEFPRINT(AST_Toplevel, function(self, output) {
+                    DEFPRINT(AST_Toplevel, function (self, output) {
                         display_body(self.body, true, output);
                         output.print("");
                     });
-                    DEFPRINT(AST_LabeledStatement, function(self, output) {
+                    DEFPRINT(AST_LabeledStatement, function (self, output) {
                         self.label.print(output);
                         output.colon();
                         self.body.print(output);
                     });
-                    DEFPRINT(AST_SimpleStatement, function(self, output) {
+                    DEFPRINT(AST_SimpleStatement, function (self, output) {
                         self.body.print(output);
                         output.semicolon();
                     });
                     function print_bracketed(body, output) {
-                        if (body.length > 0) output.with_block(function() {
+                        if (body.length > 0) output.with_block(function () {
                             display_body(body, false, output);
                         }); else output.print("{}");
                     }
-                    DEFPRINT(AST_BlockStatement, function(self, output) {
+
+                    DEFPRINT(AST_BlockStatement, function (self, output) {
                         print_bracketed(self.body, output);
                     });
-                    DEFPRINT(AST_EmptyStatement, function(self, output) {
+                    DEFPRINT(AST_EmptyStatement, function (self, output) {
                         output.semicolon();
                     });
-                    DEFPRINT(AST_Do, function(self, output) {
+                    DEFPRINT(AST_Do, function (self, output) {
                         output.print("do");
                         output.space();
                         self._do_print_body(output);
                         output.space();
                         output.print("while");
                         output.space();
-                        output.with_parens(function() {
+                        output.with_parens(function () {
                             self.condition.print(output);
                         });
                         output.semicolon();
                     });
-                    DEFPRINT(AST_While, function(self, output) {
+                    DEFPRINT(AST_While, function (self, output) {
                         output.print("while");
                         output.space();
-                        output.with_parens(function() {
+                        output.with_parens(function () {
                             self.condition.print(output);
                         });
                         output.space();
                         self._do_print_body(output);
                     });
-                    DEFPRINT(AST_For, function(self, output) {
+                    DEFPRINT(AST_For, function (self, output) {
                         output.print("for");
                         output.space();
-                        output.with_parens(function() {
+                        output.with_parens(function () {
                             if (self.init) {
                                 if (self.init instanceof AST_Definitions) {
                                     self.init.print(output);
@@ -17703,10 +18003,10 @@ var requirejs, require, define, xpcUtil;
                         output.space();
                         self._do_print_body(output);
                     });
-                    DEFPRINT(AST_ForIn, function(self, output) {
+                    DEFPRINT(AST_ForIn, function (self, output) {
                         output.print("for");
                         output.space();
-                        output.with_parens(function() {
+                        output.with_parens(function () {
                             self.init.print(output);
                             output.space();
                             output.print("in");
@@ -17716,16 +18016,16 @@ var requirejs, require, define, xpcUtil;
                         output.space();
                         self._do_print_body(output);
                     });
-                    DEFPRINT(AST_With, function(self, output) {
+                    DEFPRINT(AST_With, function (self, output) {
                         output.print("with");
                         output.space();
-                        output.with_parens(function() {
+                        output.with_parens(function () {
                             self.expression.print(output);
                         });
                         output.space();
                         self._do_print_body(output);
                     });
-                    AST_Lambda.DEFMETHOD("_do_print", function(output, nokeyword) {
+                    AST_Lambda.DEFMETHOD("_do_print", function (output, nokeyword) {
                         var self = this;
                         if (!nokeyword) {
                             output.print("function");
@@ -17734,8 +18034,8 @@ var requirejs, require, define, xpcUtil;
                             output.space();
                             self.name.print(output);
                         }
-                        output.with_parens(function() {
-                            self.argnames.forEach(function(arg, i) {
+                        output.with_parens(function () {
+                            self.argnames.forEach(function (arg, i) {
                                 if (i) output.comma();
                                 arg.print(output);
                             });
@@ -17743,10 +18043,10 @@ var requirejs, require, define, xpcUtil;
                         output.space();
                         print_bracketed(self.body, output);
                     });
-                    DEFPRINT(AST_Lambda, function(self, output) {
+                    DEFPRINT(AST_Lambda, function (self, output) {
                         self._do_print(output);
                     });
-                    AST_Exit.DEFMETHOD("_do_print", function(output, kind) {
+                    AST_Exit.DEFMETHOD("_do_print", function (output, kind) {
                         output.print(kind);
                         if (this.value) {
                             output.space();
@@ -17754,13 +18054,13 @@ var requirejs, require, define, xpcUtil;
                         }
                         output.semicolon();
                     });
-                    DEFPRINT(AST_Return, function(self, output) {
+                    DEFPRINT(AST_Return, function (self, output) {
                         self._do_print(output, "return");
                     });
-                    DEFPRINT(AST_Throw, function(self, output) {
+                    DEFPRINT(AST_Throw, function (self, output) {
                         self._do_print(output, "throw");
                     });
-                    AST_LoopControl.DEFMETHOD("_do_print", function(output, kind) {
+                    AST_LoopControl.DEFMETHOD("_do_print", function (output, kind) {
                         output.print(kind);
                         if (this.label) {
                             output.space();
@@ -17768,10 +18068,10 @@ var requirejs, require, define, xpcUtil;
                         }
                         output.semicolon();
                     });
-                    DEFPRINT(AST_Break, function(self, output) {
+                    DEFPRINT(AST_Break, function (self, output) {
                         self._do_print(output, "break");
                     });
-                    DEFPRINT(AST_Continue, function(self, output) {
+                    DEFPRINT(AST_Continue, function (self, output) {
                         self._do_print(output, "continue");
                     });
                     function make_then(self, output) {
@@ -17798,10 +18098,11 @@ var requirejs, require, define, xpcUtil;
                         }
                         force_statement(self.body, output);
                     }
-                    DEFPRINT(AST_If, function(self, output) {
+
+                    DEFPRINT(AST_If, function (self, output) {
                         output.print("if");
                         output.space();
-                        output.with_parens(function() {
+                        output.with_parens(function () {
                             self.condition.print(output);
                         });
                         output.space();
@@ -17815,43 +18116,43 @@ var requirejs, require, define, xpcUtil;
                             self._do_print_body(output);
                         }
                     });
-                    DEFPRINT(AST_Switch, function(self, output) {
+                    DEFPRINT(AST_Switch, function (self, output) {
                         output.print("switch");
                         output.space();
-                        output.with_parens(function() {
+                        output.with_parens(function () {
                             self.expression.print(output);
                         });
                         output.space();
-                        if (self.body.length > 0) output.with_block(function() {
-                            self.body.forEach(function(stmt, i) {
+                        if (self.body.length > 0) output.with_block(function () {
+                            self.body.forEach(function (stmt, i) {
                                 if (i) output.newline();
                                 output.indent(true);
                                 stmt.print(output);
                             });
                         }); else output.print("{}");
                     });
-                    AST_SwitchBranch.DEFMETHOD("_do_print_body", function(output) {
+                    AST_SwitchBranch.DEFMETHOD("_do_print_body", function (output) {
                         if (this.body.length > 0) {
                             output.newline();
-                            this.body.forEach(function(stmt) {
+                            this.body.forEach(function (stmt) {
                                 output.indent();
                                 stmt.print(output);
                                 output.newline();
                             });
                         }
                     });
-                    DEFPRINT(AST_Default, function(self, output) {
+                    DEFPRINT(AST_Default, function (self, output) {
                         output.print("default:");
                         self._do_print_body(output);
                     });
-                    DEFPRINT(AST_Case, function(self, output) {
+                    DEFPRINT(AST_Case, function (self, output) {
                         output.print("case");
                         output.space();
                         self.expression.print(output);
                         output.print(":");
                         self._do_print_body(output);
                     });
-                    DEFPRINT(AST_Try, function(self, output) {
+                    DEFPRINT(AST_Try, function (self, output) {
                         output.print("try");
                         output.space();
                         print_bracketed(self.body, output);
@@ -17864,24 +18165,24 @@ var requirejs, require, define, xpcUtil;
                             self.bfinally.print(output);
                         }
                     });
-                    DEFPRINT(AST_Catch, function(self, output) {
+                    DEFPRINT(AST_Catch, function (self, output) {
                         output.print("catch");
                         output.space();
-                        output.with_parens(function() {
+                        output.with_parens(function () {
                             self.argname.print(output);
                         });
                         output.space();
                         print_bracketed(self.body, output);
                     });
-                    DEFPRINT(AST_Finally, function(self, output) {
+                    DEFPRINT(AST_Finally, function (self, output) {
                         output.print("finally");
                         output.space();
                         print_bracketed(self.body, output);
                     });
-                    AST_Definitions.DEFMETHOD("_do_print", function(output, kind) {
+                    AST_Definitions.DEFMETHOD("_do_print", function (output, kind) {
                         output.print(kind);
                         output.space();
-                        this.definitions.forEach(function(def, i) {
+                        this.definitions.forEach(function (def, i) {
                             if (i) output.comma();
                             def.print(output);
                         });
@@ -17890,15 +18191,15 @@ var requirejs, require, define, xpcUtil;
                         var avoid_semicolon = in_for && p.init === this;
                         if (!avoid_semicolon) output.semicolon();
                     });
-                    DEFPRINT(AST_Var, function(self, output) {
+                    DEFPRINT(AST_Var, function (self, output) {
                         self._do_print(output, "var");
                     });
-                    DEFPRINT(AST_Const, function(self, output) {
+                    DEFPRINT(AST_Const, function (self, output) {
                         self._do_print(output, "const");
                     });
                     function parenthesize_for_noin(node, output, noin) {
                         if (!noin) node.print(output); else try {
-                            node.walk(new TreeWalker(function(node) {
+                            node.walk(new TreeWalker(function (node) {
                                 if (node instanceof AST_Binary && node.operator == "in") throw output;
                             }));
                             node.print(output);
@@ -17907,7 +18208,8 @@ var requirejs, require, define, xpcUtil;
                             node.print(output, true);
                         }
                     }
-                    DEFPRINT(AST_VarDef, function(self, output) {
+
+                    DEFPRINT(AST_VarDef, function (self, output) {
                         self.name.print(output);
                         if (self.value) {
                             output.space();
@@ -17918,22 +18220,22 @@ var requirejs, require, define, xpcUtil;
                             parenthesize_for_noin(self.value, output, noin);
                         }
                     });
-                    DEFPRINT(AST_Call, function(self, output) {
+                    DEFPRINT(AST_Call, function (self, output) {
                         self.expression.print(output);
                         if (self instanceof AST_New && no_constructor_parens(self, output)) return;
-                        output.with_parens(function() {
-                            self.args.forEach(function(expr, i) {
+                        output.with_parens(function () {
+                            self.args.forEach(function (expr, i) {
                                 if (i) output.comma();
                                 expr.print(output);
                             });
                         });
                     });
-                    DEFPRINT(AST_New, function(self, output) {
+                    DEFPRINT(AST_New, function (self, output) {
                         output.print("new");
                         output.space();
                         AST_Call.prototype._codegen(self, output);
                     });
-                    AST_Seq.DEFMETHOD("_do_print", function(output) {
+                    AST_Seq.DEFMETHOD("_do_print", function (output) {
                         this.car.print(output);
                         if (this.cdr) {
                             output.comma();
@@ -17944,10 +18246,10 @@ var requirejs, require, define, xpcUtil;
                             this.cdr.print(output);
                         }
                     });
-                    DEFPRINT(AST_Seq, function(self, output) {
+                    DEFPRINT(AST_Seq, function (self, output) {
                         self._do_print(output);
                     });
-                    DEFPRINT(AST_Dot, function(self, output) {
+                    DEFPRINT(AST_Dot, function (self, output) {
                         var expr = self.expression;
                         expr.print(output);
                         if (expr instanceof AST_Number && expr.getValue() >= 0) {
@@ -17959,30 +18261,30 @@ var requirejs, require, define, xpcUtil;
                         output.add_mapping(self.end);
                         output.print_name(self.property);
                     });
-                    DEFPRINT(AST_Sub, function(self, output) {
+                    DEFPRINT(AST_Sub, function (self, output) {
                         self.expression.print(output);
                         output.print("[");
                         self.property.print(output);
                         output.print("]");
                     });
-                    DEFPRINT(AST_UnaryPrefix, function(self, output) {
+                    DEFPRINT(AST_UnaryPrefix, function (self, output) {
                         var op = self.operator;
                         output.print(op);
                         if (/^[a-z]/i.test(op)) output.space();
                         self.expression.print(output);
                     });
-                    DEFPRINT(AST_UnaryPostfix, function(self, output) {
+                    DEFPRINT(AST_UnaryPostfix, function (self, output) {
                         self.expression.print(output);
                         output.print(self.operator);
                     });
-                    DEFPRINT(AST_Binary, function(self, output) {
+                    DEFPRINT(AST_Binary, function (self, output) {
                         self.left.print(output);
                         output.space();
                         output.print(self.operator);
                         output.space();
                         self.right.print(output);
                     });
-                    DEFPRINT(AST_Conditional, function(self, output) {
+                    DEFPRINT(AST_Conditional, function (self, output) {
                         self.condition.print(output);
                         output.space();
                         output.print("?");
@@ -17992,20 +18294,20 @@ var requirejs, require, define, xpcUtil;
                         output.colon();
                         self.alternative.print(output);
                     });
-                    DEFPRINT(AST_Array, function(self, output) {
-                        output.with_square(function() {
+                    DEFPRINT(AST_Array, function (self, output) {
+                        output.with_square(function () {
                             var a = self.elements, len = a.length;
                             if (len > 0) output.space();
-                            a.forEach(function(exp, i) {
+                            a.forEach(function (exp, i) {
                                 if (i) output.comma();
                                 exp.print(output);
                             });
                             if (len > 0) output.space();
                         });
                     });
-                    DEFPRINT(AST_Object, function(self, output) {
-                        if (self.properties.length > 0) output.with_block(function() {
-                            self.properties.forEach(function(prop, i) {
+                    DEFPRINT(AST_Object, function (self, output) {
+                        if (self.properties.length > 0) output.with_block(function () {
+                            self.properties.forEach(function (prop, i) {
                                 if (i) {
                                     output.print(",");
                                     output.newline();
@@ -18016,7 +18318,7 @@ var requirejs, require, define, xpcUtil;
                             output.newline();
                         }); else output.print("{}");
                     });
-                    DEFPRINT(AST_ObjectKeyVal, function(self, output) {
+                    DEFPRINT(AST_ObjectKeyVal, function (self, output) {
                         var key = self.key;
                         if (output.option("quote_keys")) {
                             output.print_string(key + "");
@@ -18030,41 +18332,41 @@ var requirejs, require, define, xpcUtil;
                         output.colon();
                         self.value.print(output);
                     });
-                    DEFPRINT(AST_ObjectSetter, function(self, output) {
+                    DEFPRINT(AST_ObjectSetter, function (self, output) {
                         output.print("set");
                         self.value._do_print(output, true);
                     });
-                    DEFPRINT(AST_ObjectGetter, function(self, output) {
+                    DEFPRINT(AST_ObjectGetter, function (self, output) {
                         output.print("get");
                         self.value._do_print(output, true);
                     });
-                    DEFPRINT(AST_Symbol, function(self, output) {
+                    DEFPRINT(AST_Symbol, function (self, output) {
                         var def = self.definition();
                         output.print_name(def ? def.mangled_name || def.name : self.name);
                     });
-                    DEFPRINT(AST_Undefined, function(self, output) {
+                    DEFPRINT(AST_Undefined, function (self, output) {
                         output.print("void 0");
                     });
                     DEFPRINT(AST_Hole, noop);
-                    DEFPRINT(AST_Infinity, function(self, output) {
+                    DEFPRINT(AST_Infinity, function (self, output) {
                         output.print("1/0");
                     });
-                    DEFPRINT(AST_NaN, function(self, output) {
+                    DEFPRINT(AST_NaN, function (self, output) {
                         output.print("0/0");
                     });
-                    DEFPRINT(AST_This, function(self, output) {
+                    DEFPRINT(AST_This, function (self, output) {
                         output.print("this");
                     });
-                    DEFPRINT(AST_Constant, function(self, output) {
+                    DEFPRINT(AST_Constant, function (self, output) {
                         output.print(self.getValue());
                     });
-                    DEFPRINT(AST_String, function(self, output) {
+                    DEFPRINT(AST_String, function (self, output) {
                         output.print_string(self.getValue());
                     });
-                    DEFPRINT(AST_Number, function(self, output) {
+                    DEFPRINT(AST_Number, function (self, output) {
                         output.print(make_num(self.getValue()));
                     });
-                    DEFPRINT(AST_RegExp, function(self, output) {
+                    DEFPRINT(AST_RegExp, function (self, output) {
                         var str = self.getValue().toString();
                         if (output.option("ascii_only")) str = output.to_ascii(str);
                         output.print(str);
@@ -18073,7 +18375,7 @@ var requirejs, require, define, xpcUtil;
                     });
                     function force_statement(stat, output) {
                         if (output.option("bracketize")) {
-                            if (!stat || stat instanceof AST_EmptyStatement) output.print("{}"); else if (stat instanceof AST_BlockStatement) stat.print(output); else output.with_block(function() {
+                            if (!stat || stat instanceof AST_EmptyStatement) output.print("{}"); else if (stat instanceof AST_BlockStatement) stat.print(output); else output.with_block(function () {
                                 output.indent();
                                 stat.print(output);
                                 output.newline();
@@ -18082,6 +18384,7 @@ var requirejs, require, define, xpcUtil;
                             if (!stat || stat instanceof AST_EmptyStatement) output.force_semicolon(); else stat.print(output);
                         }
                     }
+
                     function first_in_statement(output) {
                         var a = output.stack(), i = a.length, node = a[--i], p = a[--i];
                         while (i > 0) {
@@ -18094,9 +18397,11 @@ var requirejs, require, define, xpcUtil;
                             }
                         }
                     }
+
                     function no_constructor_parens(self, output) {
                         return self.args.length == 0 && !output.option("beautify");
                     }
+
                     function best_of(a) {
                         var best = a[0], len = best.length;
                         for (var i = 1; i < a.length; ++i) {
@@ -18107,8 +18412,9 @@ var requirejs, require, define, xpcUtil;
                         }
                         return best;
                     }
+
                     function make_num(num) {
-                        var str = num.toString(10), a = [ str.replace(/^0\./, ".").replace("e+", "e") ], m;
+                        var str = num.toString(10), a = [str.replace(/^0\./, ".").replace("e+", "e")], m;
                         if (Math.floor(num) === num) {
                             if (num >= 0) {
                                 a.push("0x" + num.toString(16).toLowerCase(), "0" + num.toString(8));
@@ -18123,26 +18429,30 @@ var requirejs, require, define, xpcUtil;
                         }
                         return best_of(a);
                     }
+
                     function make_block(stmt, output) {
                         if (stmt instanceof AST_BlockStatement) {
                             stmt.print(output);
                             return;
                         }
-                        output.with_block(function() {
+                        output.with_block(function () {
                             output.indent();
                             stmt.print(output);
                             output.newline();
                         });
                     }
+
                     function DEFMAP(nodetype, generator) {
-                        nodetype.DEFMETHOD("add_source_map", function(stream) {
+                        nodetype.DEFMETHOD("add_source_map", function (stream) {
                             generator(this, stream);
                         });
                     }
+
                     DEFMAP(AST_Node, noop);
                     function basic_sourcemap_gen(self, output) {
                         output.add_mapping(self.start);
                     }
+
                     DEFMAP(AST_Directive, basic_sourcemap_gen);
                     DEFMAP(AST_Debugger, basic_sourcemap_gen);
                     DEFMAP(AST_Symbol, basic_sourcemap_gen);
@@ -18160,7 +18470,7 @@ var requirejs, require, define, xpcUtil;
                     DEFMAP(AST_Finally, basic_sourcemap_gen);
                     DEFMAP(AST_Definitions, basic_sourcemap_gen);
                     DEFMAP(AST_Constant, basic_sourcemap_gen);
-                    DEFMAP(AST_ObjectProperty, function(self, output) {
+                    DEFMAP(AST_ObjectProperty, function (self, output) {
                         output.add_mapping(self.start, self.key);
                     });
                 })();
@@ -18192,15 +18502,16 @@ var requirejs, require, define, xpcUtil;
                         global_defs: {}
                     }, true);
                 }
+
                 Compressor.prototype = new TreeTransformer();
                 merge(Compressor.prototype, {
-                    option: function(key) {
+                    option: function (key) {
                         return this.options[key];
                     },
-                    warn: function() {
+                    warn: function () {
                         if (this.options.warnings) AST_Node.warn.apply(AST_Node, arguments);
                     },
-                    before: function(node, descend, in_list) {
+                    before: function (node, descend, in_list) {
                         if (node._squeezed) return node;
                         if (node instanceof AST_Scope) {
                             node.drop_unused(this);
@@ -18218,9 +18529,9 @@ var requirejs, require, define, xpcUtil;
                         return node;
                     }
                 });
-                (function() {
+                (function () {
                     function OPT(node, optimizer) {
-                        node.DEFMETHOD("optimize", function(compressor) {
+                        node.DEFMETHOD("optimize", function (compressor) {
                             var self = this;
                             if (self._optimized) return self;
                             var opt = optimizer(self, compressor);
@@ -18229,10 +18540,11 @@ var requirejs, require, define, xpcUtil;
                             return opt.transform(compressor);
                         });
                     }
-                    OPT(AST_Node, function(self, compressor) {
+
+                    OPT(AST_Node, function (self, compressor) {
                         return self;
                     });
-                    AST_Node.DEFMETHOD("equivalent_to", function(node) {
+                    AST_Node.DEFMETHOD("equivalent_to", function (node) {
                         return this.print_to_string() == node.print_to_string();
                     });
                     function make_node(ctor, orig, props) {
@@ -18243,6 +18555,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return new ctor(props);
                     }
+
                     function make_node_from_constant(compressor, val, orig) {
                         if (val instanceof AST_Node) return val.transform(compressor);
                         switch (typeof val) {
@@ -18274,19 +18587,22 @@ var requirejs, require, define, xpcUtil;
                                 }));
                         }
                     }
+
                     function as_statement_array(thing) {
                         if (thing === null) return [];
                         if (thing instanceof AST_BlockStatement) return thing.body;
                         if (thing instanceof AST_EmptyStatement) return [];
-                        if (thing instanceof AST_Statement) return [ thing ];
+                        if (thing instanceof AST_Statement) return [thing];
                         throw new Error("Can't convert thing to statement array");
                     }
+
                     function is_empty(thing) {
                         if (thing === null) return true;
                         if (thing instanceof AST_EmptyStatement) return true;
                         if (thing instanceof AST_BlockStatement) return thing.body.length == 0;
                         return false;
                     }
+
                     function loop_body(x) {
                         if (x instanceof AST_Switch) return x;
                         if (x instanceof AST_For || x instanceof AST_ForIn || x instanceof AST_DWLoop) {
@@ -18294,6 +18610,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return x;
                     }
+
                     function tighten_body(statements, compressor) {
                         var CHANGED;
                         do {
@@ -18315,7 +18632,7 @@ var requirejs, require, define, xpcUtil;
                         return statements;
                         function eliminate_spurious_blocks(statements) {
                             var seen_dirs = [];
-                            return statements.reduce(function(a, stat) {
+                            return statements.reduce(function (a, stat) {
                                 if (stat instanceof AST_BlockStatement) {
                                     CHANGED = true;
                                     a.push.apply(a, eliminate_spurious_blocks(stat.body));
@@ -18334,11 +18651,12 @@ var requirejs, require, define, xpcUtil;
                                 return a;
                             }, []);
                         }
+
                         function handle_if_return(statements, compressor) {
                             var self = compressor.self();
                             var in_lambda = self instanceof AST_Lambda;
                             var ret = [];
-                            loop: for (var i = statements.length; --i >= 0; ) {
+                            loop: for (var i = statements.length; --i >= 0;) {
                                 var stat = statements[i];
                                 switch (true) {
                                     case in_lambda && stat instanceof AST_Return && !stat.value && ret.length == 0:
@@ -18366,8 +18684,8 @@ var requirejs, require, define, xpcUtil;
                                                 CHANGED = true;
                                                 stat = stat.clone();
                                                 stat.alternative = ret[0] || make_node(AST_Return, stat, {
-                                                    value: make_node(AST_Undefined, stat)
-                                                });
+                                                        value: make_node(AST_Undefined, stat)
+                                                    });
                                                 ret[0] = stat.transform(compressor);
                                                 continue loop;
                                             }
@@ -18379,7 +18697,7 @@ var requirejs, require, define, xpcUtil;
                                                     body: as_statement_array(stat.alternative).concat(ret)
                                                 });
                                                 stat.alternative = null;
-                                                ret = [ stat.transform(compressor) ];
+                                                ret = [stat.transform(compressor)];
                                                 continue loop;
                                             }
                                             if (ret.length == 1 && in_lambda && ret[0] instanceof AST_SimpleStatement && (!stat.alternative || stat.alternative instanceof AST_SimpleStatement)) {
@@ -18408,7 +18726,7 @@ var requirejs, require, define, xpcUtil;
                                             stat.alternative = make_node(AST_BlockStatement, stat, {
                                                 body: body
                                             });
-                                            ret = [ stat.transform(compressor) ];
+                                            ret = [stat.transform(compressor)];
                                             continue loop;
                                         }
                                         var ab = aborts(stat.alternative);
@@ -18425,7 +18743,7 @@ var requirejs, require, define, xpcUtil;
                                             stat.alternative = make_node(AST_BlockStatement, stat.alternative, {
                                                 body: as_statement_array(stat.alternative).slice(0, -1)
                                             });
-                                            ret = [ stat.transform(compressor) ];
+                                            ret = [stat.transform(compressor)];
                                             continue loop;
                                         }
                                         ret.unshift(stat);
@@ -18438,11 +18756,12 @@ var requirejs, require, define, xpcUtil;
                             }
                             return ret;
                         }
+
                         function eliminate_dead_code(statements, compressor) {
                             var has_quit = false;
                             var orig = statements.length;
                             var self = compressor.self();
-                            statements = statements.reduce(function(a, stat) {
+                            statements = statements.reduce(function (a, stat) {
                                 if (has_quit) {
                                     extract_declarations_from_unreachable_code(compressor, stat, a);
                                 } else {
@@ -18465,9 +18784,11 @@ var requirejs, require, define, xpcUtil;
                             CHANGED = statements.length != orig;
                             return statements;
                         }
+
                         function sequencesize(statements, compressor) {
                             if (statements.length < 2) return statements;
                             var seq = [], ret = [];
+
                             function push_seq() {
                                 seq = AST_Seq.from_array(seq);
                                 if (seq) ret.push(make_node(AST_SimpleStatement, seq, {
@@ -18475,7 +18796,8 @@ var requirejs, require, define, xpcUtil;
                                 }));
                                 seq = [];
                             }
-                            statements.forEach(function(stat) {
+
+                            statements.forEach(function (stat) {
                                 if (stat instanceof AST_SimpleStatement) seq.push(stat.body); else push_seq(), ret.push(stat);
                             });
                             push_seq();
@@ -18483,6 +18805,7 @@ var requirejs, require, define, xpcUtil;
                             CHANGED = ret.length != statements.length;
                             return ret;
                         }
+
                         function sequencesize_2(statements, compressor) {
                             function cons_seq(right) {
                                 ret.pop();
@@ -18494,13 +18817,14 @@ var requirejs, require, define, xpcUtil;
                                 }
                                 return left.transform(compressor);
                             }
+
                             var ret = [], prev = null;
-                            statements.forEach(function(stat) {
+                            statements.forEach(function (stat) {
                                 if (prev) {
                                     if (stat instanceof AST_For) {
                                         var opera = {};
                                         try {
-                                            prev.body.walk(new TreeWalker(function(node) {
+                                            prev.body.walk(new TreeWalker(function (node) {
                                                 if (node instanceof AST_Binary && node.operator == "in") throw opera;
                                             }));
                                             if (stat.init && !(stat.init instanceof AST_Definitions)) {
@@ -18529,9 +18853,10 @@ var requirejs, require, define, xpcUtil;
                             });
                             return ret;
                         }
+
                         function join_consecutive_vars(statements, compressor) {
                             var prev = null;
-                            return statements.reduce(function(a, stat) {
+                            return statements.reduce(function (a, stat) {
                                 if (stat instanceof AST_Definitions && prev && prev.TYPE == stat.TYPE) {
                                     prev.definitions = prev.definitions.concat(stat.definitions);
                                     CHANGED = true;
@@ -18553,9 +18878,10 @@ var requirejs, require, define, xpcUtil;
                             }, []);
                         }
                     }
+
                     function extract_declarations_from_unreachable_code(compressor, stat, target) {
                         compressor.warn("Dropping unreachable code [{file}:{line},{col}]", stat.start);
-                        stat.walk(new TreeWalker(function(node) {
+                        stat.walk(new TreeWalker(function (node) {
                             if (node instanceof AST_Definitions) {
                                 compressor.warn("Declarations in unreachable code! [{file}:{line},{col}]", node.start);
                                 node.remove_initializers();
@@ -18571,101 +18897,105 @@ var requirejs, require, define, xpcUtil;
                             }
                         }));
                     }
-                    (function(def) {
-                        var unary_bool = [ "!", "delete" ];
-                        var binary_bool = [ "in", "instanceof", "==", "!=", "===", "!==", "<", "<=", ">=", ">" ];
-                        def(AST_Node, function() {
+
+                    (function (def) {
+                        var unary_bool = ["!", "delete"];
+                        var binary_bool = ["in", "instanceof", "==", "!=", "===", "!==", "<", "<=", ">=", ">"];
+                        def(AST_Node, function () {
                             return false;
                         });
-                        def(AST_UnaryPrefix, function() {
+                        def(AST_UnaryPrefix, function () {
                             return member(this.operator, unary_bool);
                         });
-                        def(AST_Binary, function() {
+                        def(AST_Binary, function () {
                             return member(this.operator, binary_bool) || (this.operator == "&&" || this.operator == "||") && this.left.is_boolean() && this.right.is_boolean();
                         });
-                        def(AST_Conditional, function() {
+                        def(AST_Conditional, function () {
                             return this.consequent.is_boolean() && this.alternative.is_boolean();
                         });
-                        def(AST_Assign, function() {
+                        def(AST_Assign, function () {
                             return this.operator == "=" && this.right.is_boolean();
                         });
-                        def(AST_Seq, function() {
+                        def(AST_Seq, function () {
                             return this.cdr.is_boolean();
                         });
-                        def(AST_True, function() {
+                        def(AST_True, function () {
                             return true;
                         });
-                        def(AST_False, function() {
+                        def(AST_False, function () {
                             return true;
                         });
-                    })(function(node, func) {
+                    })(function (node, func) {
                         node.DEFMETHOD("is_boolean", func);
                     });
-                    (function(def) {
-                        def(AST_Node, function() {
+                    (function (def) {
+                        def(AST_Node, function () {
                             return false;
                         });
-                        def(AST_String, function() {
+                        def(AST_String, function () {
                             return true;
                         });
-                        def(AST_UnaryPrefix, function() {
+                        def(AST_UnaryPrefix, function () {
                             return this.operator == "typeof";
                         });
-                        def(AST_Binary, function(compressor) {
+                        def(AST_Binary, function (compressor) {
                             return this.operator == "+" && (this.left.is_string(compressor) || this.right.is_string(compressor));
                         });
-                        def(AST_Assign, function(compressor) {
+                        def(AST_Assign, function (compressor) {
                             return (this.operator == "=" || this.operator == "+=") && this.right.is_string(compressor);
                         });
-                        def(AST_Seq, function(compressor) {
+                        def(AST_Seq, function (compressor) {
                             return this.cdr.is_string(compressor);
                         });
-                        def(AST_Conditional, function(compressor) {
+                        def(AST_Conditional, function (compressor) {
                             return this.consequent.is_string(compressor) && this.alternative.is_string(compressor);
                         });
-                        def(AST_Call, function(compressor) {
+                        def(AST_Call, function (compressor) {
                             return compressor.option("unsafe") && this.expression instanceof AST_SymbolRef && this.expression.name == "String" && this.expression.undeclared();
                         });
-                    })(function(node, func) {
+                    })(function (node, func) {
                         node.DEFMETHOD("is_string", func);
                     });
                     function best_of(ast1, ast2) {
                         return ast1.print_to_string().length > ast2.print_to_string().length ? ast2 : ast1;
                     }
-                    (function(def) {
-                        AST_Node.DEFMETHOD("evaluate", function(compressor) {
-                            if (!compressor.option("evaluate")) return [ this ];
+
+                    (function (def) {
+                        AST_Node.DEFMETHOD("evaluate", function (compressor) {
+                            if (!compressor.option("evaluate")) return [this];
                             try {
                                 var val = this._eval(), ast = make_node_from_constant(compressor, val, this);
-                                return [ best_of(ast, this), val ];
+                                return [best_of(ast, this), val];
                             } catch (ex) {
                                 if (ex !== def) throw ex;
-                                return [ this ];
+                                return [this];
                             }
                         });
-                        def(AST_Statement, function() {
+                        def(AST_Statement, function () {
                             throw new Error(string_template("Cannot evaluate a statement [{file}:{line},{col}]", this.start));
                         });
-                        def(AST_Function, function() {
-                            return [ this ];
+                        def(AST_Function, function () {
+                            return [this];
                         });
                         function ev(node) {
                             return node._eval();
                         }
-                        def(AST_Node, function() {
+
+                        def(AST_Node, function () {
                             throw def;
                         });
-                        def(AST_Constant, function() {
+                        def(AST_Constant, function () {
                             return this.getValue();
                         });
-                        def(AST_UnaryPrefix, function() {
+                        def(AST_UnaryPrefix, function () {
                             var e = this.expression;
                             switch (this.operator) {
                                 case "!":
                                     return !ev(e);
 
                                 case "typeof":
-                                    if (e instanceof AST_Function) return typeof function() {};
+                                    if (e instanceof AST_Function) return typeof function () {
+                                    };
                                     e = ev(e);
                                     if (e instanceof RegExp) throw def;
                                     return typeof e;
@@ -18686,7 +19016,7 @@ var requirejs, require, define, xpcUtil;
                             }
                             throw def;
                         });
-                        def(AST_Binary, function() {
+                        def(AST_Binary, function () {
                             var left = this.left, right = this.right;
                             switch (this.operator) {
                                 case "&&":
@@ -18760,49 +19090,50 @@ var requirejs, require, define, xpcUtil;
                             }
                             throw def;
                         });
-                        def(AST_Conditional, function() {
+                        def(AST_Conditional, function () {
                             return ev(this.condition) ? ev(this.consequent) : ev(this.alternative);
                         });
-                        def(AST_SymbolRef, function() {
+                        def(AST_SymbolRef, function () {
                             var d = this.definition();
                             if (d && d.constant && d.init) return ev(d.init);
                             throw def;
                         });
-                    })(function(node, func) {
+                    })(function (node, func) {
                         node.DEFMETHOD("_eval", func);
                     });
-                    (function(def) {
+                    (function (def) {
                         function basic_negation(exp) {
                             return make_node(AST_UnaryPrefix, exp, {
                                 operator: "!",
                                 expression: exp
                             });
                         }
-                        def(AST_Node, function() {
+
+                        def(AST_Node, function () {
                             return basic_negation(this);
                         });
-                        def(AST_Statement, function() {
+                        def(AST_Statement, function () {
                             throw new Error("Cannot negate a statement");
                         });
-                        def(AST_Function, function() {
+                        def(AST_Function, function () {
                             return basic_negation(this);
                         });
-                        def(AST_UnaryPrefix, function() {
+                        def(AST_UnaryPrefix, function () {
                             if (this.operator == "!") return this.expression;
                             return basic_negation(this);
                         });
-                        def(AST_Seq, function(compressor) {
+                        def(AST_Seq, function (compressor) {
                             var self = this.clone();
                             self.cdr = self.cdr.negate(compressor);
                             return self;
                         });
-                        def(AST_Conditional, function(compressor) {
+                        def(AST_Conditional, function (compressor) {
                             var self = this.clone();
                             self.consequent = self.consequent.negate(compressor);
                             self.alternative = self.alternative.negate(compressor);
                             return best_of(basic_negation(this), self);
                         });
-                        def(AST_Binary, function(compressor) {
+                        def(AST_Binary, function (compressor) {
                             var self = this.clone(), op = this.operator;
                             if (compressor.option("unsafe_comps")) {
                                 switch (op) {
@@ -18854,117 +19185,119 @@ var requirejs, require, define, xpcUtil;
                             }
                             return basic_negation(this);
                         });
-                    })(function(node, func) {
-                        node.DEFMETHOD("negate", function(compressor) {
+                    })(function (node, func) {
+                        node.DEFMETHOD("negate", function (compressor) {
                             return func.call(this, compressor);
                         });
                     });
-                    (function(def) {
-                        def(AST_Node, function() {
+                    (function (def) {
+                        def(AST_Node, function () {
                             return true;
                         });
-                        def(AST_EmptyStatement, function() {
+                        def(AST_EmptyStatement, function () {
                             return false;
                         });
-                        def(AST_Constant, function() {
+                        def(AST_Constant, function () {
                             return false;
                         });
-                        def(AST_This, function() {
+                        def(AST_This, function () {
                             return false;
                         });
-                        def(AST_Block, function() {
-                            for (var i = this.body.length; --i >= 0; ) {
+                        def(AST_Block, function () {
+                            for (var i = this.body.length; --i >= 0;) {
                                 if (this.body[i].has_side_effects()) return true;
                             }
                             return false;
                         });
-                        def(AST_SimpleStatement, function() {
+                        def(AST_SimpleStatement, function () {
                             return this.body.has_side_effects();
                         });
-                        def(AST_Defun, function() {
+                        def(AST_Defun, function () {
                             return true;
                         });
-                        def(AST_Function, function() {
+                        def(AST_Function, function () {
                             return false;
                         });
-                        def(AST_Binary, function() {
+                        def(AST_Binary, function () {
                             return this.left.has_side_effects() || this.right.has_side_effects();
                         });
-                        def(AST_Assign, function() {
+                        def(AST_Assign, function () {
                             return true;
                         });
-                        def(AST_Conditional, function() {
+                        def(AST_Conditional, function () {
                             return this.condition.has_side_effects() || this.consequent.has_side_effects() || this.alternative.has_side_effects();
                         });
-                        def(AST_Unary, function() {
+                        def(AST_Unary, function () {
                             return this.operator == "delete" || this.operator == "++" || this.operator == "--" || this.expression.has_side_effects();
                         });
-                        def(AST_SymbolRef, function() {
+                        def(AST_SymbolRef, function () {
                             return false;
                         });
-                        def(AST_Object, function() {
-                            for (var i = this.properties.length; --i >= 0; ) if (this.properties[i].has_side_effects()) return true;
+                        def(AST_Object, function () {
+                            for (var i = this.properties.length; --i >= 0;) if (this.properties[i].has_side_effects()) return true;
                             return false;
                         });
-                        def(AST_ObjectProperty, function() {
+                        def(AST_ObjectProperty, function () {
                             return this.value.has_side_effects();
                         });
-                        def(AST_Array, function() {
-                            for (var i = this.elements.length; --i >= 0; ) if (this.elements[i].has_side_effects()) return true;
+                        def(AST_Array, function () {
+                            for (var i = this.elements.length; --i >= 0;) if (this.elements[i].has_side_effects()) return true;
                             return false;
                         });
-                        def(AST_PropAccess, function() {
+                        def(AST_PropAccess, function () {
                             return true;
                         });
-                        def(AST_Seq, function() {
+                        def(AST_Seq, function () {
                             return this.car.has_side_effects() || this.cdr.has_side_effects();
                         });
-                    })(function(node, func) {
+                    })(function (node, func) {
                         node.DEFMETHOD("has_side_effects", func);
                     });
                     function aborts(thing) {
                         return thing && thing.aborts();
                     }
-                    (function(def) {
-                        def(AST_Statement, function() {
+
+                    (function (def) {
+                        def(AST_Statement, function () {
                             return null;
                         });
-                        def(AST_Jump, function() {
+                        def(AST_Jump, function () {
                             return this;
                         });
                         function block_aborts() {
                             var n = this.body.length;
                             return n > 0 && aborts(this.body[n - 1]);
                         }
+
                         def(AST_BlockStatement, block_aborts);
                         def(AST_SwitchBranch, block_aborts);
-                        def(AST_If, function() {
+                        def(AST_If, function () {
                             return this.alternative && aborts(this.body) && aborts(this.alternative);
                         });
-                    })(function(node, func) {
+                    })(function (node, func) {
                         node.DEFMETHOD("aborts", func);
                     });
-                    OPT(AST_Directive, function(self, compressor) {
+                    OPT(AST_Directive, function (self, compressor) {
                         if (self.scope.has_directive(self.value) !== self.scope) {
                             return make_node(AST_EmptyStatement, self);
                         }
                         return self;
                     });
-                    OPT(AST_Debugger, function(self, compressor) {
+                    OPT(AST_Debugger, function (self, compressor) {
                         if (compressor.option("drop_debugger")) return make_node(AST_EmptyStatement, self);
                         return self;
                     });
-                    OPT(AST_LabeledStatement, function(self, compressor) {
+                    OPT(AST_LabeledStatement, function (self, compressor) {
                         if (self.body instanceof AST_Break && compressor.loopcontrol_target(self.body.label) === self.body) {
                             return make_node(AST_EmptyStatement, self);
                         }
                         return self.label.references.length == 0 ? self.body : self;
                     });
-                    OPT(AST_Block, function(self, compressor) {
+                    OPT(AST_Block, function (self, compressor) {
                         self.body = tighten_body(self.body, compressor);
                         return self;
                     });
-                    OPT(AST_BlockStatement, function(self, compressor) {
+                    OPT(AST_BlockStatement, function (self, compressor) {
                         self.body = tighten_body(self.body, compressor);
                         switch (self.body.length) {
                             case 1:
@@ -18975,20 +19308,20 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    AST_Scope.DEFMETHOD("drop_unused", function(compressor) {
+                    AST_Scope.DEFMETHOD("drop_unused", function (compressor) {
                         var self = this;
                         if (compressor.option("unused") && !(self instanceof AST_Toplevel) && !self.uses_eval) {
                             var in_use = [];
                             var initializations = new Dictionary();
                             var scope = this;
-                            var tw = new TreeWalker(function(node, descend) {
+                            var tw = new TreeWalker(function (node, descend) {
                                 if (node !== self) {
                                     if (node instanceof AST_Defun) {
                                         initializations.add(node.name.name, node);
                                         return true;
                                     }
                                     if (node instanceof AST_Definitions && scope === self) {
-                                        node.definitions.forEach(function(def) {
+                                        node.definitions.forEach(function (def) {
                                             if (def.value) {
                                                 initializations.add(def.name.name, def.value);
                                                 if (def.value.has_side_effects()) {
@@ -19013,10 +19346,10 @@ var requirejs, require, define, xpcUtil;
                             });
                             self.walk(tw);
                             for (var i = 0; i < in_use.length; ++i) {
-                                in_use[i].orig.forEach(function(decl) {
+                                in_use[i].orig.forEach(function (decl) {
                                     var init = initializations.get(decl.name);
-                                    if (init) init.forEach(function(init) {
-                                        var tw = new TreeWalker(function(node) {
+                                    if (init) init.forEach(function (init) {
+                                        var tw = new TreeWalker(function (node) {
                                             if (node instanceof AST_SymbolRef) {
                                                 push_uniq(in_use, node.definition());
                                             }
@@ -19027,7 +19360,7 @@ var requirejs, require, define, xpcUtil;
                             }
                             var tt = new TreeTransformer(function before(node, descend, in_list) {
                                 if (node instanceof AST_Lambda) {
-                                    for (var a = node.argnames, i = a.length; --i >= 0; ) {
+                                    for (var a = node.argnames, i = a.length; --i >= 0;) {
                                         var sym = a[i];
                                         if (sym.unreferenced()) {
                                             a.pop();
@@ -19053,7 +19386,7 @@ var requirejs, require, define, xpcUtil;
                                     return node;
                                 }
                                 if (node instanceof AST_Definitions && !(tt.parent() instanceof AST_ForIn)) {
-                                    var def = node.definitions.filter(function(def) {
+                                    var def = node.definitions.filter(function (def) {
                                         if (member(def.name.definition(), in_use)) return true;
                                         var w = {
                                             name: def.name.name,
@@ -19069,13 +19402,13 @@ var requirejs, require, define, xpcUtil;
                                         compressor.warn("Dropping unused variable {name} [{file}:{line},{col}]", w);
                                         return false;
                                     });
-                                    def = mergeSort(def, function(a, b) {
+                                    def = mergeSort(def, function (a, b) {
                                         if (!a.value && b.value) return -1;
                                         if (!b.value && a.value) return 1;
                                         return 0;
                                     });
                                     var side_effects = [];
-                                    for (var i = 0; i < def.length; ) {
+                                    for (var i = 0; i < def.length;) {
                                         var x = def[i];
                                         if (x._unused_side_effects) {
                                             side_effects.push(x.value);
@@ -19091,9 +19424,9 @@ var requirejs, require, define, xpcUtil;
                                     }
                                     if (side_effects.length > 0) {
                                         side_effects = make_node(AST_BlockStatement, node, {
-                                            body: [ make_node(AST_SimpleStatement, node, {
+                                            body: [make_node(AST_SimpleStatement, node, {
                                                 body: AST_Seq.from_array(side_effects)
-                                            }) ]
+                                            })]
                                         });
                                     } else {
                                         side_effects = null;
@@ -19117,15 +19450,15 @@ var requirejs, require, define, xpcUtil;
                                     node.init = node.init.body.slice(-1)[0].body;
                                     body.push(node);
                                     return in_list ? MAP.splice(body) : make_node(AST_BlockStatement, node, {
-                                        body: body
-                                    });
+                                            body: body
+                                        });
                                 }
                                 if (node instanceof AST_Scope && node !== self) return node;
                             });
                             self.transform(tt);
                         }
                     });
-                    AST_Scope.DEFMETHOD("hoist_declarations", function(compressor) {
+                    AST_Scope.DEFMETHOD("hoist_declarations", function (compressor) {
                         var hoist_funs = compressor.option("hoist_funs");
                         var hoist_vars = compressor.option("hoist_vars");
                         var self = this;
@@ -19133,7 +19466,7 @@ var requirejs, require, define, xpcUtil;
                             var dirs = [];
                             var hoisted = [];
                             var vars = new Dictionary(), vars_found = 0, var_decl = 0;
-                            self.walk(new TreeWalker(function(node) {
+                            self.walk(new TreeWalker(function (node) {
                                 if (node instanceof AST_Scope && node !== self) return true;
                                 if (node instanceof AST_Var) {
                                     ++var_decl;
@@ -19152,7 +19485,7 @@ var requirejs, require, define, xpcUtil;
                                         return make_node(AST_EmptyStatement, node);
                                     }
                                     if (node instanceof AST_Var && hoist_vars) {
-                                        node.definitions.forEach(function(def) {
+                                        node.definitions.forEach(function (def) {
                                             vars.set(def.name.name, def);
                                             ++vars_found;
                                         });
@@ -19176,10 +19509,10 @@ var requirejs, require, define, xpcUtil;
                             self = self.transform(tt);
                             if (vars_found > 0) {
                                 var defs = [];
-                                vars.each(function(def, name) {
-                                    if (self instanceof AST_Lambda && find_if(function(x) {
-                                        return x.name == def.name.name;
-                                    }, self.argnames)) {
+                                vars.each(function (def, name) {
+                                    if (self instanceof AST_Lambda && find_if(function (x) {
+                                            return x.name == def.name.name;
+                                        }, self.argnames)) {
                                         vars.del(name);
                                     } else {
                                         def = def.clone();
@@ -19189,7 +19522,7 @@ var requirejs, require, define, xpcUtil;
                                     }
                                 });
                                 if (defs.length > 0) {
-                                    for (var i = 0; i < self.body.length; ) {
+                                    for (var i = 0; i < self.body.length;) {
                                         if (self.body[i] instanceof AST_SimpleStatement) {
                                             var expr = self.body[i].body, sym, assign;
                                             if (expr instanceof AST_Assign && expr.operator == "=" && (sym = expr.left) instanceof AST_Symbol && vars.has(sym.name)) {
@@ -19216,7 +19549,7 @@ var requirejs, require, define, xpcUtil;
                                             continue;
                                         }
                                         if (self.body[i] instanceof AST_BlockStatement) {
-                                            var tmp = [ i, 1 ].concat(self.body[i].body);
+                                            var tmp = [i, 1].concat(self.body[i].body);
                                             self.body.splice.apply(self.body, tmp);
                                             continue;
                                         }
@@ -19232,7 +19565,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_SimpleStatement, function(self, compressor) {
+                    OPT(AST_SimpleStatement, function (self, compressor) {
                         if (compressor.option("side_effects")) {
                             if (!self.body.has_side_effects()) {
                                 compressor.warn("Dropping side-effect-free statement [{file}:{line},{col}]", self.start);
@@ -19241,7 +19574,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_DWLoop, function(self, compressor) {
+                    OPT(AST_DWLoop, function (self, compressor) {
                         var cond = self.condition.evaluate(compressor);
                         self.condition = cond[0];
                         if (!compressor.option("loops")) return self;
@@ -19276,6 +19609,7 @@ var requirejs, require, define, xpcUtil;
                             }
                             if_break_in_loop(self, compressor);
                         }
+
                         var first = self.body instanceof AST_BlockStatement ? self.body.body[0] : self.body;
                         if (first instanceof AST_If) {
                             if (first.body instanceof AST_Break && compressor.loopcontrol_target(first.body.label) === self) {
@@ -19303,7 +19637,8 @@ var requirejs, require, define, xpcUtil;
                             }
                         }
                     }
-                    OPT(AST_While, function(self, compressor) {
+
+                    OPT(AST_While, function (self, compressor) {
                         if (!compressor.option("loops")) return self;
                         self = AST_DWLoop.prototype.optimize.call(self, compressor);
                         if (self instanceof AST_While) {
@@ -19312,7 +19647,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_For, function(self, compressor) {
+                    OPT(AST_For, function (self, compressor) {
                         var cond = self.condition;
                         if (cond) {
                             cond = cond.evaluate(compressor);
@@ -19340,7 +19675,7 @@ var requirejs, require, define, xpcUtil;
                         if_break_in_loop(self, compressor);
                         return self;
                     });
-                    OPT(AST_If, function(self, compressor) {
+                    OPT(AST_If, function (self, compressor) {
                         if (!compressor.option("conditionals")) return self;
                         var cond = self.condition.evaluate(compressor);
                         self.condition = cond[0];
@@ -19440,7 +19775,7 @@ var requirejs, require, define, xpcUtil;
                                 var alt = self.alternative;
                                 self.alternative = null;
                                 return make_node(AST_BlockStatement, self, {
-                                    body: [ self, alt ]
+                                    body: [self, alt]
                                 }).transform(compressor);
                             }
                         }
@@ -19450,18 +19785,18 @@ var requirejs, require, define, xpcUtil;
                             self.condition = negated_is_best ? negated : self.condition.negate(compressor);
                             self.alternative = null;
                             return make_node(AST_BlockStatement, self, {
-                                body: [ self, body ]
+                                body: [self, body]
                             }).transform(compressor);
                         }
                         return self;
                     });
-                    OPT(AST_Switch, function(self, compressor) {
+                    OPT(AST_Switch, function (self, compressor) {
                         if (self.body.length == 0 && compressor.option("conditionals")) {
                             return make_node(AST_SimpleStatement, self, {
                                 body: self.expression
                             }).transform(compressor);
                         }
-                        for (;;) {
+                        for (; ;) {
                             var last_branch = self.body[self.body.length - 1];
                             if (last_branch) {
                                 var stat = last_branch.body[last_branch.body.length - 1];
@@ -19483,17 +19818,17 @@ var requirejs, require, define, xpcUtil;
                             var started = false;
                             var stopped = false;
                             var ruined = false;
-                            var tt = new TreeTransformer(function(node, descend, in_list) {
+                            var tt = new TreeTransformer(function (node, descend, in_list) {
                                 if (node instanceof AST_Lambda || node instanceof AST_SimpleStatement) {
                                     return node;
                                 } else if (node instanceof AST_Switch && node === self) {
                                     node = node.clone();
                                     descend(node, this);
                                     return ruined ? node : make_node(AST_BlockStatement, node, {
-                                        body: node.body.reduce(function(a, branch) {
-                                            return a.concat(branch.body);
-                                        }, [])
-                                    }).transform(compressor);
+                                            body: node.body.reduce(function (a, branch) {
+                                                return a.concat(branch.body);
+                                            }, [])
+                                        }).transform(compressor);
                                 } else if (node instanceof AST_If || node instanceof AST_Try) {
                                     var save = in_if;
                                     in_if = !in_block;
@@ -19540,21 +19875,21 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_Case, function(self, compressor) {
+                    OPT(AST_Case, function (self, compressor) {
                         self.body = tighten_body(self.body, compressor);
                         return self;
                     });
-                    OPT(AST_Try, function(self, compressor) {
+                    OPT(AST_Try, function (self, compressor) {
                         self.body = tighten_body(self.body, compressor);
                         return self;
                     });
-                    AST_Definitions.DEFMETHOD("remove_initializers", function() {
-                        this.definitions.forEach(function(def) {
+                    AST_Definitions.DEFMETHOD("remove_initializers", function () {
+                        this.definitions.forEach(function (def) {
                             def.value = null;
                         });
                     });
-                    AST_Definitions.DEFMETHOD("to_assignments", function() {
-                        var assignments = this.definitions.reduce(function(a, def) {
+                    AST_Definitions.DEFMETHOD("to_assignments", function () {
+                        var assignments = this.definitions.reduce(function (a, def) {
                             if (def.value) {
                                 var name = make_node(AST_SymbolRef, def.name, def.name);
                                 a.push(make_node(AST_Assign, def, {
@@ -19568,11 +19903,11 @@ var requirejs, require, define, xpcUtil;
                         if (assignments.length == 0) return null;
                         return AST_Seq.from_array(assignments);
                     });
-                    OPT(AST_Definitions, function(self, compressor) {
+                    OPT(AST_Definitions, function (self, compressor) {
                         if (self.definitions.length == 0) return make_node(AST_EmptyStatement, self);
                         return self;
                     });
-                    OPT(AST_Function, function(self, compressor) {
+                    OPT(AST_Function, function (self, compressor) {
                         self = AST_Lambda.prototype.optimize.call(self, compressor);
                         if (compressor.option("unused")) {
                             if (self.name && self.name.unreferenced()) {
@@ -19581,7 +19916,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_Call, function(self, compressor) {
+                    OPT(AST_Call, function (self, compressor) {
                         if (compressor.option("unsafe")) {
                             var exp = self.expression;
                             if (exp instanceof AST_SymbolRef && exp.undeclared()) {
@@ -19631,7 +19966,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_New, function(self, compressor) {
+                    OPT(AST_New, function (self, compressor) {
                         if (compressor.option("unsafe")) {
                             var exp = self.expression;
                             if (exp instanceof AST_SymbolRef && exp.undeclared()) {
@@ -19647,7 +19982,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_Seq, function(self, compressor) {
+                    OPT(AST_Seq, function (self, compressor) {
                         if (!compressor.option("side_effects")) return self;
                         if (!self.car.has_side_effects()) {
                             var p;
@@ -19665,7 +20000,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    AST_Unary.DEFMETHOD("lift_sequences", function(compressor) {
+                    AST_Unary.DEFMETHOD("lift_sequences", function (compressor) {
                         if (compressor.option("sequences")) {
                             if (this.expression instanceof AST_Seq) {
                                 var seq = this.expression;
@@ -19678,10 +20013,10 @@ var requirejs, require, define, xpcUtil;
                         }
                         return this;
                     });
-                    OPT(AST_UnaryPostfix, function(self, compressor) {
+                    OPT(AST_UnaryPostfix, function (self, compressor) {
                         return self.lift_sequences(compressor);
                     });
-                    OPT(AST_UnaryPrefix, function(self, compressor) {
+                    OPT(AST_UnaryPrefix, function (self, compressor) {
                         self = self.lift_sequences(compressor);
                         var e = self.expression;
                         if (compressor.option("booleans") && compressor.in_boolean_context()) {
@@ -19702,7 +20037,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self.evaluate(compressor)[0];
                     });
-                    AST_Binary.DEFMETHOD("lift_sequences", function(compressor) {
+                    AST_Binary.DEFMETHOD("lift_sequences", function (compressor) {
                         if (compressor.option("sequences")) {
                             if (this.left instanceof AST_Seq) {
                                 var seq = this.left;
@@ -19724,7 +20059,7 @@ var requirejs, require, define, xpcUtil;
                         return this;
                     });
                     var commutativeOperators = makePredicate("== === != !== * & | ^");
-                    OPT(AST_Binary, function(self, compressor) {
+                    OPT(AST_Binary, function (self, compressor) {
                         function reverse(op, force) {
                             if (force || !(self.left.has_side_effects() || self.right.has_side_effects())) {
                                 if (op) self.operator = op;
@@ -19733,6 +20068,7 @@ var requirejs, require, define, xpcUtil;
                                 self.right = tmp;
                             }
                         }
+
                         if (commutativeOperators(self.operator)) {
                             if (self.right instanceof AST_Constant && !(self.left instanceof AST_Constant)) {
                                 reverse(null, true);
@@ -19824,7 +20160,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_SymbolRef, function(self, compressor) {
+                    OPT(AST_SymbolRef, function (self, compressor) {
                         if (self.undeclared()) {
                             var defines = compressor.option("global_defs");
                             if (defines && defines.hasOwnProperty(self.name)) {
@@ -19843,7 +20179,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_Undefined, function(self, compressor) {
+                    OPT(AST_Undefined, function (self, compressor) {
                         if (compressor.option("unsafe")) {
                             var scope = compressor.find_parent(AST_Scope);
                             var undef = scope.find_variable("undefined");
@@ -19859,8 +20195,8 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    var ASSIGN_OPS = [ "+", "-", "/", "*", "%", ">>", "<<", ">>>", "|", "^", "&" ];
-                    OPT(AST_Assign, function(self, compressor) {
+                    var ASSIGN_OPS = ["+", "-", "/", "*", "%", ">>", "<<", ">>>", "|", "^", "&"];
+                    OPT(AST_Assign, function (self, compressor) {
                         self = self.lift_sequences(compressor);
                         if (self.operator == "=" && self.left instanceof AST_SymbolRef && self.right instanceof AST_Binary && self.right.left instanceof AST_SymbolRef && self.right.left.name == self.left.name && member(self.right.operator, ASSIGN_OPS)) {
                             self.operator = self.right.operator + "=";
@@ -19868,7 +20204,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_Conditional, function(self, compressor) {
+                    OPT(AST_Conditional, function (self, compressor) {
                         if (!compressor.option("conditionals")) return self;
                         if (self.condition instanceof AST_Seq) {
                             var car = self.condition.car;
@@ -19908,7 +20244,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_Boolean, function(self, compressor) {
+                    OPT(AST_Boolean, function (self, compressor) {
                         if (compressor.option("booleans")) {
                             var p = compressor.parent();
                             if (p instanceof AST_Binary && (p.operator == "==" || p.operator == "!=")) {
@@ -19932,7 +20268,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     });
-                    OPT(AST_Sub, function(self, compressor) {
+                    OPT(AST_Sub, function (self, compressor) {
                         var prop = self.property;
                         if (prop instanceof AST_String && compressor.option("properties")) {
                             prop = prop.getValue();
@@ -19951,6 +20287,7 @@ var requirejs, require, define, xpcUtil;
                         }
                         return self;
                     }
+
                     OPT(AST_Array, literals_in_boolean_context);
                     OPT(AST_Object, literals_in_boolean_context);
                     OPT(AST_RegExp, literals_in_boolean_context);
@@ -19967,6 +20304,7 @@ var requirejs, require, define, xpcUtil;
                         sourceRoot: options.root
                     });
                     var orig_map = options.orig && new MOZ_SourceMap.SourceMapConsumer(options.orig);
+
                     function add(source, gen_line, gen_col, orig_line, orig_col, name) {
                         if (orig_map) {
                             var info = orig_map.originalPositionFor({
@@ -19991,20 +20329,22 @@ var requirejs, require, define, xpcUtil;
                             name: name
                         });
                     }
+
                     return {
                         add: add,
-                        get: function() {
+                        get: function () {
                             return generator;
                         },
-                        toString: function() {
+                        toString: function () {
                             return generator.toString();
                         }
                     };
                 }
+
                 "use strict";
-                (function() {
+                (function () {
                     var MOZ_TO_ME = {
-                        TryStatement: function(M) {
+                        TryStatement: function (M) {
                             return new AST_Try({
                                 start: my_start_token(M),
                                 end: my_end_token(M),
@@ -20013,7 +20353,7 @@ var requirejs, require, define, xpcUtil;
                                 bfinally: M.finalizer ? new AST_Finally(from_moz(M.finalizer)) : null
                             });
                         },
-                        CatchClause: function(M) {
+                        CatchClause: function (M) {
                             return new AST_Catch({
                                 start: my_start_token(M),
                                 end: my_end_token(M),
@@ -20021,11 +20361,11 @@ var requirejs, require, define, xpcUtil;
                                 body: from_moz(M.body).body
                             });
                         },
-                        ObjectExpression: function(M) {
+                        ObjectExpression: function (M) {
                             return new AST_Object({
                                 start: my_start_token(M),
                                 end: my_end_token(M),
-                                properties: M.properties.map(function(prop) {
+                                properties: M.properties.map(function (prop) {
                                     var key = prop.key;
                                     var name = key.type == "Identifier" ? key.name : key.value;
                                     var args = {
@@ -20049,10 +20389,10 @@ var requirejs, require, define, xpcUtil;
                                 })
                             });
                         },
-                        SequenceExpression: function(M) {
+                        SequenceExpression: function (M) {
                             return AST_Seq.from_array(M.expressions.map(from_moz));
                         },
-                        MemberExpression: function(M) {
+                        MemberExpression: function (M) {
                             return new (M.computed ? AST_Sub : AST_Dot)({
                                 start: my_start_token(M),
                                 end: my_end_token(M),
@@ -20060,7 +20400,7 @@ var requirejs, require, define, xpcUtil;
                                 expression: from_moz(M.object)
                             });
                         },
-                        SwitchCase: function(M) {
+                        SwitchCase: function (M) {
                             return new (M.test ? AST_Case : AST_Default)({
                                 start: my_start_token(M),
                                 end: my_end_token(M),
@@ -20068,7 +20408,7 @@ var requirejs, require, define, xpcUtil;
                                 body: M.consequent.map(from_moz)
                             });
                         },
-                        Literal: function(M) {
+                        Literal: function (M) {
                             var val = M.value, args = {
                                 start: my_start_token(M),
                                 end: my_end_token(M)
@@ -20093,7 +20433,7 @@ var requirejs, require, define, xpcUtil;
                         },
                         UnaryExpression: From_Moz_Unary,
                         UpdateExpression: From_Moz_Unary,
-                        Identifier: function(M) {
+                        Identifier: function (M) {
                             var p = FROM_MOZ_STACK[FROM_MOZ_STACK.length - 2];
                             return new (M.name == "this" ? AST_This : p.type == "LabeledStatement" ? AST_Label : p.type == "VariableDeclarator" && p.id === M ? p.kind == "const" ? AST_SymbolConst : AST_SymbolVar : p.type == "FunctionExpression" ? p.id === M ? AST_SymbolLambda : AST_SymbolFunarg : p.type == "FunctionDeclaration" ? p.id === M ? AST_SymbolDefun : AST_SymbolFunarg : p.type == "CatchClause" ? AST_SymbolCatch : p.type == "BreakStatement" || p.type == "ContinueStatement" ? AST_LabelRef : AST_SymbolRef)({
                                 start: my_start_token(M),
@@ -20102,6 +20442,7 @@ var requirejs, require, define, xpcUtil;
                             });
                         }
                     };
+
                     function From_Moz_Unary(M) {
                         var prefix = "prefix" in M ? M.prefix : M.type == "UnaryExpression" ? true : false;
                         return new (prefix ? AST_UnaryPrefix : AST_UnaryPostfix)({
@@ -20111,6 +20452,7 @@ var requirejs, require, define, xpcUtil;
                             expression: from_moz(M.argument)
                         });
                     }
+
                     var ME_TO_MOZ = {};
                     map("Node", AST_Node);
                     map("Program", AST_Toplevel, "body@body");
@@ -20152,6 +20494,7 @@ var requirejs, require, define, xpcUtil;
                             endpos: moznode.start
                         });
                     }
+
                     function my_end_token(moznode) {
                         return new AST_Token({
                             file: moznode.loc && moznode.loc.source,
@@ -20161,10 +20504,11 @@ var requirejs, require, define, xpcUtil;
                             endpos: moznode.end
                         });
                     }
+
                     function map(moztype, mytype, propmap) {
                         var moz_to_me = "function From_Moz_" + moztype + "(M){\n";
                         moz_to_me += "return new mytype({\n" + "start: my_start_token(M),\n" + "end: my_end_token(M)";
-                        if (propmap) propmap.split(/\s*,\s*/).forEach(function(prop) {
+                        if (propmap) propmap.split(/\s*,\s*/).forEach(function (prop) {
                             var m = /([a-z0-9$_]+)(=|@|>|%)([a-z0-9$_]+)/i.exec(prop);
                             if (!m) throw new Error("Can't understand property map: " + prop);
                             var moz = "M." + m[1], how = m[2], my = m[3];
@@ -20183,14 +20527,17 @@ var requirejs, require, define, xpcUtil;
                         moz_to_me = new Function("mytype", "my_start_token", "my_end_token", "from_moz", "return(" + moz_to_me + ")")(mytype, my_start_token, my_end_token, from_moz);
                         return MOZ_TO_ME[moztype] = moz_to_me;
                     }
+
                     var FROM_MOZ_STACK = null;
+
                     function from_moz(node) {
                         FROM_MOZ_STACK.push(node);
                         var ret = node != null ? MOZ_TO_ME[node.type](node) : null;
                         FROM_MOZ_STACK.pop();
                         return ret;
                     }
-                    AST_Node.from_mozilla_ast = function(node) {
+
+                    AST_Node.from_mozilla_ast = function (node) {
                         var save_stack = FROM_MOZ_STACK;
                         FROM_MOZ_STACK = [];
                         var ast = from_moz(node);
@@ -20348,35 +20695,35 @@ var requirejs, require, define, xpcUtil;
                 exports["OutputStream"] = OutputStream;
                 exports["Compressor"] = Compressor;
                 exports["SourceMap"] = SourceMap;
-            })({}, function() {
+            })({}, function () {
                 return exports;
             }());
 
             var UglifyJS = exports.UglifyJS;
 
-            UglifyJS.AST_Node.warn_function = function(txt) {
+            UglifyJS.AST_Node.warn_function = function (txt) {
                 logger.error("uglifyjs2 WARN: " + txt);
             };
 
 //JRB: MODIFIED FROM UGLIFY SOURCE
 //to take a name for the file, and then set toplevel.filename to be that name.
-            exports.minify = function(files, options, name) {
+            exports.minify = function (files, options, name) {
                 options = UglifyJS.defaults(options, {
-                    outSourceMap : null,
-                    sourceRoot   : null,
-                    inSourceMap  : null,
-                    fromString   : false,
-                    warnings     : false,
-                    mangle       : {},
-                    output       : null,
-                    compress     : {}
+                    outSourceMap: null,
+                    sourceRoot: null,
+                    inSourceMap: null,
+                    fromString: false,
+                    warnings: false,
+                    mangle: {},
+                    output: null,
+                    compress: {}
                 });
                 if (typeof files == "string")
-                    files = [ files ];
+                    files = [files];
 
                 // 1. parse
                 var toplevel = null;
-                files.forEach(function(file){
+                files.forEach(function (file) {
                     var code = options.fromString
                         ? file
                         : rjsFile.readFile(file, "utf8");
@@ -20388,7 +20735,7 @@ var requirejs, require, define, xpcUtil;
 
                 // 2. compress
                 if (options.compress) {
-                    var compress = { warnings: options.warnings };
+                    var compress = {warnings: options.warnings};
                     UglifyJS.merge(compress, options.compress);
                     toplevel.figure_out_scope();
                     var sq = UglifyJS.Compressor(compress);
@@ -20413,15 +20760,15 @@ var requirejs, require, define, xpcUtil;
                     orig: inMap,
                     root: options.sourceRoot
                 });
-                var output = { source_map: map };
+                var output = {source_map: map};
                 if (options.output) {
                     UglifyJS.merge(output, options.output);
                 }
                 var stream = UglifyJS.OutputStream(output);
                 toplevel.print(stream);
                 return {
-                    code : stream + "",
-                    map  : map + ""
+                    code: stream + "",
+                    map: map + ""
                 };
             };
 
@@ -20439,17 +20786,18 @@ var requirejs, require, define, xpcUtil;
 //     return doitem(UglifyJS.AST_Node).sub;
 // }
 
-            exports.describe_ast = function() {
-                var out = UglifyJS.OutputStream({ beautify: true });
+            exports.describe_ast = function () {
+                var out = UglifyJS.OutputStream({beautify: true});
+
                 function doitem(ctor) {
                     out.print("AST_" + ctor.TYPE);
-                    var props = ctor.SELF_PROPS.filter(function(prop){
+                    var props = ctor.SELF_PROPS.filter(function (prop) {
                         return !/^\$/.test(prop);
                     });
                     if (props.length > 0) {
                         out.space();
-                        out.with_parens(function(){
-                            props.forEach(function(prop, i){
+                        out.with_parens(function () {
+                            props.forEach(function (prop, i) {
                                 if (i) out.space();
                                 out.print(prop);
                             });
@@ -20461,8 +20809,8 @@ var requirejs, require, define, xpcUtil;
                     }
                     if (ctor.SUBCLASSES.length > 0) {
                         out.space();
-                        out.with_block(function(){
-                            ctor.SUBCLASSES.forEach(function(ctor, i){
+                        out.with_block(function () {
+                            ctor.SUBCLASSES.forEach(function (ctor, i) {
                                 out.indent();
                                 doitem(ctor);
                                 out.newline();
@@ -20960,14 +21308,14 @@ var requirejs, require, define, xpcUtil;
                 if (node && node.type === 'CallExpression' && c) {
                     if (c.type === 'Identifier' &&
                         (c.name === 'require' ||
-                            c.name === 'requirejs')) {
+                        c.name === 'requirejs')) {
                         //A require/requirejs({}, ...) call
                         callName = c.name;
                     } else if (c.type === 'MemberExpression' &&
                         c.object &&
                         c.object.type === 'Identifier' &&
                         (c.object.name === 'require' ||
-                            c.object.name === 'requirejs') &&
+                        c.object.name === 'requirejs') &&
                         c.property && c.property.name === 'config') {
                         // require/requirejs.config({}) call
                         callName = c.object.name + 'Config';
@@ -21269,7 +21617,7 @@ var requirejs, require, define, xpcUtil;
 
                         if (!existsMap[value] && (value.indexOf('license') !== -1 ||
                             (commentNode.type === 'Block' &&
-                                value.indexOf('/*!') === 0) ||
+                            value.indexOf('/*!') === 0) ||
                             value.indexOf('opyright') !== -1 ||
                             value.indexOf('(c)') !== -1)) {
 
@@ -21294,7 +21642,7 @@ var requirejs, require, define, xpcUtil;
         /*jslint */
         /*global define */
 
-        define('transform', [ './esprima', './parse', 'logger', 'lang'], function (esprima, parse, logger, lang) {
+        define('transform', ['./esprima', './parse', 'logger', 'lang'], function (esprima, parse, logger, lang) {
             'use strict';
             var transform,
                 baseIndentRegExp = /^([ \t]+)/,
@@ -21555,7 +21903,7 @@ var requirejs, require, define, xpcUtil;
                                     //anon one, since this is an already optimized
                                     //file like the phonegap one.
                                     if (!scanReset) {
-                                        defineRanges =  foundAnon ? [foundAnon] : [];
+                                        defineRanges = foundAnon ? [foundAnon] : [];
                                         scanReset = true;
                                     }
                                 } else {
@@ -21588,12 +21936,12 @@ var requirejs, require, define, xpcUtil;
 
                             if (deps.length) {
                                 depString = '[' + deps.map(function (dep) {
-                                    return "'" + dep + "'";
-                                }) + ']';
+                                        return "'" + dep + "'";
+                                    }) + ']';
                             } else {
                                 depString = '[]';
                             }
-                            depString +=  ',';
+                            depString += ',';
 
                             if (info.nameCommaRange) {
                                 //Already have a named module, need to insert the
@@ -21603,7 +21951,7 @@ var requirejs, require, define, xpcUtil;
                                     contents.substring(info.nameCommaRange[1],
                                         contents.length);
                             } else {
-                                contentInsertion +=  depString;
+                                contentInsertion += depString;
                             }
                         }
 
@@ -21771,9 +22119,9 @@ var requirejs, require, define, xpcUtil;
                     } else {
                         //An object
                         lang.eachProp(obj, function (v, prop) {
-                            value += (first ? '': ',' + lineReturn) +
+                            value += (first ? '' : ',' + lineReturn) +
                                 nextIndent +
-                                (keyRegExp.test(prop) ? prop : quote + lang.jsEscape(prop) + quote )+
+                                (keyRegExp.test(prop) ? prop : quote + lang.jsEscape(prop) + quote ) +
                                 ': ' +
                                 transform.objectToString(v,
                                     options,
@@ -21795,7 +22143,8 @@ var requirejs, require, define, xpcUtil;
                     return value;
                 }
             });
-        });/**
+        });
+        /**
          * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
          * Available via the MIT or new BSD license.
          * see: http://github.com/jrburke/requirejs for details
@@ -21806,7 +22155,8 @@ var requirejs, require, define, xpcUtil;
 
         define('pragma', ['parse', 'logger'], function (parse, logger) {
             'use strict';
-            function Temp() {}
+            function Temp() {
+            }
 
             function create(obj, mixin) {
                 Temp.prototype = obj;
@@ -21920,8 +22270,8 @@ var requirejs, require, define, xpcUtil;
                         endMarkerIndex, shouldInclude, startLength, lifecycleHas, deps,
                         i, dep, moduleName, collectorMod,
                         lifecyclePragmas, pragmas = config.pragmas, hasConfig = config.has,
-                    //Legacy arg defined to help in dojo conversion script. Remove later
-                    //when dojo no longer needs conversion:
+                        //Legacy arg defined to help in dojo conversion script. Remove later
+                        //when dojo no longer needs conversion:
                         kwArgs = pragmas;
 
                     //Mix in a specific lifecycle scoped object, to allow targeting
@@ -21976,10 +22326,10 @@ var requirejs, require, define, xpcUtil;
                                     isTrue = !!eval("(" + condition + ")");
                                 } catch (e) {
                                     throw "Error in file: " +
-                                        fileName +
-                                        ". Conditional comment: " +
-                                        conditionLine +
-                                        " failed with this error: " + e;
+                                    fileName +
+                                    ". Conditional comment: " +
+                                    conditionLine +
+                                    " failed with this error: " + e;
                                 }
 
                                 //Find the endpoint marker.
@@ -22009,9 +22359,9 @@ var requirejs, require, define, xpcUtil;
                                     startIndex = foundIndex;
                                 } else {
                                     throw "Error in file: " +
-                                        fileName +
-                                        ". Cannot find end marker for conditional comment: " +
-                                        conditionLine;
+                                    fileName +
+                                    ". Cannot find end marker for conditional comment: " +
+                                    conditionLine;
 
                                 }
                             }
@@ -22059,7 +22409,7 @@ var requirejs, require, define, xpcUtil;
 
             return pragma;
         });
-        if(env === 'browser') {
+        if (env === 'browser') {
             /**
              * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -22073,7 +22423,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'node') {
+        if (env === 'node') {
             /**
              * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -22087,7 +22437,7 @@ var requirejs, require, define, xpcUtil;
 
         }
 
-        if(env === 'rhino') {
+        if (env === 'rhino') {
             /**
              * @license Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
              * Available via the MIT or new BSD license.
@@ -22135,7 +22485,8 @@ var requirejs, require, define, xpcUtil;
                 //Bind to Closure compiler, but if it is not available, do not sweat it.
                 try {
                     JSSourceFilefromCode = java.lang.Class.forName('com.google.javascript.jscomp.JSSourceFile').getMethod('fromCode', [java.lang.String, java.lang.String]);
-                } catch (e) {}
+                } catch (e) {
+                }
 
                 //Helper for closure compiler, because of weird Java-JavaScript interactions.
                 function closurefromCode(filename, content) {
@@ -22169,9 +22520,9 @@ var requirejs, require, define, xpcUtil;
                             outBaseName, outFileNameMap, outFileNameMapContent,
                             jscomp = Packages.com.google.javascript.jscomp,
                             flags = Packages.com.google.common.flags,
-                        //Fake extern
+                            //Fake extern
                             externSourceFile = closurefromCode("fakeextern.js", " "),
-                        //Set up source input
+                            //Set up source input
                             jsSourceFile = closurefromCode(String(fileName), String(fileContents)),
                             options, option, FLAG_compilation_level, compiler,
                             Compiler = Packages.com.google.javascript.jscomp.Compiler;
@@ -22243,7 +22594,7 @@ var requirejs, require, define, xpcUtil;
             });
         }
 
-        if(env === 'xpconnect') {
+        if (env === 'xpconnect') {
             define('xpconnect/optimize', {});
         }
         /**
@@ -22255,11 +22606,11 @@ var requirejs, require, define, xpcUtil;
         /*jslint plusplus: true, nomen: true, regexp: true */
         /*global define: false */
 
-        define('optimize', [ 'lang', 'logger', 'env!env/optimize', 'env!env/file', 'parse',
-            'pragma', 'uglifyjs/index', 'uglifyjs2',
-            'source-map'],
-            function (lang,   logger,   envOptimize,        file,           parse,
-                      pragma, uglify,             uglify2,
+        define('optimize', ['lang', 'logger', 'env!env/optimize', 'env!env/file', 'parse',
+                'pragma', 'uglifyjs/index', 'uglifyjs2',
+                'source-map'],
+            function (lang, logger, envOptimize, file, parse,
+                      pragma, uglify, uglify2,
                       sourceMap) {
                 'use strict';
 
@@ -22268,7 +22619,7 @@ var requirejs, require, define, xpcUtil;
                     cssCommentImportRegExp = /\/\*[^\*]*@import[^\*]*\*\//g,
                     cssUrlRegExp = /\url\(\s*([^\)]+)\s*\)?/g,
                     SourceMapGenerator = sourceMap.SourceMapGenerator,
-                    SourceMapConsumer =sourceMap.SourceMapConsumer;
+                    SourceMapConsumer = sourceMap.SourceMapConsumer;
 
                 /**
                  * If an URL from a CSS url value contains start/end quotes, remove them.
@@ -22301,10 +22652,10 @@ var requirejs, require, define, xpcUtil;
                     //Find the last slash in the name.
                     fileName = fileName.replace(lang.backSlashRegExp, "/");
                     var endIndex = fileName.lastIndexOf("/"),
-                    //Make a file path based on the last slash.
-                    //If no slash, so must be just a file name. Use empty string then.
+                        //Make a file path based on the last slash.
+                        //If no slash, so must be just a file name. Use empty string then.
                         filePath = (endIndex !== -1) ? fileName.substring(0, endIndex + 1) : "",
-                    //store a list of merged files
+                        //store a list of merged files
                         importList = [],
                         skippedList = [];
 
@@ -22409,9 +22760,9 @@ var requirejs, require, define, xpcUtil;
                     });
 
                     return {
-                        importList : importList,
+                        importList: importList,
                         skippedList: skippedList,
-                        fileContents : fileContents
+                        fileContents: fileContents
                     };
                 }
 
@@ -22491,10 +22842,10 @@ var requirejs, require, define, xpcUtil;
                                     debugger;
 
                                 fileContents = licenseContents + optFunc(fileName,
-                                    fileContents,
-                                    outFileName,
-                                    keepLines,
-                                    optConfig);
+                                        fileContents,
+                                        outFileName,
+                                        keepLines,
+                                        optConfig);
                             } catch (e) {
                                 if (config.throwWhen && config.throwWhen.optimize) {
                                     throw e;
@@ -22520,7 +22871,7 @@ var requirejs, require, define, xpcUtil;
                         //Read in the file. Make sure we have a JS string.
                         var originalFileContents = file.readFile(fileName),
                             flat = flattenCss(fileName, originalFileContents, config.cssImportIgnore, config.cssPrefix, {}),
-                        //Do not use the flattened CSS if there was one that was skipped.
+                            //Do not use the flattened CSS if there was one that was skipped.
                             fileContents = flat.skippedList.length ? originalFileContents : flat.fileContents,
                             startIndex, endIndex, buildText, comment;
 
@@ -22544,8 +22895,8 @@ var requirejs, require, define, xpcUtil;
 
                                     if (config.preserveLicenseComments &&
                                         (comment.indexOf('license') !== -1 ||
-                                            comment.indexOf('opyright') !== -1 ||
-                                            comment.indexOf('(c)') !== -1)) {
+                                        comment.indexOf('opyright') !== -1 ||
+                                        comment.indexOf('(c)') !== -1)) {
                                         //Keep the comment, just increment the startIndex
                                         startIndex = endIndex;
                                     } else {
@@ -22573,15 +22924,15 @@ var requirejs, require, define, xpcUtil;
                         file.saveUtf8File(outFileName, fileContents);
 
                         //text output to stdout and/or written to build.txt file
-                        buildText = "\n"+ outFileName.replace(config.dir, "") +"\n----------------\n";
+                        buildText = "\n" + outFileName.replace(config.dir, "") + "\n----------------\n";
                         flat.importList.push(fileName);
-                        buildText += flat.importList.map(function(path){
+                        buildText += flat.importList.map(function (path) {
                             return path.replace(config.dir, "");
                         }).join("\n");
 
                         return {
                             importList: flat.importList,
-                            buildText: buildText +"\n"
+                            buildText: buildText + "\n"
                         };
                     },
 
@@ -22726,15 +23077,13 @@ var requirejs, require, define, xpcUtil;
 
 //NOT asking for require as a dependency since the goal is to modify the
 //global require below
-        define('requirePatch', [ 'env!env/file', 'pragma', 'parse', 'lang', 'logger', 'commonJs', 'prim'], function (
-            file,
-            pragma,
-            parse,
-            lang,
-            logger,
-            commonJs,
-            prim
-            ) {
+        define('requirePatch', ['env!env/file', 'pragma', 'parse', 'lang', 'logger', 'commonJs', 'prim'], function (file,
+                                                                                                                    pragma,
+                                                                                                                    parse,
+                                                                                                                    lang,
+                                                                                                                    logger,
+                                                                                                                    commonJs,
+                                                                                                                    prim) {
 
             var allowRun = true,
                 hasProp = lang.hasProp,
@@ -22753,9 +23102,9 @@ var requirejs, require, define, xpcUtil;
                     oldNewContext = require.s.newContext,
                     oldDef,
 
-                //create local undefined values for module and exports,
-                //so that when files are evaled in this function they do not
-                //see the node values used for r.js
+                    //create local undefined values for module and exports,
+                    //so that when files are evaled in this function they do not
+                    //see the node values used for r.js
                     exports,
                     module;
 
@@ -22838,7 +23187,7 @@ var requirejs, require, define, xpcUtil;
                                     '        var ret, fn;\n' +
                                     (value.init ?
                                         ('       fn = ' + value.init.toString() + ';\n' +
-                                            '        ret = fn.apply(global, arguments);\n') : '') +
+                                        '        ret = fn.apply(global, arguments);\n') : '') +
                                     (value.exports ?
                                         '        return ret || global.' + value.exports + ';\n' :
                                         '        return ret;\n') +
@@ -22863,7 +23212,7 @@ var requirejs, require, define, xpcUtil;
 
                             } else if ((getOwn(needFullExec, id) && falseProp(fullExec, id)) ||
                                 (parentId && getOwn(needFullExec, parentId) &&
-                                    falseProp(fullExec, id))) {
+                                falseProp(fullExec, id))) {
                                 context.require.undef(id);
                             }
 
@@ -22905,7 +23254,7 @@ var requirejs, require, define, xpcUtil;
                                 prim().start(function () {
                                     if (hasProp(require._cachedFileContents, url) &&
                                         (falseProp(context.needFullExec, moduleName) ||
-                                            getOwn(context.fullExec, moduleName))) {
+                                        getOwn(context.fullExec, moduleName))) {
                                         contents = require._cachedFileContents[url];
 
                                         //If it defines require, mark it so it can be hoisted.
@@ -22946,79 +23295,79 @@ var requirejs, require, define, xpcUtil;
                                                     'for file: ' + url + '\n' + e1);
                                             }
                                         }).then(function () {
-                                                if (hasProp(context.plugins, moduleName)) {
-                                                    //This is a loader plugin, check to see if it has a build extension,
-                                                    //otherwise the plugin will act as the plugin builder too.
-                                                    pluginBuilderMatch = pluginBuilderRegExp.exec(contents);
-                                                    if (pluginBuilderMatch) {
-                                                        //Load the plugin builder for the plugin contents.
-                                                        builderName = context.makeModuleMap(pluginBuilderMatch[3],
-                                                            context.makeModuleMap(moduleName),
-                                                            null,
-                                                            true).id;
-                                                        return require._cacheReadAsync(context.nameToUrl(builderName));
-                                                    }
+                                            if (hasProp(context.plugins, moduleName)) {
+                                                //This is a loader plugin, check to see if it has a build extension,
+                                                //otherwise the plugin will act as the plugin builder too.
+                                                pluginBuilderMatch = pluginBuilderRegExp.exec(contents);
+                                                if (pluginBuilderMatch) {
+                                                    //Load the plugin builder for the plugin contents.
+                                                    builderName = context.makeModuleMap(pluginBuilderMatch[3],
+                                                        context.makeModuleMap(moduleName),
+                                                        null,
+                                                        true).id;
+                                                    return require._cacheReadAsync(context.nameToUrl(builderName));
                                                 }
-                                                return contents;
-                                            }).then(function (text) {
-                                                contents = text;
+                                            }
+                                            return contents;
+                                        }).then(function (text) {
+                                            contents = text;
 
-                                                //Parse out the require and define calls.
-                                                //Do this even for plugins in case they have their own
-                                                //dependencies that may be separate to how the pluginBuilder works.
-                                                try {
-                                                    if (falseProp(context.needFullExec, moduleName)) {
-                                                        contents = parse(moduleName, url, contents, {
-                                                            insertNeedsDefine: true,
-                                                            has: context.config.has,
-                                                            findNestedDependencies: context.config.findNestedDependencies
-                                                        });
-                                                    }
-                                                } catch (e2) {
-                                                    throw new Error('Parse error using esprima ' +
-                                                        'for file: ' + url + '\n' + e2);
+                                            //Parse out the require and define calls.
+                                            //Do this even for plugins in case they have their own
+                                            //dependencies that may be separate to how the pluginBuilder works.
+                                            try {
+                                                if (falseProp(context.needFullExec, moduleName)) {
+                                                    contents = parse(moduleName, url, contents, {
+                                                        insertNeedsDefine: true,
+                                                        has: context.config.has,
+                                                        findNestedDependencies: context.config.findNestedDependencies
+                                                    });
                                                 }
+                                            } catch (e2) {
+                                                throw new Error('Parse error using esprima ' +
+                                                    'for file: ' + url + '\n' + e2);
+                                            }
 
-                                                require._cachedFileContents[url] = contents;
-                                            });
+                                            require._cachedFileContents[url] = contents;
+                                        });
                                     }
                                 }).then(function () {
-                                        if (contents) {
-                                            eval(contents);
-                                        }
+                                    if (contents) {
+                                        eval(contents);
+                                    }
 
-                                        try {
-                                            //If have a string shim config, and this is
-                                            //a fully executed module, try to see if
-                                            //it created a variable in this eval scope
-                                            if (getOwn(context.needFullExec, moduleName)) {
-                                                shim = getOwn(context.config.shim, moduleName);
-                                                if (shim && shim.exports) {
-                                                    shimExports = eval(shim.exports);
-                                                    if (typeof shimExports !== 'undefined') {
-                                                        context.buildShimExports[moduleName] = shimExports;
-                                                    }
+                                    try {
+                                        //If have a string shim config, and this is
+                                        //a fully executed module, try to see if
+                                        //it created a variable in this eval scope
+                                        if (getOwn(context.needFullExec, moduleName)) {
+                                            shim = getOwn(context.config.shim, moduleName);
+                                            if (shim && shim.exports) {
+                                                shimExports = eval(shim.exports);
+                                                if (typeof shimExports !== 'undefined') {
+                                                    context.buildShimExports[moduleName] = shimExports;
                                                 }
                                             }
-
-                                            //Need to close out completion of this module
-                                            //so that listeners will get notified that it is available.
-                                            context.completeLoad(moduleName);
-                                        } catch (e) {
-                                            //Track which module could not complete loading.
-                                            if (!e.moduleTree) {
-                                                e.moduleTree = [];
-                                            }
-                                            e.moduleTree.push(moduleName);
-                                            throw e;
                                         }
-                                    }).then(null, function (eOuter) {
 
-                                        if (!eOuter.fileName) {
-                                            eOuter.fileName = url;
+                                        //Need to close out completion of this module
+                                        //so that listeners will get notified that it is available.
+                                        context.completeLoad(moduleName);
+                                    } catch (e) {
+                                        //Track which module could not complete loading.
+                                        if (!e.moduleTree) {
+                                            e.moduleTree = [];
                                         }
-                                        throw eOuter;
-                                    }).end();
+                                        e.moduleTree.push(moduleName);
+                                        throw e;
+                                    }
+                                }).then(null, function (eOuter) {
+
+                                    if (!eOuter.fileName) {
+                                        eOuter.fileName = url;
+                                    }
+                                    throw eOuter;
+                                }).end();
                             } else {
                                 //With unsupported URLs still need to call completeLoad to
                                 //finish loading.
@@ -23443,48 +23792,48 @@ var requirejs, require, define, xpcUtil;
 
                     return build._run(cmdConfig);
                 }).then(null, function (e) {
-                        errorMsg = e.toString();
-                        errorTree = e.moduleTree;
-                        stackMatch = stackRegExp.exec(errorMsg);
+                    errorMsg = e.toString();
+                    errorTree = e.moduleTree;
+                    stackMatch = stackRegExp.exec(errorMsg);
 
-                        if (stackMatch) {
-                            errorMsg += errorMsg.substring(0, stackMatch.index + stackMatch[0].length + 1);
-                        }
+                    if (stackMatch) {
+                        errorMsg += errorMsg.substring(0, stackMatch.index + stackMatch[0].length + 1);
+                    }
 
-                        //If a module tree that shows what module triggered the error,
-                        //print it out.
-                        if (errorTree && errorTree.length > 0) {
-                            errorMsg += '\nIn module tree:\n';
+                    //If a module tree that shows what module triggered the error,
+                    //print it out.
+                    if (errorTree && errorTree.length > 0) {
+                        errorMsg += '\nIn module tree:\n';
 
-                            for (i = errorTree.length - 1; i > -1; i--) {
-                                errorMod = errorTree[i];
-                                if (errorMod) {
-                                    for (j = errorTree.length - i; j > -1; j--) {
-                                        errorMsg += standardIndent;
-                                    }
-                                    errorMsg += errorMod + '\n';
+                        for (i = errorTree.length - 1; i > -1; i--) {
+                            errorMod = errorTree[i];
+                            if (errorMod) {
+                                for (j = errorTree.length - i; j > -1; j--) {
+                                    errorMsg += standardIndent;
                                 }
-                            }
-
-                            logger.error(errorMsg);
-                        }
-
-                        errorStack = e.stack;
-
-                        if (typeof args === 'string' && args.indexOf('stacktrace=true') !== -1) {
-                            errorMsg += '\n' + errorStack;
-                        } else {
-                            if (!stackMatch && errorStack) {
-                                //Just trim out the first "at" in the stack.
-                                stackMatch = stackRegExp.exec(errorStack);
-                                if (stackMatch) {
-                                    errorMsg += '\n' + stackMatch[0] || '';
-                                }
+                                errorMsg += errorMod + '\n';
                             }
                         }
 
-                        throw new Error(errorMsg);
-                    });
+                        logger.error(errorMsg);
+                    }
+
+                    errorStack = e.stack;
+
+                    if (typeof args === 'string' && args.indexOf('stacktrace=true') !== -1) {
+                        errorMsg += '\n' + errorStack;
+                    } else {
+                        if (!stackMatch && errorStack) {
+                            //Just trim out the first "at" in the stack.
+                            stackMatch = stackRegExp.exec(errorStack);
+                            if (stackMatch) {
+                                errorMsg += '\n' + stackMatch[0] || '';
+                            }
+                        }
+                    }
+
+                    throw new Error(errorMsg);
+                });
             };
 
             build._run = function (cmdConfig) {
@@ -23639,319 +23988,319 @@ var requirejs, require, define, xpcUtil;
                         buildFileContents += optimize.css(config.dir, config);
                     }
                 }).then(function () {
-                        var actions = [];
+                    var actions = [];
 
-                        if (modules) {
-                            actions = modules.map(function (module, i) {
-                                return function () {
-                                    //Save off buildPath to module index in a hash for quicker
-                                    //lookup later.
-                                    config._buildPathToModuleIndex[module._buildPath] = i;
+                    if (modules) {
+                        actions = modules.map(function (module, i) {
+                            return function () {
+                                //Save off buildPath to module index in a hash for quicker
+                                //lookup later.
+                                config._buildPathToModuleIndex[module._buildPath] = i;
 
-                                    //Call require to calculate dependencies.
-                                    return build.traceDependencies(module, config)
-                                        .then(function (layer) {
-                                            module.layer = layer;
-                                        });
-                                };
-                            });
-
-                            return prim.serial(actions);
-                        }
-                    }).then(function () {
-                        var actions;
-
-                        if (modules) {
-                            //Now build up shadow layers for anything that should be excluded.
-                            //Do this after tracing dependencies for each module, in case one
-                            //of those modules end up being one of the excluded values.
-                            actions = modules.map(function (module) {
-                                return function () {
-                                    if (module.exclude) {
-                                        module.excludeLayers = [];
-                                        return prim.serial(module.exclude.map(function (exclude, i) {
-                                            return function () {
-                                                //See if it is already in the list of modules.
-                                                //If not trace dependencies for it.
-                                                var found = build.findBuildModule(exclude, modules);
-                                                if (found) {
-                                                    module.excludeLayers[i] = found;
-                                                } else {
-                                                    return build.traceDependencies({name: exclude}, config)
-                                                        .then(function (layer) {
-                                                            module.excludeLayers[i] = { layer: layer };
-                                                        });
-                                                }
-                                            };
-                                        }));
-                                    }
-                                };
-                            });
-
-                            return prim.serial(actions);
-                        }
-                    }).then(function () {
-                        if (modules) {
-                            return prim.serial(modules.map(function (module) {
-                                return function () {
-                                    if (module.exclude) {
-                                        //module.exclude is an array of module names. For each one,
-                                        //get the nested dependencies for it via a matching entry
-                                        //in the module.excludeLayers array.
-                                        module.exclude.forEach(function (excludeModule, i) {
-                                            var excludeLayer = module.excludeLayers[i].layer,
-                                                map = excludeLayer.buildFileToModule;
-                                            excludeLayer.buildFilePaths.forEach(function(filePath){
-                                                build.removeModulePath(map[filePath], filePath, module.layer);
-                                            });
-                                        });
-                                    }
-                                    if (module.excludeShallow) {
-                                        //module.excludeShallow is an array of module names.
-                                        //shallow exclusions are just that module itself, and not
-                                        //its nested dependencies.
-                                        module.excludeShallow.forEach(function (excludeShallowModule) {
-                                            var path = getOwn(module.layer.buildPathMap, excludeShallowModule);
-                                            if (path) {
-                                                build.removeModulePath(excludeShallowModule, path, module.layer);
-                                            }
-                                        });
-                                    }
-
-                                    //Flatten them and collect the build output for each module.
-                                    return build.flattenModule(module, module.layer, config).then(function (builtModule) {
-                                        var finalText, baseName;
-                                        //Save it to a temp file for now, in case there are other layers that
-                                        //contain optimized content that should not be included in later
-                                        //layer optimizations. See issue #56.
-                                        if (module._buildPath === 'FUNCTION') {
-                                            module._buildText = builtModule.text;
-                                            module._buildSourceMap = builtModule.sourceMap;
-                                        } else {
-                                            finalText = builtModule.text;
-                                            if (builtModule.sourceMap) {
-                                                baseName = module._buildPath.split('/');
-                                                baseName = baseName.pop();
-                                                finalText += '\n//@ sourceMappingURL=' + baseName + '.map';
-                                                file.saveUtf8File(module._buildPath + '.map', builtModule.sourceMap);
-                                            }
-                                            file.saveUtf8File(module._buildPath + '-temp', finalText);
-
-                                        }
-                                        buildFileContents += builtModule.buildText;
+                                //Call require to calculate dependencies.
+                                return build.traceDependencies(module, config)
+                                    .then(function (layer) {
+                                        module.layer = layer;
                                     });
-                                };
-                            }));
-                        }
-                    }).then(function () {
-                        var moduleName;
-                        if (modules) {
-                            //Now move the build layers to their final position.
-                            modules.forEach(function (module) {
-                                var finalPath = module._buildPath;
-                                if (finalPath !== 'FUNCTION') {
-                                    if (file.exists(finalPath)) {
-                                        file.deleteFile(finalPath);
-                                    }
-                                    file.renameFile(finalPath + '-temp', finalPath);
+                            };
+                        });
 
-                                    //And finally, if removeCombined is specified, remove
-                                    //any of the files that were used in this layer.
-                                    //Be sure not to remove other build layers.
-                                    if (config.removeCombined) {
-                                        module.layer.buildFilePaths.forEach(function (path) {
-                                            if (file.exists(path) && !modules.some(function (mod) {
+                        return prim.serial(actions);
+                    }
+                }).then(function () {
+                    var actions;
+
+                    if (modules) {
+                        //Now build up shadow layers for anything that should be excluded.
+                        //Do this after tracing dependencies for each module, in case one
+                        //of those modules end up being one of the excluded values.
+                        actions = modules.map(function (module) {
+                            return function () {
+                                if (module.exclude) {
+                                    module.excludeLayers = [];
+                                    return prim.serial(module.exclude.map(function (exclude, i) {
+                                        return function () {
+                                            //See if it is already in the list of modules.
+                                            //If not trace dependencies for it.
+                                            var found = build.findBuildModule(exclude, modules);
+                                            if (found) {
+                                                module.excludeLayers[i] = found;
+                                            } else {
+                                                return build.traceDependencies({name: exclude}, config)
+                                                    .then(function (layer) {
+                                                        module.excludeLayers[i] = {layer: layer};
+                                                    });
+                                            }
+                                        };
+                                    }));
+                                }
+                            };
+                        });
+
+                        return prim.serial(actions);
+                    }
+                }).then(function () {
+                    if (modules) {
+                        return prim.serial(modules.map(function (module) {
+                            return function () {
+                                if (module.exclude) {
+                                    //module.exclude is an array of module names. For each one,
+                                    //get the nested dependencies for it via a matching entry
+                                    //in the module.excludeLayers array.
+                                    module.exclude.forEach(function (excludeModule, i) {
+                                        var excludeLayer = module.excludeLayers[i].layer,
+                                            map = excludeLayer.buildFileToModule;
+                                        excludeLayer.buildFilePaths.forEach(function (filePath) {
+                                            build.removeModulePath(map[filePath], filePath, module.layer);
+                                        });
+                                    });
+                                }
+                                if (module.excludeShallow) {
+                                    //module.excludeShallow is an array of module names.
+                                    //shallow exclusions are just that module itself, and not
+                                    //its nested dependencies.
+                                    module.excludeShallow.forEach(function (excludeShallowModule) {
+                                        var path = getOwn(module.layer.buildPathMap, excludeShallowModule);
+                                        if (path) {
+                                            build.removeModulePath(excludeShallowModule, path, module.layer);
+                                        }
+                                    });
+                                }
+
+                                //Flatten them and collect the build output for each module.
+                                return build.flattenModule(module, module.layer, config).then(function (builtModule) {
+                                    var finalText, baseName;
+                                    //Save it to a temp file for now, in case there are other layers that
+                                    //contain optimized content that should not be included in later
+                                    //layer optimizations. See issue #56.
+                                    if (module._buildPath === 'FUNCTION') {
+                                        module._buildText = builtModule.text;
+                                        module._buildSourceMap = builtModule.sourceMap;
+                                    } else {
+                                        finalText = builtModule.text;
+                                        if (builtModule.sourceMap) {
+                                            baseName = module._buildPath.split('/');
+                                            baseName = baseName.pop();
+                                            finalText += '\n//@ sourceMappingURL=' + baseName + '.map';
+                                            file.saveUtf8File(module._buildPath + '.map', builtModule.sourceMap);
+                                        }
+                                        file.saveUtf8File(module._buildPath + '-temp', finalText);
+
+                                    }
+                                    buildFileContents += builtModule.buildText;
+                                });
+                            };
+                        }));
+                    }
+                }).then(function () {
+                    var moduleName;
+                    if (modules) {
+                        //Now move the build layers to their final position.
+                        modules.forEach(function (module) {
+                            var finalPath = module._buildPath;
+                            if (finalPath !== 'FUNCTION') {
+                                if (file.exists(finalPath)) {
+                                    file.deleteFile(finalPath);
+                                }
+                                file.renameFile(finalPath + '-temp', finalPath);
+
+                                //And finally, if removeCombined is specified, remove
+                                //any of the files that were used in this layer.
+                                //Be sure not to remove other build layers.
+                                if (config.removeCombined) {
+                                    module.layer.buildFilePaths.forEach(function (path) {
+                                        if (file.exists(path) && !modules.some(function (mod) {
                                                 return mod._buildPath === path;
                                             })) {
-                                                file.deleteFile(path);
-                                            }
-                                        });
-                                    }
+                                            file.deleteFile(path);
+                                        }
+                                    });
                                 }
-
-                                //Signal layer is done
-                                if (config.onModuleBundleComplete) {
-                                    config.onModuleBundleComplete(module.onCompleteData);
-                                }
-                            });
-                        }
-
-                        //If removeCombined in play, remove any empty directories that
-                        //may now exist because of its use
-                        if (config.removeCombined && !config.out && config.dir) {
-                            file.deleteEmptyDirs(config.dir);
-                        }
-
-                        //Do other optimizations.
-                        if (config.out && !config.cssIn) {
-                            //Just need to worry about one JS file.
-                            fileName = config.modules[0]._buildPath;
-                            if (fileName === 'FUNCTION') {
-                                config.modules[0]._buildText = optimize.js(fileName,
-                                    config.modules[0]._buildText,
-                                    null,
-                                    config);
-                            } else {
-                                optimize.jsFile(fileName, null, fileName, config);
                             }
-                        } else if (!config.cssIn) {
-                            //Normal optimizations across modules.
 
-                            //JS optimizations.
-                            fileNames = file.getFilteredFileList(config.dir, /\.js$/, true);
-                            fileNames.forEach(function (fileName) {
-                                var cfg, override, moduleIndex;
+                            //Signal layer is done
+                            if (config.onModuleBundleComplete) {
+                                config.onModuleBundleComplete(module.onCompleteData);
+                            }
+                        });
+                    }
 
-                                //Generate the module name from the config.dir root.
-                                moduleName = fileName.replace(config.dir, '');
-                                //Get rid of the extension
-                                moduleName = moduleName.substring(0, moduleName.length - 3);
+                    //If removeCombined in play, remove any empty directories that
+                    //may now exist because of its use
+                    if (config.removeCombined && !config.out && config.dir) {
+                        file.deleteEmptyDirs(config.dir);
+                    }
 
-                                //If there is an override for a specific layer build module,
-                                //and this file is that module, mix in the override for use
-                                //by optimize.jsFile.
-                                moduleIndex = getOwn(config._buildPathToModuleIndex, fileName);
-                                //Normalize, since getOwn could have returned undefined
-                                moduleIndex = moduleIndex === 0 || moduleIndex > 0 ? moduleIndex : -1;
+                    //Do other optimizations.
+                    if (config.out && !config.cssIn) {
+                        //Just need to worry about one JS file.
+                        fileName = config.modules[0]._buildPath;
+                        if (fileName === 'FUNCTION') {
+                            config.modules[0]._buildText = optimize.js(fileName,
+                                config.modules[0]._buildText,
+                                null,
+                                config);
+                        } else {
+                            optimize.jsFile(fileName, null, fileName, config);
+                        }
+                    } else if (!config.cssIn) {
+                        //Normal optimizations across modules.
 
-                                //Try to avoid extra work if the other files do not need to
-                                //be read. Build layers should be processed at the very
-                                //least for optimization.
-                                if (moduleIndex > -1 || !config.skipDirOptimize ||
-                                    config.normalizeDirDefines === "all" ||
-                                    config.cjsTranslate) {
-                                    //Convert the file to transport format, but without a name
-                                    //inserted (by passing null for moduleName) since the files are
-                                    //standalone, one module per file.
-                                    fileContents = file.readFile(fileName);
+                        //JS optimizations.
+                        fileNames = file.getFilteredFileList(config.dir, /\.js$/, true);
+                        fileNames.forEach(function (fileName) {
+                            var cfg, override, moduleIndex;
+
+                            //Generate the module name from the config.dir root.
+                            moduleName = fileName.replace(config.dir, '');
+                            //Get rid of the extension
+                            moduleName = moduleName.substring(0, moduleName.length - 3);
+
+                            //If there is an override for a specific layer build module,
+                            //and this file is that module, mix in the override for use
+                            //by optimize.jsFile.
+                            moduleIndex = getOwn(config._buildPathToModuleIndex, fileName);
+                            //Normalize, since getOwn could have returned undefined
+                            moduleIndex = moduleIndex === 0 || moduleIndex > 0 ? moduleIndex : -1;
+
+                            //Try to avoid extra work if the other files do not need to
+                            //be read. Build layers should be processed at the very
+                            //least for optimization.
+                            if (moduleIndex > -1 || !config.skipDirOptimize ||
+                                config.normalizeDirDefines === "all" ||
+                                config.cjsTranslate) {
+                                //Convert the file to transport format, but without a name
+                                //inserted (by passing null for moduleName) since the files are
+                                //standalone, one module per file.
+                                fileContents = file.readFile(fileName);
 
 
-                                    //For builds, if wanting cjs translation, do it now, so that
-                                    //the individual modules can be loaded cross domain via
-                                    //plain script tags.
-                                    if (config.cjsTranslate &&
-                                        (!config.shim || !lang.hasProp(config.shim, moduleName))) {
-                                        fileContents = commonJs.convert(fileName, fileContents);
+                                //For builds, if wanting cjs translation, do it now, so that
+                                //the individual modules can be loaded cross domain via
+                                //plain script tags.
+                                if (config.cjsTranslate &&
+                                    (!config.shim || !lang.hasProp(config.shim, moduleName))) {
+                                    fileContents = commonJs.convert(fileName, fileContents);
+                                }
+
+                                if (moduleIndex === -1) {
+                                    if (config.onBuildRead) {
+                                        fileContents = config.onBuildRead(moduleName,
+                                            fileName,
+                                            fileContents);
                                     }
 
-                                    if (moduleIndex === -1) {
-                                        if (config.onBuildRead) {
-                                            fileContents = config.onBuildRead(moduleName,
-                                                fileName,
-                                                fileContents);
-                                        }
-
-                                        //Only do transport normalization if this is not a build
-                                        //layer (since it was already normalized) and if
-                                        //normalizeDirDefines indicated all should be done.
-                                        if (config.normalizeDirDefines === "all") {
-                                            fileContents = build.toTransport(config.namespace,
-                                                null,
-                                                fileName,
-                                                fileContents);
-                                        }
-
-                                        if (config.onBuildWrite) {
-                                            fileContents = config.onBuildWrite(moduleName,
-                                                fileName,
-                                                fileContents);
-                                        }
+                                    //Only do transport normalization if this is not a build
+                                    //layer (since it was already normalized) and if
+                                    //normalizeDirDefines indicated all should be done.
+                                    if (config.normalizeDirDefines === "all") {
+                                        fileContents = build.toTransport(config.namespace,
+                                            null,
+                                            fileName,
+                                            fileContents);
                                     }
 
-                                    override = moduleIndex > -1 ?
-                                        config.modules[moduleIndex].override : null;
-                                    if (override) {
-                                        cfg = build.createOverrideConfig(config, override);
-                                    } else {
-                                        cfg = config;
-                                    }
-
-                                    if (moduleIndex > -1 || !config.skipDirOptimize) {
-                                        optimize.jsFile(fileName, fileContents, fileName, cfg, pluginCollector);
+                                    if (config.onBuildWrite) {
+                                        fileContents = config.onBuildWrite(moduleName,
+                                            fileName,
+                                            fileContents);
                                     }
                                 }
-                            });
 
-                            //Normalize all the plugin resources.
-                            context = require.s.contexts._;
+                                override = moduleIndex > -1 ?
+                                    config.modules[moduleIndex].override : null;
+                                if (override) {
+                                    cfg = build.createOverrideConfig(config, override);
+                                } else {
+                                    cfg = config;
+                                }
 
-                            for (moduleName in pluginCollector) {
-                                if (hasProp(pluginCollector, moduleName)) {
-                                    parentModuleMap = context.makeModuleMap(moduleName);
-                                    resources = pluginCollector[moduleName];
-                                    for (i = 0; i < resources.length; i++) {
-                                        resource = resources[i];
+                                if (moduleIndex > -1 || !config.skipDirOptimize) {
+                                    optimize.jsFile(fileName, fileContents, fileName, cfg, pluginCollector);
+                                }
+                            }
+                        });
+
+                        //Normalize all the plugin resources.
+                        context = require.s.contexts._;
+
+                        for (moduleName in pluginCollector) {
+                            if (hasProp(pluginCollector, moduleName)) {
+                                parentModuleMap = context.makeModuleMap(moduleName);
+                                resources = pluginCollector[moduleName];
+                                for (i = 0; i < resources.length; i++) {
+                                    resource = resources[i];
+                                    moduleMap = context.makeModuleMap(resource, parentModuleMap);
+                                    if (falseProp(context.plugins, moduleMap.prefix)) {
+                                        //Set the value in context.plugins so it
+                                        //will be evaluated as a full plugin.
+                                        context.plugins[moduleMap.prefix] = true;
+
+                                        //Do not bother if the plugin is not available.
+                                        if (!file.exists(require.toUrl(moduleMap.prefix + '.js'))) {
+                                            continue;
+                                        }
+
+                                        //Rely on the require in the build environment
+                                        //to be synchronous
+                                        context.require([moduleMap.prefix]);
+
+                                        //Now that the plugin is loaded, redo the moduleMap
+                                        //since the plugin will need to normalize part of the path.
                                         moduleMap = context.makeModuleMap(resource, parentModuleMap);
-                                        if (falseProp(context.plugins, moduleMap.prefix)) {
-                                            //Set the value in context.plugins so it
-                                            //will be evaluated as a full plugin.
-                                            context.plugins[moduleMap.prefix] = true;
-
-                                            //Do not bother if the plugin is not available.
-                                            if (!file.exists(require.toUrl(moduleMap.prefix + '.js'))) {
-                                                continue;
-                                            }
-
-                                            //Rely on the require in the build environment
-                                            //to be synchronous
-                                            context.require([moduleMap.prefix]);
-
-                                            //Now that the plugin is loaded, redo the moduleMap
-                                            //since the plugin will need to normalize part of the path.
-                                            moduleMap = context.makeModuleMap(resource, parentModuleMap);
-                                        }
-
-                                        //Only bother with plugin resources that can be handled
-                                        //processed by the plugin, via support of the writeFile
-                                        //method.
-                                        if (falseProp(pluginProcessed, moduleMap.id)) {
-                                            //Only do the work if the plugin was really loaded.
-                                            //Using an internal access because the file may
-                                            //not really be loaded.
-                                            plugin = getOwn(context.defined, moduleMap.prefix);
-                                            if (plugin && plugin.writeFile) {
-                                                plugin.writeFile(
-                                                    moduleMap.prefix,
-                                                    moduleMap.name,
-                                                    require,
-                                                    makeWriteFile(
-                                                        config.namespace
-                                                    ),
-                                                    context.config
-                                                );
-                                            }
-
-                                            pluginProcessed[moduleMap.id] = true;
-                                        }
                                     }
 
+                                    //Only bother with plugin resources that can be handled
+                                    //processed by the plugin, via support of the writeFile
+                                    //method.
+                                    if (falseProp(pluginProcessed, moduleMap.id)) {
+                                        //Only do the work if the plugin was really loaded.
+                                        //Using an internal access because the file may
+                                        //not really be loaded.
+                                        plugin = getOwn(context.defined, moduleMap.prefix);
+                                        if (plugin && plugin.writeFile) {
+                                            plugin.writeFile(
+                                                moduleMap.prefix,
+                                                moduleMap.name,
+                                                require,
+                                                makeWriteFile(
+                                                    config.namespace
+                                                ),
+                                                context.config
+                                            );
+                                        }
+
+                                        pluginProcessed[moduleMap.id] = true;
+                                    }
                                 }
+
                             }
-
-                            //console.log('PLUGIN COLLECTOR: ' + JSON.stringify(pluginCollector, null, "  "));
-
-
-                            //All module layers are done, write out the build.txt file.
-                            file.saveUtf8File(config.dir + "build.txt", buildFileContents);
                         }
 
-                        //If just have one CSS file to optimize, do that here.
-                        if (config.cssIn) {
-                            buildFileContents += optimize.cssFile(config.cssIn, config.out, config).buildText;
-                        }
+                        //console.log('PLUGIN COLLECTOR: ' + JSON.stringify(pluginCollector, null, "  "));
 
-                        if (typeof config.out === 'function') {
-                            config.out(config.modules[0]._buildText);
-                        }
 
-                        //Print out what was built into which layers.
-                        if (buildFileContents) {
-                            logger.info(buildFileContents);
-                            return buildFileContents;
-                        }
+                        //All module layers are done, write out the build.txt file.
+                        file.saveUtf8File(config.dir + "build.txt", buildFileContents);
+                    }
 
-                        return '';
-                    });
+                    //If just have one CSS file to optimize, do that here.
+                    if (config.cssIn) {
+                        buildFileContents += optimize.cssFile(config.cssIn, config.out, config).buildText;
+                    }
+
+                    if (typeof config.out === 'function') {
+                        config.out(config.modules[0]._buildText);
+                    }
+
+                    //Print out what was built into which layers.
+                    if (buildFileContents) {
+                        logger.info(buildFileContents);
+                        return buildFileContents;
+                    }
+
+                    return '';
+                });
             };
 
             /**
@@ -24122,7 +24471,7 @@ var requirejs, require, define, xpcUtil;
                 var i, dotLength, finalParts, length,
                     refParts = refPath.split('/'),
                     targetParts = targetPath.split('/'),
-                //Pull off file name
+                    //Pull off file name
                     targetName = targetParts.pop(),
                     dotParts = [];
 
@@ -24171,9 +24520,7 @@ var requirejs, require, define, xpcUtil;
                         //If the value of the property is a plain object, then
                         //allow a one-level-deep mixing of it.
                         value = source[prop];
-                        if (typeof value === 'object' && value &&
-                            !lang.isArray(value) && !lang.isFunction(value) &&
-                            !lang.isRegExp(value)) {
+                        if (typeof value === 'object' && value && !lang.isArray(value) && !lang.isFunction(value) && !lang.isRegExp(value)) {
                             target[prop] = lang.mixin({}, target[prop], value, true);
                         } else {
                             target[prop] = value;
@@ -24204,7 +24551,7 @@ var requirejs, require, define, xpcUtil;
                         wrap[keyName] += (wrap[keyName] ? '\n' : '') +
                             file.readFile(build.makeAbsPath(fileName, absFilePath));
                     });
-                } else if (wrap[keyName] === null ||  wrap[keyName] === undefined) {
+                } else if (wrap[keyName] === null || wrap[keyName] === undefined) {
                     //Allow missing one, just set to empty string.
                     wrap[keyName] = '';
                 } else if (typeof wrap[keyName] !== 'string') {
@@ -24345,8 +24692,7 @@ var requirejs, require, define, xpcUtil;
                     throw new Error('"main" passed as an option, but the ' +
                         'supported option is called "name".');
                 }
-                if (config.out && !config.name && !config.modules && !config.include &&
-                    !config.cssIn) {
+                if (config.out && !config.name && !config.modules && !config.include && !config.cssIn) {
                     throw new Error('Missing either a "name", "include" or "modules" ' +
                         'option');
                 }
@@ -24877,154 +25223,154 @@ var requirejs, require, define, xpcUtil;
                                             return require._cacheReadAsync(path);
                                         }
                                     }).then(function (text) {
-                                            var hasPackageName;
+                                        var hasPackageName;
 
-                                            currContents = text;
+                                        currContents = text;
 
-                                            if (config.cjsTranslate &&
-                                                (!config.shim || !lang.hasProp(config.shim, moduleName))) {
-                                                currContents = commonJs.convert(path, currContents);
-                                            }
+                                        if (config.cjsTranslate &&
+                                            (!config.shim || !lang.hasProp(config.shim, moduleName))) {
+                                            currContents = commonJs.convert(path, currContents);
+                                        }
 
-                                            if (config.onBuildRead) {
-                                                currContents = config.onBuildRead(moduleName, path, currContents);
-                                            }
+                                        if (config.onBuildRead) {
+                                            currContents = config.onBuildRead(moduleName, path, currContents);
+                                        }
 
-                                            if (packageConfig) {
-                                                hasPackageName = (nonPackageName === parse.getNamedDefine(currContents));
-                                            }
+                                        if (packageConfig) {
+                                            hasPackageName = (nonPackageName === parse.getNamedDefine(currContents));
+                                        }
 
-                                            if (namespace) {
-                                                currContents = pragma.namespace(currContents, namespace);
-                                            }
+                                        if (namespace) {
+                                            currContents = pragma.namespace(currContents, namespace);
+                                        }
 
-                                            currContents = build.toTransport(namespace, moduleName, path, currContents, layer, {
-                                                useSourceUrl: config.useSourceUrl
-                                            });
-
-                                            if (packageConfig && !hasPackageName) {
-                                                currContents = addSemiColon(currContents) + '\n';
-                                                currContents += namespaceWithDot + "define('" +
-                                                    packageConfig.name + "', ['" + moduleName +
-                                                    "'], function (main) { return main; });\n";
-                                            }
-
-                                            if (config.onBuildWrite) {
-                                                currContents = config.onBuildWrite(moduleName, path, currContents);
-                                            }
-
-                                            //Semicolon is for files that are not well formed when
-                                            //concatenated with other content.
-                                            singleContents += "\n" + addSemiColon(currContents);
+                                        currContents = build.toTransport(namespace, moduleName, path, currContents, layer, {
+                                            useSourceUrl: config.useSourceUrl
                                         });
+
+                                        if (packageConfig && !hasPackageName) {
+                                            currContents = addSemiColon(currContents) + '\n';
+                                            currContents += namespaceWithDot + "define('" +
+                                                packageConfig.name + "', ['" + moduleName +
+                                                "'], function (main) { return main; });\n";
+                                        }
+
+                                        if (config.onBuildWrite) {
+                                            currContents = config.onBuildWrite(moduleName, path, currContents);
+                                        }
+
+                                        //Semicolon is for files that are not well formed when
+                                        //concatenated with other content.
+                                        singleContents += "\n" + addSemiColon(currContents);
+                                    });
                                 }
                             }).then(function () {
-                                    var sourceMapPath, sourceMapLineNumber,
-                                        shortPath = path.replace(config.dir, "");
+                                var sourceMapPath, sourceMapLineNumber,
+                                    shortPath = path.replace(config.dir, "");
 
-                                    module.onCompleteData.included.push(shortPath);
-                                    buildFileContents += shortPath + "\n";
+                                module.onCompleteData.included.push(shortPath);
+                                buildFileContents += shortPath + "\n";
 
-                                    //Some files may not have declared a require module, and if so,
-                                    //put in a placeholder call so the require does not try to load them
-                                    //after the module is processed.
-                                    //If we have a name, but no defined module, then add in the placeholder.
-                                    if (moduleName && falseProp(layer.modulesWithNames, moduleName) && !config.skipModuleInsertion) {
-                                        shim = config.shim && (getOwn(config.shim, moduleName) || (packageConfig && getOwn(config.shim, nonPackageName)));
-                                        if (shim) {
-                                            singleContents += '\n' + namespaceWithDot + 'define("' + moduleName + '", ' +
-                                                (shim.deps && shim.deps.length ?
-                                                    build.makeJsArrayString(shim.deps) + ', ' : '') +
-                                                (shim.exportsFn ? shim.exportsFn() : 'function(){}') +
-                                                ');\n';
-                                        } else {
-                                            singleContents += '\n' + namespaceWithDot + 'define("' + moduleName + '", function(){});\n';
-                                        }
+                                //Some files may not have declared a require module, and if so,
+                                //put in a placeholder call so the require does not try to load them
+                                //after the module is processed.
+                                //If we have a name, but no defined module, then add in the placeholder.
+                                if (moduleName && falseProp(layer.modulesWithNames, moduleName) && !config.skipModuleInsertion) {
+                                    shim = config.shim && (getOwn(config.shim, moduleName) || (packageConfig && getOwn(config.shim, nonPackageName)));
+                                    if (shim) {
+                                        singleContents += '\n' + namespaceWithDot + 'define("' + moduleName + '", ' +
+                                            (shim.deps && shim.deps.length ?
+                                                build.makeJsArrayString(shim.deps) + ', ' : '') +
+                                            (shim.exportsFn ? shim.exportsFn() : 'function(){}') +
+                                            ');\n';
+                                    } else {
+                                        singleContents += '\n' + namespaceWithDot + 'define("' + moduleName + '", function(){});\n';
+                                    }
+                                }
+
+                                //Add to the source map
+                                if (sourceMapGenerator) {
+                                    sourceMapPath = build.makeRelativeFilePath(module._buildPath, path);
+                                    sourceMapLineNumber = fileContents.split('\n').length - 1;
+                                    lineCount = singleContents.split('\n').length;
+                                    for (var i = 1; i <= lineCount; i += 1) {
+                                        sourceMapGenerator.addMapping({
+                                            generated: {
+                                                line: sourceMapLineNumber + i,
+                                                column: 0
+                                            },
+                                            original: {
+                                                line: i,
+                                                column: 0
+                                            },
+                                            source: sourceMapPath
+                                        });
                                     }
 
-                                    //Add to the source map
-                                    if (sourceMapGenerator) {
-                                        sourceMapPath = build.makeRelativeFilePath(module._buildPath, path);
-                                        sourceMapLineNumber = fileContents.split('\n').length - 1;
-                                        lineCount = singleContents.split('\n').length;
-                                        for (var i = 1; i <= lineCount; i += 1) {
-                                            sourceMapGenerator.addMapping({
-                                                generated: {
-                                                    line: sourceMapLineNumber + i,
-                                                    column: 0
-                                                },
-                                                original: {
-                                                    line: i,
-                                                    column: 0
-                                                },
-                                                source: sourceMapPath
-                                            });
-                                        }
+                                    //Store the content of the original in the source
+                                    //map since other transforms later like minification
+                                    //can mess up translating back to the original
+                                    //source
+                                    sourceMapGenerator.setSourceContent(sourceMapPath, singleContents);
+                                }
 
-                                        //Store the content of the original in the source
-                                        //map since other transforms later like minification
-                                        //can mess up translating back to the original
-                                        //source
-                                        sourceMapGenerator.setSourceContent(sourceMapPath, singleContents);
-                                    }
-
-                                    //Add the file to the final contents
-                                    fileContents += singleContents;
-                                });
+                                //Add the file to the final contents
+                                fileContents += singleContents;
+                            });
                         };
                     })).then(function () {
-                            if (onLayerEnds.length) {
-                                onLayerEnds.forEach(function (builder) {
-                                    var path;
-                                    if (typeof module.out === 'string') {
-                                        path = module.out;
-                                    } else if (typeof module._buildPath === 'string') {
-                                        path = module._buildPath;
-                                    }
-                                    builder.onLayerEnd(function (input) {
-                                        fileContents += "\n" + addSemiColon(input);
-                                    }, {
-                                        name: module.name,
-                                        path: path
-                                    });
+                        if (onLayerEnds.length) {
+                            onLayerEnds.forEach(function (builder) {
+                                var path;
+                                if (typeof module.out === 'string') {
+                                    path = module.out;
+                                } else if (typeof module._buildPath === 'string') {
+                                    path = module._buildPath;
+                                }
+                                builder.onLayerEnd(function (input) {
+                                    fileContents += "\n" + addSemiColon(input);
+                                }, {
+                                    name: module.name,
+                                    path: path
                                 });
-                            }
+                            });
+                        }
 
-                            if (module.create) {
-                                //The ID is for a created layer. Write out
-                                //a module definition for it in case the
-                                //built file is used with enforceDefine
-                                //(#432)
-                                fileContents += '\n' + namespaceWithDot + 'define("' + module.name + '", function(){});\n';
-                            }
+                        if (module.create) {
+                            //The ID is for a created layer. Write out
+                            //a module definition for it in case the
+                            //built file is used with enforceDefine
+                            //(#432)
+                            fileContents += '\n' + namespaceWithDot + 'define("' + module.name + '", function(){});\n';
+                        }
 
-                            //Add a require at the end to kick start module execution, if that
-                            //was desired. Usually this is only specified when using small shim
-                            //loaders like almond.
-                            if (module.insertRequire) {
-                                fileContents += '\n' + namespaceWithDot + 'require(["' + module.insertRequire.join('", "') + '"]);\n';
-                            }
-                        });
-                }).then(function () {
-                        return {
-                            text: config.wrap ?
-                                config.wrap.start + fileContents + config.wrap.end :
-                                fileContents,
-                            buildText: buildFileContents,
-                            sourceMap: sourceMapGenerator ?
-                                JSON.stringify(sourceMapGenerator.toJSON(), null, '  ') :
-                                undefined
-                        };
+                        //Add a require at the end to kick start module execution, if that
+                        //was desired. Usually this is only specified when using small shim
+                        //loaders like almond.
+                        if (module.insertRequire) {
+                            fileContents += '\n' + namespaceWithDot + 'require(["' + module.insertRequire.join('", "') + '"]);\n';
+                        }
                     });
+                }).then(function () {
+                    return {
+                        text: config.wrap ?
+                            config.wrap.start + fileContents + config.wrap.end :
+                            fileContents,
+                        buildText: buildFileContents,
+                        sourceMap: sourceMapGenerator ?
+                            JSON.stringify(sourceMapGenerator.toJSON(), null, '  ') :
+                            undefined
+                    };
+                });
             };
 
             //Converts an JS array of strings to a string representation.
             //Not using JSON.stringify() for Rhino's sake.
             build.makeJsArrayString = function (ary) {
                 return '["' + ary.map(function (item) {
-                    //Escape any double quotes, backslashes
-                    return lang.jsEscape(item);
-                }).join('","') + '"]';
+                        //Escape any double quotes, backslashes
+                        return lang.jsEscape(item);
+                    }).join('","') + '"]';
             };
 
             build.toTransport = function (namespace, moduleName, path, contents, layer, options) {
@@ -25111,12 +25457,12 @@ var requirejs, require, define, xpcUtil;
                 }
 
                 errback = errback || function (err) {
-                    // Using console here since logger may have
-                    // turned off error logging. Since quit is
-                    // called want to be sure a message is printed.
-                    console.log(err);
-                    quit(1);
-                };
+                        // Using console here since logger may have
+                        // turned off error logging. Since quit is
+                        // called want to be sure a message is printed.
+                        console.log(err);
+                        quit(1);
+                    };
 
                 build(config).then(done, done).then(callback, errback);
             };
@@ -25202,9 +25548,10 @@ var requirejs, require, define, xpcUtil;
                 catchError: {
                     define: true
                 }
-            },       ['env!env/args', 'env!env/quit', 'logger', 'build'],
+            }, ['env!env/args', 'env!env/quit', 'logger', 'build'],
             function (args, quit, logger, build) {
-                build(args).then(function () {}, function (err) {
+                build(args).then(function () {
+                }, function (err) {
                     logger.error(err);
                     quit(1);
                 });
@@ -25251,6 +25598,6 @@ var requirejs, require, define, xpcUtil;
 
 }((typeof console !== 'undefined' ? console : undefined),
     (typeof Packages !== 'undefined' || (typeof window === 'undefined' &&
-        typeof Components !== 'undefined' && Components.interfaces) ?
+    typeof Components !== 'undefined' && Components.interfaces) ?
         Array.prototype.slice.call(arguments, 0) : []),
     (typeof readFile !== 'undefined' ? readFile : undefined)));

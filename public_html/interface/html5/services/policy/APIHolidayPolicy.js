@@ -1,51 +1,51 @@
-var APIHolidayPolicy = ServiceCaller.extend( {
+var APIHolidayPolicy = ServiceCaller.extend({
 
-	key_name: 'HolidayPolicy',
-	className: 'APIHolidayPolicy',
+    key_name: 'HolidayPolicy',
+    className: 'APIHolidayPolicy',
 
-	getHolidayPolicyDefaultData: function() {
+    getHolidayPolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getHolidayPolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getHolidayPolicyDefaultData', arguments);
 
-	},
+    },
 
-	getHolidayPolicy: function() {
+    getHolidayPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getHolidayPolicy', arguments );
+        return this.argumentsHandler(this.className, 'getHolidayPolicy', arguments);
 
-	},
+    },
 
-	getCommonHolidayPolicyData: function() {
+    getCommonHolidayPolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonHolidayPolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonHolidayPolicyData', arguments);
 
-	},
+    },
 
-	validateHolidayPolicy: function() {
+    validateHolidayPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateHolidayPolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateHolidayPolicy', arguments);
 
-	},
+    },
 
-	setHolidayPolicy: function() {
+    setHolidayPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setHolidayPolicy', arguments );
+        return this.argumentsHandler(this.className, 'setHolidayPolicy', arguments);
 
-	},
+    },
 
-	deleteHolidayPolicy: function() {
+    deleteHolidayPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteHolidayPolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteHolidayPolicy', arguments);
 
-	},
+    },
 
-	copyHolidayPolicy: function() {
-		return this.argumentsHandler( this.className, 'copyHolidayPolicy', arguments );
-	},
+    copyHolidayPolicy: function () {
+        return this.argumentsHandler(this.className, 'copyHolidayPolicy', arguments);
+    },
 
-	exportHolidayPolicy: function() {
-		return this.argumentsHandler( this.className, 'exportHolidayPolicy', arguments );
-	}
+    exportHolidayPolicy: function () {
+        return this.argumentsHandler(this.className, 'exportHolidayPolicy', arguments);
+    }
 
 
-} );
+});

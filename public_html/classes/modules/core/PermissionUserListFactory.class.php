@@ -19,280 +19,287 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class PermissionUserListFactory extends PermissionUserFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class PermissionUserListFactory extends PermissionUserFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable();
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+					from	' . $this->getTable();
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$pcf = new PermissionControlFactory();
+        $pcf = new PermissionControlFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $pcf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $pcf->getTable() . ' as b
 					where	a.permission_control_id = b.id
 						AND b.company_id = ?
 						AND b.deleted = 0
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndUserIdAndNotPermissionControlId($company_id, $user_id, $permission_control_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndUserIdAndNotPermissionControlId($company_id, $user_id, $permission_control_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $user_id == '') {
-			return FALSE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		if ( $permission_control_id == '') {
-			return FALSE;
-		}
+        if ($permission_control_id == '') {
+            return false;
+        }
 
-		$pcf = new PermissionControlFactory();
+        $pcf = new PermissionControlFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'permission_control_id' => (int)$permission_control_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'permission_control_id' => (int)$permission_control_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $pcf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $pcf->getTable() . ' as b
 					where	a.permission_control_id = b.id
 						AND b.company_id = ?
 						AND a.permission_control_id != ?
-						AND a.user_id in ('. $this->getListSQL( $user_id, $ph, 'int' ) .')
+						AND a.user_id in (' . $this->getListSQL($user_id, $ph, 'int') . ')
 						AND b.deleted = 0
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndDateAndValidIDs($company_id, $date = NULL, $valid_ids = array(), $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndDateAndValidIDs($company_id, $date = null, $valid_ids = array(), $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $date == '') {
-			$date = 0;
-		}
+        if ($date == '') {
+            $date = 0;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$pcf = new PermissionControlFactory();
-		
-		$query = '
+        $pcf = new PermissionControlFactory();
+
+        $query = '
 					select	a.*,
 							b.updated_date as updated_date,
 							b.updated_by as updated_by
-					from	'. $this->getTable() .' as a,
-							'. $pcf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $pcf->getTable() . ' as b
 					where	b.id = a.permission_control_id
 						AND b.company_id = ?
 						AND (
 								(
 								1=1 ';
 
-		if ( isset($date) AND $date > 0 ) {
-			//Append the same date twice for created and updated.
-			$ph[] = (int)$date;
-			$ph[] = (int)$date;
-			$query	.=	'		AND ( b.created_date >= ? OR b.updated_date >= ? ) )';
-		} else {
-			$query	.=	' ) ';
-		}
-		
-		if ( isset($valid_ids) AND is_array($valid_ids) AND count($valid_ids) > 0 ) {
-			$query	.=	' OR a.id in ('. $this->getListSQL( $valid_ids, $ph, 'int' ) .') ';
-		}
+        if (isset($date) and $date > 0) {
+            //Append the same date twice for created and updated.
+            $ph[] = (int)$date;
+            $ph[] = (int)$date;
+            $query .= '		AND ( b.created_date >= ? OR b.updated_date >= ? ) )';
+        } else {
+            $query .= ' ) ';
+        }
 
-		$query .= '	)
+        if (isset($valid_ids) and is_array($valid_ids) and count($valid_ids) > 0) {
+            $query .= ' OR a.id in (' . $this->getListSQL($valid_ids, $ph, 'int') . ') ';
+        }
+
+        $query .= '	)
 						AND ( b.deleted = 0)';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPermissionControlId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByPermissionControlId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'a.user_id' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($order == null) {
+            $order = array('a.user_id' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
+					from	' . $this->getTable() . ' as a
 					where	a.permission_control_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPermissionControlIdAndUserID($id, $user_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByPermissionControlIdAndUserID($id, $user_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $user_id == '') {
-			return FALSE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					'user_id' => (int)$user_id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+            'user_id' => (int)$user_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
+					from	' . $this->getTable() . ' as a
 					where	a.permission_control_id = ?
 						AND a.user_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
 
-	function getByPermissionControlIdArray($id) {
-		$pculf = new PermissionControlUserListFactory();
+    public function getByPermissionControlIdArray($id)
+    {
+        $pculf = new PermissionControlUserListFactory();
 
-		$pculf->getByPayPermissionControlId($id);
-		$user_list = array();
-		foreach ($pculf as $user) {
-			$user_list[$user->getUser()] = NULL;
-		}
+        $pculf->getByPayPermissionControlId($id);
+        $user_list = array();
+        foreach ($pculf as $user) {
+            $user_list[$user->getUser()] = null;
+        }
 
-		if ( empty($user_list) == FALSE ) {
-			return $user_list;
-		}
+        if (empty($user_list) == false) {
+            return $user_list;
+        }
 
-		return array();
-	}
+        return array();
+    }
 
-	function getIsModifiedByCompanyIdAndDate($company_id, $date, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getIsModifiedByCompanyIdAndDate($company_id, $date, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $date == '') {
-			return FALSE;
-		}
+        if ($date == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'created_date' => $date,
-					'updated_date' => $date,
-					'deleted_date' => $date,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'created_date' => $date,
+            'updated_date' => $date,
+            'deleted_date' => $date,
+        );
 
-		$pcf = new PermissionControlFactory();
+        $pcf = new PermissionControlFactory();
 
-		$query = '
+        $query = '
 					select	a.*,
 							b.updated_date as updated_date,
 							b.updated_by as updated_by
-					from	'. $this->getTable() .' as a,
-							'. $pcf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $pcf->getTable() . ' as b
 					where	b.id = a.permission_control_id
 						AND b.company_id = ?
 						AND
 							( b.created_date >=	 ? OR b.updated_date >= ? OR ( b.deleted = 1 AND b.deleted_date >= ? ) )
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->rs = $this->db->SelectLimit($query, 1, -1, $ph);
-		if ( $this->getRecordCount() > 0 ) {
-			Debug::text('Rows have been modified: '. $this->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
+        $this->rs = $this->db->SelectLimit($query, 1, -1, $ph);
+        if ($this->getRecordCount() > 0) {
+            Debug::text('Rows have been modified: ' . $this->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
 
-			return TRUE;
-		}
-		Debug::text('Rows have NOT been modified', __FILE__, __LINE__, __METHOD__, 10);
-		return FALSE;
-	}
-
+            return true;
+        }
+        Debug::text('Rows have NOT been modified', __FILE__, __LINE__, __METHOD__, 10);
+        return false;
+    }
 }
-?>

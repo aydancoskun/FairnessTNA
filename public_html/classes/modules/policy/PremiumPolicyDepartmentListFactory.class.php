@@ -19,122 +19,126 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class PremiumPolicyDepartmentListFactory extends PremiumPolicyDepartmentFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class PremiumPolicyDepartmentListFactory extends PremiumPolicyDepartmentFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable();
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+					from	' . $this->getTable();
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$cache_id = 'premium_policy-'. $company_id;
-		$this->rs = $this->getCache( $cache_id );
-		if ( $this->rs === FALSE ) {
-			$ppf = new PremiumPolicyFactory();
+        $cache_id = 'premium_policy-' . $company_id;
+        $this->rs = $this->getCache($cache_id);
+        if ($this->rs === false) {
+            $ppf = new PremiumPolicyFactory();
 
-			$ph = array(
-						'company_id' => (int)$company_id,
-						);
+            $ph = array(
+                'company_id' => (int)$company_id,
+            );
 
-			$query = '
+            $query = '
 						select	a.*
-						from	'. $this->getTable() .' as a
-						LEFT JOIN '. $ppf->getTable() .' as ppf ON a.premium_policy_id = ppf.id
+						from	' . $this->getTable() . ' as a
+						LEFT JOIN ' . $ppf->getTable() . ' as ppf ON a.premium_policy_id = ppf.id
 						where	ppf.company_id = ?
 							AND ( ppf.deleted = 0 )';
-			$query .= $this->getWhereSQL( $where );
-			$query .= $this->getSortSQL( $order );
+            $query .= $this->getWhereSQL($where);
+            $query .= $this->getSortSQL($order);
 
-			$this->ExecuteSQL( $query, $ph );
+            $this->ExecuteSQL($query, $ph);
 
-			$this->saveCache($this->rs, $cache_id);
-		}
+            $this->saveCache($this->rs, $cache_id);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPremiumPolicyId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByPremiumPolicyIdArray($id)
+    {
+        $ppdlf = new PremiumPolicyDepartmentListFactory();
 
-		$ppf = new PremiumPolicyFactory();
+        $ppdlf->getByPremiumPolicyId($id);
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $list = array();
+        foreach ($ppdlf as $obj) {
+            $list[$obj->getPremiumPolicy()] = null;
+        }
+
+        if (empty($list) == false) {
+            return $list;
+        }
+
+        return array();
+    }
+
+    public function getByPremiumPolicyId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
+
+        $ppf = new PremiumPolicyFactory();
+
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $ppf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $ppf->getTable() . ' as b
 					where	b.id = a.premium_policy_id
 						AND a.premium_policy_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
-
-	function getByPremiumPolicyIdArray($id) {
-		$ppdlf = new PremiumPolicyDepartmentListFactory();
-
-		$ppdlf->getByPremiumPolicyId($id);
-
-		$list = array();
-		foreach ($ppdlf as $obj) {
-			$list[$obj->getPremiumPolicy()] = NULL;
-		}
-
-		if ( empty($list) == FALSE ) {
-			return $list;
-		}
-
-		return array();
-	}
+        return $this;
+    }
 }
-?>

@@ -1,66 +1,65 @@
-var APIUserSkill = ServiceCaller.extend( {
+var APIUserSkill = ServiceCaller.extend({
 
-	key_name: 'UserSkill',
-	className: 'APIUserSkill',
+    key_name: 'UserSkill',
+    className: 'APIUserSkill',
 
-	getCommonUserSkillData: function() {
+    getCommonUserSkillData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserSkillData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserSkillData', arguments);
 
-	},
+    },
 
-	getUserSkill: function() {
+    getUserSkill: function () {
 
-		return this.argumentsHandler( this.className, 'getUserSkill', arguments );
+        return this.argumentsHandler(this.className, 'getUserSkill', arguments);
 
-	},
+    },
 
-	setUserSkill: function() {
+    setUserSkill: function () {
 
-		return this.argumentsHandler( this.className, 'setUserSkill', arguments );
+        return this.argumentsHandler(this.className, 'setUserSkill', arguments);
 
-	},
+    },
 
-	getUserSkillDefaultData: function() {
+    getUserSkillDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserSkillDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserSkillDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserSkill: function() {
+    deleteUserSkill: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserSkill', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserSkill', arguments);
 
-	},
+    },
 
-	validateUserSkill: function() {
+    validateUserSkill: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserSkill', arguments );
+        return this.argumentsHandler(this.className, 'validateUserSkill', arguments);
 
-	},
+    },
 
-	copyUserSkill: function() {
+    copyUserSkill: function () {
 
-		return this.argumentsHandler( this.className, 'copyUserSkill', arguments );
+        return this.argumentsHandler(this.className, 'copyUserSkill', arguments);
 
-	},
+    },
 
-	exportUserSkill: function() {
-		return this.argumentsHandler( this.className, 'exportUserSkill', arguments );
-	},
+    exportUserSkill: function () {
+        return this.argumentsHandler(this.className, 'exportUserSkill', arguments);
+    },
 
-	generateInvoices: function() {
+    generateInvoices: function () {
 
-		return this.argumentsHandler( this.className, 'generateInvoices', arguments );
+        return this.argumentsHandler(this.className, 'generateInvoices', arguments);
 
-	},
+    },
 
-	calcExperience: function() {
+    calcExperience: function () {
 
-		return this.argumentsHandler( this.className, 'calcExperience', arguments );
+        return this.argumentsHandler(this.className, 'calcExperience', arguments);
 
-	}
+    }
 
 
-
-} );
+});

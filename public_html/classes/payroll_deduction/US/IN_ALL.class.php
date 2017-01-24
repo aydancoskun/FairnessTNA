@@ -19,44 +19,45 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package PayrollDeduction\US
  */
-class PayrollDeduction_US_IN_ALL extends PayrollDeduction_US_IN {
+class PayrollDeduction_US_IN_ALL extends PayrollDeduction_US_IN
+{
+    public function getDistrictTaxPayable()
+    {
+        $annual_income = $this->getDistrictAnnualTaxableIncome();
 
-	function getDistrictAnnualTaxableIncome() {
-		$annual_income = $this->getAnnualTaxableIncome();
-		$state_allowance = $this->getStateAllowanceAmount();
-		$state_dependant_allowance = $this->getStateDependantAllowanceAmount();
+        $retval = 0;
 
-		$income = bcsub( bcsub( $annual_income, $state_allowance), $state_dependant_allowance);
+        if ($annual_income > 0) {
+            $rate = bcdiv($this->getUserValue3(), 100);
 
-		Debug::text('District Annual Taxable Income: '. $income, __FILE__, __LINE__, __METHOD__, 10);
+            $retval = bcmul($annual_income, $rate);
+        }
 
-		return $income;
-	}
+        if ($retval < 0) {
+            $retval = 0;
+        }
 
-	function getDistrictTaxPayable() {
-		$annual_income = $this->getDistrictAnnualTaxableIncome();
+        Debug::text('District Annual Tax Payable: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		$retval = 0;
+        return $retval;
+    }
 
-		if ( $annual_income > 0 ) {
-			$rate = bcdiv( $this->getUserValue3(), 100);
+    public function getDistrictAnnualTaxableIncome()
+    {
+        $annual_income = $this->getAnnualTaxableIncome();
+        $state_allowance = $this->getStateAllowanceAmount();
+        $state_dependant_allowance = $this->getStateDependantAllowanceAmount();
 
-			$retval = bcmul( $annual_income, $rate);
-		}
+        $income = bcsub(bcsub($annual_income, $state_allowance), $state_dependant_allowance);
 
-		if ( $retval < 0 ) {
-			$retval = 0;
-		}
+        Debug::text('District Annual Taxable Income: ' . $income, __FILE__, __LINE__, __METHOD__, 10);
 
-		Debug::text('District Annual Tax Payable: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
-
-		return $retval;
-	}
+        return $income;
+    }
 }
-?>

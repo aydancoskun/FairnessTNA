@@ -19,57 +19,59 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1060A extends InstallSchema_Base {
+class InstallSchema_1060A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        //Go through each permission group, and enable affordable_care report for for anyone who can view W2's.
+        $clf = TTnew('CompanyListFactory');
+        $clf->getAll();
+        if ($clf->getRecordCount() > 0) {
+            foreach ($clf as $c_obj) {
+                Debug::text('Company: ' . $c_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
+                if ($c_obj->getStatus() != 30) {
+                    $pclf = TTnew('PermissionControlListFactory');
+                    $pclf->getByCompanyId($c_obj->getId(), null, null, null, array('name' => 'asc')); //Force order to prevent references to columns that haven't been created yet.
+                    if ($pclf->getRecordCount() > 0) {
+                        foreach ($pclf as $pc_obj) {
+                            Debug::text('Permission Group: ' . $pc_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
+                            $plf = TTnew('PermissionListFactory');
+                            $plf->getByCompanyIdAndPermissionControlIdAndSectionAndNameAndValue($c_obj->getId(), $pc_obj->getId(), 'report', 'view_formW2', 1);
+                            if ($plf->getRecordCount() > 0) {
+                                Debug::text('Found permission group with view_formW2 enabled: ' . $plf->getCurrent()->getValue(), __FILE__, __LINE__, __METHOD__, 9);
+                                $pc_obj->setPermission(
+                                    array('report' => array(
+                                        'view_affordable_care' => true,
+                                    )
+                                    )
+                                );
+                            } else {
+                                Debug::text('Permission group does NOT have view_formW2 enabled...', __FILE__, __LINE__, __METHOD__, 9);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-		//Go through each permission group, and enable affordable_care report for for anyone who can view W2's.
-		$clf = TTnew( 'CompanyListFactory' );
-		$clf->getAll();
-		if ( $clf->getRecordCount() > 0 ) {
-			foreach( $clf as $c_obj ) {
-				Debug::text('Company: '. $c_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
-				if ( $c_obj->getStatus() != 30 ) {
-					$pclf = TTnew( 'PermissionControlListFactory' );
-					$pclf->getByCompanyId( $c_obj->getId(), NULL, NULL, NULL, array( 'name' => 'asc' ) ); //Force order to prevent references to columns that haven't been created yet.
-					if ( $pclf->getRecordCount() > 0 ) {
-						foreach( $pclf as $pc_obj ) {
-							Debug::text('Permission Group: '. $pc_obj->getName(), __FILE__, __LINE__, __METHOD__, 9);
-							$plf = TTnew( 'PermissionListFactory' );
-							$plf->getByCompanyIdAndPermissionControlIdAndSectionAndNameAndValue( $c_obj->getId(), $pc_obj->getId(), 'report', 'view_formW2', 1 );
-							if ( $plf->getRecordCount() > 0 ) {
-								Debug::text('Found permission group with view_formW2 enabled: '. $plf->getCurrent()->getValue(), __FILE__, __LINE__, __METHOD__, 9);
-								$pc_obj->setPermission(
-														array(	'report' => array(
-																					'view_affordable_care' => TRUE,
-																				)
-															)
-														);
-							} else {
-								Debug::text('Permission group does NOT have view_formW2 enabled...', __FILE__, __LINE__, __METHOD__, 9);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		//Go through all stations and disable ones that don't have any employees activated for them.
-		//This greatly speeds up station checks, as most stations never have employees activated.
-		$query = 'update station set status_id = 10
+        //Go through all stations and disable ones that don't have any employees activated for them.
+        //This greatly speeds up station checks, as most stations never have employees activated.
+        $query = 'update station set status_id = 10
 					where status_id = 20
 					AND
 					(
@@ -84,9 +86,8 @@ class InstallSchema_1060A extends InstallSchema_Base {
 						NOT EXISTS( select e.id from station_include_user as e WHERE id = e.station_id )
 					)
 					AND ( deleted = 0 )';
-		$this->getDatabaseConnection()->Execute($query);
+        $this->getDatabaseConnection()->Execute($query);
 
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

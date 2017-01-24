@@ -1,92 +1,91 @@
-var APIUser = ServiceCaller.extend( {
+var APIUser = ServiceCaller.extend({
 
-	key_name: 'User',
-	className: 'APIUser',
+    key_name: 'User',
+    className: 'APIUser',
 
-	getCommonUserData: function() {
+    getCommonUserData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserData', arguments);
 
-	},
+    },
 
-	getUser: function() {
+    getUser: function () {
 
-		return this.argumentsHandler( this.className, 'getUser', arguments );
+        return this.argumentsHandler(this.className, 'getUser', arguments);
 
-	},
+    },
 
-	setUser: function() {
+    setUser: function () {
 
-		return this.argumentsHandler( this.className, 'setUser', arguments );
+        return this.argumentsHandler(this.className, 'setUser', arguments);
 
-	},
+    },
 
-	getUserDefaultData: function() {
+    getUserDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserDefaultData', arguments);
 
-	},
+    },
 
-	deleteUser: function() {
+    deleteUser: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUser', arguments );
+        return this.argumentsHandler(this.className, 'deleteUser', arguments);
 
-	},
+    },
 
-	validateUser: function() {
+    validateUser: function () {
 
-		return this.argumentsHandler( this.className, 'validateUser', arguments );
+        return this.argumentsHandler(this.className, 'validateUser', arguments);
 
-	},
+    },
 
-	copyUser: function() {
+    copyUser: function () {
 
-		return this.argumentsHandler( this.className, 'copyUser', arguments );
+        return this.argumentsHandler(this.className, 'copyUser', arguments);
 
-	},
+    },
 
-	isUniqueUserName: function() {
+    isUniqueUserName: function () {
 
-		return this.argumentsHandler( this.className, 'isUniqueUserName', arguments );
+        return this.argumentsHandler(this.className, 'isUniqueUserName', arguments);
 
-	},
+    },
 
-	changePassword: function() {
+    changePassword: function () {
 
-		return this.argumentsHandler( this.className, 'changePassword', arguments );
+        return this.argumentsHandler(this.className, 'changePassword', arguments);
 
-	},
-
-
-	UnsubscribeEmail: function() {
-
-		return this.argumentsHandler( this.className, 'UnsubscribeEmail', arguments );
-
-	},
-
-	getCompanyUser: function() {
-
-		return this.argumentsHandler( this.className, 'getCompanyUser', arguments );
-
-	},
+    },
 
 
-	getUniqueUserProvinces: function() {
+    UnsubscribeEmail: function () {
 
-		return this.argumentsHandler( this.className, 'getUniqueUserProvinces', arguments );
+        return this.argumentsHandler(this.className, 'UnsubscribeEmail', arguments);
 
-	},
+    },
 
+    getCompanyUser: function () {
 
-	sendValidationEmail: function() {
-		return this.argumentsHandler( this.className, 'sendValidationEmail', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyUser', arguments);
 
-	},
-
-	exportUser: function() {
-		return this.argumentsHandler( this.className, 'exportUser', arguments );
-	}
+    },
 
 
+    getUniqueUserProvinces: function () {
 
-} );
+        return this.argumentsHandler(this.className, 'getUniqueUserProvinces', arguments);
+
+    },
+
+
+    sendValidationEmail: function () {
+        return this.argumentsHandler(this.className, 'sendValidationEmail', arguments);
+
+    },
+
+    exportUser: function () {
+        return this.argumentsHandler(this.className, 'exportUser', arguments);
+    }
+
+
+});

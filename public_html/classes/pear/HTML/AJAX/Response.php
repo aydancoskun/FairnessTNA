@@ -2,7 +2,7 @@
 /**
  * OO AJAX Implementation for PHP, contains HTML_AJAX_Response
  *
- * SVN Rev: $Id: Response.php 620 2008-05-07 22:33:32Z jeichorn $ 
+ * SVN Rev: $Id: Response.php 620 2008-05-07 22:33:32Z jeichorn $
  *
  * @category   HTML
  * @package    AJAX
@@ -36,7 +36,7 @@ class HTML_AJAX_Response
      * @var string
      * @access public
      */
-    var $contentType = 'text/plain';
+    public $contentType = 'text/plain';
 
     /**
      * Assign a string to this variable to use the bare response class
@@ -44,7 +44,7 @@ class HTML_AJAX_Response
      * @var string
      * @access public
      */
-    var $payload = '';
+    public $payload = '';
 
     /**
      * Returns the appropriate content type
@@ -55,7 +55,7 @@ class HTML_AJAX_Response
      * @return  string   appropriate content type
      * @access public
      */
-    function getContentType()
+    public function getContentType()
     {
         return $this->contentType;
     }
@@ -70,9 +70,8 @@ class HTML_AJAX_Response
      * @return  string   serialized response content
      * @access public
      */
-    function getPayload()
+    public function getPayload()
     {
         return $this->payload;
     }
 }
-?>

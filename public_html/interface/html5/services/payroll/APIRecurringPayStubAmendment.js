@@ -1,47 +1,47 @@
-var APIRecurringPayStubAmendment = ServiceCaller.extend( {
+var APIRecurringPayStubAmendment = ServiceCaller.extend({
 
-	key_name: 'RecurringPayStubAmendment',
-	className: 'APIRecurringPayStubAmendment',
+    key_name: 'RecurringPayStubAmendment',
+    className: 'APIRecurringPayStubAmendment',
 
-	getRecurringPayStubAmendmentDefaultData: function() {
+    getRecurringPayStubAmendmentDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getRecurringPayStubAmendmentDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getRecurringPayStubAmendmentDefaultData', arguments);
 
-	},
+    },
 
-	getRecurringPayStubAmendment: function() {
+    getRecurringPayStubAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'getRecurringPayStubAmendment', arguments );
+        return this.argumentsHandler(this.className, 'getRecurringPayStubAmendment', arguments);
 
-	},
+    },
 
-	getCommonRecurringPayStubAmendmentData: function() {
+    getCommonRecurringPayStubAmendmentData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonRecurringPayStubAmendmentData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonRecurringPayStubAmendmentData', arguments);
 
-	},
+    },
 
-	validateRecurringPayStubAmendment: function() {
+    validateRecurringPayStubAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'validateRecurringPayStubAmendment', arguments );
+        return this.argumentsHandler(this.className, 'validateRecurringPayStubAmendment', arguments);
 
-	},
+    },
 
-	setRecurringPayStubAmendment: function() {
+    setRecurringPayStubAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'setRecurringPayStubAmendment', arguments );
+        return this.argumentsHandler(this.className, 'setRecurringPayStubAmendment', arguments);
 
-	},
+    },
 
-	deleteRecurringPayStubAmendment: function() {
+    deleteRecurringPayStubAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'deleteRecurringPayStubAmendment', arguments );
+        return this.argumentsHandler(this.className, 'deleteRecurringPayStubAmendment', arguments);
 
-	},
+    },
 
-	copyRecurringPayStubAmendment: function() {
-		return this.argumentsHandler( this.className, 'copyRecurringPayStubAmendment', arguments );
-	}
+    copyRecurringPayStubAmendment: function () {
+        return this.argumentsHandler(this.className, 'copyRecurringPayStubAmendment', arguments);
+    }
 
 
-} );
+});

@@ -19,119 +19,123 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class StationDepartmentListFactory extends StationDepartmentFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class StationDepartmentListFactory extends StationDepartmentFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable();
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+					from	' . $this->getTable();
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$sf = new StationFactory();
+        $sf = new StationFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $sf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $sf->getTable() . ' as b
 					where	b.id = a.station_id
 						AND b.company_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByStationId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByStationIdArray($id)
+    {
+        $sdlf = new StationDepartmentListFactory();
 
-		$sf = new StationFactory();
+        $sdlf->getByStationId($id);
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $list = array();
+        foreach ($sdlf as $obj) {
+            $list[$obj->getStation()] = null;
+        }
+
+        if (empty($list) == false) {
+            return $list;
+        }
+
+        return array();
+    }
+
+    public function getByStationId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
+
+        $sf = new StationFactory();
+
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		//When adding a new station, since we can set data in child tables
-		//we need to return data even if no station record exists yet, but never if the station record is deleted.
-		$query = '
+        //When adding a new station, since we can set data in child tables
+        //we need to return data even if no station record exists yet, but never if the station record is deleted.
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-							LEFT JOIN '. $sf->getTable() .' as b ON ( b.id = a.station_id )
+					from	' . $this->getTable() . ' as a
+							LEFT JOIN ' . $sf->getTable() . ' as b ON ( b.id = a.station_id )
 					where	a.station_id = ?
 						AND ( b.deleted is NULL OR b.deleted = 0 )
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
-
-	function getByStationIdArray($id) {
-		$sdlf = new StationDepartmentListFactory();
-
-		$sdlf->getByStationId($id);
-
-		$list = array();
-		foreach ($sdlf as $obj) {
-			$list[$obj->getStation()] = NULL;
-		}
-
-		if ( empty($list) == FALSE ) {
-			return $list;
-		}
-
-		return array();
-	}
+        return $this;
+    }
 }
-?>

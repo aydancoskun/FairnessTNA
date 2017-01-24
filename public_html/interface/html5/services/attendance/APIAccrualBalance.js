@@ -1,15 +1,15 @@
-var APIAccrualBalance = ServiceCaller.extend( {
+var APIAccrualBalance = ServiceCaller.extend({
 
-	key_name: 'AccrualBalance',
-	className: 'APIAccrualBalance',
+    key_name: 'AccrualBalance',
+    className: 'APIAccrualBalance',
 
-	getAccrualBalance: function() {
+    getAccrualBalance: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualBalance', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualBalance', arguments);
 
-	},
+    },
 
-	exportAccrualBalance: function() {
-		return this.argumentsHandler( this.className, 'exportAccrualBalance', arguments );
-	}
-} );
+    exportAccrualBalance: function () {
+        return this.argumentsHandler(this.className, 'exportAccrualBalance', arguments);
+    }
+});

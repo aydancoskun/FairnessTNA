@@ -1,61 +1,60 @@
-var APIPayPeriodSchedule = ServiceCaller.extend( {
+var APIPayPeriodSchedule = ServiceCaller.extend({
 
-	key_name: 'PayPeriodSchedule',
-	className: 'APIPayPeriodSchedule',
+    key_name: 'PayPeriodSchedule',
+    className: 'APIPayPeriodSchedule',
 
-	detectPayPeriodScheduleDates: function() {
+    detectPayPeriodScheduleDates: function () {
 
-		return this.argumentsHandler( this.className, 'detectPayPeriodScheduleDates', arguments );
+        return this.argumentsHandler(this.className, 'detectPayPeriodScheduleDates', arguments);
 
-	},
+    },
 
-	getPayPeriodSchedule: function() {
+    getPayPeriodSchedule: function () {
 
-		return this.argumentsHandler( this.className, 'getPayPeriodSchedule', arguments );
+        return this.argumentsHandler(this.className, 'getPayPeriodSchedule', arguments);
 
-	},
+    },
 
-	getPayPeriodScheduleDefaultData: function() {
+    getPayPeriodScheduleDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayPeriodScheduleDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayPeriodScheduleDefaultData', arguments);
 
-	},
-	getCommonPayPeriodScheduleData: function() {
+    },
+    getCommonPayPeriodScheduleData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayPeriodScheduleData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayPeriodScheduleData', arguments);
 
-	},
-	validatePayPeriodSchedule: function() {
+    },
+    validatePayPeriodSchedule: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayPeriodSchedule', arguments );
+        return this.argumentsHandler(this.className, 'validatePayPeriodSchedule', arguments);
 
-	},
-	setPayPeriodSchedule: function() {
+    },
+    setPayPeriodSchedule: function () {
 
-		return this.argumentsHandler( this.className, 'setPayPeriodSchedule', arguments );
+        return this.argumentsHandler(this.className, 'setPayPeriodSchedule', arguments);
 
-	},
-	deletePayPeriodSchedule: function() {
+    },
+    deletePayPeriodSchedule: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayPeriodSchedule', arguments );
+        return this.argumentsHandler(this.className, 'deletePayPeriodSchedule', arguments);
 
-	},
-	copyPayPeriodSchedule: function() {
+    },
+    copyPayPeriodSchedule: function () {
 
-		return this.argumentsHandler( this.className, 'copyPayPeriodSchedule', arguments );
+        return this.argumentsHandler(this.className, 'copyPayPeriodSchedule', arguments);
 
-	},
-	detectPayPeriodScheduleSettings: function() {
+    },
+    detectPayPeriodScheduleSettings: function () {
 
-		return this.argumentsHandler( this.className, 'detectPayPeriodScheduleSettings', arguments );
+        return this.argumentsHandler(this.className, 'detectPayPeriodScheduleSettings', arguments);
 
-	},
-	exportPayPeriodSchedule: function() {
+    },
+    exportPayPeriodSchedule: function () {
 
-		return this.argumentsHandler( this.className, 'exportPayPeriodSchedule', arguments );
+        return this.argumentsHandler(this.className, 'exportPayPeriodSchedule', arguments);
 
-	},
+    },
 
 
-
-} );
+});

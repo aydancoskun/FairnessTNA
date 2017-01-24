@@ -44,34 +44,34 @@ class Numbers_Words_cs extends Numbers_Words
 {
 
     // {{{ properties
-    
+
     /**
      * Locale name
      * @var string
      * @access public
      */
-    var $locale      = 'cs';
+    public $locale = 'cs';
 
     /**
      * Language name in English
      * @var string
      * @access public
      */
-    var $lang        = 'Czech';
+    public $lang = 'Czech';
 
     /**
      * Native language name
      * @var string
      * @access public
      */
-    var $lang_native = 'Czech';
-    
+    public $lang_native = 'Czech';
+
     /**
      * The word for the minus sign
      * @var string
      * @access private
      */
-    var $_minus = 'mínus'; // minus sign
+    public $_minus = 'mï¿½nus'; // minus sign
 
     /**
      * The sufixes for exponents (singular and plural)
@@ -84,47 +84,47 @@ class Numbers_Words_cs extends Numbers_Words
      * @access private
      */
 
-    var $_exponent = array(
+    public $_exponent = array(
         0 => array(''),
-        3 => array('tisíc','tisíce','tisíc'),
-        6 => array('milion','miliony','milionù'),
-        9 => array('miliarda','miliardy','miliard'),
-       12 => array('bilion','biliony','bilionù'),
-       15 => array('biliarda','biliardy','biliard'),
-       18 => array('trilion','triliony','trilionù'),
-       21 => array('triliarda','triliardy','triliard'),
+        3 => array('tisï¿½c', 'tisï¿½ce', 'tisï¿½c'),
+        6 => array('milion', 'miliony', 'milionï¿½'),
+        9 => array('miliarda', 'miliardy', 'miliard'),
+        12 => array('bilion', 'biliony', 'bilionï¿½'),
+        15 => array('biliarda', 'biliardy', 'biliard'),
+        18 => array('trilion', 'triliony', 'trilionï¿½'),
+        21 => array('triliarda', 'triliardy', 'triliard'),
 
-       24 => array('kvadrilion','kvadriliony','kvadrilionù'),
-       30 => array('kvintilion','kvintiliony','kvintilionù'),
-       36 => array('sextilion','sextiliony','sextilionù'),
-       42 => array('septilion','septiliony','septilionù'),
+        24 => array('kvadrilion', 'kvadriliony', 'kvadrilionï¿½'),
+        30 => array('kvintilion', 'kvintiliony', 'kvintilionï¿½'),
+        36 => array('sextilion', 'sextiliony', 'sextilionï¿½'),
+        42 => array('septilion', 'septiliony', 'septilionï¿½'),
 
-       48 => array('oktilion','oktiliony','oktilionù'),
-       54 => array('nonilion','noniliony','nonilionù'),
-       60 => array('decilion','deciliony','decilionù'),
+        48 => array('oktilion', 'oktiliony', 'oktilionï¿½'),
+        54 => array('nonilion', 'noniliony', 'nonilionï¿½'),
+        60 => array('decilion', 'deciliony', 'decilionï¿½'),
 
-       66 => array('undecilion','undeciliony','undecilionù'),
-       72 => array('duodecilion','duodeciliony','duodecilionù'),
-       78 => array('tredecilion','tredeciliony','tredecilionù'),
-       84 => array('kvatrodecilion','kvatrodeciliony','kvatrodecilionù'),
-       90 => array('kvindecilion','kvindeciliony','kvindecilionù'),
-       96 => array('sexdecilion','sexdeciliony','sexdecilionù'),
-      102 => array('septendecilion','septendeciliony','septendecilionù'),
-      108 => array('oktodecilion','oktodeciliony','oktodecilionù'),
-      114 => array('novemdecilion','novemdeciliony','novemdecilionù'),
-      120 => array('vigintilion','vigintiliony','vigintilionù'),
-      192 => array('duotrigintilion','duotrigintiliony','duotrigintilionù'),
-      600 => array('centilion','centiliony','centilionù')
+        66 => array('undecilion', 'undeciliony', 'undecilionï¿½'),
+        72 => array('duodecilion', 'duodeciliony', 'duodecilionï¿½'),
+        78 => array('tredecilion', 'tredeciliony', 'tredecilionï¿½'),
+        84 => array('kvatrodecilion', 'kvatrodeciliony', 'kvatrodecilionï¿½'),
+        90 => array('kvindecilion', 'kvindeciliony', 'kvindecilionï¿½'),
+        96 => array('sexdecilion', 'sexdeciliony', 'sexdecilionï¿½'),
+        102 => array('septendecilion', 'septendeciliony', 'septendecilionï¿½'),
+        108 => array('oktodecilion', 'oktodeciliony', 'oktodecilionï¿½'),
+        114 => array('novemdecilion', 'novemdeciliony', 'novemdecilionï¿½'),
+        120 => array('vigintilion', 'vigintiliony', 'vigintilionï¿½'),
+        192 => array('duotrigintilion', 'duotrigintiliony', 'duotrigintilionï¿½'),
+        600 => array('centilion', 'centiliony', 'centilionï¿½')
 
-        );
+    );
 
     /**
      * The array containing the forms of Czech word for "hundred"
      * @var array
      * @access private
      */
-    var $_hundreds = array(
-        0 => 'sto', 'stì', 'sta', 'set'
+    public $_hundreds = array(
+        0 => 'sto', 'stï¿½', 'sta', 'set'
     );
 
     /**
@@ -132,9 +132,9 @@ class Numbers_Words_cs extends Numbers_Words
      * @var array
      * @access private
      */
-    var $_digits = array(
-        0 => 'nula', 'jedna', 'dva', 'tøi', 'ètyøi',
-        'pìt', '¹est', 'sedm', 'osm', 'devìt'
+    public $_digits = array(
+        0 => 'nula', 'jedna', 'dva', 'tï¿½i', 'ï¿½tyï¿½i',
+        'pï¿½t', 'ï¿½est', 'sedm', 'osm', 'devï¿½t'
     );
 
     /**
@@ -142,7 +142,7 @@ class Numbers_Words_cs extends Numbers_Words
      * @var string
      * @access private
      */
-    var $_sep = ' ';
+    public $_sep = ' ';
 
     // }}}
     // {{{ toWords()
@@ -151,7 +151,7 @@ class Numbers_Words_cs extends Numbers_Words
      * Converts a number to its word representation
      * in Czech language
      *
-     * @param  integer $num   An integer between -infinity and infinity inclusive :)
+     * @param  integer $num An integer between -infinity and infinity inclusive :)
      *                        that need to be converted to words
      * @param  integer $power The power of ten for the rest of the number to the right.
      *                        Optional, defaults to 0.
@@ -164,176 +164,181 @@ class Numbers_Words_cs extends Numbers_Words
      * @author Petr 'PePa' Pavel <petr.pavel@pepa.info>
      * @since  PHP 4.2.3
      */
-    function toWords($num, $power = 0, $powsuffix = '') {
-//    print "<br>$num,$power,$powsuffix<br>";
-      $ret = '';        
-        
-      // add a minus sign
-      if (substr($num, 0, 1) == '-') {
-        $ret = $this->_sep . $this->_minus;
-        $num = substr($num, 1);
-      }
-        
-      // strip excessive zero signs and spaces
-      $num = trim($num);
-      $num = preg_replace('/^0+/','',$num);
-        
-      if (strlen($num) > 3) {
-          $maxp = strlen($num)-1;
-          $curp = $maxp;
-          for ($p = $maxp; $p > 0; --$p) { // power
-            
-            // check for highest power
-            if (isset($this->_exponent[$p])) {
-              // send substr from $curp to $p
-              $snum = substr($num, $maxp - $curp, $curp - $p + 1);
-              $snum = preg_replace('/^0+/','',$snum);
-              if ($snum !== '') {
-                  $cursuffix = $this->_exponent[$power][count($this->_exponent[$power])-1];
-                  if ($powsuffix != '')
-                    $cursuffix .= $this->_sep . $powsuffix;
-                  $ret .= $this->toWords($snum, $p, $cursuffix);
-              }
-              $curp = $p - 1;
-              continue;
+    public function toWords($num, $power = 0, $powsuffix = '')
+    {
+        //    print "<br>$num,$power,$powsuffix<br>";
+        $ret = '';
+
+        // add a minus sign
+        if (substr($num, 0, 1) == '-') {
+            $ret = $this->_sep . $this->_minus;
+            $num = substr($num, 1);
+        }
+
+        // strip excessive zero signs and spaces
+        $num = trim($num);
+        $num = preg_replace('/^0+/', '', $num);
+
+        if (strlen($num) > 3) {
+            $maxp = strlen($num) - 1;
+            $curp = $maxp;
+            for ($p = $maxp; $p > 0; --$p) { // power
+
+                // check for highest power
+                if (isset($this->_exponent[$p])) {
+                    // send substr from $curp to $p
+                    $snum = substr($num, $maxp - $curp, $curp - $p + 1);
+                    $snum = preg_replace('/^0+/', '', $snum);
+                    if ($snum !== '') {
+                        $cursuffix = $this->_exponent[$power][count($this->_exponent[$power]) - 1];
+                        if ($powsuffix != '') {
+                            $cursuffix .= $this->_sep . $powsuffix;
+                        }
+                        $ret .= $this->toWords($snum, $p, $cursuffix);
+                    }
+                    $curp = $p - 1;
+                    continue;
+                }
             }
-          }
-          $num = substr($num, $maxp - $curp, $curp - $p + 1);
-          if ($num == 0) {
-              return $ret;
-          }
-      } elseif ($num == 0 || $num == '') {
-        return $this->_sep . $this->_digits[0];
-      }
-    
-      $h = $t = $d = 0;
-      
-      switch(strlen($num)) {
-        case 3:
-          $h = (int)substr($num,-3,1);
+            $num = substr($num, $maxp - $curp, $curp - $p + 1);
+            if ($num == 0) {
+                return $ret;
+            }
+        } elseif ($num == 0 || $num == '') {
+            return $this->_sep . $this->_digits[0];
+        }
 
-        case 2:
-          $t = (int)substr($num,-2,1);
+        $h = $t = $d = 0;
 
-        case 1:
-          $d = (int)substr($num,-1,1);
-          break;
+        switch (strlen($num)) {
+            case 3:
+                $h = (int)substr($num, -3, 1);
 
-        case 0:
-          return;
-          break;
-      }
+            case 2:
+                $t = (int)substr($num, -2, 1);
 
-      if ($h) {
-   
-        // inflection of the word "hundred"
-        if ($h == 1)
-          $ret .= $this->_sep . $this->_hundreds[0];
-        elseif ($h == 2)
-          $ret .= $this->_sep . "dvì" . $this->_sep . $this->_hundreds[1];
-        elseif ( ($h > 1) && ($h < 5) )
-          $ret .= $this->_sep . $this->_digits[$h] . $this->_sep . $this->_hundreds[2];
-        else		//if ($h >= 5)
-          $ret .= $this->_sep . $this->_digits[$h] . $this->_sep . $this->_hundreds[3];
+            case 1:
+                $d = (int)substr($num, -1, 1);
+                break;
 
-        // in English only - add ' and' for [1-9]01..[1-9]99
-        // (also for 1001..1099, 10001..10099 but it is harder)
-        // for now it is switched off, maybe some language purists
-        // can force me to enable it, or to remove it completely
-        // if (($t + $d) > 0)
-        //   $ret .= $this->_sep . 'and';
-      }
+            case 0:
+                return;
+                break;
+        }
 
-      // ten, twenty etc.
-      switch ($t) {
-      case 2:
-      case 3:
-      case 4:
-          $ret .= $this->_sep . $this->_digits[$t] . 'cet';
-          break;
-    
-      case 5:
-          $ret .= $this->_sep . 'padesát';
-          break;
-    
-      case 6:
-          $ret .= $this->_sep . '¹edesát';
-          break;
-    
-      case 7:
-          $ret .= $this->_sep . 'sedmdesát';
-          break;
-    
-      case 8:
-          $ret .= $this->_sep . 'osmdesát';
-          break;
-    
-      case 9:
-          $ret .= $this->_sep . 'devadesát';
-          break;
-    
-      case 1:
-          switch ($d) {
-          case 0:
-              $ret .= $this->_sep . 'deset';
-              break;
-    
-          case 1:
-              $ret .= $this->_sep . 'jedenáct';
-              break;
-    
-          case 4:
-              $ret .= $this->_sep . 'ètrnáct';
-              break;
-    
-          case 5:
-              $ret .= $this->_sep . 'patnáct';
-              break;
-    
-          case 9:
-              $ret .= $this->_sep . 'devatenáct';
-              break;
-    
-          case 2:
-          case 3:
-          case 6:
-          case 7:
-          case 8:
-              $ret .= $this->_sep . $this->_digits[$d] . 'náct';
-              break;
-          }
-          break; 
-      }
+        if ($h) {
 
-      if ($t != 1 && $d > 0 && ($power == 0 || $d > 1)) {
-      // 
-        $ret .= $this->_sep . $this->_digits[$d];
-      }
-  
-      if ($power > 0) {
-        if (isset($this->_exponent[$power]))
-          $lev = $this->_exponent[$power];
-    
-        if (!isset($lev) || !is_array($lev))
-          return null;
+            // inflection of the word "hundred"
+            if ($h == 1) {
+                $ret .= $this->_sep . $this->_hundreds[0];
+            } elseif ($h == 2) {
+                $ret .= $this->_sep . "dvï¿½" . $this->_sep . $this->_hundreds[1];
+            } elseif (($h > 1) && ($h < 5)) {
+                $ret .= $this->_sep . $this->_digits[$h] . $this->_sep . $this->_hundreds[2];
+            } else {        //if ($h >= 5)
+                $ret .= $this->_sep . $this->_digits[$h] . $this->_sep . $this->_hundreds[3];
+            }
 
-           // inflection of exponental words
-          if ($num == 1)
-            $idx = 0;
-          elseif ( ($num > 1) && ($num < 5) )
-            $idx = 1;
-          else		//if ($num >= 5)
-            $idx = 2;
+            // in English only - add ' and' for [1-9]01..[1-9]99
+            // (also for 1001..1099, 10001..10099 but it is harder)
+            // for now it is switched off, maybe some language purists
+            // can force me to enable it, or to remove it completely
+            // if (($t + $d) > 0)
+            //   $ret .= $this->_sep . 'and';
+        }
 
-        $ret .= $this->_sep . $lev[$idx];
-      }
-    
-      if ($powsuffix != '')
-        $ret .= $this->_sep . $powsuffix;
-    
-      return $ret;
+        // ten, twenty etc.
+        switch ($t) {
+            case 2:
+            case 3:
+            case 4:
+                $ret .= $this->_sep . $this->_digits[$t] . 'cet';
+                break;
+
+            case 5:
+                $ret .= $this->_sep . 'padesï¿½t';
+                break;
+
+            case 6:
+                $ret .= $this->_sep . 'ï¿½edesï¿½t';
+                break;
+
+            case 7:
+                $ret .= $this->_sep . 'sedmdesï¿½t';
+                break;
+
+            case 8:
+                $ret .= $this->_sep . 'osmdesï¿½t';
+                break;
+
+            case 9:
+                $ret .= $this->_sep . 'devadesï¿½t';
+                break;
+
+            case 1:
+                switch ($d) {
+                    case 0:
+                        $ret .= $this->_sep . 'deset';
+                        break;
+
+                    case 1:
+                        $ret .= $this->_sep . 'jedenï¿½ct';
+                        break;
+
+                    case 4:
+                        $ret .= $this->_sep . 'ï¿½trnï¿½ct';
+                        break;
+
+                    case 5:
+                        $ret .= $this->_sep . 'patnï¿½ct';
+                        break;
+
+                    case 9:
+                        $ret .= $this->_sep . 'devatenï¿½ct';
+                        break;
+
+                    case 2:
+                    case 3:
+                    case 6:
+                    case 7:
+                    case 8:
+                        $ret .= $this->_sep . $this->_digits[$d] . 'nï¿½ct';
+                        break;
+                }
+                break;
+        }
+
+        if ($t != 1 && $d > 0 && ($power == 0 || $d > 1)) {
+            //
+            $ret .= $this->_sep . $this->_digits[$d];
+        }
+
+        if ($power > 0) {
+            if (isset($this->_exponent[$power])) {
+                $lev = $this->_exponent[$power];
+            }
+
+            if (!isset($lev) || !is_array($lev)) {
+                return null;
+            }
+
+            // inflection of exponental words
+            if ($num == 1) {
+                $idx = 0;
+            } elseif (($num > 1) && ($num < 5)) {
+                $idx = 1;
+            } else {        //if ($num >= 5)
+                $idx = 2;
+            }
+
+            $ret .= $this->_sep . $lev[$idx];
+        }
+
+        if ($powsuffix != '') {
+            $ret .= $this->_sep . $powsuffix;
+        }
+
+        return $ret;
     }
     // }}}
 }
-
-?>

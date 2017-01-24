@@ -19,62 +19,61 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
-require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'global.inc.php');
-require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'CLI.inc.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'global.inc.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'CLI.inc.php');
 
-if ( $argc < 2 OR in_array ($argv[1], array('--help', '-help', '-h', '-?') ) ) {
-	$help_output = "Usage: set_admin_permissions.php [user_name]\n";
-	echo $help_output;
+if ($argc < 2 or in_array($argv[1], array('--help', '-help', '-h', '-?'))) {
+    $help_output = "Usage: set_admin_permissions.php [user_name]\n";
+    echo $help_output;
 } else {
-	//Handle command line arguments
-	$last_arg = count($argv)-1;
+    //Handle command line arguments
+    $last_arg = count($argv) - 1;
 
-	if ( isset($argv[$last_arg]) AND $argv[$last_arg] != '' ) {
-		$user_name = $argv[$last_arg];
-		//Get user_id from user_name
-		$ulf = new UserListFactory();
-		$ulf->getByUserName( $user_name );
-		if ( $ulf->getRecordCount() == 1 ) {
-			echo "Found user, apply administrator permissions...\n";
-			ob_flush();
+    if (isset($argv[$last_arg]) and $argv[$last_arg] != '') {
+        $user_name = $argv[$last_arg];
+        //Get user_id from user_name
+        $ulf = new UserListFactory();
+        $ulf->getByUserName($user_name);
+        if ($ulf->getRecordCount() == 1) {
+            echo "Found user, apply administrator permissions...\n";
+            ob_flush();
 
-			$u_obj = $ulf->getCurrent();
-			//Create new Permission Group just for this purpose.
-			$pf = new PermissionFactory();
-			$pf->StartTransaction();
+            $u_obj = $ulf->getCurrent();
+            //Create new Permission Group just for this purpose.
+            $pf = new PermissionFactory();
+            $pf->StartTransaction();
 
-			//Apply all preset flags, including 0 => "system"
-			$preset_flags = array_merge( array( 0 ), array_keys( $pf->getOptions('preset_flags') ) );
+            //Apply all preset flags, including 0 => "system"
+            $preset_flags = array_merge(array(0), array_keys($pf->getOptions('preset_flags')));
 
-			$pcf = new PermissionControlFactory();
-			$pcf->setCompany( $u_obj->getCompany() );
-			$pcf->setLevel( 25 );
-			$pcf->setName( 'Administrator Fix ('.rand(1,1000).')' );
-			$pcf->setDescription( 'Created By set_admin_permissions.php' );
-			if ( $pcf->isValid() ) {
-				$pcf_id = $pcf->Save(FALSE);
+            $pcf = new PermissionControlFactory();
+            $pcf->setCompany($u_obj->getCompany());
+            $pcf->setLevel(25);
+            $pcf->setName('Administrator Fix (' . rand(1, 1000) . ')');
+            $pcf->setDescription('Created By set_admin_permissions.php');
+            if ($pcf->isValid()) {
+                $pcf_id = $pcf->Save(false);
 
-				$pcf->setUser( array( $u_obj->getId() ) );
+                $pcf->setUser(array($u_obj->getId()));
 
-				$pcf->Save();
+                $pcf->Save();
 
-				if ( $pf->applyPreset($pcf_id, 40, $preset_flags ) == TRUE ) {
-					echo "Success!\n";
-				}
-			}
-			//$pf->FailTransaction();
-			$pf->CommitTransaction();
-		} elseif ( $ulf->getRecordCount() > 2 ) {
-			echo "Found more then one user with the same user name, not updating permissions!\n";
-		} else {
-			echo "User name not found!\n";
-		}
-	}
+                if ($pf->applyPreset($pcf_id, 40, $preset_flags) == true) {
+                    echo "Success!\n";
+                }
+            }
+            //$pf->FailTransaction();
+            $pf->CommitTransaction();
+        } elseif ($ulf->getRecordCount() > 2) {
+            echo "Found more then one user with the same user name, not updating permissions!\n";
+        } else {
+            echo "User name not found!\n";
+        }
+    }
 }
 
 echo "WARNING: Clear Fairness cache after running this.\n";
 //Debug::Display();
 Debug::writeToLog();
-?>

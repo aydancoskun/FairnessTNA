@@ -19,44 +19,44 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1009A extends InstallSchema_Base {
+class InstallSchema_1009A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        //Add Calendar Based Accruals to Cron.
+        $maint_base_path = Environment::getBasePath() . DIRECTORY_SEPARATOR . 'maint' . DIRECTORY_SEPARATOR;
+        if (PHP_OS == 'WINNT') {
+            $cron_job_base_command = 'php-win.exe ' . $maint_base_path;
+        } else {
+            $cron_job_base_command = 'php ' . $maint_base_path;
+        }
+        Debug::text('Cron Job Base Command: ' . $cron_job_base_command, __FILE__, __LINE__, __METHOD__, 9);
 
-		//Add Calendar Based Accruals to Cron.
-		$maint_base_path = Environment::getBasePath() . DIRECTORY_SEPARATOR .'maint'. DIRECTORY_SEPARATOR;
-		if ( PHP_OS == 'WINNT' ) {
-			$cron_job_base_command = 'php-win.exe '. $maint_base_path;
-		} else {
-			$cron_job_base_command = 'php '. $maint_base_path;
-		}
-		Debug::text('Cron Job Base Command: '. $cron_job_base_command, __FILE__, __LINE__, __METHOD__, 9);
-		
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('AddAccrualPolicyTime');
-		$cjf->setMinute(30);
-		$cjf->setHour(1);
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'AddAccrualPolicyTime.php');
-		$cjf->Save();
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('AddAccrualPolicyTime');
+        $cjf->setMinute(30);
+        $cjf->setHour(1);
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'AddAccrualPolicyTime.php');
+        $cjf->Save();
 
-		return TRUE;
-
-	}
+        return true;
+    }
 }
-?>

@@ -27,7 +27,7 @@
  * @link http://www.xe.net
  *
  * @author Unknown
- * @copyright 
+ * @copyright
  * @license http://www.php.net/license/2_02.txt PHP License 2.0
  * @package Services_ExchangeRates
  */
@@ -42,61 +42,56 @@ require_once 'Services/ExchangeRates/Common.php';
  *
  * @package Services_ExchangeRates
  */
-class Services_ExchangeRates_Rates_XE extends Services_ExchangeRates_Common {
-    
-   /**
-    * URL of HTML page where the rates are given
-    * @var string
-    */
-    var $feedHTMLUrl = 'http://www.xe.com/ict/?basecur=USD&hide_inverse=true&historical=false';
+class Services_ExchangeRates_Rates_XE extends Services_ExchangeRates_Common
+{
 
-   /**
-    * Downloads exchange rates from XE.com
-    * This information is updated daily, and is cached by default for 1 hour.
-    *
-    * Returns a multi-dimensional array containing:
-    * 'rates' => associative array of currency codes to exchange rates
-    * 'source' => URL of feed
-    * 'date' => date feed last updated, pulled from the feed (more reliable than file mod time)
-    *
-    * @param int Length of time to cache (in seconds)
-    * @return array 
-    */
-    function retrieve($cacheLength, $cacheDir) {
+    /**
+     * URL of HTML page where the rates are given
+     * @var string
+     */
+    public $feedHTMLUrl = 'http://www.xe.com/ict/?basecur=USD&hide_inverse=true&historical=false';
 
+    /**
+     * Downloads exchange rates from XE.com
+     * This information is updated daily, and is cached by default for 1 hour.
+     *
+     * Returns a multi-dimensional array containing:
+     * 'rates' => associative array of currency codes to exchange rates
+     * 'source' => URL of feed
+     * 'date' => date feed last updated, pulled from the feed (more reliable than file mod time)
+     *
+     * @param int Length of time to cache (in seconds)
+     * @return array
+     */
+    public function retrieve($cacheLength, $cacheDir)
+    {
         $return['rates'] = array('USD' => 1.0);
 
         $return['source'] = $this->feedHTMLUrl;
-        
+
         // retrieve XML address
         $htmlpage = $this->retrieveFile($this->feedHTMLUrl, $cacheLength, $cacheDir);
-        
+
         //Get date rates were generated
         preg_match('/rates as of <b>(.*)<\/td>/i', $htmlpage, $raw_date);
-        if ( isset($raw_date[1]) )
-        {
-            $return['date'] = strtotime( $raw_date[1] ); 
+        if (isset($raw_date[1])) {
+            $return['date'] = strtotime($raw_date[1]);
         }
-        
+
         //Remove any HTML comments.
-        $htmlpage = preg_replace('/<!--\s+.*\s+-->/i','', $htmlpage );
-        
-        //Get actual rates here        
+        $htmlpage = preg_replace('/<!--\s+.*\s+-->/i', '', $htmlpage);
+
+        //Get actual rates here
         preg_match_all('/<td align="left" class="bbl">([A-Z]{3,5})<\/td><td align="left" class="bbr">(.*)<\/td><td align="right" class="bbr">([0-9\.,]{9,20})<\/td>/i', $htmlpage, $matches);
-        
-        if ( is_array($matches) )
-        {
-            foreach( $matches[1] as $key => $val ) {
-               if ( isset($matches[3][$key]) ){
-                  $return['rates'][trim($val)] = str_replace( array(' ', ','), '', $matches[3][$key] );
-               }
+
+        if (is_array($matches)) {
+            foreach ($matches[1] as $key => $val) {
+                if (isset($matches[3][$key])) {
+                    $return['rates'][trim($val)] = str_replace(array(' ', ','), '', $matches[3][$key]);
+                }
             }
         }
-        
-        return $return; 
 
+        return $return;
     }
-
 }
-
-?>

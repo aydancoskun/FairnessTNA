@@ -1,4 +1,4 @@
-var Debug = function() {
+var Debug = function () {
 };
 //Global variables and functions will be used everywhere
 
@@ -8,67 +8,67 @@ Debug.visible = 0;
 Debug.start_execution_time = (new Date()).getTime();
 
 Debug.Arr = function (arr, text, file, class_name, function_name, verbosity) {
-    if ( this.getEnable() == 1 && verbosity <= this.getVerbosity() ) {
-        this.Text('Array: '+text, file, function_name, class_name, verbosity);
+    if (this.getEnable() == 1 && verbosity <= this.getVerbosity()) {
+        this.Text('Array: ' + text, file, function_name, class_name, verbosity);
         console.debug(arr);
         console.info('===============================================');
     }
 };
 
 Debug.Text = function (text, file, class_name, function_name, verbosity) {
-    if ( this.getEnable() == 1 && verbosity <= this.getVerbosity() ) {
-        var time = ("00000"+Debug.getExecutionTime()).slice(-5);
-        var output = ' DEBUG ['+time+'ms] ';
-        if ( file != undefined ) {
-            output += file+'::';
+    if (this.getEnable() == 1 && verbosity <= this.getVerbosity()) {
+        var time = ("00000" + Debug.getExecutionTime()).slice(-5);
+        var output = ' DEBUG [' + time + 'ms] ';
+        if (file != undefined) {
+            output += file + '::';
         }
-        if ( class_name != undefined ) {
-            output += class_name+'.';
+        if (class_name != undefined) {
+            output += class_name + '.';
         }
-        if ( function_name != undefined ) {
-            output += function_name+'():';
+        if (function_name != undefined) {
+            output += function_name + '():';
         }
-        if ( text != undefined ) {
-            if ( file != undefined || class_name != undefined || function_name != undefined ) {
+        if (text != undefined) {
+            if (file != undefined || class_name != undefined || function_name != undefined) {
                 output += ' ';
             }
-            output += text+' ';
+            output += text + ' ';
         }
         console.info(output);
     }
 };
 
-Debug.backTrace = function(verbosity) {
-    if ( verbosity == undefined ) {
+Debug.backTrace = function (verbosity) {
+    if (verbosity == undefined) {
         verbosity = 10
     }
-    if ( this.getEnable() == 1 && verbosity <= this.getVerbosity() ) {
+    if (this.getEnable() == 1 && verbosity <= this.getVerbosity()) {
         console.error('BACKTRACE:')
     }
 };
 
-Debug.setVerbosity = function (verbosity ) {
+Debug.setVerbosity = function (verbosity) {
     this.verbosity = verbosity;
-    Debug.Text('<<<DEBUG VERBOSITY SET TO '+verbosity+'>>>', 'Debug.js', 'Debug', 'setVerbosity', 0);
+    Debug.Text('<<<DEBUG VERBOSITY SET TO ' + verbosity + '>>>', 'Debug.js', 'Debug', 'setVerbosity', 0);
 };
 
 Debug.getVerbosity = function () {
     return this.verbosity;
 };
 
-Debug.getExecutionTime = function() {
+Debug.getExecutionTime = function () {
     return (new Date()).getTime() - this.start_execution_time;
 };
 
-Debug.getEnable = function(){
+Debug.getEnable = function () {
     return this.enable;
 };
 
-Debug.setEnable = function(value){
+Debug.setEnable = function (value) {
     if (value) {
-        document.cookie  = 'debug=1';
+        document.cookie = 'debug=1';
         this.enable = 1;
-        if ( this.verbosity == 0 ) {
+        if (this.verbosity == 0) {
             this.verbosity = 10;
         }
         Debug.Text('<<<DEBUG ENABLED>>>', null, null, null, 10);
@@ -80,7 +80,7 @@ Debug.setEnable = function(value){
 };
 
 // Press CTRL+ALT+SHIFT+F12 to show the panel.
-Debug.showPanel = function() {
+Debug.showPanel = function () {
     //we can be sure jquery is loaded.
     if ($('#fn_debug_console').length > 0) {
         $('#fn_debug_console').remove();
@@ -90,8 +90,8 @@ Debug.showPanel = function() {
         $('body').append(view);
         Global.loadScript('views/developer_tools/debugPanelController.js');
         $('#fn_debug_enable_checkbox').prop('checked', Debug.getEnable());
-        $('#fn_debug_exception_verbosity').val( Debug.getVerbosity() );
-        $('#fn_debug_console .fn_version').html( APIGlobal.pre_login_data.application_build );
+        $('#fn_debug_exception_verbosity').val(Debug.getVerbosity());
+        $('#fn_debug_console .fn_version').html(APIGlobal.pre_login_data.application_build);
     });
 };
 
@@ -112,11 +112,11 @@ Debug.varDump = function (obj) {
     return result.replace(/,\n$/, "");
 };
 
-window.addEventListener('keydown',function(e){
-    var evt = e ? e:event;
+window.addEventListener('keydown', function (e) {
+    var evt = e ? e : event;
     var keyCode = evt.keyCode;
     //CTRL+ALT+SHIFT+F12(123)
-    if ( evt.ctrlKey && evt.shiftKey && evt.altKey && keyCode == 123 ) {
+    if (evt.ctrlKey && evt.shiftKey && evt.altKey && keyCode == 123) {
         Debug.showPanel();
     }
 });
@@ -124,7 +124,7 @@ window.addEventListener('keydown',function(e){
 //on load get cookie data
 {
     var cookie = document.cookie;
-    if ( cookie.indexOf('debug=1') >= 0 ) {
+    if (cookie.indexOf('debug=1') >= 0) {
         Debug.setVerbosity(10);
         Debug.setEnable(1);
     } else {

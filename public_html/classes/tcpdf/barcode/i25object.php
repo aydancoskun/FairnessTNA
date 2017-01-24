@@ -45,173 +45,195 @@
  * @since 2001-03-25
  * @license http://www.gnu.org/copyleft/lesser.html LGPL
  */
-class I25Object extends BarcodeObject {
-	
-	/**
-	 * Class Constructor.
-	 * @param int $Width Image width in pixels.
-	 * @param int $Height Image height in pixels. 
-	 * @param int $Style Barcode style.
-	 * @param int $Value value to print on barcode.
-	 */
-	public function __construct($Width, $Height, $Style, $Value) {
-		parent::__construct($Width, $Height, $Style);
-		$this->mValue = $Value;
-		$this->mCharSet = array (
-		/* 0 */ "00110",
-		/* 1 */ "10001",
-		/* 2 */ "01001",
-		/* 3 */ "11000",
-		/* 4 */ "00101",
-		/* 5 */ "10100",
-		/* 6 */ "01100",
-		/* 7 */ "00011",
-		/* 8 */ "10010",
-		/* 9 */ "01010"
-		);
-	}
-	
-	/**
-	 * Returns barcode size.
-	 * @param int $xres Horizontal resolution.
-	 * @return barcode size.
-	 * @access private
-	 */
-	private function GetSize($xres) {
-		$len = strlen($this->mValue);
+class I25Object extends BarcodeObject
+{
 
-		if ($len == 0)  {
-			$this->mError = "Null value";
-			return false;
-		}
+    /**
+     * Class Constructor.
+     * @param int $Width Image width in pixels.
+     * @param int $Height Image height in pixels.
+     * @param int $Style Barcode style.
+     * @param int $Value value to print on barcode.
+     */
+    public function __construct($Width, $Height, $Style, $Value)
+    {
+        parent::__construct($Width, $Height, $Style);
+        $this->mValue = $Value;
+        $this->mCharSet = array(
+            /* 0 */
+            "00110",
+            /* 1 */
+            "10001",
+            /* 2 */
+            "01001",
+            /* 3 */
+            "11000",
+            /* 4 */
+            "00101",
+            /* 5 */
+            "10100",
+            /* 6 */
+            "01100",
+            /* 7 */
+            "00011",
+            /* 8 */
+            "10010",
+            /* 9 */
+            "01010"
+        );
+    }
 
-		for ($i=0;$i<$len;$i++) {
-			if ((ord($this->mValue[$i])<48) || (ord($this->mValue[$i])>57)) {
-				$this->mError = "I25 is numeric only";
-				return false;
-			}
-		}
+    /**
+     * Draws the barcode object.
+     * @param int $xres Horizontal resolution.
+     * @return bool true in case of success.
+     */
+    public function DrawObject($xres)
+    {
+        $len = strlen($this->mValue);
 
-		if (($len%2) != 0) {
-			$this->mError = "The length of barcode value must be even";
-			return false;
-		}
-		$StartSize = BCD_I25_NARROW_BAR * 4  * $xres;
-		$StopSize  = BCD_I25_WIDE_BAR * $xres + 2 * BCD_I25_NARROW_BAR * $xres;
-		$cPos = 0;
-		$sPos = 0;
-		do {
-			$c1    = $this->mValue[$cPos];
-			$c2    = $this->mValue[$cPos+1];
-			$cset1 = $this->mCharSet[$c1];
-			$cset2 = $this->mCharSet[$c2];
+        if (($size = $this->GetSize($xres)) == 0) {
+            return false;
+        }
 
-			for ($i=0;$i<5;$i++) {
-				$type1 = ($cset1[$i]==0) ? (BCD_I25_NARROW_BAR  * $xres) : (BCD_I25_WIDE_BAR * $xres);
-				$type2 = ($cset2[$i]==0) ? (BCD_I25_NARROW_BAR  * $xres) : (BCD_I25_WIDE_BAR * $xres);
-				$sPos += ($type1 + $type2);
-			}
-			$cPos+=2;
-		} while ($cPos<$len);
+        $cPos = 0;
 
-		return $sPos + $StartSize + $StopSize;
-	}
+        if ($this->mStyle & BCS_DRAW_TEXT) {
+            $ysize = $this->mHeight - BCD_DEFAULT_MAR_Y1 - BCD_DEFAULT_MAR_Y2 - $this->GetFontHeight($this->mFont);
+        } else {
+            $ysize = $this->mHeight - BCD_DEFAULT_MAR_Y1 - BCD_DEFAULT_MAR_Y2;
+        }
 
-	/**
-	 * Draws the start code.
-	 * @param int $DrawPos Drawing position.
-	 * @param int $yPos Vertical position.
-	 * @param int $ySize Vertical size.
-	 * @param int $xres Horizontal resolution.
-	 * @return int drawing position.
-	 * @access private
-	 */
-	private function DrawStart($DrawPos, $yPos, $ySize, $xres) {
-		/* Start code is "0000" */
-		$this->DrawSingleBar($DrawPos, $yPos, BCD_I25_NARROW_BAR  * $xres , $ySize);
-		$DrawPos += BCD_I25_NARROW_BAR  * $xres;
-		$DrawPos += BCD_I25_NARROW_BAR  * $xres;
-		$this->DrawSingleBar($DrawPos, $yPos, BCD_I25_NARROW_BAR  * $xres , $ySize);
-		$DrawPos += BCD_I25_NARROW_BAR  * $xres;
-		$DrawPos += BCD_I25_NARROW_BAR  * $xres;
-		return $DrawPos;
-	}
-	
-	/**
-	 * Draws the stop code.
-	 * @param int $DrawPos Drawing position.
-	 * @param int $yPos Vertical position.
-	 * @param int $ySize Vertical size.
-	 * @param int $xres Horizontal resolution.
-	 * @return int drawing position.
-	 * @access private
-	 */
-	private function DrawStop($DrawPos, $yPos, $ySize, $xres) {
-		/* Stop code is "100" */
-		$this->DrawSingleBar($DrawPos, $yPos, BCD_I25_WIDE_BAR * $xres , $ySize);
-		$DrawPos += BCD_I25_WIDE_BAR  * $xres;
-		$DrawPos += BCD_I25_NARROW_BAR  * $xres;
-		$this->DrawSingleBar($DrawPos, $yPos, BCD_I25_NARROW_BAR  * $xres , $ySize);
-		$DrawPos += BCD_I25_NARROW_BAR  * $xres;
-		return $DrawPos;
-	}
+        if ($this->mStyle & BCS_ALIGN_CENTER) {
+            $sPos = (integer)(($this->mWidth - $size) / 2);
+        } elseif ($this->mStyle & BCS_ALIGN_RIGHT) {
+            $sPos = $this->mWidth - $size;
+        } else {
+            $sPos = 0;
+        }
 
-	/**
-	 * Draws the barcode object.
-	 * @param int $xres Horizontal resolution.
-	 * @return bool true in case of success.
-	 */
-	public function DrawObject($xres) {
-		$len = strlen($this->mValue);
+        if ($this->mStyle & BCS_DRAW_TEXT) {
+            if ($this->mStyle & BCS_STRETCH_TEXT) {
+                /* Stretch */
+                for ($i = 0; $i < $len; $i++) {
+                    $this->DrawChar($this->mFont, $sPos + BCD_I25_NARROW_BAR * 4 * $xres + ($size / $len) * $i,
+                        $ysize + BCD_DEFAULT_MAR_Y1 + BCD_DEFAULT_TEXT_OFFSET, $this->mValue[$i]);
+                }
+            } else {/* Center */
+                $text_width = $this->GetFontWidth($this->mFont) * strlen($this->mValue);
+                $this->DrawText($this->mFont, $sPos + (($size - $text_width) / 2) + (BCD_I25_NARROW_BAR * 4 * $xres),
+                    $ysize + BCD_DEFAULT_MAR_Y1 + BCD_DEFAULT_TEXT_OFFSET, $this->mValue);
+            }
+        }
 
-		if (($size = $this->GetSize($xres))==0) {
-			return false;
-		}
+        $sPos = $this->DrawStart($sPos, BCD_DEFAULT_MAR_Y1, $ysize, $xres);
+        do {
+            $c1 = $this->mValue[$cPos];
+            $c2 = $this->mValue[$cPos + 1];
+            $cset1 = $this->mCharSet[$c1];
+            $cset2 = $this->mCharSet[$c2];
 
-		$cPos  = 0;
+            for ($i = 0; $i < 5; $i++) {
+                $type1 = ($cset1[$i] == 0) ? (BCD_I25_NARROW_BAR * $xres) : (BCD_I25_WIDE_BAR * $xres);
+                $type2 = ($cset2[$i] == 0) ? (BCD_I25_NARROW_BAR * $xres) : (BCD_I25_WIDE_BAR * $xres);
+                $this->DrawSingleBar($sPos, BCD_DEFAULT_MAR_Y1, $type1, $ysize);
+                $sPos += ($type1 + $type2);
+            }
+            $cPos += 2;
+        } while ($cPos < $len);
+        $sPos = $this->DrawStop($sPos, BCD_DEFAULT_MAR_Y1, $ysize, $xres);
+        return true;
+    }
 
-		if ($this->mStyle & BCS_DRAW_TEXT) $ysize = $this->mHeight - BCD_DEFAULT_MAR_Y1 - BCD_DEFAULT_MAR_Y2 - $this->GetFontHeight($this->mFont);
-		else $ysize = $this->mHeight - BCD_DEFAULT_MAR_Y1 - BCD_DEFAULT_MAR_Y2;
+    /**
+     * Returns barcode size.
+     * @param int $xres Horizontal resolution.
+     * @return barcode size.
+     * @access private
+     */
+    private function GetSize($xres)
+    {
+        $len = strlen($this->mValue);
 
-		if ($this->mStyle & BCS_ALIGN_CENTER) $sPos = (integer)(($this->mWidth - $size ) / 2);
-		else if ($this->mStyle & BCS_ALIGN_RIGHT) $sPos = $this->mWidth - $size;
-		else $sPos = 0;
+        if ($len == 0) {
+            $this->mError = "Null value";
+            return false;
+        }
 
-		if ($this->mStyle & BCS_DRAW_TEXT) {
-			if ($this->mStyle & BCS_STRETCH_TEXT) {
-				/* Stretch */
-				for ($i=0;$i<$len;$i++) {
-					$this->DrawChar($this->mFont, $sPos+BCD_I25_NARROW_BAR*4*$xres+($size/$len)*$i,
-					$ysize + BCD_DEFAULT_MAR_Y1 + BCD_DEFAULT_TEXT_OFFSET , $this->mValue[$i]);
-				}
-			}else {/* Center */
-			$text_width = $this->GetFontWidth($this->mFont) * strlen($this->mValue);
-			$this->DrawText($this->mFont, $sPos+(($size-$text_width)/2)+(BCD_I25_NARROW_BAR*4*$xres),
-			$ysize + BCD_DEFAULT_MAR_Y1 + BCD_DEFAULT_TEXT_OFFSET, $this->mValue);
-			}
-		}
+        for ($i = 0; $i < $len; $i++) {
+            if ((ord($this->mValue[$i]) < 48) || (ord($this->mValue[$i]) > 57)) {
+                $this->mError = "I25 is numeric only";
+                return false;
+            }
+        }
 
-		$sPos = $this->DrawStart($sPos, BCD_DEFAULT_MAR_Y1, $ysize, $xres);
-		do {
-			$c1 = $this->mValue[$cPos];
-			$c2 = $this->mValue[$cPos+1];
-			$cset1 = $this->mCharSet[$c1];
-			$cset2 = $this->mCharSet[$c2];
+        if (($len % 2) != 0) {
+            $this->mError = "The length of barcode value must be even";
+            return false;
+        }
+        $StartSize = BCD_I25_NARROW_BAR * 4 * $xres;
+        $StopSize = BCD_I25_WIDE_BAR * $xres + 2 * BCD_I25_NARROW_BAR * $xres;
+        $cPos = 0;
+        $sPos = 0;
+        do {
+            $c1 = $this->mValue[$cPos];
+            $c2 = $this->mValue[$cPos + 1];
+            $cset1 = $this->mCharSet[$c1];
+            $cset2 = $this->mCharSet[$c2];
 
-			for ($i=0;$i<5;$i++) {
-				$type1 = ($cset1[$i]==0) ? (BCD_I25_NARROW_BAR * $xres) : (BCD_I25_WIDE_BAR * $xres);
-				$type2 = ($cset2[$i]==0) ? (BCD_I25_NARROW_BAR * $xres) : (BCD_I25_WIDE_BAR * $xres);
-				$this->DrawSingleBar($sPos, BCD_DEFAULT_MAR_Y1, $type1 , $ysize);
-				$sPos += ($type1 + $type2);
-			}
-			$cPos+=2;
-		} while ($cPos<$len);
-		$sPos =  $this->DrawStop($sPos, BCD_DEFAULT_MAR_Y1, $ysize, $xres);
-		return true;
-	}
+            for ($i = 0; $i < 5; $i++) {
+                $type1 = ($cset1[$i] == 0) ? (BCD_I25_NARROW_BAR * $xres) : (BCD_I25_WIDE_BAR * $xres);
+                $type2 = ($cset2[$i] == 0) ? (BCD_I25_NARROW_BAR * $xres) : (BCD_I25_WIDE_BAR * $xres);
+                $sPos += ($type1 + $type2);
+            }
+            $cPos += 2;
+        } while ($cPos < $len);
+
+        return $sPos + $StartSize + $StopSize;
+    }
+
+    /**
+     * Draws the start code.
+     * @param int $DrawPos Drawing position.
+     * @param int $yPos Vertical position.
+     * @param int $ySize Vertical size.
+     * @param int $xres Horizontal resolution.
+     * @return int drawing position.
+     * @access private
+     */
+    private function DrawStart($DrawPos, $yPos, $ySize, $xres)
+    {
+        /* Start code is "0000" */
+        $this->DrawSingleBar($DrawPos, $yPos, BCD_I25_NARROW_BAR * $xres, $ySize);
+        $DrawPos += BCD_I25_NARROW_BAR * $xres;
+        $DrawPos += BCD_I25_NARROW_BAR * $xres;
+        $this->DrawSingleBar($DrawPos, $yPos, BCD_I25_NARROW_BAR * $xres, $ySize);
+        $DrawPos += BCD_I25_NARROW_BAR * $xres;
+        $DrawPos += BCD_I25_NARROW_BAR * $xres;
+        return $DrawPos;
+    }
+
+    /**
+     * Draws the stop code.
+     * @param int $DrawPos Drawing position.
+     * @param int $yPos Vertical position.
+     * @param int $ySize Vertical size.
+     * @param int $xres Horizontal resolution.
+     * @return int drawing position.
+     * @access private
+     */
+    private function DrawStop($DrawPos, $yPos, $ySize, $xres)
+    {
+        /* Stop code is "100" */
+        $this->DrawSingleBar($DrawPos, $yPos, BCD_I25_WIDE_BAR * $xres, $ySize);
+        $DrawPos += BCD_I25_WIDE_BAR * $xres;
+        $DrawPos += BCD_I25_NARROW_BAR * $xres;
+        $this->DrawSingleBar($DrawPos, $yPos, BCD_I25_NARROW_BAR * $xres, $ySize);
+        $DrawPos += BCD_I25_NARROW_BAR * $xres;
+        return $DrawPos;
+    }
 }
 
 //============================================================+
 // END OF FILE
-//============================================================+
-?>
+//============================================================+;

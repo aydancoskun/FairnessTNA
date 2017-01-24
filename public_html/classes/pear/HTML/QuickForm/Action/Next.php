@@ -21,22 +21,22 @@
 require_once 'HTML/QuickForm/Action.php';
 
 /**
- * The action for a 'next' button of wizard-type multipage form. 
- * 
+ * The action for a 'next' button of wizard-type multipage form.
+ *
  * @author  Alexey Borzov <avb@php.net>
  * @package HTML_QuickForm_Controller
  * @version $Revision: 1.3 $
  */
 class HTML_QuickForm_Action_Next extends HTML_QuickForm_Action
 {
-    function perform(&$page, $actionName)
+    public function perform(&$page, $actionName)
     {
         // save the form values and validation status to the session
         $page->isFormBuilt() or $page->buildForm();
-        $pageName =  $page->getAttribute('id');
-        $data     = $page->controller->container();
+        $pageName = $page->getAttribute('id');
+        $data = $page->controller->container();
         $data['values'][$pageName] = $page->exportValues();
-        $data['valid'][$pageName]  = $page->validate();
+        $data['valid'][$pageName] = $page->validate();
 
         // Modal form and page is invalid: don't go further
         if ($page->controller->isModal() && !$data['valid'][$pageName]) {
@@ -46,8 +46,8 @@ class HTML_QuickForm_Action_Next extends HTML_QuickForm_Action
         if (null !== ($nextName = $page->controller->getNextName($pageName))) {
             $next = $page->controller->getPage($nextName);
             $next->handle('jump');
-        // Consider this a 'finish' button, if there is no explicit one
-        } elseif($page->controller->isModal()) {
+            // Consider this a 'finish' button, if there is no explicit one
+        } elseif ($page->controller->isModal()) {
             if ($page->controller->isValid()) {
                 $page->handle('process');
             } else {
@@ -59,5 +59,3 @@ class HTML_QuickForm_Action_Next extends HTML_QuickForm_Action
         }
     }
 }
-
-?>

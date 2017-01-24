@@ -1,53 +1,52 @@
-var APICurrency = ServiceCaller.extend( {
+var APICurrency = ServiceCaller.extend({
 
 
-	key_name: 'Currency',
-	className: 'APICurrency',
+    key_name: 'Currency',
+    className: 'APICurrency',
 
-	getCurrency: function() {
+    getCurrency: function () {
 
-		return this.argumentsHandler( this.className, 'getCurrency', arguments );
+        return this.argumentsHandler(this.className, 'getCurrency', arguments);
 
-	},
-	getCurrencyDefaultData: function() {
+    },
+    getCurrencyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getCurrencyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getCurrencyDefaultData', arguments);
 
-	},
-	getCommonCurrencyData: function() {
+    },
+    getCommonCurrencyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonCurrencyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonCurrencyData', arguments);
 
-	},
-	validateCurrency: function() {
+    },
+    validateCurrency: function () {
 
-		return this.argumentsHandler( this.className, 'validateCurrency', arguments );
+        return this.argumentsHandler(this.className, 'validateCurrency', arguments);
 
-	},
-	setCurrency: function() {
+    },
+    setCurrency: function () {
 
-		return this.argumentsHandler( this.className, 'setCurrency', arguments );
+        return this.argumentsHandler(this.className, 'setCurrency', arguments);
 
-	},
-	deleteCurrency: function() {
+    },
+    deleteCurrency: function () {
 
-		return this.argumentsHandler( this.className, 'deleteCurrency', arguments );
+        return this.argumentsHandler(this.className, 'deleteCurrency', arguments);
 
-	},
-	copyCurrency: function() {
+    },
+    copyCurrency: function () {
 
-		return this.argumentsHandler( this.className, 'copyCurrency', arguments );
+        return this.argumentsHandler(this.className, 'copyCurrency', arguments);
 
-	},
-	exportCurrency: function() {
-		return this.argumentsHandler( this.className, 'exportCurrency', arguments );
-	},
-	getISOCodesArray: function() {
+    },
+    exportCurrency: function () {
+        return this.argumentsHandler(this.className, 'exportCurrency', arguments);
+    },
+    getISOCodesArray: function () {
 
-		return this.argumentsHandler( this.className, 'getISOCodesArray', arguments );
+        return this.argumentsHandler(this.className, 'getISOCodesArray', arguments);
 
-	}
+    }
 
 
-
-} );
+});

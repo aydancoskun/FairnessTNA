@@ -19,216 +19,223 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Department
  */
-class DepartmentBranchListFactory extends DepartmentBranchFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class DepartmentBranchListFactory extends DepartmentBranchFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '' ) {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$df = new DepartmentFactory();
+        $df = new DepartmentFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-					LEFT JOIN '. $df->getTable() .' as df ON a.department_id = df.id
+					from	' . $this->getTable() . ' as a
+					LEFT JOIN ' . $df->getTable() . ' as df ON a.department_id = df.id
 					where	df.company_id = ?
 					AND df.deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByBranchId($id, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getByBranchId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	branch_id = ?
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndBranchId($id, $branch_id, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getByIdAndBranchId($id, $branch_id, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $branch_id == '' ) {
-			return FALSE;
-		}
+        if ($branch_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'branch_id' => (int)$branch_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'branch_id' => (int)$branch_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	branch_id = ?
 						AND	id = ?
 					';
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByDepartmentId($id, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getByDepartmentId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	department_id = ?
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndDepartmentId($id, $department_id, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getByIdAndDepartmentId($id, $department_id, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $department_id == '' ) {
-			return FALSE;
-		}
+        if ($department_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'department_id' => (int)$department_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'department_id' => (int)$department_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	department_id = ?
 						AND	id = ?
 					';
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByDepartmentIdAndBranchId($department_id, $branch_id, $order = NULL) {
-		if ( $department_id == '' ) {
-			return FALSE;
-		}
+    public function getByDepartmentIdAndBranchId($department_id, $branch_id, $order = null)
+    {
+        if ($department_id == '') {
+            return false;
+        }
 
-		if ( $branch_id == '' ) {
-			return FALSE;
-		}
+        if ($branch_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'department_id' => (int)$department_id,
-					'branch_id' => (int)$branch_id,
-					);
+        $ph = array(
+            'department_id' => (int)$department_id,
+            'branch_id' => (int)$branch_id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	department_id = ?
 						AND	branch_id = ?
 					';
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-/*
-	function getByBranchIdArray($branch_id) {
-
-		$blf = new BranchListFactory();
-		$blf->getByCompanyId($company_id);
-
-		$branch_list[0] = '--';
-
-		foreach ($blf as $branch) {
-			$branch_list[$branch->getID()] = $branch->getName();
-		}
-
-		return $branch_list;
-	}
-*/
+    /*
+        function getByBranchIdArray($branch_id) {
+    
+            $blf = new BranchListFactory();
+            $blf->getByCompanyId($company_id);
+    
+            $branch_list[0] = '--';
+    
+            foreach ($blf as $branch) {
+                $branch_list[$branch->getID()] = $branch->getName();
+            }
+    
+            return $branch_list;
+        }
+    */
 }
-?>

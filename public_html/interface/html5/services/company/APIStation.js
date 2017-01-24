@@ -1,63 +1,63 @@
-var APIStation = ServiceCaller.extend( {
+var APIStation = ServiceCaller.extend({
 
-	key_name: 'Station',
-	className: 'APIStation',
+    key_name: 'Station',
+    className: 'APIStation',
 
-	getCurrentStation: function() {
+    getCurrentStation: function () {
 
-		return this.argumentsHandler( this.className, 'getCurrentStation', arguments );
+        return this.argumentsHandler(this.className, 'getCurrentStation', arguments);
 
-	},
+    },
 
-	getStation: function() {
+    getStation: function () {
 
-		return this.argumentsHandler( this.className, 'getStation', arguments );
+        return this.argumentsHandler(this.className, 'getStation', arguments);
 
-	},
+    },
 
-	getStationDefaultData: function() {
+    getStationDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getStationDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getStationDefaultData', arguments);
 
-	},
+    },
 
-	getCommonStationData: function() {
+    getCommonStationData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonStationData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonStationData', arguments);
 
-	},
+    },
 
-	validateStation: function() {
+    validateStation: function () {
 
-		return this.argumentsHandler( this.className, 'validateStation', arguments );
+        return this.argumentsHandler(this.className, 'validateStation', arguments);
 
-	},
+    },
 
-	setStation: function() {
+    setStation: function () {
 
-		return this.argumentsHandler( this.className, 'setStation', arguments );
+        return this.argumentsHandler(this.className, 'setStation', arguments);
 
-	},
+    },
 
-	deleteStation: function() {
+    deleteStation: function () {
 
-		return this.argumentsHandler( this.className, 'deleteStation', arguments );
+        return this.argumentsHandler(this.className, 'deleteStation', arguments);
 
-	},
+    },
 
-	copyStation: function() {
+    copyStation: function () {
 
-		return this.argumentsHandler( this.className, 'copyStation', arguments );
+        return this.argumentsHandler(this.className, 'copyStation', arguments);
 
-	},
+    },
 
-	runManualCommand: function() {
-		return this.argumentsHandler( this.className, 'runManualCommand', arguments );
-	},
+    runManualCommand: function () {
+        return this.argumentsHandler(this.className, 'runManualCommand', arguments);
+    },
 
-	exportStation: function() {
-		return this.argumentsHandler( this.className, 'exportStation', arguments );
-	},
+    exportStation: function () {
+        return this.argumentsHandler(this.className, 'exportStation', arguments);
+    },
 
 
-} );
+});

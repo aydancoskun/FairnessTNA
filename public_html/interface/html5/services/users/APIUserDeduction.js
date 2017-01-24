@@ -1,55 +1,54 @@
-var APIUserDeduction = ServiceCaller.extend( {
+var APIUserDeduction = ServiceCaller.extend({
 
-	key_name: 'UserDeduction',
-	className: 'APIUserDeduction',
+    key_name: 'UserDeduction',
+    className: 'APIUserDeduction',
 
-	getHourlyRate: function() {
+    getHourlyRate: function () {
 
-		return this.argumentsHandler( this.className, 'getHourlyRate', arguments );
-	},
+        return this.argumentsHandler(this.className, 'getHourlyRate', arguments);
+    },
 
-	getCommonUserDeductionData: function() {
+    getCommonUserDeductionData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserDeductionData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserDeductionData', arguments);
 
-	},
+    },
 
-	getUserDeduction: function() {
+    getUserDeduction: function () {
 
-		return this.argumentsHandler( this.className, 'getUserDeduction', arguments );
+        return this.argumentsHandler(this.className, 'getUserDeduction', arguments);
 
-	},
+    },
 
-	setUserDeduction: function() {
+    setUserDeduction: function () {
 
-		return this.argumentsHandler( this.className, 'setUserDeduction', arguments );
+        return this.argumentsHandler(this.className, 'setUserDeduction', arguments);
 
-	},
+    },
 
-	copyUserDeduction: function() {
+    copyUserDeduction: function () {
 
-		return this.argumentsHandler( this.className, 'copyUserDeduction', arguments );
+        return this.argumentsHandler(this.className, 'copyUserDeduction', arguments);
 
-	},
+    },
 
-	getUserDeductionDefaultData: function() {
+    getUserDeductionDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserDeductionDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserDeductionDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserDeduction: function() {
+    deleteUserDeduction: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserDeduction', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserDeduction', arguments);
 
-	},
+    },
 
-	validateUserDeduction: function() {
+    validateUserDeduction: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserDeduction', arguments );
+        return this.argumentsHandler(this.className, 'validateUserDeduction', arguments);
 
-	}
+    }
 
 
-
-} );
+});

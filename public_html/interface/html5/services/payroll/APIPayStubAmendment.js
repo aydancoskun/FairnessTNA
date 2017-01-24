@@ -1,56 +1,55 @@
-var APIPayStubAmendment = ServiceCaller.extend( {
+var APIPayStubAmendment = ServiceCaller.extend({
 
-	key_name: 'PayStubAmendment',
-	className: 'APIPayStubAmendment',
+    key_name: 'PayStubAmendment',
+    className: 'APIPayStubAmendment',
 
-	getPayStubAmendmentDefaultData: function() {
+    getPayStubAmendmentDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubAmendmentDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubAmendmentDefaultData', arguments);
 
-	},
+    },
 
-	getPayStubAmendment: function() {
+    getPayStubAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubAmendment', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubAmendment', arguments);
 
-	},
+    },
 
-	getCommonPayStubAmendmentData: function() {
+    getCommonPayStubAmendmentData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayStubAmendmentData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayStubAmendmentData', arguments);
 
-	},
+    },
 
-	validatePayStubAmendment: function() {
+    validatePayStubAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayStubAmendment', arguments );
+        return this.argumentsHandler(this.className, 'validatePayStubAmendment', arguments);
 
-	},
+    },
 
-	setPayStubAmendment: function() {
+    setPayStubAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'setPayStubAmendment', arguments );
+        return this.argumentsHandler(this.className, 'setPayStubAmendment', arguments);
 
-	},
+    },
 
-	deletePayStubAmendment: function() {
+    deletePayStubAmendment: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayStubAmendment', arguments );
+        return this.argumentsHandler(this.className, 'deletePayStubAmendment', arguments);
 
-	},
+    },
 
-	copyPayStubAmendment: function() {
-		return this.argumentsHandler( this.className, 'copyPayStubAmendment', arguments );
-	},
+    copyPayStubAmendment: function () {
+        return this.argumentsHandler(this.className, 'copyPayStubAmendment', arguments);
+    },
 
-	calcAmount: function() {
-		return this.argumentsHandler( this.className, 'calcAmount', arguments );
-	},
+    calcAmount: function () {
+        return this.argumentsHandler(this.className, 'calcAmount', arguments);
+    },
 
-	exportPayStubAmendment: function() {
-		return this.argumentsHandler( this.className, 'exportPayStubAmendment', arguments );
-	},
+    exportPayStubAmendment: function () {
+        return this.argumentsHandler(this.className, 'exportPayStubAmendment', arguments);
+    },
 
 
-
-} );
+});

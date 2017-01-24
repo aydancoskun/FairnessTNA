@@ -42,7 +42,7 @@ $conv = new Services_ExchangeRates('ECB', 'UN');
 
 <html>
 <head>
-<title>Currency Converter - PEAR::Services_ExchangeRates Example</title>
+    <title>Currency Converter - PEAR::Services_ExchangeRates Example</title>
 </head>
 <body>
 
@@ -51,13 +51,11 @@ $conv = new Services_ExchangeRates('ECB', 'UN');
 <?php
 
 if (!empty($_POST['amount'])) {
-   
     echo "<h1>";
     echo $conv->format($_POST['amount']) . ' ' . $_POST['from'];
-    echo " = "; 
-    echo $conv->convert($_POST['from'], $_POST['to'], $_POST['amount']) . ' ' . $_POST['to']; 
+    echo " = ";
+    echo $conv->convert($_POST['from'], $_POST['to'], $_POST['amount']) . ' ' . $_POST['to'];
     echo "</h1>";
-
 } else {
     echo "<h1>Enter how much you want to convert!</h1>";
 }
@@ -72,28 +70,28 @@ foreach ($conv->validCurrencies as $code => $label) {
     <table style="border-collapse: separate; border-spacing: 1em;">
         <tr style="text-align: center;">
             <td>
-                <label for="amount">this amount</label><br />
-                <input type="text" name="amount" id="amount" value="1" />
+                <label for="amount">this amount</label><br/>
+                <input type="text" name="amount" id="amount" value="1"/>
             </td>
             <td>
-                <label for="from">of this type of currency</label><br />
+                <label for="from">of this type of currency</label><br/>
                 <select name="from" id="from">
-                <?php echo $options; ?>
+                    <?php echo $options; ?>
                 </select>
             </td>
             <td>
-                <label for="to">to this type of currency</label><br />
+                <label for="to">to this type of currency</label><br/>
                 <select name="to" id="to">
-                <?php echo $options; ?>
+                    <?php echo $options; ?>
                 </select>
             </td>
         </tr>
         <tr style="text-align: center;">
             <td colspan="3">
-                <input type="submit" value="Convert my money!" />
+                <input type="submit" value="Convert my money!"/>
             </td>
         </tr>
-    </table>    
+    </table>
 </form>
 
 </body>

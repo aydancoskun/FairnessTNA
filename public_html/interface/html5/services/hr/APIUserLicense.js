@@ -1,54 +1,53 @@
-var APIUserLicense = ServiceCaller.extend( {
+var APIUserLicense = ServiceCaller.extend({
 
-	key_name: 'UserLicense',
-	className: 'APIUserLicense',
+    key_name: 'UserLicense',
+    className: 'APIUserLicense',
 
-	getCommonUserLicenseData: function() {
+    getCommonUserLicenseData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserLicenseData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserLicenseData', arguments);
 
-	},
+    },
 
-	getUserLicense: function() {
+    getUserLicense: function () {
 
-		return this.argumentsHandler( this.className, 'getUserLicense', arguments );
+        return this.argumentsHandler(this.className, 'getUserLicense', arguments);
 
-	},
+    },
 
-	setUserLicense: function() {
+    setUserLicense: function () {
 
-		return this.argumentsHandler( this.className, 'setUserLicense', arguments );
+        return this.argumentsHandler(this.className, 'setUserLicense', arguments);
 
-	},
+    },
 
-	getUserLicenseDefaultData: function() {
+    getUserLicenseDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserLicenseDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserLicenseDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserLicense: function() {
+    deleteUserLicense: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserLicense', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserLicense', arguments);
 
-	},
+    },
 
-	validateUserLicense: function() {
+    validateUserLicense: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserLicense', arguments );
+        return this.argumentsHandler(this.className, 'validateUserLicense', arguments);
 
-	},
+    },
 
-	copyUserLicense: function() {
+    copyUserLicense: function () {
 
-		return this.argumentsHandler( this.className, 'copyUserLicense', arguments );
+        return this.argumentsHandler(this.className, 'copyUserLicense', arguments);
 
-	},
+    },
 
-	exportUserLicense: function() {
-		return this.argumentsHandler( this.className, 'exportUserLicense', arguments );
-	}
+    exportUserLicense: function () {
+        return this.argumentsHandler(this.className, 'exportUserLicense', arguments);
+    }
 
 
-
-} );
+});

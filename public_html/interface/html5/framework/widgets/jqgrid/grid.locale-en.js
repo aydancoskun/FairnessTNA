@@ -1,5 +1,5 @@
 ;
-(function( $ ) {
+(function ($) {
     /**
      * jqGrid English Translation
      * Tony Tomov tony@trirand.com
@@ -9,7 +9,7 @@
      * http://www.gnu.org/licenses/gpl.html
      **/
     $.jgrid = $.jgrid || {};
-    $.extend( $.jgrid, {
+    $.extend($.jgrid, {
         defaults: {
             recordtext: "View {0} - {1} of {2}",
             emptyrecords: "No records to view",
@@ -22,8 +22,8 @@
             Reset: "Reset",
             odata: ['equal', 'not equal', 'less', 'less or equal', 'greater', 'greater or equal', 'begins with', 'does not begin with', 'is in', 'is not in', 'ends with', 'does not end with', 'contains', 'does not contain'],
             groupOps: [
-                { op: "AND", text: "all" },
-                { op: "OR", text: "any" }
+                {op: "AND", text: "all"},
+                {op: "OR", text: "any"}
             ],
             matchText: " match",
             rulesText: " rules"
@@ -94,7 +94,14 @@
         formatter: {
             integer: {thousandsSeparator: ",", defaultValue: '0'},
             number: {decimalSeparator: ".", thousandsSeparator: ",", decimalPlaces: 2, defaultValue: '0.00'},
-            currency: {decimalSeparator: ".", thousandsSeparator: ",", decimalPlaces: 2, prefix: "", suffix: "", defaultValue: '0.00'},
+            currency: {
+                decimalSeparator: ".",
+                thousandsSeparator: ",",
+                decimalPlaces: 2,
+                prefix: "",
+                suffix: "",
+                defaultValue: '0.00'
+            },
             date: {
                 dayNames: [
                     "Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat",
@@ -105,8 +112,8 @@
                     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
                 ],
                 AmPm: ["am", "pm", "AM", "PM"],
-                S: function( j ) {
-                    return j < 11 || j > 13 ? ['st', 'nd', 'rd', 'th'][Math.min( (j - 1) % 10, 3 )] : 'th';
+                S: function (j) {
+                    return j < 11 || j > 13 ? ['st', 'nd', 'rd', 'th'][Math.min((j - 1) % 10, 3)] : 'th';
                 },
                 srcformat: 'Y-m-d',
                 newformat: 'n/j/Y',
@@ -171,5 +178,5 @@
             checkbox: {disabled: true},
             idName: 'id'
         }
-    } );
-})( jQuery );
+    });
+})(jQuery);

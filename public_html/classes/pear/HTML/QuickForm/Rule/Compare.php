@@ -22,39 +22,50 @@ require_once 'HTML/QuickForm/Rule.php';
 
 /**
  * Rule to compare two form fields
- * 
- * The most common usage for this is to ensure that the password 
+ *
+ * The most common usage for this is to ensure that the password
  * confirmation field matches the password field
- * 
+ *
  * @access public
  * @package HTML_QuickForm
  * @version $Revision: 1.3 $
  */
 class HTML_QuickForm_Rule_Compare extends HTML_QuickForm_Rule
 {
-   /**
-    * Possible operators to use
-    * @var array
-    * @access private
-    */
-    var $_operators = array(
-        'eq'  => '==',
+    /**
+     * Possible operators to use
+     * @var array
+     * @access private
+     */
+    public $_operators = array(
+        'eq' => '==',
         'neq' => '!=',
-        'gt'  => '>',
+        'gt' => '>',
         'gte' => '>=',
-        'lt'  => '<',
+        'lt' => '<',
         'lte' => '<='
     );
 
+    public function validate($values, $operator = null)
+    {
+        $operator = $this->_findOperator($operator);
+        if ('==' != $operator && '!=' != $operator) {
+            $compareFn = create_function('$a, $b', 'return floatval($a) ' . $operator . ' floatval($b);');
+        } else {
+            $compareFn = create_function('$a, $b', 'return $a ' . $operator . ' $b;');
+        }
 
-   /**
-    * Returns the operator to use for comparing the values
-    * 
-    * @access private
-    * @param  string     operator name
-    * @return string     operator to use for validation
-    */
-    function _findOperator($name)
+        return $compareFn($values[0], $values[1]);
+    }
+
+    /**
+     * Returns the operator to use for comparing the values
+     *
+     * @access private
+     * @param  string     operator name
+     * @return string     operator to use for validation
+     */
+    public function _findOperator($name)
     {
         if (empty($name)) {
             return '==';
@@ -67,21 +78,7 @@ class HTML_QuickForm_Rule_Compare extends HTML_QuickForm_Rule
         }
     }
 
-
-    function validate($values, $operator = null)
-    {
-        $operator = $this->_findOperator($operator);
-        if ('==' != $operator && '!=' != $operator) {
-            $compareFn = create_function('$a, $b', 'return floatval($a) ' . $operator . ' floatval($b);');
-        } else {
-            $compareFn = create_function('$a, $b', 'return $a ' . $operator . ' $b;');
-        }
-        
-        return $compareFn($values[0], $values[1]);
-    }
-
-
-    function getValidationScript($operator = null)
+    public function getValidationScript($operator = null)
     {
         $operator = $this->_findOperator($operator);
         if ('==' != $operator && '!=' != $operator) {
@@ -92,4 +89,3 @@ class HTML_QuickForm_Rule_Compare extends HTML_QuickForm_Rule
         return array('', "'' != {jsVar}[0] && {$check}");
     }
 }
-?>

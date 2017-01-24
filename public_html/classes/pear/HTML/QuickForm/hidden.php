@@ -23,7 +23,7 @@ require_once("HTML/QuickForm/input.php");
 
 /**
  * HTML class for a hidden type element
- * 
+ *
  * @author       Adam Daniel <adaniel1@eesus.jnj.com>
  * @author       Bertrand Mansion <bmansion@mamasam.com>
  * @version      1.0
@@ -36,33 +36,33 @@ class HTML_QuickForm_hidden extends HTML_QuickForm_input
 
     /**
      * Class constructor
-     * 
-     * @param     string    $elementName    (optional)Input field name attribute
-     * @param     string    $value          (optional)Input field value
-     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string 
+     *
+     * @param     string $elementName (optional)Input field name attribute
+     * @param     string $value (optional)Input field value
+     * @param     mixed $attributes (optional)Either a typical HTML attribute string
      *                                      or an associative array
      * @since     1.0
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_hidden($elementName=null, $value='', $attributes=null)
+    public function HTML_QuickForm_hidden($elementName = null, $value = '', $attributes = null)
     {
         //HTML_QuickForm_input::HTML_QuickForm_input($elementName, null, $attributes);
         new HTML_QuickForm_input($elementName, null, $attributes);
         self::setType('hidden');
         self::setValue($value);
     } //end constructor
-        
+
     // }}}
     // {{{ freeze()
 
     /**
      * Freeze the element so that only its value is returned
-     * 
+     *
      * @access    public
      * @return    void
      */
-    static function freeze()
+    public static function freeze()
     {
         return false;
     } //end func freeze
@@ -70,19 +70,17 @@ class HTML_QuickForm_hidden extends HTML_QuickForm_input
     // }}}
     // {{{ accept()
 
-   /**
-    * Accepts a renderer
-    *
-    * @param object     An HTML_QuickForm_Renderer object
-    * @access public
-    * @return void 
-    */
-    static function accept(&$renderer)
+    /**
+     * Accepts a renderer
+     *
+     * @param object     An HTML_QuickForm_Renderer object
+     * @access public
+     * @return void
+     */
+    public static function accept(&$renderer)
     {
         $renderer->renderHidden($this);
     } // end func accept
 
     // }}}
-
-} //end class HTML_QuickForm_hidden
-?>
+} //end class HTML_QuickForm_hidden;

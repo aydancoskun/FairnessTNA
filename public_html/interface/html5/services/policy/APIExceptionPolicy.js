@@ -1,48 +1,48 @@
-var APIExceptionPolicy = ServiceCaller.extend( {
+var APIExceptionPolicy = ServiceCaller.extend({
 
-	key_name: 'ExceptionPolicy',
-	className: 'APIExceptionPolicy',
+    key_name: 'ExceptionPolicy',
+    className: 'APIExceptionPolicy',
 
-	getExceptionPolicyDefaultData: function() {
+    getExceptionPolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getExceptionPolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getExceptionPolicyDefaultData', arguments);
 
-	},
+    },
 
-	getExceptionPolicy: function() {
+    getExceptionPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getExceptionPolicy', arguments );
+        return this.argumentsHandler(this.className, 'getExceptionPolicy', arguments);
 
-	},
+    },
 
-	getCommonExceptionPolicyData: function() {
+    getCommonExceptionPolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonExceptionPolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonExceptionPolicyData', arguments);
 
-	},
+    },
 
-	validateExceptionPolicy: function() {
+    validateExceptionPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateExceptionPolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateExceptionPolicy', arguments);
 
-	},
+    },
 
-	setExceptionPolicy: function() {
+    setExceptionPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setExceptionPolicy', arguments );
+        return this.argumentsHandler(this.className, 'setExceptionPolicy', arguments);
 
-	},
+    },
 
-	deleteExceptionPolicy: function() {
+    deleteExceptionPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteExceptionPolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteExceptionPolicy', arguments);
 
-	},
+    },
 
-	copyExceptionPolicy: function() {
+    copyExceptionPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'copyExceptionPolicy', arguments );
+        return this.argumentsHandler(this.className, 'copyExceptionPolicy', arguments);
 
-	}
+    }
 
-} );
+});

@@ -30,10 +30,10 @@ require_once 'Net/Curl.php';
  * Defines global variables
  */
 $GLOBALS['_Payment_Process_Beanstream'] = array(
-    PAYMENT_PROCESS_ACTION_NORMAL   => 'P',
+    PAYMENT_PROCESS_ACTION_NORMAL => 'P',
     PAYMENT_PROCESS_ACTION_AUTHONLY => 'PA',
     PAYMENT_PROCESS_ACTION_POSTAUTH => 'PAC',
-    PAYMENT_PROCESS_ACTION_VOID     => 'VP'
+    PAYMENT_PROCESS_ACTION_VOID => 'VP'
 );
 
 /**
@@ -58,24 +58,24 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      * @see _prepare()
      * @access private
      */
-    var $_fieldMap = array(
+    public $_fieldMap = array(
         // Required
-        'customerId'    => 'merchant_id',
-        'login'         => 'username',
-        'password'      => 'password',
-        'action'        => 'trnType',
+        'customerId' => 'merchant_id',
+        'login' => 'username',
+        'password' => 'password',
+        'action' => 'trnType',
         'invoiceNumber' => 'trnOrderNumber',
-        'amount'        => 'trnAmount',
-        'name'          =>  '',
-        'address'       => 'ordAddress1',
-        'city'          => 'ordCity',
-        'state'         => 'ordProvince',
-        'country'       => 'ordCountry',
-        'postalCode'    => 'ordPostalCode',
-        'zip'           => 'ordPostalCode',
-        'phone'         => 'ordPhoneNumber',
-        'email'         => 'ordEmailAddress',
-        'errorPage'     => 'errorPage',
+        'amount' => 'trnAmount',
+        'name' => '',
+        'address' => 'ordAddress1',
+        'city' => 'ordCity',
+        'state' => 'ordProvince',
+        'country' => 'ordCountry',
+        'postalCode' => 'ordPostalCode',
+        'zip' => 'ordPostalCode',
+        'phone' => 'ordPhoneNumber',
+        'email' => 'ordEmailAddress',
+        'errorPage' => 'errorPage',
     );
 
     /**
@@ -84,14 +84,14 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      * @author Joe Stump <joe@joestump.net>
      * @access protected
      */
-    var $_typeFieldMap = array(
-           'CreditCard' => array(
-                'firstName'  => 'firstName',
-                'lastName'   => 'lastName',
-                'cardNumber' => 'trnCardNumber',
-                'cvv'        => 'trnCardCvd',
-                'expDate'    => 'expDate'
-           ),
+    public $_typeFieldMap = array(
+        'CreditCard' => array(
+            'firstName' => 'firstName',
+            'lastName' => 'lastName',
+            'cardNumber' => 'trnCardNumber',
+            'cvv' => 'trnCardCvd',
+            'expDate' => 'expDate'
+        ),
     );
 
     /**
@@ -100,11 +100,11 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      * @see Payment_Process::setOptions()
      * @access private
      */
-    var $_defaultOptions = array(
-         'authorizeUri' => 'https://www.beanstream.com/scripts/process_transaction.asp',
-         'requestType' => 'BACKEND',
-         'cavEnabled' => 0,
-         'cavServiceVersion' => '1.2',
+    public $_defaultOptions = array(
+        'authorizeUri' => 'https://www.beanstream.com/scripts/process_transaction.asp',
+        'requestType' => 'BACKEND',
+        'cavEnabled' => 0,
+        'cavServiceVersion' => '1.2',
     );
 
     /**
@@ -113,7 +113,7 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      * @var string
      * @access private
      */
-    var $_encapChars = '|~#$^*_=+-`{}![]:";<>?/&';
+    public $_encapChars = '|~#$^*_=+-`{}![]:";<>?/&';
 
     /**
      * Has the transaction been processed?
@@ -121,32 +121,32 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      * @type boolean
      * @access private
      */
-    var $_processed = false;
+    public $_processed = false;
 
     /**
      * The response body sent back from the gateway.
      *
      * @access private
      */
-    var $_responseBody = '';
+    public $_responseBody = '';
+
+    public function Payment_Process_Beanstream($options = false)
+    {
+        $this->__construct($options);
+    }
 
     /**
      * Constructor.
      *
-     * @param  array  $options  Class options to set.
+     * @param  array $options Class options to set.
      * @see Payment_Process::setOptions()
      * @return void
      */
-    function __construct($options = false)
+    public function __construct($options = false)
     {
         parent::__construct($options);
         $this->_driver = 'Beanstream';
-        $this->_makeRequired('customerId','login', 'password', 'action', 'invoiceNumber');
-    }
-
-    function Payment_Process_Beanstream($options = false)
-    {
-        $this->__construct($options);
+        $this->_makeRequired('customerId', 'login', 'password', 'action', 'invoiceNumber');
     }
 
     /**
@@ -158,7 +158,7 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      * @return mixed Payment_Process_Result on success, PEAR_Error on failure
      * @access public
      */
-    function &process()
+    public function &process()
     {
         // Sanity check
         $result = $this->validate();
@@ -208,8 +208,8 @@ class Payment_Process_Beanstream extends Payment_Process_Common
         PEAR::popErrorHandling();
 
         $response = Payment_Process_Result::factory($this->_driver,
-                                                     $this->_responseBody,
-                                                     $this);
+            $this->_responseBody,
+            $this);
 
         if (!PEAR::isError($response)) {
             $response->parse();
@@ -220,6 +220,30 @@ class Payment_Process_Beanstream extends Payment_Process_Common
     }
 
     /**
+     * Prepare the POST query string.
+     *
+     * You will need PHP_Compat::str_split() if you run this processor
+     * under PHP 4.
+     *
+     * @access private
+     * @return string The query string
+     */
+    public function _prepareQueryString()
+    {
+        $data = array_merge($this->_options, $this->_data);
+
+        foreach ($data as $key => $val) {
+            if (strlen($val) > 0) {
+                $return[] = $key . '=' . urlencode($val);
+            }
+        }
+
+        $retval = implode('&', $return);
+
+        return $retval;
+    }
+
+    /**
      * Processes a callback from payment gateway
      *
      * Success here doesn't mean the transaction was approved. It means
@@ -227,13 +251,13 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      *
      * @return mixed Payment_Process_Result on success, PEAR_Error on failure
      */
-    function &processCallback()
+    public function &processCallback()
     {
         $this->_responseBody = $_POST;
         $this->_processed = true;
 
         $response = &Payment_Process_Result::factory($this->_driver,
-                            $this->_responseBody);
+            $this->_responseBody);
         if (!PEAR::isError($response)) {
             $response->_request = $this;
             $response->parseCallback();
@@ -241,7 +265,6 @@ class Payment_Process_Beanstream extends Payment_Process_Common
             $r = $response->isLegitimate();
             if (PEAR::isError($r)) {
                 return $r;
-
             } elseif ($r === false) {
                 return PEAR::raiseError('Illegitimate callback from gateway.');
             }
@@ -255,33 +278,9 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      *
      * @return string Two-digit status returned from gateway.
      */
-    function getStatus()
+    public function getStatus()
     {
         return false;
-    }
-
-    /**
-     * Prepare the POST query string.
-     *
-     * You will need PHP_Compat::str_split() if you run this processor
-     * under PHP 4.
-     *
-     * @access private
-     * @return string The query string
-     */
-    function _prepareQueryString()
-    {
-        $data = array_merge($this->_options, $this->_data);
-
-        foreach ($data as $key => $val) {
-            if (strlen($val) > 0 ) {
-                $return[] = $key.'='.urlencode($val);
-            }
-        }
-
-        $retval = implode('&', $return);
-
-        return $retval;
     }
 
     /**
@@ -292,10 +291,10 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      *
      * @access private
      */
-    function _handleName()
+    public function _handleName()
     {
-        $this->_data['trnCardOwner'] = $this->_payment->firstName.' '.$this->_payment->lastName;
-        $this->_data['ordName'] = $this->_payment->firstName.' '.$this->_payment->lastName;
+        $this->_data['trnCardOwner'] = $this->_payment->firstName . ' ' . $this->_payment->lastName;
+        $this->_data['ordName'] = $this->_payment->firstName . ' ' . $this->_payment->lastName;
     }
 
     /**
@@ -305,25 +304,24 @@ class Payment_Process_Beanstream extends Payment_Process_Common
      *
      * @access private
      */
-    function _handleExpDate()
+    public function _handleExpDate()
     {
         $split_expire_date = explode('/', $this->_payment->expDate);
         $this->_data['trnExpMonth'] = $split_expire_date[0];
-        $this->_data['trnExpYear'] = substr( $split_expire_date[1], -2, 2);
+        $this->_data['trnExpYear'] = substr($split_expire_date[1], -2, 2);
     }
-
 }
 
 
-class Payment_Process_Result_Beanstream extends Payment_Process_Result {
+class Payment_Process_Result_Beanstream extends Payment_Process_Result
+{
+    public $_statusCodeMap = array('1' => PAYMENT_PROCESS_RESULT_APPROVED,
+        '2' => PAYMENT_PROCESS_RESULT_DECLINED,
+        '3' => PAYMENT_PROCESS_RESULT_OTHER,
+        '4' => PAYMENT_PROCESS_RESULT_REVIEW
+    );
 
-    var $_statusCodeMap = array('1' => PAYMENT_PROCESS_RESULT_APPROVED,
-                                '2' => PAYMENT_PROCESS_RESULT_DECLINED,
-                                '3' => PAYMENT_PROCESS_RESULT_OTHER,
-                                '4' => PAYMENT_PROCESS_RESULT_REVIEW
-                                );
-
-    var $_avsCodeMap = array(
+    public $_avsCodeMap = array(
         'A' => PAYMENT_PROCESS_AVS_MISMATCH,
         'B' => PAYMENT_PROCESS_AVS_ERROR,
         'E' => PAYMENT_PROCESS_AVS_ERROR,
@@ -339,7 +337,7 @@ class Payment_Process_Result_Beanstream extends Payment_Process_Result {
         'Z' => PAYMENT_PROCESS_AVS_MISMATCH
     );
 
-    var $_avsCodeMessages = array(
+    public $_avsCodeMessages = array(
         '0' => 'Address verification not performed for this transaction',
         '5' => 'Invalid AVS repsonse',
         '0' => 'Address verification data contains edit error',
@@ -358,15 +356,15 @@ class Payment_Process_Result_Beanstream extends Payment_Process_Result {
         'Z' => '5-digit postal code matches, street address does not'
     );
 
-    var $_cvvCodeMap = array('1' => PAYMENT_PROCESS_CVV_MATCH,
-                             '2' => PAYMENT_PROCESS_CVV_MISMATCH,
-                             '3' => PAYMENT_PROCESS_CVV_ERROR,
-                             '4' => PAYMENT_PROCESS_CVV_ERROR,
-                             '5' => PAYMENT_PROCESS_CVV_ERROR,
-                             '6' => PAYMENT_PROCESS_CVV_ERROR
+    public $_cvvCodeMap = array('1' => PAYMENT_PROCESS_CVV_MATCH,
+        '2' => PAYMENT_PROCESS_CVV_MISMATCH,
+        '3' => PAYMENT_PROCESS_CVV_ERROR,
+        '4' => PAYMENT_PROCESS_CVV_ERROR,
+        '5' => PAYMENT_PROCESS_CVV_ERROR,
+        '6' => PAYMENT_PROCESS_CVV_ERROR
     );
 
-    var $_cvvCodeMessages = array(
+    public $_cvvCodeMessages = array(
         1 => 'CVV code matches',
         2 => 'CVV code does not match',
         3 => 'CVV code was not processed',
@@ -375,21 +373,21 @@ class Payment_Process_Result_Beanstream extends Payment_Process_Result {
         6 => 'CVV not provided',
     );
 
-    var $_fieldMap = array('0'  => 'code',
-                           '2'  => 'messageCode',
-                           '3'  => 'message',
-                           '4'  => 'approvalCode',
-                           '5'  => 'avsCode',
-                           '6'  => 'transactionId',
-                           '7'  => 'invoiceNumber',
-                           '8'  => 'description',
-                           '9'  => 'amount',
-                           '12' => 'customerId',
-                           '37' => 'md5Hash',
-                           '38' => 'cvvCode'
+    public $_fieldMap = array('0' => 'code',
+        '2' => 'messageCode',
+        '3' => 'message',
+        '4' => 'approvalCode',
+        '5' => 'avsCode',
+        '6' => 'transactionId',
+        '7' => 'invoiceNumber',
+        '8' => 'description',
+        '9' => 'amount',
+        '12' => 'customerId',
+        '37' => 'md5Hash',
+        '38' => 'cvvCode'
     );
 
-    function Payment_Process_Response_Beanstream($rawResponse)
+    public function Payment_Process_Response_Beanstream($rawResponse)
     {
         $this->Payment_Process_Response($rawResponse);
     }
@@ -399,23 +397,23 @@ class Payment_Process_Result_Beanstream extends Payment_Process_Result {
      *
      * @access public
      */
-    function parse()
+    public function parse()
     {
 
         //get last line of response
-        $split_response = explode("\n", $this->_rawResponse );
+        $split_response = explode("\n", $this->_rawResponse);
         $response_str = array_pop($split_response);
 
-        if ( preg_match('/trnApproved=(.*)/i', $response_str ) ) {
-            if ( isset($response_str) AND strlen($response_str) > 0 ) {
+        if (preg_match('/trnApproved=(.*)/i', $response_str)) {
+            if (isset($response_str) and strlen($response_str) > 0) {
 
                 //Parse URL for variables.
-                $response_str_arr = explode('&', urldecode( $response_str ) );
+                $response_str_arr = explode('&', urldecode($response_str));
 
-                if ( is_array($response_str_arr) ) {
-                    foreach( $response_str_arr as $response_value ) {
+                if (is_array($response_str_arr)) {
+                    foreach ($response_str_arr as $response_value) {
                         $split_response_value = explode('=', $response_value, 2);
-                        if ( isset($split_response_value[0]) AND isset($split_response_value[1]) ) {
+                        if (isset($split_response_value[0]) and isset($split_response_value[1])) {
                             $responseArray[trim($split_response_value[0])] = trim($split_response_value[1]);
                         }
                     }
@@ -423,45 +421,45 @@ class Payment_Process_Result_Beanstream extends Payment_Process_Result {
 
                     //var_dump($responseArray);
 
-                    if ( !isset($responseArray) AND !is_array( $responseArray) ) {
+                    if (!isset($responseArray) and !is_array($responseArray)) {
                         $this->_returnCode = PAYMENT_PROCESS_RESULT_OTHER;
                     }
 
-                    if ( isset($responseArray['trnApproved']) AND $responseArray['trnApproved'] == 1 ) {
+                    if (isset($responseArray['trnApproved']) and $responseArray['trnApproved'] == 1) {
                         $this->_returnCode = PAYMENT_PROCESS_RESULT_APPROVED;
                     } else {
                         $this->_returnCode = PAYMENT_PROCESS_RESULT_DECLINED;
                     }
 
-                    if ( isset($responseArray['messageId']) ) {
-                        $this->code          = $responseArray['messageId'];
-                        $this->messageCode   = $responseArray['messageId'];
+                    if (isset($responseArray['messageId'])) {
+                        $this->code = $responseArray['messageId'];
+                        $this->messageCode = $responseArray['messageId'];
                     }
 
-                    if ( isset($responseArray['errorType']) AND $responseArray['errorType'] == 'N' ) {
-                        $this->message = $responseArray['messageText'] .' (Code: '. $responseArray['messageId'] .')';
-                    } elseif ( $responseArray['errorType'] != 'N' AND isset($responseArray['errorFields']) ) {
-                        $this->message = $responseArray['messageText'] .' Code('. $responseArray['messageId'] .')';
-                        if ( isset($responseArray['errorFields']) AND $responseArray['errorFields'] != '' ) {
-                            $this->message .= ' Error Fields('.$responseArray['errorFields'].')';
+                    if (isset($responseArray['errorType']) and $responseArray['errorType'] == 'N') {
+                        $this->message = $responseArray['messageText'] . ' (Code: ' . $responseArray['messageId'] . ')';
+                    } elseif ($responseArray['errorType'] != 'N' and isset($responseArray['errorFields'])) {
+                        $this->message = $responseArray['messageText'] . ' Code(' . $responseArray['messageId'] . ')';
+                        if (isset($responseArray['errorFields']) and $responseArray['errorFields'] != '') {
+                            $this->message .= ' Error Fields(' . $responseArray['errorFields'] . ')';
                         }
                     }
 
-                    if ( isset($responseArray['authCode']) ) {
+                    if (isset($responseArray['authCode'])) {
                         $this->approvalCode = $responseArray['authCode'];
                     }
 
-                    if ( isset($responseArray['trnId']) ) {
+                    if (isset($responseArray['trnId'])) {
                         $this->transactionId = $responseArray['trnId'];
                     }
 
-                    if ( isset($responseArray['trnOrderNumber']) ) {
+                    if (isset($responseArray['trnOrderNumber'])) {
                         $this->invoiceNumber = $responseArray['trnOrderNumber'];
                     }
 
-                    if ( isset($responseArray['cvdId']) ) {
+                    if (isset($responseArray['cvdId'])) {
                         $this->cvvCode = $responseArray['cvdId'];
-                        if ( isset($this->_cvvCodeMessages[$this->cvvCode]) ) {
+                        if (isset($this->_cvvCodeMessages[$this->cvvCode])) {
                             $this->cvvMessage = $this->_cvvCodeMessages[$this->cvvCode];
                         }
                     }
@@ -476,4 +474,3 @@ class Payment_Process_Result_Beanstream extends Payment_Process_Result {
         }
     }
 }
-?>

@@ -28,8 +28,8 @@
  */
 
 /**
-* Requires the IBAN Finance Validate class
-*/
+ * Requires the IBAN Finance Validate class
+ */
 require_once 'Validate/Finance/IBAN.php';
 
 /**
@@ -52,12 +52,12 @@ class Validate_Finance
     /**
      * Validation of an IBAN (international bankaccount number)
      *
-     * @param     string      $iban              IBAN to be validated
+     * @param     string $iban IBAN to be validated
      * @access    public
      * @since     0.1
      * @return    boolean   true if IBAN is okay
      */
-    function iban($iban = '')
+    public function iban($iban = '')
     {
         $validate_finance_iban = new Validate_Finance_IBAN($iban);
         return $validate_finance_iban->validate($iban);
@@ -66,12 +66,12 @@ class Validate_Finance
     /**
      * Validation of a Euro banknote id
      *
-     * @param     string      $banknote              Euro banknote id to be validated
+     * @param     string $banknote Euro banknote id to be validated
      * @access    public
      * @since     0.1
      * @return    boolean   true if Euro banknote id is okay
      */
-    function banknoteEuro($banknote = '')
+    public function banknoteEuro($banknote = '')
     {
         $euro_countrycode = array('J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
@@ -97,8 +97,6 @@ class Validate_Finance
         $tempcheckvalue %= 9; // modulo 9
         $tempcheckvalue = 8 - $tempcheckvalue;
 
-        return (intval($banknote[strlen($banknote)-1]) == $tempcheckvalue);
+        return (intval($banknote[strlen($banknote) - 1]) == $tempcheckvalue);
     } // end func banknoteEuro
-
-} // end class Validate_Finance
-?>
+} // end class Validate_Finance;

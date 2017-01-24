@@ -1,56 +1,55 @@
-var APIAccrualPolicyUserModifier = ServiceCaller.extend( {
+var APIAccrualPolicyUserModifier = ServiceCaller.extend({
 
-	key_name: 'AccrualPolicyUserModifier',
-	className: 'APIAccrualPolicyUserModifier',
+    key_name: 'AccrualPolicyUserModifier',
+    className: 'APIAccrualPolicyUserModifier',
 
-	getAccrualPolicyUserModifier: function() {
+    getAccrualPolicyUserModifier: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicyUserModifier', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicyUserModifier', arguments);
 
-	},
+    },
 
-	getAccrualPolicyUserModifierDefaultData: function() {
+    getAccrualPolicyUserModifierDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicyUserModifierDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicyUserModifierDefaultData', arguments);
 
-	},
+    },
 
-	getCommonAccrualPolicyUserModifierData: function() {
+    getCommonAccrualPolicyUserModifierData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonAccrualPolicyUserModifierData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonAccrualPolicyUserModifierData', arguments);
 
-	},
+    },
 
-	validateAccrualPolicyUserModifier: function() {
+    validateAccrualPolicyUserModifier: function () {
 
-		return this.argumentsHandler( this.className, 'validateAccrualPolicyUserModifier', arguments );
+        return this.argumentsHandler(this.className, 'validateAccrualPolicyUserModifier', arguments);
 
-	},
+    },
 
-	setAccrualPolicyUserModifier: function() {
+    setAccrualPolicyUserModifier: function () {
 
-		return this.argumentsHandler( this.className, 'setAccrualPolicyUserModifier', arguments );
+        return this.argumentsHandler(this.className, 'setAccrualPolicyUserModifier', arguments);
 
-	},
+    },
 
-	deleteAccrualPolicyUserModifier: function() {
+    deleteAccrualPolicyUserModifier: function () {
 
-		return this.argumentsHandler( this.className, 'deleteAccrualPolicyUserModifier', arguments );
+        return this.argumentsHandler(this.className, 'deleteAccrualPolicyUserModifier', arguments);
 
-	},
+    },
 
-	copyAccrualPolicyUserModifier: function() {
+    copyAccrualPolicyUserModifier: function () {
 
-		return this.argumentsHandler( this.className, 'copyAccrualPolicyUserModifier', arguments );
+        return this.argumentsHandler(this.className, 'copyAccrualPolicyUserModifier', arguments);
 
-	},
+    },
 
-	getAccrualPolicyDataFromUserModifier: function() {
+    getAccrualPolicyDataFromUserModifier: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicyDataFromUserModifier', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicyDataFromUserModifier', arguments);
 
-	}
+    }
 
 
-
-} );
+});

@@ -19,96 +19,101 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
-
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Import
  */
-class ImportBankAccount extends Import {
+class ImportBankAccount extends Import
+{
+    public $class_name = 'APIBankAccount';
 
-	public $class_name = 'APIBankAccount';
+    public $wage_group_options = false;
 
-	public $wage_group_options = FALSE;
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'columns':
+                $baf = TTNew('BankAccountFactory');
+                $retval = Misc::prependArray($this->getUserIdentificationColumns(), Misc::arrayIntersectByKey(array('transit', 'institution', 'account'), Misc::trimSortPrefix($baf->getOptions('columns'))));
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+                break;
+            case 'column_aliases':
+                //Used for converting column names after they have been parsed.
+                $retval = array(
+                    //'type' => 'type_id',
+                    //'wage_group' => 'wage_group_id',
+                );
+                break;
+            case 'import_options':
+                $retval = array(
+                    '-1010-fuzzy_match' => TTi18n::getText('Enable smart matching.'),
+                );
+                break;
+            case 'parse_hint':
+            case 'parse_hint':
+                //$upf = TTnew('UserPreferenceFactory');
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'columns':
-				$baf = TTNew('BankAccountFactory');
-				$retval = Misc::prependArray( $this->getUserIdentificationColumns(), Misc::arrayIntersectByKey( array('transit', 'institution', 'account'), Misc::trimSortPrefix( $baf->getOptions('columns') ) ) );
+                $retval = array(
+                    //'effective_date' => $upf->getOptions('date_format'),
+                    //'weekly_time' => $upf->getOptions('time_unit_format'),
+                );
+                break;
+        }
 
-				break;
-			case 'column_aliases':
-				//Used for converting column names after they have been parsed.
-				$retval = array(
-								//'type' => 'type_id',
-								//'wage_group' => 'wage_group_id',
-								);
-				break;
-			case 'import_options':
-				$retval = array(
-								'-1010-fuzzy_match' => TTi18n::getText('Enable smart matching.'),
-								);
-				break;
-			case 'parse_hint':
-			case 'parse_hint':
-				//$upf = TTnew('UserPreferenceFactory');
-
-				$retval = array(
-								//'effective_date' => $upf->getOptions('date_format'),
-								//'weekly_time' => $upf->getOptions('time_unit_format'),
-								);
-				break;
-		}
-
-		return $retval;
-	}
+        return $retval;
+    }
 
 
-	function _preParseRow( $row_number, $raw_row ) {
-		$retval = $this->getObject()->stripReturnHandler( $this->getObject()->getBankAccountDefaultData() );
+    public function _preParseRow($row_number, $raw_row)
+    {
+        $retval = $this->getObject()->stripReturnHandler($this->getObject()->getBankAccountDefaultData());
 
-		return $retval;
-	}
+        return $retval;
+    }
 
-	function _postParseRow( $row_number, $raw_row ) {
-		$raw_row['user_id'] = $this->getUserIdByRowData( $raw_row );
-		if ( $raw_row['user_id'] == FALSE ) {
-			$raw_row['user_id'] = -1;
-			//unset($raw_row['user_id']);
-		}
+    public function _postParseRow($row_number, $raw_row)
+    {
+        $raw_row['user_id'] = $this->getUserIdByRowData($raw_row);
+        if ($raw_row['user_id'] == false) {
+            $raw_row['user_id'] = -1;
+            //unset($raw_row['user_id']);
+        }
 
-		return $raw_row;
-	}
+        return $raw_row;
+    }
 
-	function _import( $validate_only ) {
-		return $this->getObject()->setBankAccount( $this->getParsedData(), $validate_only );
-	}
+    public function _import($validate_only)
+    {
+        return $this->getObject()->setBankAccount($this->getParsedData(), $validate_only);
+    }
 
-	//
-	// Generic parser functions.
-	//
-	function parse_institution( $input, $default_value = NULL, $parse_hint = NULL ) {
-		$val = new Validator();
-		$retval = str_pad( $val->stripNonNumeric($input), 3, 0, STR_PAD_LEFT );
+    //
+    // Generic parser functions.
+    //
+    public function parse_institution($input, $default_value = null, $parse_hint = null)
+    {
+        $val = new Validator();
+        $retval = str_pad($val->stripNonNumeric($input), 3, 0, STR_PAD_LEFT);
 
-		return $retval;
-	}
-	function parse_transit( $input, $default_value = NULL, $parse_hint = NULL ) {
-		$val = new Validator();
-		$retval = $val->stripNonNumeric($input);
+        return $retval;
+    }
 
-		return $retval;
-	}
-	function parse_account( $input, $default_value = NULL, $parse_hint = NULL ) {
-		$val = new Validator();
-		$retval = $val->stripNonNumeric($input);
+    public function parse_transit($input, $default_value = null, $parse_hint = null)
+    {
+        $val = new Validator();
+        $retval = $val->stripNonNumeric($input);
 
-		return $retval;
-	}
+        return $retval;
+    }
 
+    public function parse_account($input, $default_value = null, $parse_hint = null)
+    {
+        $val = new Validator();
+        $retval = $val->stripNonNumeric($input);
+
+        return $retval;
+    }
 }
-?>

@@ -1,86 +1,86 @@
-(function( $ ) {
+(function ($) {
 
-	$.fn.ASearchInput = function( options ) {
-		var opts = $.extend( {}, $.fn.ADropDown.defaults, options );
+    $.fn.ASearchInput = function (options) {
+        var opts = $.extend({}, $.fn.ADropDown.defaults, options);
 
-		var column_model = null;
+        var column_model = null;
 
-		var search_timer = null;
+        var search_timer = null;
 
-		var $this = this;
-		var default_tooltip = $.i18n._( 'click to search' );
+        var $this = this;
+        var default_tooltip = $.i18n._('click to search');
 
-		this.setFilter = function( filters ) {
-			var field = column_model.name;
+        this.setFilter = function (filters) {
+            var field = column_model.name;
 
-			if ( Global.isSet( filters[field] ) ) {
-				$( this ).val( filters[field] );
-				$( this ).addClass( 'search-input-focus-in' );
-			}
-		}
+            if (Global.isSet(filters[field])) {
+                $(this).val(filters[field]);
+                $(this).addClass('search-input-focus-in');
+            }
+        }
 
-		this.clearValue = function() {
-			$( this ).val( default_tooltip );
-			$( this ).removeClass( 'search-input-focus-in' );
-			$( this ).addClass( 'search-input-focus-out' );
-		}
+        this.clearValue = function () {
+            $(this).val(default_tooltip);
+            $(this).removeClass('search-input-focus-in');
+            $(this).addClass('search-input-focus-out');
+        }
 
-		this.each( function() {
+        this.each(function () {
 
-			var o = $.meta ? $.extend( {}, opts, $( this ).data() ) : opts;
+            var o = $.meta ? $.extend({}, opts, $(this).data()) : opts;
 
-			if ( o.column_model ) {
+            if (o.column_model) {
 
-				column_model = o.column_model;
-			}
+                column_model = o.column_model;
+            }
 
-			$( this ).addClass( 'search-input-focus-out' );
+            $(this).addClass('search-input-focus-out');
 
-			$( this ).val( default_tooltip );
+            $(this).val(default_tooltip);
 
-			$( this ).focusin( function() {
+            $(this).focusin(function () {
 
-				if ( $( this ).val() === default_tooltip ) {
-					$( this ).val( '' );
-					$( this ).addClass( 'search-input-focus-in' );
-				}
+                if ($(this).val() === default_tooltip) {
+                    $(this).val('');
+                    $(this).addClass('search-input-focus-in');
+                }
 
-			} );
+            });
 
-			$( this ).focusout( function() {
-				if ( $( this ).val() === '' ) {
-					$( this ).val( default_tooltip );
-					$( this ).removeClass( 'search-input-focus-in' );
-				}
+            $(this).focusout(function () {
+                if ($(this).val() === '') {
+                    $(this).val(default_tooltip);
+                    $(this).removeClass('search-input-focus-in');
+                }
 
-			} );
+            });
 
-			$( this ).bind( 'input propertychange', function( e ) {
+            $(this).bind('input propertychange', function (e) {
 
-				if ( search_timer ) {
-					clearTimeout( search_timer );
-				}
+                if (search_timer) {
+                    clearTimeout(search_timer);
+                }
 
-				if ( e.keyCode === 91 || e.ctrlKey || e.metaKey || e.keyCode === 17 ) {
-					return;
-				}
+                if (e.keyCode === 91 || e.ctrlKey || e.metaKey || e.keyCode === 17) {
+                    return;
+                }
 
-				search_timer = setTimeout( function() {
+                search_timer = setTimeout(function () {
 
-					var val = ($this.val() === default_tooltip) ? '' : $this.val();
+                    var val = ($this.val() === default_tooltip) ? '' : $this.val();
 
-					$this.trigger( 'searchEnter', [val, column_model.name] );
+                    $this.trigger('searchEnter', [val, column_model.name]);
 
-				}, 500 );
+                }, 500);
 
-			} );
+            });
 
-		} );
+        });
 
-		return this;
+        return this;
 
-	};
+    };
 
-	$.fn.ASearchInput.defaults = {};
+    $.fn.ASearchInput.defaults = {};
 
-})( jQuery );
+})(jQuery);

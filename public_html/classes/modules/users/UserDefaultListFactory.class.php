@@ -19,113 +19,116 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Users
  */
-class UserDefaultListFactory extends UserDefaultFactory implements IteratorAggregate {
+class UserDefaultListFactory extends UserDefaultFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($order == null) {
+            $order = array('company_id' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $order == NULL ) {
-			$order = array( 'company_id' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
-
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$this->rs = $this->getCache($id);
-		if ( $this->rs === FALSE ) {
-			$ph = array(
-						'id' => (int)$id,
-						);
+        $this->rs = $this->getCache($id);
+        if ($this->rs === false) {
+            $ph = array(
+                'id' => (int)$id,
+            );
 
-			$query = '
+            $query = '
 						select	*
-						from	'. $this->getTable() .'
+						from	' . $this->getTable() . '
 						where	id = ?
 							AND deleted = 0';
-			//$query .= $this->getSortSQL( $order );
+            //$query .= $this->getSortSQL( $order );
 
-			$this->ExecuteSQL( $query, $ph );
+            $this->ExecuteSQL($query, $ph);
 
-			$this->saveCache($this->rs, $id);
-		}
+            $this->saveCache($this->rs, $id);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndCompanyId($id, $company_id, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByIdAndCompanyId($id, $company_id, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $company_id == '') {
-			return FALSE;
-		}
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'id' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($order == null) {
+            $order = array('id' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND	id = ?
 						AND deleted = 0';
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $limit = NULL, $page = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $limit = null, $page = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND deleted = 0';
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 }
-?>

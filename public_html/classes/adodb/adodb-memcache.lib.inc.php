@@ -1,13 +1,17 @@
 <?php
 
 // security - hide paths
-if (!defined('ADODB_DIR')) die();
+if (!defined('ADODB_DIR')) {
+    die();
+}
 
 global $ADODB_INCLUDED_MEMCACHE;
 $ADODB_INCLUDED_MEMCACHE = 1;
 
 global $ADODB_INCLUDED_CSV;
-if (empty($ADODB_INCLUDED_CSV)) include_once(ADODB_DIR.'/adodb-csvlib.inc.php');
+if (empty($ADODB_INCLUDED_CSV)) {
+    include_once(ADODB_DIR . '/adodb-csvlib.inc.php');
+}
 
 /*
 
@@ -35,154 +39,188 @@ $db->CacheExecute($sql);
   Class instance is stored in $ADODB_CACHE
 */
 
-	class ADODB_Cache_MemCache {
-		var $createdir = false; // create caching directory structure?
+class ADODB_Cache_MemCache
+{
+    public $createdir = false; // create caching directory structure?
 
-		//-----------------------------
-		// memcache specific variables
+    //-----------------------------
+    // memcache specific variables
 
-		var $hosts;	// array of hosts
-		var $port = 11211;
-		var $compress = false; // memcache compression with zlib
+    public $hosts;    // array of hosts
+    public $port = 11211;
+    public $compress = false; // memcache compression with zlib
 
-		var $_connected = false;
-		var $_memcache = false;
+    public $_connected = false;
+    public $_memcache = false;
 
-		function ADODB_Cache_MemCache(&$obj)
-		{
-			$this->hosts = $obj->memCacheHost;
-			$this->port = $obj->memCachePort;
-			$this->compress = $obj->memCacheCompress;
-		}
+    public function ADODB_Cache_MemCache(&$obj)
+    {
+        $this->hosts = $obj->memCacheHost;
+        $this->port = $obj->memCachePort;
+        $this->compress = $obj->memCacheCompress;
+    }
 
-		// implement as lazy connection. The connection only occurs on CacheExecute call
-		function connect(&$err)
-		{
-			if (!function_exists('memcache_pconnect')) {
-				$err = 'Memcache module PECL extension not found!';
-				return false;
-			}
+    // implement as lazy connection. The connection only occurs on CacheExecute call
 
-			$memcache = new MemCache;
+    public function writecache($filename, $contents, $debug, $secs2cache)
+    {
+        if (!$this->_connected) {
+            $err = '';
+            if (!$this->connect($err) && $debug) {
+                ADOConnection::outp($err);
+            }
+        }
+        if (!$this->_memcache) {
+            return false;
+        }
 
-			if (!is_array($this->hosts)) $this->hosts = array($this->hosts);
+        if (!$this->_memcache->set($filename, $contents, $this->compress ? MEMCACHE_COMPRESSED : 0, $secs2cache)) {
+            if ($debug) {
+                ADOConnection::outp(" Failed to save data at the memcached server!<br>\n");
+            }
+            return false;
+        }
 
-			$failcnt = 0;
-			foreach($this->hosts as $host) {
-				if (!@$memcache->addServer($host,$this->port,true)) {
-					$failcnt += 1;
-				}
-			}
-			if ($failcnt == sizeof($this->hosts)) {
-				$err = 'Can\'t connect to any memcache server';
-				return false;
-			}
-			$this->_connected = true;
-			$this->_memcache = $memcache;
-			return true;
-		}
+        return true;
+    }
 
-		// returns true or false. true if successful save
-		function writecache($filename, $contents, $debug, $secs2cache)
-		{
-			if (!$this->_connected) {
-				$err = '';
-				if (!$this->connect($err) && $debug) ADOConnection::outp($err);
-			}
-			if (!$this->_memcache) return false;
+    // returns true or false. true if successful save
 
-			if (!$this->_memcache->set($filename, $contents, $this->compress ? MEMCACHE_COMPRESSED : 0, $secs2cache)) {
-				if ($debug) ADOConnection::outp(" Failed to save data at the memcached server!<br>\n");
-				return false;
-			}
+    public function connect(&$err)
+    {
+        if (!function_exists('memcache_pconnect')) {
+            $err = 'Memcache module PECL extension not found!';
+            return false;
+        }
 
-			return true;
-		}
+        $memcache = new MemCache;
 
-		// returns a recordset
-		function readcache($filename, &$err, $secs2cache, $rsClass)
-		{
-			$false = false;
-			if (!$this->_connected) $this->connect($err);
-			if (!$this->_memcache) return $false;
+        if (!is_array($this->hosts)) {
+            $this->hosts = array($this->hosts);
+        }
 
-			$rs = $this->_memcache->get($filename);
-			if (!$rs) {
-				$err = 'Item with such key doesn\'t exists on the memcached server.';
-				return $false;
-			}
+        $failcnt = 0;
+        foreach ($this->hosts as $host) {
+            if (!@$memcache->addServer($host, $this->port, true)) {
+                $failcnt += 1;
+            }
+        }
+        if ($failcnt == sizeof($this->hosts)) {
+            $err = 'Can\'t connect to any memcache server';
+            return false;
+        }
+        $this->_connected = true;
+        $this->_memcache = $memcache;
+        return true;
+    }
 
-			// hack, should actually use _csv2rs
-			$rs = explode("\n", $rs);
-            unset($rs[0]);
-            $rs = join("\n", $rs);
- 			$rs = unserialize($rs);
-			if (! is_object($rs)) {
-				$err = 'Unable to unserialize $rs';
-				return $false;
-			}
-			if ($rs->timeCreated == 0) return $rs; // apparently have been reports that timeCreated was set to 0 somewhere
+    // returns a recordset
 
-			$tdiff = intval($rs->timeCreated+$secs2cache - time());
-			if ($tdiff <= 2) {
-				switch($tdiff) {
-					case 2:
-						if ((rand() & 15) == 0) {
-							$err = "Timeout 2";
-							return $false;
-						}
-						break;
-					case 1:
-						if ((rand() & 3) == 0) {
-							$err = "Timeout 1";
-							return $false;
-						}
-						break;
-					default:
-						$err = "Timeout 0";
-						return $false;
-				}
-			}
-			return $rs;
-		}
+    public function readcache($filename, &$err, $secs2cache, $rsClass)
+    {
+        $false = false;
+        if (!$this->_connected) {
+            $this->connect($err);
+        }
+        if (!$this->_memcache) {
+            return $false;
+        }
 
-		function flushall($debug=false)
-		{
-			if (!$this->_connected) {
-				$err = '';
-				if (!$this->connect($err) && $debug) ADOConnection::outp($err);
-			}
-			if (!$this->_memcache) return false;
+        $rs = $this->_memcache->get($filename);
+        if (!$rs) {
+            $err = 'Item with such key doesn\'t exists on the memcached server.';
+            return $false;
+        }
 
-			$del = $this->_memcache->flush();
+        // hack, should actually use _csv2rs
+        $rs = explode("\n", $rs);
+        unset($rs[0]);
+        $rs = join("\n", $rs);
+        $rs = unserialize($rs);
+        if (!is_object($rs)) {
+            $err = 'Unable to unserialize $rs';
+            return $false;
+        }
+        if ($rs->timeCreated == 0) {
+            return $rs;
+        } // apparently have been reports that timeCreated was set to 0 somewhere
 
-			if ($debug)
-				if (!$del) ADOConnection::outp("flushall: failed!<br>\n");
-				else ADOConnection::outp("flushall: succeeded!<br>\n");
+        $tdiff = intval($rs->timeCreated + $secs2cache - time());
+        if ($tdiff <= 2) {
+            switch ($tdiff) {
+                case 2:
+                    if ((rand() & 15) == 0) {
+                        $err = "Timeout 2";
+                        return $false;
+                    }
+                    break;
+                case 1:
+                    if ((rand() & 3) == 0) {
+                        $err = "Timeout 1";
+                        return $false;
+                    }
+                    break;
+                default:
+                    $err = "Timeout 0";
+                    return $false;
+            }
+        }
+        return $rs;
+    }
 
-			return $del;
-		}
+    public function flushall($debug = false)
+    {
+        if (!$this->_connected) {
+            $err = '';
+            if (!$this->connect($err) && $debug) {
+                ADOConnection::outp($err);
+            }
+        }
+        if (!$this->_memcache) {
+            return false;
+        }
 
-		function flushcache($filename, $debug=false)
-		{
-			if (!$this->_connected) {
-  				$err = '';
-  				if (!$this->connect($err) && $debug) ADOConnection::outp($err);
-			}
-			if (!$this->_memcache) return false;
+        $del = $this->_memcache->flush();
 
-			$del = $this->_memcache->delete($filename);
+        if ($debug) {
+            if (!$del) {
+                ADOConnection::outp("flushall: failed!<br>\n");
+            } else {
+                ADOConnection::outp("flushall: succeeded!<br>\n");
+            }
+        }
 
-			if ($debug)
-				if (!$del) ADOConnection::outp("flushcache: $key entry doesn't exist on memcached server!<br>\n");
-				else ADOConnection::outp("flushcache: $key entry flushed from memcached server!<br>\n");
+        return $del;
+    }
 
-			return $del;
-		}
+    public function flushcache($filename, $debug = false)
+    {
+        if (!$this->_connected) {
+            $err = '';
+            if (!$this->connect($err) && $debug) {
+                ADOConnection::outp($err);
+            }
+        }
+        if (!$this->_memcache) {
+            return false;
+        }
 
-		// not used for memcache
-		function createdir($dir, $hash)
-		{
-			return true;
-		}
-	}
+        $del = $this->_memcache->delete($filename);
+
+        if ($debug) {
+            if (!$del) {
+                ADOConnection::outp("flushcache: $key entry doesn't exist on memcached server!<br>\n");
+            } else {
+                ADOConnection::outp("flushcache: $key entry flushed from memcached server!<br>\n");
+            }
+        }
+
+        return $del;
+    }
+
+    // not used for memcache
+    public function createdir($dir, $hash)
+    {
+        return true;
+    }
+}

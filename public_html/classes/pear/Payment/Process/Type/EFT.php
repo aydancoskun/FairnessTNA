@@ -32,25 +32,24 @@ class Payment_Process_Type_EFT extends Payment_Process_Type
      *
      * @var string $_type
      */
-    var $_type = 'EFT';
+    public $_type = 'EFT';
 
     /**
      * $type
      *
      * @var $type
      */
-    var $type;
-    var $accountNumber;
-    var $routingCode;
-    var $institutionCode;
-    var $name;
+    public $type;
+    public $accountNumber;
+    public $routingCode;
+    public $institutionCode;
+    public $name;
 
-    function Payment_Process_Type_EFT()
+    public function Payment_Process_Type_EFT()
     {
-
     }
 
-    function _validateAccountNumber()
+    public function _validateAccountNumber()
     {
         if (!isset($this->accountNumber)) {
             return PEAR::raiseError('Account number is required');
@@ -59,7 +58,7 @@ class Payment_Process_Type_EFT extends Payment_Process_Type
         return true;
     }
 
-    function _validateInstituionCode()
+    public function _validateInstituionCode()
     {
         if (!isset($this->accountNumber)) {
             return PEAR::raiseError('Institution code is required');
@@ -68,7 +67,7 @@ class Payment_Process_Type_EFT extends Payment_Process_Type
         return true;
     }
 
-    function _validateRoutingCode()
+    public function _validateRoutingCode()
     {
         if (!isset($this->routingCode)) {
             return PEAR::raiseError('Routing code is required');
@@ -77,7 +76,7 @@ class Payment_Process_Type_EFT extends Payment_Process_Type
         return true;
     }
 
-    function _validateName()
+    public function _validateName()
     {
         if (!isset($this->routingCode)) {
             return PEAR::raiseError('Name is required');
@@ -85,7 +84,4 @@ class Payment_Process_Type_EFT extends Payment_Process_Type
 
         return true;
     }
-
 }
-
-?>

@@ -19,150 +19,186 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\PayPeriod
  */
-class PayPeriodScheduleUserFactory extends Factory {
-	protected $table = 'pay_period_schedule_user';
-	protected $pk_sequence_name = 'pay_period_schedule_user_id_seq'; //PK Sequence name
+class PayPeriodScheduleUserFactory extends Factory
+{
+    protected $table = 'pay_period_schedule_user';
+    protected $pk_sequence_name = 'pay_period_schedule_user_id_seq'; //PK Sequence name
 
-	protected $user_obj = NULL;
-	protected $pay_period_schedule_obj = NULL;
+    protected $user_obj = null;
+    protected $pay_period_schedule_obj = null;
 
-	function getUserObject() {
-		return $this->getGenericObject( 'UserListFactory', $this->getUser(), 'user_obj' );
-	}
-	function getPayPeriodScheduleObject() {
-		return $this->getGenericObject( 'PayPeriodScheduleListFactory', $this->getPayPeriodSchedule(), 'pay_period_schedule_obj' );
-	}
+    public function getPayPeriodScheduleObject()
+    {
+        return $this->getGenericObject('PayPeriodScheduleListFactory', $this->getPayPeriodSchedule(), 'pay_period_schedule_obj');
+    }
 
-	function getPayPeriodSchedule() {
-		return (int)$this->data['pay_period_schedule_id'];
-	}
-	function setPayPeriodSchedule($id) {
-		$id = trim($id);
+    public function getPayPeriodSchedule()
+    {
+        return (int)$this->data['pay_period_schedule_id'];
+    }
 
-		$ppslf = TTnew( 'PayPeriodScheduleListFactory' );
+    public function setPayPeriodSchedule($id)
+    {
+        $id = trim($id);
 
-		if ( $id != 0
-				OR $this->Validator->isResultSetWithRows(	'pay_period_schedule',
-															$ppslf->getByID($id),
-															TTi18n::gettext('Pay Period Schedule is invalid')
-															) ) {
-			$this->data['pay_period_schedule_id'] = $id;
+        $ppslf = TTnew('PayPeriodScheduleListFactory');
 
-			return TRUE;
-		}
+        if ($id != 0
+            or $this->Validator->isResultSetWithRows('pay_period_schedule',
+                $ppslf->getByID($id),
+                TTi18n::gettext('Pay Period Schedule is invalid')
+            )
+        ) {
+            $this->data['pay_period_schedule_id'] = $id;
 
-		return FALSE;
-	}
+            return true;
+        }
 
-	function isUniqueUser($id) {
-		$ppslf = TTnew( 'PayPeriodScheduleListFactory' );
+        return false;
+    }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+    public function setUser($id)
+    {
+        $id = trim($id);
 
-		$query = 'select a.id from '. $this->getTable() .' as a, '. $ppslf->getTable() .' as b where a.pay_period_schedule_id = b.id AND a.user_id = ? AND b.deleted=0';
-		$user_id = $this->db->GetOne($query, $ph);
-		Debug::Arr($user_id, 'Unique User ID: '. $user_id, __FILE__, __LINE__, __METHOD__, 10);
+        $ulf = TTnew('UserListFactory');
 
-		if ( $user_id === FALSE ) {
-			return TRUE;
-		}
+        if ($id != 0
+            and $this->Validator->isResultSetWithRows('user',
+                $ulf->getByID($id),
+                TTi18n::gettext('Selected Employee is invalid')
+            )
+            and $this->Validator->isTrue('user',
+                $this->isUniqueUser($id),
+                TTi18n::gettext('Selected Employee is already assigned to another Pay Period Schedule')
+            )
+        ) {
+            $this->data['user_id'] = $id;
 
-		return FALSE;
-	}
-	function getUser() {
-		if ( isset($this->data['user_id']) ) {
-			return (int)$this->data['user_id'];
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setUser($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		$ulf = TTnew( 'UserListFactory' );
+    public function isUniqueUser($id)
+    {
+        $ppslf = TTnew('PayPeriodScheduleListFactory');
 
-		if ( $id != 0
-				AND $this->Validator->isResultSetWithRows(	'user',
-															$ulf->getByID($id),
-															TTi18n::gettext('Selected Employee is invalid')
-															)
-				AND	$this->Validator->isTrue(		'user',
-													$this->isUniqueUser($id),
-													TTi18n::gettext('Selected Employee is already assigned to another Pay Period Schedule')
-													)
-			) {
+        $ph = array(
+            'id' => (int)$id,
+        );
 
-			$this->data['user_id'] = $id;
+        $query = 'select a.id from ' . $this->getTable() . ' as a, ' . $ppslf->getTable() . ' as b where a.pay_period_schedule_id = b.id AND a.user_id = ? AND b.deleted=0';
+        $user_id = $this->db->GetOne($query, $ph);
+        Debug::Arr($user_id, 'Unique User ID: ' . $user_id, __FILE__, __LINE__, __METHOD__, 10);
 
-			return TRUE;
-		}
+        if ($user_id === false) {
+            return true;
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+    public function getDeleted()
+    {
+        return false;
+    }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
 
+    public function getCreatedDate()
+    {
+        return false;
+    }
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
 
-	function addLog( $log_action ) {
-		$u_obj = $this->getUserObject();
-		if ( is_object($u_obj) ) {
-			return TTLog::addEntry( $this->getPayPeriodSchedule(), $log_action, TTi18n::getText('Employee').': '. $u_obj->getFullName( FALSE, TRUE ), NULL, $this->getTable() );
-		}
+    public function getCreatedBy()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
+
+    public function addLog($log_action)
+    {
+        $u_obj = $this->getUserObject();
+        if (is_object($u_obj)) {
+            return TTLog::addEntry($this->getPayPeriodSchedule(), $log_action, TTi18n::getText('Employee') . ': ' . $u_obj->getFullName(false, true), null, $this->getTable());
+        }
+
+        return false;
+    }
+
+    public function getUserObject()
+    {
+        return $this->getGenericObject('UserListFactory', $this->getUser(), 'user_obj');
+    }
+
+    public function getUser()
+    {
+        if (isset($this->data['user_id'])) {
+            return (int)$this->data['user_id'];
+        }
+
+        return false;
+    }
 }
-?>

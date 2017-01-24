@@ -1,4 +1,4 @@
-var ContextMenuIconName = function() {
+var ContextMenuIconName = function () {
 
 };
 
@@ -188,7 +188,7 @@ ContextMenuIconName.migrate_pay_stub_account = 'MigratePayStubAccount';
 
 ContextMenuIconName.auto_arrange = 'autoArrange';
 
-var Icons = function() {
+var Icons = function () {
 
 };
 

@@ -46,51 +46,51 @@ class Image_Barcode_int25 extends Image_Barcode
      * Barcode type
      * @var string
      */
-    var $_type = 'int25';
+    public $_type = 'int25';
 
     /**
      * Barcode height
      *
      * @var integer
      */
-    var $_barcodeheight = 50;
+    public $_barcodeheight = 50;
 
     /**
      * Bar thin width
      *
      * @var integer
      */
-    var $_barthinwidth = 1;
+    public $_barthinwidth = 1;
 
     /**
      * Bar thick width
      *
      * @var integer
      */
-    var $_barthickwidth = 3;
+    public $_barthickwidth = 3;
 
     /**
      * Coding map
      * @var array
      */
-    var $_coding_map = array(
-           '0' => '00110',
-           '1' => '10001',
-           '2' => '01001',
-           '3' => '11000',
-           '4' => '00101',
-           '5' => '10100',
-           '6' => '01100',
-           '7' => '00011',
-           '8' => '10010',
-           '9' => '01010'
-        );
+    public $_coding_map = array(
+        '0' => '00110',
+        '1' => '10001',
+        '2' => '01001',
+        '3' => '11000',
+        '4' => '00101',
+        '5' => '10100',
+        '6' => '01100',
+        '7' => '00011',
+        '8' => '10010',
+        '9' => '01010'
+    );
 
     /**
      * Draws a Interleaved 2 of 5 image barcode
      *
-     * @param  string $text     A text that should be in the image barcode
-     * @param  string $imgtype  The image type that will be generated
+     * @param  string $text A text that should be in the image barcode
+     * @param  string $imgtype The image type that will be generated
      *
      * @return image            The corresponding Interleaved 2 of 5 image barcode
      *
@@ -100,12 +100,13 @@ class Image_Barcode_int25 extends Image_Barcode
      * @since  Image_Barcode 0.3
      */
 
-    function draw($text, $imgtype = 'png')
+    public function draw($text, $imgtype = 'png')
     {
-
         $text = trim($text);
 
-        if (!preg_match("/[0-9]/",$text)) return;
+        if (!preg_match("/[0-9]/", $text)) {
+            return;
+        }
 
         // if odd $text lenght adds a '0' at string beginning
         $text = strlen($text) % 2 ? '0' . $text : $text;
@@ -129,31 +130,31 @@ class Image_Barcode_int25 extends Image_Barcode
         $xpos = 0;
 
         // Draws the leader
-        for ($i=0; $i < 2; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $elementwidth = $this->_barthinwidth;
             imagefilledrectangle($img, $xpos, 0, $xpos + $elementwidth - 1, $this->_barcodeheight, $black);
             $xpos += $elementwidth;
             $xpos += $this->_barthinwidth;
-            $xpos ++;
+            $xpos++;
         }
 
         // Draw $text contents
         for ($idx = 0; $idx < strlen($text); $idx += 2) {       // Draw 2 chars at a time
-            $oddchar  = substr($text, $idx, 1);                 // get odd char
+            $oddchar = substr($text, $idx, 1);                 // get odd char
             $evenchar = substr($text, $idx + 1, 1);             // get even char
 
             // interleave
             for ($baridx = 0; $baridx < 5; $baridx++) {
 
                 // Draws odd char corresponding bar (black)
-                $elementwidth = (substr($this->_coding_map[$oddchar], $baridx, 1)) ?  $this->_barthickwidth : $this->_barthinwidth;
+                $elementwidth = (substr($this->_coding_map[$oddchar], $baridx, 1)) ? $this->_barthickwidth : $this->_barthinwidth;
                 imagefilledrectangle($img, $xpos, 0, $xpos + $elementwidth - 1, $this->_barcodeheight, $black);
                 $xpos += $elementwidth;
 
                 // Left enought space to draw even char (white)
-                $elementwidth = (substr($this->_coding_map[$evenchar], $baridx, 1)) ?  $this->_barthickwidth : $this->_barthinwidth;
-                $xpos += $elementwidth; 
-                $xpos ++;
+                $elementwidth = (substr($this->_coding_map[$evenchar], $baridx, 1)) ? $this->_barthickwidth : $this->_barthinwidth;
+                $xpos += $elementwidth;
+                $xpos++;
             }
         }
 
@@ -163,35 +164,33 @@ class Image_Barcode_int25 extends Image_Barcode
         imagefilledrectangle($img, $xpos, 0, $xpos + $elementwidth - 1, $this->_barcodeheight, $black);
         $xpos += $elementwidth;
         $xpos += $this->_barthinwidth;
-        $xpos ++;
+        $xpos++;
         $elementwidth = $this->_barthinwidth;
         imagefilledrectangle($img, $xpos, 0, $xpos + $elementwidth - 1, $this->_barcodeheight, $black);
 
         // Send image to browser
-        switch($imgtype) {
+        switch ($imgtype) {
 
             case 'gif':
                 header("Content-type: image/gif");
                 imagegif($img);
                 imagedestroy($img);
-            break;
+                break;
 
             case 'jpg':
                 header("Content-type: image/jpg");
                 imagejpeg($img);
                 imagedestroy($img);
-            break;
+                break;
 
             default:
                 header("Content-type: image/png");
                 imagepng($img);
                 imagedestroy($img);
-            break;
+                break;
 
         }
 
         return;
-
     } // function create
-
 } // class

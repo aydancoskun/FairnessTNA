@@ -19,119 +19,119 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1000A extends InstallSchema_Base {
+class InstallSchema_1000A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
-
-		return TRUE;
-	}
+        return true;
+    }
 
 
-	function postInstall() {
-		
-		// @codingStandardsIgnoreStart
-		global $config_vars;
-		// @codingStandardsIgnoreEnd
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+    public function postInstall()
+    {
 
-		$maint_base_path = Environment::getBasePath() . DIRECTORY_SEPARATOR .'maint'. DIRECTORY_SEPARATOR;
-		if ( PHP_OS == 'WINNT' ) {
-			$cron_job_base_command = 'php-win.exe '. $maint_base_path;
-		} else {
-			$cron_job_base_command = 'php '. $maint_base_path;
-		}
-		Debug::text('Cron Job Base Command: '. $cron_job_base_command, __FILE__, __LINE__, __METHOD__, 9);
+        // @codingStandardsIgnoreStart
+        global $config_vars;
+        // @codingStandardsIgnoreEnd
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-		// >> /dev/null 2>&1
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('AddPayPeriod');
-		$cjf->setMinute(0);
-		$cjf->setHour(0);
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'AddPayPeriod.php');
-		$cjf->Save();
+        $maint_base_path = Environment::getBasePath() . DIRECTORY_SEPARATOR . 'maint' . DIRECTORY_SEPARATOR;
+        if (PHP_OS == 'WINNT') {
+            $cron_job_base_command = 'php-win.exe ' . $maint_base_path;
+        } else {
+            $cron_job_base_command = 'php ' . $maint_base_path;
+        }
+        Debug::text('Cron Job Base Command: ' . $cron_job_base_command, __FILE__, __LINE__, __METHOD__, 9);
 
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('AddUserDate');
-		$cjf->setMinute(15);
-		$cjf->setHour(0);
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'AddUserDate.php');
-		$cjf->Save();
+        // >> /dev/null 2>&1
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('AddPayPeriod');
+        $cjf->setMinute(0);
+        $cjf->setHour(0);
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'AddPayPeriod.php');
+        $cjf->Save();
 
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('calcExceptions');
-		$cjf->setMinute(30);
-		$cjf->setHour(0);
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'calcExceptions.php');
-		$cjf->Save();
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('AddUserDate');
+        $cjf->setMinute(15);
+        $cjf->setHour(0);
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'AddUserDate.php');
+        $cjf->Save();
 
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('AddRecurringPayStubAmendment');
-		$cjf->setMinute(45);
-		$cjf->setHour(0);
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'AddRecurringPayStubAmendment.php');
-		$cjf->Save();
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('calcExceptions');
+        $cjf->setMinute(30);
+        $cjf->setHour(0);
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'calcExceptions.php');
+        $cjf->Save();
 
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('AddRecurringHoliday');
-		$cjf->setMinute(55);
-		$cjf->setHour(0);
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'AddRecurringHoliday.php');
-		$cjf->Save();
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('AddRecurringPayStubAmendment');
+        $cjf->setMinute(45);
+        $cjf->setHour(0);
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'AddRecurringPayStubAmendment.php');
+        $cjf->Save();
 
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('UserCount');
-		$cjf->setMinute(15);
-		$cjf->setHour(1);
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'UserCount.php');
-		$cjf->Save();
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('AddRecurringHoliday');
+        $cjf->setMinute(55);
+        $cjf->setHour(0);
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'AddRecurringHoliday.php');
+        $cjf->Save();
 
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('AddRecurringScheduleShift');
-		$cjf->setMinute('20, 50');
-		$cjf->setHour('*');
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'AddRecurringScheduleShift.php');
-		$cjf->Save();
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('UserCount');
+        $cjf->setMinute(15);
+        $cjf->setHour(1);
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'UserCount.php');
+        $cjf->Save();
 
-		$cjf = TTnew( 'CronJobFactory' );
-		$cjf->setName('CheckForUpdate');
-		$cjf->setMinute( rand(0, 59) ); //Random time once a day for load balancing
-		$cjf->setHour( rand(0, 23) ); //Random time once a day for load balancing
-		$cjf->setDayOfMonth('*');
-		$cjf->setMonth('*');
-		$cjf->setDayOfWeek('*');
-		$cjf->setCommand($cron_job_base_command.'CheckForUpdate.php');
-		$cjf->Save();
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('AddRecurringScheduleShift');
+        $cjf->setMinute('20, 50');
+        $cjf->setHour('*');
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'AddRecurringScheduleShift.php');
+        $cjf->Save();
 
-		return TRUE;
+        $cjf = TTnew('CronJobFactory');
+        $cjf->setName('CheckForUpdate');
+        $cjf->setMinute(rand(0, 59)); //Random time once a day for load balancing
+        $cjf->setHour(rand(0, 23)); //Random time once a day for load balancing
+        $cjf->setDayOfMonth('*');
+        $cjf->setMonth('*');
+        $cjf->setDayOfWeek('*');
+        $cjf->setCommand($cron_job_base_command . 'CheckForUpdate.php');
+        $cjf->Save();
 
-	}
+        return true;
+    }
 }
-?>

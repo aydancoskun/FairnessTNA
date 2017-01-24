@@ -7,7 +7,6 @@
 
 function smarty_function_gettimeunit($params, &$smarty)
 {
-   
     $value = $params['value'];
 
     $default = $params['default'];
@@ -15,28 +14,26 @@ function smarty_function_gettimeunit($params, &$smarty)
     //var_dump($default);
     if ($default == 'TRUE') {
         $default = 'N/A';
-    } elseif ( $default == '0' ) {
-        if ( $value === FALSE OR $value === NULL) {
+    } elseif ($default == '0') {
+        if ($value === false or $value === null) {
             $value = 0;
         }
     } else {
-        $default = NULL;   
+        $default = null;
     }
-    
-    if ( $abs == 'TRUE' ) {
+
+    if ($abs == 'TRUE') {
         $value = abs($value);
     }
     //var_dump($value);
     //Make sure the default is set to TRUE to get "N/A"
-    if ( $value === FALSE OR $value === NULL) {
+    if ($value === false or $value === null) {
         return $default;
     }
 
     $retval = TTDate::getTimeUnit($value);
-    
+
     return $retval;
 }
 
-/* vim: set expandtab: */
-
-?>
+/* vim: set expandtab: */;

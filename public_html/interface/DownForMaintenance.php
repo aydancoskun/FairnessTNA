@@ -19,21 +19,20 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
-$disable_database_connection = TRUE;
+$disable_database_connection = true;
 require_once('../includes/global.inc.php');
 
-$authenticate=FALSE;
-require_once(Environment::getBasePath() .'includes/Interface.inc.php');
+$authenticate = false;
+require_once(Environment::getBasePath() . 'includes/Interface.inc.php');
 
-extract	(FormVariables::GetVariables(
-										array	(
-												'exception',
-												) ) );
+extract(FormVariables::GetVariables(
+    array(
+        'exception',
+    )));
 
 $smarty->assign('title', TTi18n::gettext('Down for Maintenance'));
-$smarty->assign('exception', strtolower($exception) );
+$smarty->assign('exception', strtolower($exception));
 
 $smarty->display('DownForMaintenance.tpl');
-?>

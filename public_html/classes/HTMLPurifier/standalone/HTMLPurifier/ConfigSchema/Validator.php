@@ -60,23 +60,26 @@ class HTMLPurifier_ConfigSchema_Validator
     }
 
     /**
-     * Validates a HTMLPurifier_ConfigSchema_Interchange_Id object.
-     * @param HTMLPurifier_ConfigSchema_Interchange_Id $id
+     * Emits an error, providing helpful context.
+     * @throws HTMLPurifier_ConfigSchema_Exception
      */
-    public function validateId($id)
+    protected function error($target, $msg)
     {
-        $id_string = $id->toString();
-        $this->context[] = "id '$id_string'";
-        if (!$id instanceof HTMLPurifier_ConfigSchema_Interchange_Id) {
-            // handled by InterchangeBuilder
-            $this->error(false, 'is not an instance of HTMLPurifier_ConfigSchema_Interchange_Id');
+        if ($target !== false) {
+            $prefix = ucfirst($target) . ' in ' . $this->getFormattedContext();
+        } else {
+            $prefix = ucfirst($this->getFormattedContext());
         }
-        // keys are now unconstrained (we might want to narrow down to A-Za-z0-9.)
-        // we probably should check that it has at least one namespace
-        $this->with($id, 'key')
-            ->assertNotEmpty()
-            ->assertIsString(); // implicit assertIsString handled by InterchangeBuilder
-        array_pop($this->context);
+        throw new HTMLPurifier_ConfigSchema_Exception(trim($prefix . ' ' . $msg));
+    }
+
+    /**
+     * Returns a formatted context string.
+     * @return string
+     */
+    protected function getFormattedContext()
+    {
+        return implode(' in ', array_reverse($this->context));
     }
 
     /**
@@ -120,6 +123,40 @@ class HTMLPurifier_ConfigSchema_Validator
 
         array_pop($this->context);
     }
+
+    /**
+     * Validates a HTMLPurifier_ConfigSchema_Interchange_Id object.
+     * @param HTMLPurifier_ConfigSchema_Interchange_Id $id
+     */
+    public function validateId($id)
+    {
+        $id_string = $id->toString();
+        $this->context[] = "id '$id_string'";
+        if (!$id instanceof HTMLPurifier_ConfigSchema_Interchange_Id) {
+            // handled by InterchangeBuilder
+            $this->error(false, 'is not an instance of HTMLPurifier_ConfigSchema_Interchange_Id');
+        }
+        // keys are now unconstrained (we might want to narrow down to A-Za-z0-9.)
+        // we probably should check that it has at least one namespace
+        $this->with($id, 'key')
+            ->assertNotEmpty()
+            ->assertIsString(); // implicit assertIsString handled by InterchangeBuilder
+        array_pop($this->context);
+    }
+
+    /**
+     * Convenience function for generating HTMLPurifier_ConfigSchema_ValidatorAtom
+     * for validating simple member variables of objects.
+     * @param $obj
+     * @param $member
+     * @return HTMLPurifier_ConfigSchema_ValidatorAtom
+     */
+    protected function with($obj, $member)
+    {
+        return new HTMLPurifier_ConfigSchema_ValidatorAtom($this->getFormattedContext(), $obj, $member);
+    }
+
+    // protected helper functions
 
     /**
      * Extra validation if $allowed member variable of
@@ -205,43 +242,6 @@ class HTMLPurifier_ConfigSchema_Validator
             $this->aliases[$s] = $d->id->toString();
         }
         array_pop($this->context);
-    }
-
-    // protected helper functions
-
-    /**
-     * Convenience function for generating HTMLPurifier_ConfigSchema_ValidatorAtom
-     * for validating simple member variables of objects.
-     * @param $obj
-     * @param $member
-     * @return HTMLPurifier_ConfigSchema_ValidatorAtom
-     */
-    protected function with($obj, $member)
-    {
-        return new HTMLPurifier_ConfigSchema_ValidatorAtom($this->getFormattedContext(), $obj, $member);
-    }
-
-    /**
-     * Emits an error, providing helpful context.
-     * @throws HTMLPurifier_ConfigSchema_Exception
-     */
-    protected function error($target, $msg)
-    {
-        if ($target !== false) {
-            $prefix = ucfirst($target) . ' in ' . $this->getFormattedContext();
-        } else {
-            $prefix = ucfirst($this->getFormattedContext());
-        }
-        throw new HTMLPurifier_ConfigSchema_Exception(trim($prefix . ' ' . $msg));
-    }
-
-    /**
-     * Returns a formatted context string.
-     * @return string
-     */
-    protected function getFormattedContext()
-    {
-        return implode(' in ', array_reverse($this->context));
     }
 }
 

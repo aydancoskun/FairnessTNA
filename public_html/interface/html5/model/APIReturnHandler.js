@@ -4,125 +4,124 @@
 
  */
 
-var APIReturnHandler = Base.extend( {
+var APIReturnHandler = Base.extend({
 
 
-	defaults: {
-		result_data: null,
-		delegate: null
-	},
+    defaults: {
+        result_data: null,
+        delegate: null
+    },
 
-	isValid: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_retval ) ) {
-			return this.get( 'result_data' ).api_retval;
-		}
+    isValid: function () {
+        if (Global.isSet(this.get('result_data').api_retval)) {
+            return this.get('result_data').api_retval;
+        }
 
-		return true;
-	},
+        return true;
+    },
 
-	getDetails: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_details ) && Global.isSet( this.get( 'result_data' ).api_details.details ) ) {
-			return this.get( 'result_data' ).api_details.details;
-		}
+    getDetails: function () {
+        if (Global.isSet(this.get('result_data').api_details) && Global.isSet(this.get('result_data').api_details.details)) {
+            return this.get('result_data').api_details.details;
+        }
 
-		return true;
-	},
+        return true;
+    },
 
-	getPagerData: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_details ) && Global.isSet( this.get( 'result_data' ).api_details.pager ) ) {
-			return this.get( 'result_data' ).api_details.pager;
-		}
+    getPagerData: function () {
+        if (Global.isSet(this.get('result_data').api_details) && Global.isSet(this.get('result_data').api_details.pager)) {
+            return this.get('result_data').api_details.pager;
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	getResult: function() {
+    getResult: function () {
 
-		var result;
-		if ( Global.isSet( this.get( 'result_data' ).api_retval ) ) {
-			result = this.get( 'result_data' ).api_retval;
-		} else {
-			result = this.get( 'result_data' );
-		}
+        var result;
+        if (Global.isSet(this.get('result_data').api_retval)) {
+            result = this.get('result_data').api_retval;
+        } else {
+            result = this.get('result_data');
+        }
 
-		if ( typeof result === 'undefined' ) {
-			result = null;
-		} else if ( $.type( result ) === 'array' && result.length === 0 ) {
-			result = {};
-		}
+        if (typeof result === 'undefined') {
+            result = null;
+        } else if ($.type(result) === 'array' && result.length === 0) {
+            result = {};
+        }
 
-		return result;
+        return result;
 
-	},
+    },
 
-	getCode: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_details ) && Global.isSet( this.get( 'result_data' ).api_details.code ) ) {
-			return this.get( 'result_data' ).api_details.code;
-		}
+    getCode: function () {
+        if (Global.isSet(this.get('result_data').api_details) && Global.isSet(this.get('result_data').api_details.code)) {
+            return this.get('result_data').api_details.code;
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	getDescription: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_details ) && Global.isSet( this.get( 'result_data' ).api_details.description ) ) {
-			return this.get( 'result_data' ).api_details.description;
-		}
+    getDescription: function () {
+        if (Global.isSet(this.get('result_data').api_details) && Global.isSet(this.get('result_data').api_details.description)) {
+            return this.get('result_data').api_details.description;
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	getRecordDetails: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_details ) && Global.isSet( this.get( 'result_data' ).api_details.record_details ) ) {
-			return this.get( 'result_data' ).api_details.record_details;
-		}
+    getRecordDetails: function () {
+        if (Global.isSet(this.get('result_data').api_details) && Global.isSet(this.get('result_data').api_details.record_details)) {
+            return this.get('result_data').api_details.record_details;
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	getTotalRecords: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_details ) && Global.isSet( this.get( 'result_data' ).api_details.record_details ) &&
-			Global.isSet( this.get( 'result_data' ).api_details.record_details.total_records ) ) {
-			return this.get( 'result_data' ).api_details.record_details.total_records;
-		}
+    getTotalRecords: function () {
+        if (Global.isSet(this.get('result_data').api_details) && Global.isSet(this.get('result_data').api_details.record_details) &&
+            Global.isSet(this.get('result_data').api_details.record_details.total_records)) {
+            return this.get('result_data').api_details.record_details.total_records;
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	getValidRecords: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_details ) && Global.isSet( this.get( 'result_data' ).api_details.record_details ) &&
-			Global.isSet( this.get( 'result_data' ).api_details.record_details.valid_records ) ) {
-			return this.get( 'result_data' ).api_details.record_details.valid_records;
-		}
+    getValidRecords: function () {
+        if (Global.isSet(this.get('result_data').api_details) && Global.isSet(this.get('result_data').api_details.record_details) &&
+            Global.isSet(this.get('result_data').api_details.record_details.valid_records)) {
+            return this.get('result_data').api_details.record_details.valid_records;
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	getInValidRecords: function() {
-		if ( Global.isSet( this.get( 'result_data' ).api_details ) && Global.isSet( this.get( 'result_data' ).api_details.record_details ) &&
-			Global.isSet( this.get( 'result_data' ).api_details.record_details.invalid_records ) ) {
-			return this.get( 'result_data' ).api_details.record_details.invalid_records;
-		}
+    getInValidRecords: function () {
+        if (Global.isSet(this.get('result_data').api_details) && Global.isSet(this.get('result_data').api_details.record_details) &&
+            Global.isSet(this.get('result_data').api_details.record_details.invalid_records)) {
+            return this.get('result_data').api_details.record_details.invalid_records;
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	getAttributeInAPIDetails: function( attrName ) {
-		return    this.get( 'result_data' ).api_details[attrName];
-	},
+    getAttributeInAPIDetails: function (attrName) {
+        return this.get('result_data').api_details[attrName];
+    },
 
-	getDetailsAsString: function() {
-		var errorInfo = '';
+    getDetailsAsString: function () {
+        var errorInfo = '';
 
-		$.each( this.getDetails(), function( index, errorItem ) {
+        $.each(this.getDetails(), function (index, errorItem) {
 
-			for ( var i in errorItem ) {
-				errorInfo += errorItem[i][0] + '\r'
-			}
-		} );
+            for (var i in errorItem) {
+                errorInfo += errorItem[i][0] + '\r'
+            }
+        });
 
-		return errorInfo;
-	}
+        return errorInfo;
+    }
 
 
-
-} )
+})

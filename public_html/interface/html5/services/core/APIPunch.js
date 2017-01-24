@@ -1,73 +1,73 @@
-var APIPunch = ServiceCaller.extend( {
+var APIPunch = ServiceCaller.extend({
 
-	key_name: 'Punch',
-	className: 'APIPunch',
+    key_name: 'Punch',
+    className: 'APIPunch',
 
-	setUserPunch: function() {
+    setUserPunch: function () {
 
-		return this.argumentsHandler( this.className, 'setUserPunch', arguments );
+        return this.argumentsHandler(this.className, 'setUserPunch', arguments);
 
-	},
+    },
 
-	getPunchTotalData: function() {
+    getPunchTotalData: function () {
 
-		return this.argumentsHandler( this.className, 'getPunchTotalData', arguments );
+        return this.argumentsHandler(this.className, 'getPunchTotalData', arguments);
 
-	},
+    },
 
-	getUserPunch: function() {
+    getUserPunch: function () {
 
-		return this.argumentsHandler( this.className, 'getUserPunch', arguments );
+        return this.argumentsHandler(this.className, 'getUserPunch', arguments);
 
-	},
+    },
 
-	getPunchData: function() {
+    getPunchData: function () {
 
-		return this.argumentsHandler( this.className, 'getPunchData', arguments );
+        return this.argumentsHandler(this.className, 'getPunchData', arguments);
 
-	},
+    },
 
-	getCommonPunchData: function() {
+    getCommonPunchData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPunchData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPunchData', arguments);
 
-	},
+    },
 
-	getPunch: function() {
+    getPunch: function () {
 
-		return this.argumentsHandler( this.className, 'getPunch', arguments );
+        return this.argumentsHandler(this.className, 'getPunch', arguments);
 
-	},
+    },
 
-	setPunch: function() {
+    setPunch: function () {
 
-		return this.argumentsHandler( this.className, 'setPunch', arguments );
+        return this.argumentsHandler(this.className, 'setPunch', arguments);
 
-	},
+    },
 
-	getPunchDefaultData: function() {
+    getPunchDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPunchDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPunchDefaultData', arguments);
 
-	},
+    },
 
-	deletePunch: function() {
+    deletePunch: function () {
 
-		return this.argumentsHandler( this.className, 'deletePunch', arguments );
+        return this.argumentsHandler(this.className, 'deletePunch', arguments);
 
-	},
+    },
 
-	validatePunch: function() {
+    validatePunch: function () {
 
-		return this.argumentsHandler( this.className, 'validatePunch', arguments );
+        return this.argumentsHandler(this.className, 'validatePunch', arguments);
 
-	},
+    },
 
-	exportPunch: function() {
-		return this.argumentsHandler( this.className, 'exportPunch', arguments );
-	},
+    exportPunch: function () {
+        return this.argumentsHandler(this.className, 'exportPunch', arguments);
+    },
 
-	getRequestDefaultData: function() {
-		return this.argumentsHandler( this.className, 'getRequestDefaultData', arguments );
-	}
-} );
+    getRequestDefaultData: function () {
+        return this.argumentsHandler(this.className, 'getRequestDefaultData', arguments);
+    }
+});

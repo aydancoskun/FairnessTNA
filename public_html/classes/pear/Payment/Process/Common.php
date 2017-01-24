@@ -26,7 +26,8 @@
 require_once('Payment/Process.php');
 require_once('Payment/Process/Type.php');
 
-class Payment_Process_Common {
+class Payment_Process_Common
+{
     // {{{ Private Properties
     /**
      * Options.
@@ -35,7 +36,7 @@ class Payment_Process_Common {
      * @see setOptions()
      * @access private;
      */
-    var $_options = '';
+    public $_options = '';
 
     /**
      * Array of fields which are required.
@@ -44,7 +45,7 @@ class Payment_Process_Common {
      * @access private
      * @see _makeRequired()
      */
-    var $_required = array();
+    public $_required = array();
 
     /**
      * Processor-specific data.
@@ -52,7 +53,7 @@ class Payment_Process_Common {
      * @access private
      * @var array
      */
-    var $_data = array();
+    public $_data = array();
 
     /**
      * $_driver
@@ -61,7 +62,7 @@ class Payment_Process_Common {
      * @var string $_driver
      * @access private
      */
-    var $_driver = null;
+    public $_driver = null;
 
     /**
      * PEAR::Log instance
@@ -70,7 +71,7 @@ class Payment_Process_Common {
      * @access  protected
      * @see     Log
      */
-    var $_log;
+    public $_log;
 
     /**
      * Mapping between API fields and processors'
@@ -78,7 +79,7 @@ class Payment_Process_Common {
      * @var mixed $_typeFieldMap
      * @access protected
      */
-    var $_typeFieldMap = array();
+    public $_typeFieldMap = array();
 
     /**
      * Reference to payment type
@@ -90,7 +91,7 @@ class Payment_Process_Common {
      * @access protected
      * @see Payment_Process_Common::setPayment()
      */
-    var $_payment = null;
+    public $_payment = null;
     // }}}
     // {{{ Public Properties
     /**
@@ -98,14 +99,14 @@ class Payment_Process_Common {
      *
      * @var string
      */
-    var $login = '';
+    public $login = '';
 
     /**
      * Your password to use for authentication to the online processor.
      *
      * @var string
      */
-    var $password = '';
+    public $password = '';
 
     /**
      * Processing action.
@@ -114,35 +115,35 @@ class Payment_Process_Common {
      *
      * @var int
      */
-    var $action = '';
+    public $action = '';
 
     /**
      * A description of the transaction (used by some processors to send
      * information to the client, normally not a required field).
      * @var string
      */
-    var $description = '';
+    public $description = '';
 
     /**
      * The transaction amount.
      *
      * @var double
      */
-    var $amount = 0;
+    public $amount = 0;
 
     /**
      * An invoice number.
      *
      * @var mixed string or int
      */
-    var $invoiceNumber = '';
+    public $invoiceNumber = '';
 
     /**
      * Customer identifier
      *
      * @var mixed string or int
      */
-    var $customerId = '';
+    public $customerId = '';
 
     /**
      * Transaction source.
@@ -151,23 +152,10 @@ class Payment_Process_Common {
      *
      * @var int
      */
-    var $transactionSource;
+    public $transactionSource;
     // }}}
     // {{{ __construct($options = false)
-    /**
-     * __construct
-     *
-     * PHP 5.x constructor
-     *
-     * @author Joe Stump <joe@joestump.net>
-     * @access public
-     */
-    function __construct($options = false)
-    {
-        $this->setOptions($options);
-    }
-    // }}}
-    // {{{ Payment_Process_Common($options = false)
+
     /**
      * Payment_Process_Common
      *
@@ -176,12 +164,44 @@ class Payment_Process_Common {
      * @author Joe Stump <joe@joestump.net>
      * @access public
      */
-    function Payment_Process_Common($options = false)
+    public function Payment_Process_Common($options = false)
     {
         $this->__construct();
     }
     // }}}
+    // {{{ Payment_Process_Common($options = false)
+
+    /**
+     * __construct
+     *
+     * PHP 5.x constructor
+     *
+     * @author Joe Stump <joe@joestump.net>
+     * @access public
+     */
+    public function __construct($options = false)
+    {
+        $this->setOptions($options);
+    }
+    // }}}
     // {{{ setPayment(&$payment)
+
+    /**
+     * Set class options.
+     *
+     * @author Ian Eure <ieure@php.net>
+     * @param  Array $options Options to set
+     * @param  Array $defaultOptions Default options
+     * @return void
+     */
+    public function setOptions($options = false, $defaultOptions = false)
+    {
+        $defaultOptions = $defaultOptions ? $defaultOptions : $this->_defaultOptions;
+        $this->_options = @array_merge($defaultOptions, $options);
+    }
+    // }}}
+    // {{{ setFrom($where)
+
     /**
      * Sets payment
      *
@@ -195,12 +215,12 @@ class Payment_Process_Common {
      * @access public
      * @author Joe Stump <joe@joestump.net>
      */
-    function setPayment(&$payment)
+    public function setPayment(&$payment)
     {
         if (isset($this->_typeFieldMap[$payment->getType()]) &&
             is_array($this->_typeFieldMap[$payment->getType()]) &&
-            count($this->_typeFieldMap[$payment->getType()])) {
-
+            count($this->_typeFieldMap[$payment->getType()])
+        ) {
             $result = Payment_Process_Type::isValid($payment);
             if (PEAR::isError($result)) {
                 return $result;
@@ -211,8 +231,7 @@ class Payment_Process_Common {
             // $_typeFieldMap for more information.
             $paymentType = $payment->getType();
             foreach ($this->_typeFieldMap[$paymentType] as $generic => $specific) {
-
-                $func = '_handle'.ucfirst($generic);
+                $func = '_handle' . ucfirst($generic);
                 if (method_exists($this, $func)) {
                     $result = $this->$func();
                     if (PEAR::isError($result)) {
@@ -236,15 +255,16 @@ class Payment_Process_Common {
         return PEAR::raiseError('Invalid type field map');
     }
     // }}}
-    // {{{ setFrom($where)
+    // {{{ process()
+
     /**
      * Set many fields.
      *
-     * @param  array  $where  Associative array of data to set, in the format
+     * @param  array $where Associative array of data to set, in the format
      *                       'field' => 'value',
      * @return void
      */
-    function setFrom($where)
+    public function setFrom($where)
     {
         foreach ($this->getFields() as $field) {
             if (isset($where[$field])) {
@@ -253,113 +273,8 @@ class Payment_Process_Common {
         }
     }
     // }}}
-    // {{{ process()
-    /**
-     * Processes the transaction.
-     *
-     * This function should be overloaded by the processor.
-     */
-    function process()
-    {
-        return PEAR::raiseError("process() is not implemented in this processor.", PAYMENT_PROCESS_ERROR_NOTIMPLEMENTED);
-    }
-    // }}}
     // {{{ &processCallback()
-    /**
-     * processCallback
-     *
-     * This should be overridden in driver classes. It will be used to process
-     * communications from gateways to your application. For instance, the
-     * Authorize.net gateway will post information about pending transactions
-     * to a URL you specify. This function should handle such requests
-     *
-     * @return object Payment_Process_Result on success, PEAR_Error on failure
-     */
-    function &processCallback()
-    {
-        return PEAR::raiseError('processCallback() not implemented',
-                                PAYMENT_PROCESS_ERROR_NOTIMPLEMENTED);
-    }
-    // }}}
-    // {{{ validate()
-    /**
-     * validate
-     *
-     * Validates data before processing. This function may be overloaded by
-     * the processor.
-     *
-     * @return boolean true if validation succeeded, PEAR_Error if it failed.
-     */
-    function validate()
-    {
-        foreach ($this->getFields() as $field) {
-            $func = '_validate'.ucfirst($field);
 
-            // Don't validate unset optional fields
-            if (! $this->isRequired($field) && !strlen($this->$field)) {
-                continue;
-            }
-
-            if (method_exists($this, $func)) {
-                $res = $this->$func();
-                if (PEAR::isError($res)) {
-                    return $res;
-                } elseif (is_bool($res) && $res == false) {
-                    return PEAR::raiseError('Validation of field "'.$field.'" failed.', PAYMENT_PROCESS_ERROR_INVALID);
-                }
-            }
-        }
-
-        return true;
-    }
-    // }}}
-    // {{{ set($field, $value)
-    /**
-     * Set a value.
-     *
-     * This will set a value, such as the credit card number. If the requested
-     * field is not part of the basic set of supported fields, it is set in
-     * $_options.
-     *
-     * @param  string  $field  The field to set
-     * @param  string  $value  The value to set
-     * @return void
-     */
-    function set($field, $value)
-    {
-        if (!$this->fieldExists($field)) {
-            return PEAR::raiseError('Field "' . $field . '" does not exist.', PAYMENT_PROCESS_ERROR_INVALID);
-        }
-        $this->$field = $value;
-        return true;
-    }
-    // }}}
-    // {{{ isRequired($field)
-    /**
-     * Determine if a field is required.
-     *
-     * @param  string $field Field to check
-     * @return boolean true if required, false if optional.
-     */
-    function isRequired($field)
-    {
-        return (isset($this->_required[$field]));
-    }
-    // }}}
-    // {{{ fieldExists($field)
-    /**
-     * Determines if a field exists.
-     *
-     * @author Ian Eure <ieure@php.net>
-     * @param  string  $field  Field to check
-     * @return boolean true if field exists, false otherwise
-     */
-    function fieldExists($field)
-    {
-        return @in_array($field, $this->getFields());
-    }
-    // }}}
-    // {{{ getFields()
     /**
      * Get a list of fields.
      *
@@ -370,7 +285,7 @@ class Payment_Process_Common {
      * @access public
      * @return array Array of valid fields.
      */
-    function getFields()
+    public function getFields()
     {
         $vars = array_keys(get_class_vars(get_class($this)));
         foreach ($vars as $idx => $field) {
@@ -382,29 +297,128 @@ class Payment_Process_Common {
         return $vars;
     }
     // }}}
-    // {{{ setOptions($options = false, $defaultOptions = false)
+    // {{{ validate()
+
     /**
-     * Set class options.
+     * Processes the transaction.
      *
-     * @author Ian Eure <ieure@php.net>
-     * @param  Array  $options         Options to set
-     * @param  Array  $defaultOptions  Default options
+     * This function should be overloaded by the processor.
+     */
+    public function process()
+    {
+        return PEAR::raiseError("process() is not implemented in this processor.", PAYMENT_PROCESS_ERROR_NOTIMPLEMENTED);
+    }
+    // }}}
+    // {{{ set($field, $value)
+
+    /**
+     * processCallback
+     *
+     * This should be overridden in driver classes. It will be used to process
+     * communications from gateways to your application. For instance, the
+     * Authorize.net gateway will post information about pending transactions
+     * to a URL you specify. This function should handle such requests
+     *
+     * @return object Payment_Process_Result on success, PEAR_Error on failure
+     */
+    public function &processCallback()
+    {
+        return PEAR::raiseError('processCallback() not implemented',
+            PAYMENT_PROCESS_ERROR_NOTIMPLEMENTED);
+    }
+    // }}}
+    // {{{ isRequired($field)
+
+    /**
+     * validate
+     *
+     * Validates data before processing. This function may be overloaded by
+     * the processor.
+     *
+     * @return boolean true if validation succeeded, PEAR_Error if it failed.
+     */
+    public function validate()
+    {
+        foreach ($this->getFields() as $field) {
+            $func = '_validate' . ucfirst($field);
+
+            // Don't validate unset optional fields
+            if (!$this->isRequired($field) && !strlen($this->$field)) {
+                continue;
+            }
+
+            if (method_exists($this, $func)) {
+                $res = $this->$func();
+                if (PEAR::isError($res)) {
+                    return $res;
+                } elseif (is_bool($res) && $res == false) {
+                    return PEAR::raiseError('Validation of field "' . $field . '" failed.', PAYMENT_PROCESS_ERROR_INVALID);
+                }
+            }
+        }
+
+        return true;
+    }
+    // }}}
+    // {{{ fieldExists($field)
+
+    /**
+     * Determine if a field is required.
+     *
+     * @param  string $field Field to check
+     * @return boolean true if required, false if optional.
+     */
+    public function isRequired($field)
+    {
+        return (isset($this->_required[$field]));
+    }
+    // }}}
+    // {{{ getFields()
+
+    /**
+     * Set a value.
+     *
+     * This will set a value, such as the credit card number. If the requested
+     * field is not part of the basic set of supported fields, it is set in
+     * $_options.
+     *
+     * @param  string $field The field to set
+     * @param  string $value The value to set
      * @return void
      */
-    function setOptions($options = false, $defaultOptions = false)
+    public function set($field, $value)
     {
-        $defaultOptions = $defaultOptions ? $defaultOptions : $this->_defaultOptions;           $this->_options = @array_merge($defaultOptions, $options);
+        if (!$this->fieldExists($field)) {
+            return PEAR::raiseError('Field "' . $field . '" does not exist.', PAYMENT_PROCESS_ERROR_INVALID);
+        }
+        $this->$field = $value;
+        return true;
+    }
+    // }}}
+    // {{{ setOptions($options = false, $defaultOptions = false)
+
+    /**
+     * Determines if a field exists.
+     *
+     * @author Ian Eure <ieure@php.net>
+     * @param  string $field Field to check
+     * @return boolean true if field exists, false otherwise
+     */
+    public function fieldExists($field)
+    {
+        return @in_array($field, $this->getFields());
     }
     // }}}
     // {{{ getOption($option)
+
     /**
      * Get an option value.
      *
      * @author Ian Eure <ieure@php.net>
-     * @param  string  $option  Option to get
+     * @param  string $option Option to get
      * @return mixed   Option value
      */
-    function getOption($option)
+    public function getOption($option)
     {
         return @$this->_options[$option];
     }
@@ -415,10 +429,10 @@ class Payment_Process_Common {
      *
      * @author Joe Stump <joe@joestump.net>
      * @access public
-     * @param  string  $option  Option name to set
-     * @param  mixed   $value   Value to set
+     * @param  string $option Option name to set
+     * @param  mixed $value Value to set
      */
-    function setOption($option,$value)
+    public function setOption($option, $value)
     {
         return ($this->_options[$option] = $value);
     }
@@ -429,12 +443,60 @@ class Payment_Process_Common {
      *
      * This function should be overloaded by the processor.
      */
-    function getResult()
+    public function getResult()
     {
         return PEAR::raiseError("getResult() is not implemented in this processor.", PAYMENT_PROCESS_ERROR_NOTIMPLEMENTED);
     }
     // }}}
     // {{{ _isDefinedConstant($value, $class)
+
+    /**
+     * Mark a field (or fields) as being required.
+     *
+     * @param  string $field Field name
+     * @param  string ...
+     * @return boolean always true.
+     */
+    public function _makeRequired()
+    {
+        foreach (func_get_args() as $field) {
+            $this->_required[$field] = true;
+        }
+        return true;
+    }
+    // }}}
+    // {{{ _makeRequired()
+
+    /**
+     * Mark a field as being optional.
+     *
+     * @param  string $field Field name
+     * @param  ...
+     * @return boolean always true.
+     */
+    public function _makeOptional()
+    {
+        foreach (func_get_args() as $field) {
+            unset($this->_required[$field]);
+        }
+        return true;
+    }
+    // }}}
+    // {{{ _makeOptional()
+
+    /**
+     * Validates transaction type.
+     *
+     * @return boolean true on success, false on failure.
+     * @access private
+     */
+    public function _validateType()
+    {
+        return $this->_isDefinedConst($this->type, 'type');
+    }
+    // }}}
+    // {{{ _validateType()
+
     /**
      * See if a value is a defined constant.
      *
@@ -444,19 +506,20 @@ class Payment_Process_Common {
      * PAYMENT_PROCESS_ACTION_AUTHONLY etc.
      *
      * @access private
-     * @param  mixed    $value  Value to check
-     * @param  mixed    $class  Constant class to check
+     * @param  mixed $value Value to check
+     * @param  mixed $class Constant class to check
      * @return boolean  true if it is defined, false otherwise.
      */
-    function _isDefinedConst($value, $class)
+    public function _isDefinedConst($value, $class)
     {
-        $constClass = 'PAYMENT_PROCESS_'.strtoupper($class).'_';
+        $constClass = 'PAYMENT_PROCESS_' . strtoupper($class) . '_';
         $length = strlen($constClass);
         $consts = get_defined_constants();
         $found = false;
         foreach ($consts as $constant => $constVal) {
             if (strncmp($constClass, $constant, $length) === 0 &&
-                $constVal == $value) {
+                $constVal == $value
+            ) {
                 $found = true;
                 break;
             }
@@ -465,60 +528,17 @@ class Payment_Process_Common {
         return $found;
     }
     // }}}
-    // {{{ _makeRequired()
-    /**
-     * Mark a field (or fields) as being required.
-     *
-     * @param  string  $field Field name
-     * @param  string  ...
-     * @return boolean always true.
-     */
-    function _makeRequired()
-    {
-        foreach (func_get_args() as $field) {
-            $this->_required[$field] = true;
-        }
-        return true;
-    }
-    // }}}
-    // {{{ _makeOptional()
-    /**
-     * Mark a field as being optional.
-     *
-     * @param  string  $field Field name
-     * @param  ...
-     * @return boolean always true.
-     */
-    function _makeOptional()
-    {
-        foreach (func_get_args() as $field) {
-            unset($this->_required[$field]);
-        }
-        return true;
-    }
-    // }}}
-    // {{{ _validateType()
-    /**
-     * Validates transaction type.
-     *
-     * @return boolean true on success, false on failure.
-     * @access private
-     */
-    function _validateType()
-    {
-        return $this->_isDefinedConst($this->type, 'type');
-    }
-    // }}}
     // {{{ _validateAction()
+
     /**
      * Validates transaction action.
      *
      * @return boolean true on success, false on failure.
      * @access private
      */
-    function _validateAction()
+    public function _validateAction()
     {
-        return (isset($GLOBALS['_Payment_Process_'.$this->_driver][$this->action]));
+        return (isset($GLOBALS['_Payment_Process_' . $this->_driver][$this->action]));
     }
     // }}}
     // {{{ _validateSource()
@@ -528,7 +548,7 @@ class Payment_Process_Common {
      * @return boolean true on success, false on failure.
      * @access private
      */
-    function _validateSource()
+    public function _validateSource()
     {
         return $this->_isDefinedConst($this->transactionSource, 'source');
     }
@@ -543,7 +563,7 @@ class Payment_Process_Common {
      *
      * @return boolean true on success, false otherwise
      */
-    function _validateAmount()
+    public function _validateAmount()
     {
         return Validate::number($this->amount, array(
             'decimal' => '.',
@@ -562,9 +582,9 @@ class Payment_Process_Common {
      *
      * @access private
      */
-    function _handleAction()
+    public function _handleAction()
     {
-        $this->_data[$this->_fieldMap['action']] = $GLOBALS['_Payment_Process_'.$this->_driver][$this->action];
+        $this->_data[$this->_fieldMap['action']] = $GLOBALS['_Payment_Process_' . $this->_driver][$this->action];
     }
     // }}}
     // {{{ _prepare()
@@ -581,7 +601,7 @@ class Payment_Process_Common {
      * @return array Data to POST
      * @access private
      */
-    function _prepare()
+    public function _prepare()
     {
         /*
          * FIXME - because this only loops through stuff in the fieldMap, we
@@ -590,7 +610,7 @@ class Payment_Process_Common {
          *         to do something more than simple mapping.
          */
         foreach ($this->_fieldMap as $generic => $specific) {
-            $func = '_handle'.ucfirst($generic);
+            $func = '_handle' . ucfirst($generic);
             if (method_exists($this, $func)) {
                 $result = $this->$func();
                 if (PEAR::isError($result)) {
@@ -620,5 +640,3 @@ class Payment_Process_Common {
     }
     // }}}
 }
-
-?>

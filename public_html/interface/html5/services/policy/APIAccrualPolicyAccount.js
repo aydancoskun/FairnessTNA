@@ -1,51 +1,51 @@
-var APIAccrualPolicyAccount = ServiceCaller.extend( {
+var APIAccrualPolicyAccount = ServiceCaller.extend({
 
-	key_name: 'AccrualPolicyAccount',
-	className: 'APIAccrualPolicyAccount',
+    key_name: 'AccrualPolicyAccount',
+    className: 'APIAccrualPolicyAccount',
 
-	getAccrualPolicyAccountDefaultData: function() {
+    getAccrualPolicyAccountDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicyAccountDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicyAccountDefaultData', arguments);
 
-	},
+    },
 
-	getAccrualPolicyAccount: function() {
+    getAccrualPolicyAccount: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicyAccount', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicyAccount', arguments);
 
-	},
+    },
 
-	getCommonAccrualPolicyAccountData: function() {
+    getCommonAccrualPolicyAccountData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonAccrualPolicyAccountData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonAccrualPolicyAccountData', arguments);
 
-	},
+    },
 
-	validateAccrualPolicyAccount: function() {
+    validateAccrualPolicyAccount: function () {
 
-		return this.argumentsHandler( this.className, 'validateAccrualPolicyAccount', arguments );
+        return this.argumentsHandler(this.className, 'validateAccrualPolicyAccount', arguments);
 
-	},
+    },
 
-	setAccrualPolicyAccount: function() {
+    setAccrualPolicyAccount: function () {
 
-		return this.argumentsHandler( this.className, 'setAccrualPolicyAccount', arguments );
+        return this.argumentsHandler(this.className, 'setAccrualPolicyAccount', arguments);
 
-	},
+    },
 
-	deleteAccrualPolicyAccount: function() {
+    deleteAccrualPolicyAccount: function () {
 
-		return this.argumentsHandler( this.className, 'deleteAccrualPolicyAccount', arguments );
+        return this.argumentsHandler(this.className, 'deleteAccrualPolicyAccount', arguments);
 
-	},
+    },
 
-	copyAccrualPolicyAccount: function() {
-		return this.argumentsHandler( this.className, 'copyAccrualPolicyAccount', arguments );
-	},
+    copyAccrualPolicyAccount: function () {
+        return this.argumentsHandler(this.className, 'copyAccrualPolicyAccount', arguments);
+    },
 
-	exportAccrualPolicyAccount: function() {
-		return this.argumentsHandler( this.className, 'exportAccrualPolicyAccount', arguments );
-	}
+    exportAccrualPolicyAccount: function () {
+        return this.argumentsHandler(this.className, 'exportAccrualPolicyAccount', arguments);
+    }
 
 
-} );
+});

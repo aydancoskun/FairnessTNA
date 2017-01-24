@@ -1,284 +1,290 @@
-PayStubSummaryReportViewController = ReportBaseViewController.extend( {
+PayStubSummaryReportViewController = ReportBaseViewController.extend({
 
-	initialize: function( options ) {
-		this.__super( 'initialize', options );
-		this.script_name = 'PayStubSummaryReport';
-		this.viewId = 'PayStubSummaryReport';
-		this.context_menu_name = $.i18n._( 'Pay Stub Summary' );
-		this.navigation_label = $.i18n._( 'Saved Report' ) +':';
-		this.view_file = 'PayStubSummaryReportView.html';
-		this.api = new (APIFactory.getAPIClass( 'APIPayStubSummaryReport' ))();
-		this.buildContextMenu();
+    initialize: function (options) {
+        this.__super('initialize', options);
+        this.script_name = 'PayStubSummaryReport';
+        this.viewId = 'PayStubSummaryReport';
+        this.context_menu_name = $.i18n._('Pay Stub Summary');
+        this.navigation_label = $.i18n._('Saved Report') + ':';
+        this.view_file = 'PayStubSummaryReportView.html';
+        this.api = new (APIFactory.getAPIClass('APIPayStubSummaryReport'))();
+        this.buildContextMenu();
 
-	},
+    },
 
-	onReportMenuClick: function( id ) {
-		this.onViewClick( id );
-	},
+    onReportMenuClick: function (id) {
+        this.onViewClick(id);
+    },
 
-	buildContextMenuModels: function() {
+    buildContextMenuModels: function () {
 
-		//Context Menu
-		var menu = new RibbonMenu( {
-			label: this.context_menu_name,
-			id: this.viewId + 'ContextMenu',
-			sub_menu_groups: []
-		} );
+        //Context Menu
+        var menu = new RibbonMenu({
+            label: this.context_menu_name,
+            id: this.viewId + 'ContextMenu',
+            sub_menu_groups: []
+        });
 
-		//menu group
-		var editor_group = new RibbonSubMenuGroup( {
-			label: $.i18n._( 'Editor' ),
-			id: this.viewId + 'Editor',
-			ribbon_menu: menu,
-			sub_menus: []
-		} );
+        //menu group
+        var editor_group = new RibbonSubMenuGroup({
+            label: $.i18n._('Editor'),
+            id: this.viewId + 'Editor',
+            ribbon_menu: menu,
+            sub_menus: []
+        });
 
-		//menu group
-		var saved_report_group = new RibbonSubMenuGroup( {
-			label: $.i18n._( 'Saved Report' ),
-			id: this.viewId + 'SavedReport',
-			ribbon_menu: menu,
-			sub_menus: []
-		} );
+        //menu group
+        var saved_report_group = new RibbonSubMenuGroup({
+            label: $.i18n._('Saved Report'),
+            id: this.viewId + 'SavedReport',
+            ribbon_menu: menu,
+            sub_menus: []
+        });
 
-		//menu group
-		var pay_stub_group = new RibbonSubMenuGroup( {
-			label: $.i18n._( 'Pay Stub' ),
-			id: this.script_name + 'PayStub',
-			ribbon_menu: menu,
-			sub_menus: []
-		} );
+        //menu group
+        var pay_stub_group = new RibbonSubMenuGroup({
+            label: $.i18n._('Pay Stub'),
+            id: this.script_name + 'PayStub',
+            ribbon_menu: menu,
+            sub_menus: []
+        });
 
-		//menu group
-		var export_group = new RibbonSubMenuGroup( {
-			label: $.i18n._( 'Export' ),
-			id: this.viewId + 'Export',
-			ribbon_menu: menu,
-			sub_menus: []
-		} );
+        //menu group
+        var export_group = new RibbonSubMenuGroup({
+            label: $.i18n._('Export'),
+            id: this.viewId + 'Export',
+            ribbon_menu: menu,
+            sub_menus: []
+        });
 
-		var view_html = new RibbonSubMenu( {
-			label: $.i18n._( 'View' ),
-			id: ContextMenuIconName.view_html,
-			group: editor_group,
-			icon: Icons.view,
-			permission_result: true,
-			permission: null
-		} );
+        var view_html = new RibbonSubMenu({
+            label: $.i18n._('View'),
+            id: ContextMenuIconName.view_html,
+            group: editor_group,
+            icon: Icons.view,
+            permission_result: true,
+            permission: null
+        });
 
-		var view_pdf = new RibbonSubMenu( {
-			label: $.i18n._( 'PDF' ),
-			id: ContextMenuIconName.view,
-			group: editor_group,
-			icon: Icons.print,
-			permission_result: true,
-			permission: null
-		} );
+        var view_pdf = new RibbonSubMenu({
+            label: $.i18n._('PDF'),
+            id: ContextMenuIconName.view,
+            group: editor_group,
+            icon: Icons.print,
+            permission_result: true,
+            permission: null
+        });
 
-		var excel = new RibbonSubMenu( {
-			label: $.i18n._( 'Excel' ),
-			id: ContextMenuIconName.export_excel,
-			group: editor_group,
-			icon: Icons.export_excel,
-			permission_result: true,
-			permission: null
-		} );
+        var excel = new RibbonSubMenu({
+            label: $.i18n._('Excel'),
+            id: ContextMenuIconName.export_excel,
+            group: editor_group,
+            icon: Icons.export_excel,
+            permission_result: true,
+            permission: null
+        });
 
-		var cancel = new RibbonSubMenu( {
-			label: $.i18n._( 'Cancel' ),
-			id: ContextMenuIconName.cancel,
-			group: editor_group,
-			icon: Icons.cancel,
-			permission_result: true,
-			permission: null
-		} );
+        var cancel = new RibbonSubMenu({
+            label: $.i18n._('Cancel'),
+            id: ContextMenuIconName.cancel,
+            group: editor_group,
+            icon: Icons.cancel,
+            permission_result: true,
+            permission: null
+        });
 
-		var save_existed_report = new RibbonSubMenu( {
-			label: $.i18n._( 'Save' ),
-			id: ContextMenuIconName.save_existed_report,
-			group: saved_report_group,
-			icon: Icons.save,
-			permission_result: true,
-			permission: null
-		} );
+        var save_existed_report = new RibbonSubMenu({
+            label: $.i18n._('Save'),
+            id: ContextMenuIconName.save_existed_report,
+            group: saved_report_group,
+            icon: Icons.save,
+            permission_result: true,
+            permission: null
+        });
 
-		var save_new_report = new RibbonSubMenu( {
-			label: $.i18n._( 'Save as New' ),
-			id: ContextMenuIconName.save_new_report,
-			group: saved_report_group,
-			icon: Icons.save_and_new,
-			permission_result: true,
-			permission: null
-		} );
+        var save_new_report = new RibbonSubMenu({
+            label: $.i18n._('Save as New'),
+            id: ContextMenuIconName.save_new_report,
+            group: saved_report_group,
+            icon: Icons.save_and_new,
+            permission_result: true,
+            permission: null
+        });
 
-		var employee_pay_stubs = new RibbonSubMenu( {
-			label: $.i18n._( 'Employee<br>Pay Stubs' ),
-			id: ContextMenuIconName.employee_pay_stubs,
-			group: pay_stub_group,
-			icon: Icons.pay_stubs,
-			permission_result: true,
-			permission: null
-		} );
+        var employee_pay_stubs = new RibbonSubMenu({
+            label: $.i18n._('Employee<br>Pay Stubs'),
+            id: ContextMenuIconName.employee_pay_stubs,
+            group: pay_stub_group,
+            icon: Icons.pay_stubs,
+            permission_result: true,
+            permission: null
+        });
 
-		var employer_pay_stubs = new RibbonSubMenu( {
-			label: $.i18n._( 'Employer<br>Pay Stubs' ),
-			id: ContextMenuIconName.employer_pay_stubs,
-			group: pay_stub_group,
-			icon: Icons.pay_stubs,
-			permission_result: true,
-			permission: null
-		} );
+        var employer_pay_stubs = new RibbonSubMenu({
+            label: $.i18n._('Employer<br>Pay Stubs'),
+            id: ContextMenuIconName.employer_pay_stubs,
+            group: pay_stub_group,
+            icon: Icons.pay_stubs,
+            permission_result: true,
+            permission: null
+        });
 
-		var print_checks = new RibbonSubMenu( {label: $.i18n._( 'Print Checks' ),
-			id: ContextMenuIconName.print_checks,
-			group: export_group,
-			icon: 'print_checks-35x35.png',
-			type: RibbonSubMenuType.NAVIGATION,
-			items: [],
-			permission_result: true,
-			permission: true} );
+        var print_checks = new RibbonSubMenu({
+            label: $.i18n._('Print Checks'),
+            id: ContextMenuIconName.print_checks,
+            group: export_group,
+            icon: 'print_checks-35x35.png',
+            type: RibbonSubMenuType.NAVIGATION,
+            items: [],
+            permission_result: true,
+            permission: true
+        });
 
-		var export_cheque_result = new (APIFactory.getAPIClass( 'APIPayStub' ))().getOptions( 'export_cheque', {async: false} ).getResult();
+        var export_cheque_result = new (APIFactory.getAPIClass('APIPayStub'))().getOptions('export_cheque', {async: false}).getResult();
 
-		export_cheque_result = Global.buildRecordArray( export_cheque_result );
+        export_cheque_result = Global.buildRecordArray(export_cheque_result);
 
-		for ( var i = 0; i < export_cheque_result.length; i++ ) {
-			var item = export_cheque_result[i];
-			var btn = new RibbonSubMenuNavItem( {label: item.label,
-				id: item.value,
-				nav: print_checks
-			} );
-		}
+        for (var i = 0; i < export_cheque_result.length; i++) {
+            var item = export_cheque_result[i];
+            var btn = new RibbonSubMenuNavItem({
+                label: item.label,
+                id: item.value,
+                nav: print_checks
+            });
+        }
 
-		var direct_deposit = new RibbonSubMenu( {label: $.i18n._( 'Direct Deposit' ),
-			id: ContextMenuIconName.direct_deposit,
-			group: export_group,
-			icon: 'direct_deposit-35x35.png',
-			type: RibbonSubMenuType.NAVIGATION,
-			items: [],
-			permission_result: true,
-			permission: true} );
+        var direct_deposit = new RibbonSubMenu({
+            label: $.i18n._('Direct Deposit'),
+            id: ContextMenuIconName.direct_deposit,
+            group: export_group,
+            icon: 'direct_deposit-35x35.png',
+            type: RibbonSubMenuType.NAVIGATION,
+            items: [],
+            permission_result: true,
+            permission: true
+        });
 
-		var direct_deposit_result = new (APIFactory.getAPIClass( 'APIPayStub' ))().getOptions( 'export_eft', {async: false} ).getResult();
+        var direct_deposit_result = new (APIFactory.getAPIClass('APIPayStub'))().getOptions('export_eft', {async: false}).getResult();
 
-		direct_deposit_result = Global.buildRecordArray( direct_deposit_result );
+        direct_deposit_result = Global.buildRecordArray(direct_deposit_result);
 
-		for ( i = 0; i < direct_deposit_result.length; i++ ) {
-			item = direct_deposit_result[i];
-			btn = new RibbonSubMenuNavItem( {label: item.label,
-				id: item.value,
-				nav: direct_deposit
-			} );
-		}
+        for (i = 0; i < direct_deposit_result.length; i++) {
+            item = direct_deposit_result[i];
+            btn = new RibbonSubMenuNavItem({
+                label: item.label,
+                id: item.value,
+                nav: direct_deposit
+            });
+        }
 
-		return [menu];
+        return [menu];
 
-	},
+    },
 
-	openEditView: function() {
+    openEditView: function () {
 
-		var $this = this;
-		$this.initOptions( function() {
+        var $this = this;
+        $this.initOptions(function () {
 
-			for ( var i = 0; i < $this.setup_fields_array.length; i++ ) {
-				var item = $this.setup_fields_array[i];
-				if ( item.value === 'status_id' ) {
-					item.value = 'filter';
-				}
-			}
+            for (var i = 0; i < $this.setup_fields_array.length; i++) {
+                var item = $this.setup_fields_array[i];
+                if (item.value === 'status_id') {
+                    item.value = 'filter';
+                }
+            }
 
-			if ( !$this.edit_view ) {
-				$this.initEditViewUI( $this.viewId, $this.view_file );
-			}
+            if (!$this.edit_view) {
+                $this.initEditViewUI($this.viewId, $this.view_file);
+            }
 
-			$this.do_validate_after_create_ui = true;
+            $this.do_validate_after_create_ui = true;
 
-			$this.getReportData( function( result ) {
-				// Waiting for the (APIFactory.getAPIClass( 'API' )) returns data to set the current edit record.
+            $this.getReportData(function (result) {
+                // Waiting for the (APIFactory.getAPIClass( 'API' )) returns data to set the current edit record.
 
-				var edit_item;
-				if ( LocalCacheData.default_edit_id_for_next_open_edit_view ) {
-					for ( var i = 0; i < result.length; i++ ) {
-						if ( result[i].id == LocalCacheData.default_edit_id_for_next_open_edit_view ) {
-							edit_item = result[i];
-						}
-					}
-					LocalCacheData.default_edit_id_for_next_open_edit_view = null;
-				}else{
-					edit_item = $this.getDefaultReport( result );
-				}
+                var edit_item;
+                if (LocalCacheData.default_edit_id_for_next_open_edit_view) {
+                    for (var i = 0; i < result.length; i++) {
+                        if (result[i].id == LocalCacheData.default_edit_id_for_next_open_edit_view) {
+                            edit_item = result[i];
+                        }
+                    }
+                    LocalCacheData.default_edit_id_for_next_open_edit_view = null;
+                } else {
+                    edit_item = $this.getDefaultReport(result);
+                }
 
-				if ( result && result.length > 0 ) {
-					$this.current_saved_report = edit_item;
-					$this.saved_report_array = result;
-				} else {
-					$this.current_saved_report = {};
-					$this.saved_report_array = [];
-				}
+                if (result && result.length > 0) {
+                    $this.current_saved_report = edit_item;
+                    $this.saved_report_array = result;
+                } else {
+                    $this.current_saved_report = {};
+                    $this.saved_report_array = [];
+                }
 
-				$this.current_edit_record = {};
-				$this.visible_report_values = {};
+                $this.current_edit_record = {};
+                $this.visible_report_values = {};
 
-				$this.initEditView();
+                $this.initEditView();
 
-			} );
+            });
 
-		} );
+        });
 
-	},
+    },
 
-	onFormItemChangeProcessFilterField: function( target, key ) {
-		var filter = target.getValue();
-		this.visible_report_values[key] = {status_id: filter};
-	},
+    onFormItemChangeProcessFilterField: function (target, key) {
+        var filter = target.getValue();
+        this.visible_report_values[key] = {status_id: filter};
+    },
 
-	setFilterValue: function( widget, value ) {
-		widget.setValue( value.status_id );
-	},
+    setFilterValue: function (widget, value) {
+        widget.setValue(value.status_id);
+    },
 
-	onContextMenuClick: function( context_btn, menu_name ) {
-		if ( Global.isSet( menu_name ) ) {
-			var id = menu_name;
-		} else {
-			context_btn = $( context_btn );
+    onContextMenuClick: function (context_btn, menu_name) {
+        if (Global.isSet(menu_name)) {
+            var id = menu_name;
+        } else {
+            context_btn = $(context_btn);
 
-			id = $( context_btn.find( '.ribbon-sub-menu-icon' ) ).attr( 'id' );
+            id = $(context_btn.find('.ribbon-sub-menu-icon')).attr('id');
 
-			if ( context_btn.hasClass( 'disable-image' ) ) {
-				return;
-			}
-		}
+            if (context_btn.hasClass('disable-image')) {
+                return;
+            }
+        }
 
-		switch ( id ) {
-			case ContextMenuIconName.view:
-				this.onViewClick();
-				break;
-			case ContextMenuIconName.view_html:
+        switch (id) {
+            case ContextMenuIconName.view:
+                this.onViewClick();
+                break;
+            case ContextMenuIconName.view_html:
 
-				this.onViewClick('html');
-				break;
-			case ContextMenuIconName.view_html_new_window:
-				this.onViewClick('html', true);
-				break;
-			case ContextMenuIconName.export_excel:
-				this.onViewExcelClick();
-				break;
-			case ContextMenuIconName.cancel:
-				this.onCancelClick();
-				break;
-			case ContextMenuIconName.save_existed_report: //All report view
-				this.onSaveExistedReportClick();
-				break;
-			case ContextMenuIconName.save_new_report: //All report view
-				this.onSaveNewReportClick();
-				break;
-			case ContextMenuIconName.employee_pay_stubs: //All report view
-				this.onViewClick( 'pdf_employee_pay_stub' )
-				break;
-			case ContextMenuIconName.employer_pay_stubs: //All report view
-				this.onViewClick( 'pdf_employer_pay_stub' )
-				break;
-		}
-	}
+                this.onViewClick('html');
+                break;
+            case ContextMenuIconName.view_html_new_window:
+                this.onViewClick('html', true);
+                break;
+            case ContextMenuIconName.export_excel:
+                this.onViewExcelClick();
+                break;
+            case ContextMenuIconName.cancel:
+                this.onCancelClick();
+                break;
+            case ContextMenuIconName.save_existed_report: //All report view
+                this.onSaveExistedReportClick();
+                break;
+            case ContextMenuIconName.save_new_report: //All report view
+                this.onSaveNewReportClick();
+                break;
+            case ContextMenuIconName.employee_pay_stubs: //All report view
+                this.onViewClick('pdf_employee_pay_stub')
+                break;
+            case ContextMenuIconName.employer_pay_stubs: //All report view
+                this.onViewClick('pdf_employer_pay_stub')
+                break;
+        }
+    }
 
-} );
+});

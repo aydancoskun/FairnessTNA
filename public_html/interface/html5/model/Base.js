@@ -1,15 +1,13 @@
-var Base = Backbone.Model.extend( {
+var Base = Backbone.Model.extend({
 
-	defaults: {
+    defaults: {},
 
-	},
+    fromJSONToAttributes: function (data) {
+        var handler = this;
+        handler.set(data);
 
-	fromJSONToAttributes: function( data ) {
-		var handler = this;
-		handler.set( data );
-
-		return handler;
-	}
+        return handler;
+    }
 
 
-} );
+});

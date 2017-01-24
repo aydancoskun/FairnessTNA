@@ -19,212 +19,217 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Users
  */
-class UserGenericStatusListFactory extends UserGenericStatusFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class UserGenericStatusListFactory extends UserGenericStatusFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
+        $uf = new UserFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-						LEFT JOIN  '. $uf->getTable() .' as b on a.user_id = b.id
+					from	' . $this->getTable() . ' as a
+						LEFT JOIN  ' . $uf->getTable() . ' as b on a.user_id = b.id
 					where	b.company_id = ?
 						AND a.deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL($query, $ph);
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndCompanyId($id, $company_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByIdAndCompanyId($id, $company_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $company_id == '') {
-			return FALSE;
-		}
+        if ($company_id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
+        $uf = new UserFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'id' => (int)$id,
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-						LEFT JOIN  '. $uf->getTable() .' as b on a.user_id = b.id
+					from	' . $this->getTable() . ' as a
+						LEFT JOIN  ' . $uf->getTable() . ' as b on a.user_id = b.id
 					where	a.id = ?
 						AND b.company_id = ?
 						AND a.deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL($query, $ph);
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByUserId($id, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByUserId($id, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'user_id' => (int)$id,
-					);
+        $ph = array(
+            'user_id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	user_id = ?
 							AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByUserIdAndBatchId($user_id, $batch_id, $limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $user_id == '') {
-			return FALSE;
-		}
+    public function getByUserIdAndBatchId($user_id, $batch_id, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($user_id == '') {
+            return false;
+        }
 
-		if ( $batch_id == '') {
-			return FALSE;
-		}
+        if ($batch_id == '') {
+            return false;
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'status_id' => 'asc', 'label' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($order == null) {
+            $order = array('status_id' => 'asc', 'label' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-		$ph = array(
-					'user_id' => (int)$user_id,
-					'batch_id' => (int)$batch_id,
-					);
+        $ph = array(
+            'user_id' => (int)$user_id,
+            'batch_id' => (int)$batch_id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	user_id = ?
 						AND batch_id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getStatusCountArrayByUserIdAndBatchId($user_id, $batch_id, $where = NULL, $order = NULL) {
-		if ( $user_id == '') {
-			return FALSE;
-		}
+    public function getStatusCountArrayByUserIdAndBatchId($user_id, $batch_id, $where = null, $order = null)
+    {
+        if ($user_id == '') {
+            return false;
+        }
 
-		if ( $batch_id == '') {
-			return FALSE;
-		}
+        if ($batch_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'user_id' => (int)$user_id,
-					'batch_id' => (int)$batch_id,
-					);
+        $ph = array(
+            'user_id' => (int)$user_id,
+            'batch_id' => (int)$batch_id,
+        );
 
-		$query = '
+        $query = '
 					select	status_id, count(*) as total
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	user_id = ?
 						AND batch_id = ?
 						AND deleted = 0
 					GROUP BY status_id';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$result = $this->db->GetArray($query, $ph);
+        $result = $this->db->GetArray($query, $ph);
 
-		$total = 0;
-		foreach( $result as $row ) {
-			$total = ( $total + $row['total'] );
-		}
-		$retarr = array();
-		$retarr['total'] = $total;
+        $total = 0;
+        foreach ($result as $row) {
+            $total = ($total + $row['total']);
+        }
+        $retarr = array();
+        $retarr['total'] = $total;
 
-		$retarr['status'] = array(
-								10 => array('total' => 0, 'percent' => 0),
-								20 => array('total' => 0, 'percent' => 0),
-								30 => array('total' => 0, 'percent' => 0),
-								);
+        $retarr['status'] = array(
+            10 => array('total' => 0, 'percent' => 0),
+            20 => array('total' => 0, 'percent' => 0),
+            30 => array('total' => 0, 'percent' => 0),
+        );
 
-		foreach( $result as $row ) {
-			$retarr['status'][$row['status_id']] = array('total' => $row['total'], 'percent' => round( ( ($row['total'] / $total) * 100 ), 1 ) );
-		}
+        foreach ($result as $row) {
+            $retarr['status'][$row['status_id']] = array('total' => $row['total'], 'percent' => round((($row['total'] / $total) * 100), 1));
+        }
 
-		if ( empty($retarr) == FALSE ) {
-			return $retarr;
-		}
+        if (empty($retarr) == false) {
+            return $retarr;
+        }
 
-		return FALSE;
-	}
-
+        return false;
+    }
 }
-?>

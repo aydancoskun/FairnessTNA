@@ -18,43 +18,44 @@
 // $Id: Apache.php 203595 2005-12-24 02:34:39Z aashley $
 
 /**
-* Simple config parser for apache httpd.conf files
-* A more complex version could handle directives as
-* associative arrays.
-*
-* @author      Bertrand Mansion <bmansion@mamasam.com>
-* @package     Config
-*/
-class Config_Container_Apache {
+ * Simple config parser for apache httpd.conf files
+ * A more complex version could handle directives as
+ * associative arrays.
+ *
+ * @author      Bertrand Mansion <bmansion@mamasam.com>
+ * @package     Config
+ */
+class Config_Container_Apache
+{
 
     /**
-    * This class options
-    * Not used at the moment
-    *
-    * @var  array
-    */
-    var $options = array();
+     * This class options
+     * Not used at the moment
+     *
+     * @var  array
+     */
+    public $options = array();
 
     /**
-    * Constructor
-    *
-    * @access public
-    * @param    string  $options    (optional)Options to be used by renderer
-    */
-    function Config_Container_Apache($options = array())
+     * Constructor
+     *
+     * @access public
+     * @param    string $options (optional)Options to be used by renderer
+     */
+    public function Config_Container_Apache($options = array())
     {
         $this->options = $options;
     } // end constructor
 
     /**
-    * Parses the data of the given configuration file
-    *
-    * @access public
-    * @param string $datasrc    path to the configuration file
-    * @param object $obj        reference to a config object
-    * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
-    */
-    function &parseDatasrc($datasrc, &$obj)
+     * Parses the data of the given configuration file
+     *
+     * @access public
+     * @param string $datasrc path to the configuration file
+     * @param object $obj reference to a config object
+     * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
+     */
+    public function &parseDatasrc($datasrc, &$obj)
     {
         $return = true;
         if (!is_readable($datasrc)) {
@@ -66,38 +67,40 @@ class Config_Container_Apache {
         $sections[0] =& $obj->container;
         foreach ($lines as $line) {
             $n++;
-            if (!preg_match('/^\s*#/', $line) && 
-                 preg_match('/^\s*(.*)\s+\\\$/', $line, $match)) {
+            if (!preg_match('/^\s*#/', $line) &&
+                preg_match('/^\s*(.*)\s+\\\$/', $line, $match)
+            ) {
                 // directive on more than one line
-                $lastline .= $match[1].' ';
+                $lastline .= $match[1] . ' ';
                 continue;
             }
             if ($lastline != '') {
-                $line = $lastline.trim($line);
+                $line = $lastline . trim($line);
                 $lastline = '';
             }
             if (preg_match('/^\s*#+\s*(.*?)\s*$/', $line, $match)) {
                 // a comment
-                $currentSection =& $sections[count($sections)-1];
+                $currentSection =& $sections[count($sections) - 1];
                 $currentSection->createComment($match[1]);
             } elseif (trim($line) == '') {
                 // a blank line
-                $currentSection =& $sections[count($sections)-1];
+                $currentSection =& $sections[count($sections) - 1];
                 $currentSection->createBlank();
             } elseif (preg_match('/^\s*(\w+)(?:\s+(.*?)|)\s*$/', $line, $match)) {
                 // a directive
-                $currentSection =& $sections[count($sections)-1];
+                $currentSection =& $sections[count($sections) - 1];
                 $currentSection->createDirective($match[1], $match[2]);
             } elseif (preg_match('/^\s*<(\w+)(?:\s+([^>]*)|\s*)>\s*$/', $line, $match)) {
                 // a section opening
-                if (!isset($match[2]))
+                if (!isset($match[2])) {
                     $match[2] = '';
-                $currentSection =& $sections[count($sections)-1];
+                }
+                $currentSection =& $sections[count($sections) - 1];
                 $attributes = explode(' ', $match[2]);
                 $sections[] =& $currentSection->createSection($match[1], $attributes);
             } elseif (preg_match('/^\s*<\/(\w+)\s*>\s*$/', $line, $match)) {
                 // a section closing
-                $currentSection =& $sections[count($sections)-1];
+                $currentSection =& $sections[count($sections) - 1];
                 if ($currentSection->name != $match[1]) {
                     return PEAR::raiseError("Section not closed in '$datasrc' at line $n.", null, PEAR_ERROR_RETURN);
                 }
@@ -110,12 +113,12 @@ class Config_Container_Apache {
     } // end func parseDatasrc
 
     /**
-    * Returns a formatted string of the object
-    * @param    object  $obj    Container object to be output as string
-    * @access   public
-    * @return   string
-    */
-    function toString(&$obj)
+     * Returns a formatted string of the object
+     * @param    object $obj Container object to be output as string
+     * @access   public
+     * @return   string
+     */
+    public function toString(&$obj)
     {
         static $deep = -1;
         $ident = '';
@@ -132,17 +135,17 @@ class Config_Container_Apache {
                 $string = "\n";
                 break;
             case 'comment':
-                $string = $ident.'# '.$obj->content."\n";
+                $string = $ident . '# ' . $obj->content . "\n";
                 break;
             case 'directive':
-                $string = $ident.$obj->name.' '.$obj->content."\n";
+                $string = $ident . $obj->name . ' ' . $obj->content . "\n";
                 break;
             case 'section':
                 if (!$obj->isRoot()) {
-                    $string = $ident.'<'.$obj->name;
+                    $string = $ident . '<' . $obj->name;
                     if (is_array($obj->attributes) && count($obj->attributes) > 0) {
                         foreach ($obj->attributes as $attr => $val) {
-                            $string .= ' '.$val;
+                            $string .= ' ' . $val;
                         }
                     }
                     $string .= ">\n";
@@ -154,7 +157,7 @@ class Config_Container_Apache {
                 }
                 if (!$obj->isRoot()) {
                     // object is not root
-                    $string .= $ident.'</'.$obj->name.">\n";
+                    $string .= $ident . '</' . $obj->name . ">\n";
                 }
                 break;
             default:
@@ -165,5 +168,4 @@ class Config_Container_Apache {
         }
         return $string;
     } // end func toString
-} // end class Config_Container_Apache
-?>
+} // end class Config_Container_Apache;

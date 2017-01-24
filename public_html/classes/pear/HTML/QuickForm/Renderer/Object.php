@@ -27,48 +27,49 @@ require_once('HTML/QuickForm/Renderer.php');
  *
  * @public
  */
-class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
+class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer
+{
     /**
      * The object being generated
      * @var object $_obj
      */
-    var $_obj= null;
+    public $_obj = null;
 
     /**
      * Number of sections in the form (i.e. number of headers in it)
      * @var integer $_sectionCount
      */
-    var $_sectionCount;
+    public $_sectionCount;
 
     /**
-    * Current section number
-    * @var integer $_currentSection
-    */
-    var $_currentSection;
+     * Current section number
+     * @var integer $_currentSection
+     */
+    public $_currentSection;
 
     /**
-    * Object representing current group
-    * @var object $_currentGroup
-    */
-    var $_currentGroup = null;
+     * Object representing current group
+     * @var object $_currentGroup
+     */
+    public $_currentGroup = null;
 
     /**
      * Class of Element Objects
      * @var object $_elementType
      */
-    var $_elementType = 'QuickFormElement';
+    public $_elementType = 'QuickFormElement';
 
     /**
-    * Additional style information for different elements  
-    * @var array $_elementStyles
-    */
-    var $_elementStyles = array();
+     * Additional style information for different elements
+     * @var array $_elementStyles
+     */
+    public $_elementStyles = array();
 
     /**
-    * true: collect all hidden elements into string; false: process them as usual form elements
-    * @var bool $_collectHidden
-    */
-    var $_collectHidden = false;
+     * true: collect all hidden elements into string; false: process them as usual form elements
+     * @var bool $_collectHidden
+     */
+    public $_collectHidden = false;
 
 
     /**
@@ -77,7 +78,7 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
      * @param collecthidden bool    true: collect all hidden elements
      * @public
      */
-    function HTML_QuickForm_Renderer_Object($collecthidden = false) 
+    public function HTML_QuickForm_Renderer_Object($collecthidden = false)
     {
         $this->HTML_QuickForm_Renderer();
         $this->_collectHidden = $collecthidden;
@@ -88,7 +89,7 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
      * Return the rendered Object
      * @public
      */
-    function toObject() 
+    public function toObject()
     {
         return $this->_obj;
     }
@@ -98,11 +99,12 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
      * @param type string   Name of element class
      * @public
      */
-    function setElementType($type) {
+    public function setElementType($type)
+    {
         $this->_elementType = $type;
     }
 
-    function startForm(&$form) 
+    public function startForm(&$form)
     {
         $this->_obj->frozen = $form->isFrozen();
         $this->_obj->javascript = $form->getValidationScript();
@@ -110,7 +112,7 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
         $this->_obj->requirednote = $form->getRequiredNote();
         $this->_obj->errors = new StdClass;
 
-        if($this->_collectHidden) {
+        if ($this->_collectHidden) {
             $this->_obj->hidden = '';
         }
         $this->_elementIdx = 1;
@@ -118,47 +120,34 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
         $this->_sectionCount = 0;
     } // end func startForm
 
-    function renderHeader(&$header) 
+    public function renderHeader(&$header)
     {
         $hobj = new StdClass;
         $hobj->header = $header->toHtml();
         $this->_obj->sections[$this->_sectionCount] = $hobj;
         $this->_currentSection = $this->_sectionCount++;
     }
-    function renderElement(&$element, $required, $error) 
-    {
-        $elObj = $this->_elementToObject($element, $required, $error);
-        if(!empty($error)) {
-            $name = $elObj->name;
-            $this->_obj->errors->$name = $error;
-        }
-        $this->_storeObject($elObj);
-    } // end func renderElement
 
-    function renderHidden(&$element) {
-        if($this->_collectHidden) {
+    public function renderHidden(&$element)
+    {
+        if ($this->_collectHidden) {
             $this->_obj->hidden .= $element->toHtml() . "\n";
         } else {
             $this->renderElement($element, false, null);
         }
+    } // end func renderElement
+
+    public function renderElement(&$element, $required, $error)
+    {
+        $elObj = $this->_elementToObject($element, $required, $error);
+        if (!empty($error)) {
+            $name = $elObj->name;
+            $this->_obj->errors->$name = $error;
+        }
+        $this->_storeObject($elObj);
     } //end func renderHidden
 
-    function startGroup(&$group, $required, $error) 
-    {
-        $this->_currentGroup = $this->_elementToObject($group, $required, $error);
-        if(!empty($error)) {
-            $name = $this->_currentGroup->name;
-            $this->_view->errors->$name = $error;
-        }
-    } // end func startGroup
-
-    function finishGroup(&$group) 
-    {
-        $this->_storeObject($this->_currentGroup);
-        $this->_currentGroup = null;
-    } // end func finishGroup
-
-    /**
+        /**
      * Creates an object representing an element
      *
      * @private
@@ -167,9 +156,9 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
      * @param error string    Error associated with the element
      * @return object
      */
-    function _elementToObject(&$element, $required, $error) 
+    public function _elementToObject(&$element, $required, $error)
     {
-        if($this->_elementType) {
+        if ($this->_elementType) {
             $ret = new $this->_elementType;
         }
         $ret->name = $element->getName();
@@ -180,7 +169,7 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
         if (is_array($labels)) {
             $ret->label = array_shift($labels);
             foreach ($labels as $key => $label) {
-                $key = is_int($key)? $key + 2: $key;
+                $key = is_int($key) ? $key + 2 : $key;
                 $ret->{'label_' . $key} = $label;
             }
         } else {
@@ -189,56 +178,69 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
         $ret->required = $required;
         $ret->error = $error;
 
-        if(isset($this->_elementStyles[$ret->name])) {
+        if (isset($this->_elementStyles[$ret->name])) {
             $ret->style = $this->_elementStyles[$ret->name];
-            $ret->styleTemplate = "styles/". $ret->style .".html";
+            $ret->styleTemplate = "styles/" . $ret->style . ".html";
         }
-        if($ret->type == 'group') {
+        if ($ret->type == 'group') {
             $ret->separator = $element->_separator;
             $ret->elements = array();
         } else {
             $ret->html = $element->toHtml();
         }
         return $ret;
-    }
+    } // end func startGroup
 
-    /** 
+        /**
      * Stores an object representation of an element in the form array
      *
      * @private
      * @param elObj object     Object representation of an element
      * @return void
      */
-    function _storeObject($elObj) 
+    public function _storeObject($elObj)
     {
         $name = $elObj->name;
-        if(is_object($this->_currentGroup) && $elObj->type != 'group') {
+        if (is_object($this->_currentGroup) && $elObj->type != 'group') {
             $this->_currentGroup->elements[] = $elObj;
         } elseif (isset($this->_currentSection)) {
             $this->_obj->sections[$this->_currentSection]->elements[] = $elObj;
         } else {
             $this->_obj->elements[] = $elObj;
         }
+    } // end func finishGroup
+
+public function startGroup(&$group, $required, $error)
+    {
+        $this->_currentGroup = $this->_elementToObject($group, $required, $error);
+        if (!empty($error)) {
+            $name = $this->_currentGroup->name;
+            $this->_view->errors->$name = $error;
+        }
     }
 
-    function setElementStyle($elementName, $styleName = null)
+public function finishGroup(&$group)
     {
-        if(is_array($elementName)) {
+        $this->_storeObject($this->_currentGroup);
+        $this->_currentGroup = null;
+    }
+
+    public function setElementStyle($elementName, $styleName = null)
+    {
+        if (is_array($elementName)) {
             $this->_elementStyles = array_merge($this->_elementStyles, $elementName);
         } else {
             $this->_elementStyles[$elementName] = $styleName;
         }
     }
-
 } // end class HTML_QuickForm_Renderer_Object
-
 
 
 /**
  * @abstract Long Description
  * This class represents the object passed to outputObject()
- * 
- * Eg.  
+ *
+ * Eg.
  * {form.outputJavaScript():h}
  * {form.outputHeader():h}
  *   <table>
@@ -247,192 +249,195 @@ class HTML_QuickForm_Renderer_Object extends HTML_QuickForm_Renderer {
  *     </tr>
  *   </table>
  * </form>
- * 
+ *
  * @public
  */
-class QuickformForm {
+class QuickformForm
+{
     /**
      * Whether the form has been frozen
      * @var boolean $frozen
      */
-    var $frozen;        
-    
+    public $frozen;
+
     /**
      * Javascript for client-side validation
      * @var string $javascript
      */
-     var $javascript;
+    public $javascript;
 
-     /**
-      * Attributes for form tag
-      * @var string $attributes
-      */
-     var $attributes;
+    /**
+     * Attributes for form tag
+     * @var string $attributes
+     */
+    public $attributes;
 
-     /**
-      * Note about required elements
-      * @var string $requirednote
-      */
-     var $requirednote;
+    /**
+     * Note about required elements
+     * @var string $requirednote
+     */
+    public $requirednote;
 
-     /**
-      * Collected html of all hidden variables
-      * @var string $hidden
-      */
-     var $hidden;
+    /**
+     * Collected html of all hidden variables
+     * @var string $hidden
+     */
+    public $hidden;
 
-     /**
-      * Set if there were validation errors.  
-      * StdClass object with element names for keys and their
-      * error messages as values
-      * @var object $errors
-      */
-     var $errors;
+    /**
+     * Set if there were validation errors.
+     * StdClass object with element names for keys and their
+     * error messages as values
+     * @var object $errors
+     */
+    public $errors;
 
-     /**
-      * Array of QuickformElementObject elements.  If there are headers in the form
-      * this will be empty and the elements will be in the 
-      * separate sections
-      * @var array $elements
-      */
-     var $elements;
+    /**
+     * Array of QuickformElementObject elements.  If there are headers in the form
+     * this will be empty and the elements will be in the
+     * separate sections
+     * @var array $elements
+     */
+    public $elements;
 
-     /**
-      * Array of sections contained in the document
-      * @var array $sections
-      */
-     var $sections;
+    /**
+     * Array of sections contained in the document
+     * @var array $sections
+     */
+    public $sections;
 
-     /**
-      * Output &lt;form&gt; header
-      * {form.outputHeader():h} 
-      * @return string    &lt;form attributes&gt;
-      */
-     function outputHeader() {
+    /**
+     * Output &lt;form&gt; header
+     * {form.outputHeader():h}
+     * @return string    &lt;form attributes&gt;
+     */
+    public function outputHeader()
+    {
         $hdr = "<form " . $this->attributes . ">\n";
         return $hdr;
-       }
-     /**
-      * Output form javascript
-      * {form.outputJavaScript():h}
-      * @return string    Javascript
-      */
-     function outputJavaScript() {
+    }
+
+    /**
+     * Output form javascript
+     * {form.outputJavaScript():h}
+     * @return string    Javascript
+     */
+    public function outputJavaScript()
+    {
         return $this->javascript;
-     }
+    }
 } // end class QuickformForm
 
 
 /**
  * Convenience class describing a form element.
- * The properties defined here will be available from 
+ * The properties defined here will be available from
  * your flexy templates by referencing
  * {form.zip.label:h}, {form.zip.html:h}, etc.
  */
-class QuickformElement {
-    
+class QuickformElement
+{
+
     /**
      * Element name
      * @var string $name
      */
-    var $name;
+    public $name;
 
     /**
      * Element value
      * @var mixed $value
      */
-    var $value;
+    public $value;
 
     /**
      * Type of element
      * @var string $type
      */
-    var $type;
+    public $type;
 
     /**
      * Whether the element is frozen
      * @var boolean $frozen
      */
-    var $frozen;
+    public $frozen;
 
     /**
      * Label for the element
      * @var string $label
      */
-    var $label;
+    public $label;
 
     /**
      * Whether element is required
      * @var boolean $required
      */
-    var $required;
+    public $required;
 
     /**
      * Error associated with the element
      * @var string $error
      */
-    var $error;
+    public $error;
 
     /**
      * Some information about element style
      * @var string $style
      */
-    var $style;
+    public $style;
 
     /**
      * HTML for the element
      * @var string $html
      */
-    var $html;
+    public $html;
 
     /**
      * If element is a group, the group separator
      * @var mixed $separator
      */
-    var $separator;
+    public $separator;
 
     /**
      * If element is a group, an array of subelements
      * @var array $elements
      */
-    var $elements;
+    public $elements;
 
-    function isType($type)
+    public function isType($type)
     {
-        if($this->type == $type) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    function notFrozen()
-    {
-        if(!$this->frozen) {
+        if ($this->type == $type) {
             return true;
         } else {
             return false;
         }
     }
 
-    function isButton()
+    public function notFrozen()
     {
-        if($this->type == "submit" || $this->type == "reset") {
+        if (!$this->frozen) {
             return true;
         } else {
             return false;
         }
     }
 
-    function outputStyle()
+    public function isButton()
     {
-        $filename = "styles/".$this->style.".html";
+        if ($this->type == "submit" || $this->type == "reset") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function outputStyle()
+    {
+        $filename = "styles/" . $this->style . ".html";
         ob_start();
         HTML_Template_Flexy::staticQuickTemplate($filename, $this);
         $ret = ob_get_contents();
         ob_end_clean();
         return $ret;
     }
-
-} // end class QuickformElement
-?>
+} // end class QuickformElement;

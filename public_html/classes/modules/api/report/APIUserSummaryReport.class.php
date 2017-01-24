@@ -19,23 +19,25 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Report
  */
-class APIUserSummaryReport extends APIReport {
-	protected $main_class = 'UserSummaryReport';
+class APIUserSummaryReport extends APIReport
+{
+    protected $main_class = 'UserSummaryReport';
 
-	public function __construct() {
-		parent::__construct(); //Make sure parent constructor is always called.
+    public function __construct()
+    {
+        parent::__construct(); //Make sure parent constructor is always called.
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	function getUserSummaryReport( $config, $format = 'pdf' ) {
-		return $this->getReport( $config, $format );
-	}
+    public function getUserSummaryReport($config, $format = 'pdf')
+    {
+        return $this->getReport($config, $format);
+    }
 }
-?>

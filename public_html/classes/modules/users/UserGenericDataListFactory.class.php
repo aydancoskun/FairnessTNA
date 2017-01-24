@@ -19,497 +19,510 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Users
  */
-class UserGenericDataListFactory extends UserGenericDataFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class UserGenericDataListFactory extends UserGenericDataFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByUserId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByUserId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'user_id' => (int)$id,
-					);
+        $ph = array(
+            'user_id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	user_id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByUserIdAndId($user_id, $id, $where = NULL, $order = NULL) {
-		if ( $user_id == '') {
-			return FALSE;
-		}
+    public function getByUserIdAndId($user_id, $id, $where = null, $order = null)
+    {
+        if ($user_id == '') {
+            return false;
+        }
 
-		if ( $id == '') {
-			return FALSE;
-		}
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'user_id' => (int)$user_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'user_id' => (int)$user_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	user_id = ?
 						AND id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndUserIdAndId($company_id, $user_id, $id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndUserIdAndId($company_id, $user_id, $id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $id == '') {
-			return FALSE;
-		}
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND id = ? ';
 
-		//Allow getting company wide data if user_id == ''
-		if ( $user_id != '' ) {
-			$ph[] = (int)$user_id;
-			$query .= '		AND user_id = ?';
-		} else {
-			$query .= '		AND ( user_id = 0 OR user_id IS NULL )';
-		}
+        //Allow getting company wide data if user_id == ''
+        if ($user_id != '') {
+            $ph[] = (int)$user_id;
+            $query .= '		AND user_id = ?';
+        } else {
+            $query .= '		AND ( user_id = 0 OR user_id IS NULL )';
+        }
 
-		$query .= ' AND deleted = 0';
+        $query .= ' AND deleted = 0';
 
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByUserIdAndScript($user_id, $script, $where = NULL, $order = NULL) {
-		if ( $user_id == '') {
-			return FALSE;
-		}
+    public function getByUserIdAndScriptAndDefault($user_id, $script, $default = true, $where = null, $order = null)
+    {
+        if ($user_id == '') {
+            return false;
+        }
 
-		if ( $script == '') {
-			return FALSE;
-		} else {
-			$script = self::handleScriptName( $script );
-		}
+        if ($script == '') {
+            return false;
+        } else {
+            $script = self::handleScriptName($script);
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'is_default' => 'desc', 'name' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($order == null) {
+            $order = array('updated_date' => 'desc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-		$ph = array(
-					'user_id' => (int)$user_id,
-					'script' => $script,
-					);
+        $ph = array(
+            'user_id' => (int)$user_id,
+            'script' => $script,
+            'default' => $this->toBool($default),
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
-					where	user_id = ?
-						AND script = ?
-						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
-
-		$this->ExecuteSQL( $query, $ph );
-
-		return $this;
-	}
-
-	function getByUserIdAndScriptAndDefault($user_id, $script, $default = TRUE, $where = NULL, $order = NULL) {
-		if ( $user_id == '') {
-			return FALSE;
-		}
-
-		if ( $script == '') {
-			return FALSE;
-		} else {
-			$script = self::handleScriptName( $script );
-		}
-
-		if ( $order == NULL ) {
-			$order = array( 'updated_date' => 'desc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
-
-		$ph = array(
-					'user_id' => (int)$user_id,
-					'script' => $script,
-					'default' => $this->toBool($default),
-					);
-
-		$query = '
-					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	user_id = ?
 						AND script = ?
 						AND is_default = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByUserIdAndScriptArray($user_id, $script, $include_blank = TRUE) {
+    public function getByUserIdAndScriptArray($user_id, $script, $include_blank = true)
+    {
+        $ugdlf = new UserGenericDataListFactory();
+        $ugdlf->getByUserIdAndScript($user_id, $script);
 
-		$ugdlf = new UserGenericDataListFactory();
-		$ugdlf->getByUserIdAndScript($user_id, $script);
+        $list = array();
+        if ($include_blank == true) {
+            $list[0] = '--';
+        }
 
-		$list = array();
-		if ( $include_blank == TRUE ) {
-			$list[0] = '--';
-		}
+        foreach ($ugdlf as $ugd_obj) {
+            if ($ugd_obj->getDefault() == true) {
+                $default = ' (Default)';
+            } else {
+                $default = null;
+            }
+            $list[$ugd_obj->getID()] = $ugd_obj->getName() . $default;
+        }
 
-		foreach ($ugdlf as $ugd_obj) {
-			if ( $ugd_obj->getDefault() == TRUE ) {
-				$default = ' (Default)';
-			} else {
-				$default = NULL;
-			}
-			$list[$ugd_obj->getID()] = $ugd_obj->getName().$default;
-		}
+        if (empty($list) == false) {
+            return $list;
+        }
 
-		if ( empty($list) == FALSE ) {
-			return $list;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getByUserIdAndScript($user_id, $script, $where = null, $order = null)
+    {
+        if ($user_id == '') {
+            return false;
+        }
 
-	/*
+        if ($script == '') {
+            return false;
+        } else {
+            $script = self::handleScriptName($script);
+        }
 
-		Company List Functions
+        if ($order == null) {
+            $order = array('is_default' => 'desc', 'name' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-	*/
-	function getByCompanyId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+        $ph = array(
+            'user_id' => (int)$user_id,
+            'script' => $script,
+        );
 
-		$ph = array(
-					'id' => (int)$id,
-					);
-
-
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
+					where	user_id = ?
+						AND script = ?
+						AND deleted = 0';
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
+
+        $this->ExecuteSQL($query, $ph);
+
+        return $this;
+    }
+
+    /*
+
+        Company List Functions
+
+    */
+
+    public function getByCompanyId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
+
+        $ph = array(
+            'id' => (int)$id,
+        );
+
+
+        $query = '
+					select	*
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND ( user_id = 0 OR user_id is NULL )
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndId($company_id, $id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndId($company_id, $id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $id == '') {
-			return FALSE;
-		}
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND ( user_id = 0 OR user_id is NULL )
 						AND id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndScript($company_id, $script, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndScript($company_id, $script, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $script == '') {
-			return FALSE;
-		} else {
-			$script = self::handleScriptName( $script );
-		}
+        if ($script == '') {
+            return false;
+        } else {
+            $script = self::handleScriptName($script);
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'updated_date' => 'desc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($order == null) {
+            $order = array('updated_date' => 'desc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'script' => $script
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'script' => $script
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND ( user_id = 0 OR user_id is NULL )
 						AND script = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIdAndScriptAndDefault($company_id, $script, $default = TRUE, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIdAndScriptAndDefault($company_id, $script, $default = true, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $script == '') {
-			return FALSE;
-		} else {
-			$script = self::handleScriptName( $script );
-		}
+        if ($script == '') {
+            return false;
+        } else {
+            $script = self::handleScriptName($script);
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'updated_date' => 'desc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($order == null) {
+            $order = array('updated_date' => 'desc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'script' => $script,
-					'default' => $this->toBool($default)
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'script' => $script,
+            'default' => $this->toBool($default)
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	company_id = ?
 						AND ( user_id = 0 OR user_id is NULL )
 						AND script = ?
 						AND is_default = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getAPISearchByCompanyIdAndArrayCriteria( $company_id, $filter_data, $limit = NULL, $page = NULL, $where = NULL, $order = NULL ) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getAPISearchByCompanyIdAndArrayCriteria($company_id, $filter_data, $limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( !is_array($order) ) {
-			//Use Filter Data ordering if its set.
-			if ( isset($filter_data['sort_column']) AND $filter_data['sort_order']) {
-				$order = array(Misc::trimSortPrefix($filter_data['sort_column']) => $filter_data['sort_order']);
-			}
-		}
+        if (!is_array($order)) {
+            //Use Filter Data ordering if its set.
+            if (isset($filter_data['sort_column']) and $filter_data['sort_order']) {
+                $order = array(Misc::trimSortPrefix($filter_data['sort_column']) => $filter_data['sort_order']);
+            }
+        }
 
-		$additional_order_fields = array();
-		if ( $order == NULL ) {
-			$order = array( 'a.name' => 'asc' ); //Default to sort by name for saved reports and such.
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
-		//Debug::Arr($order, 'Order Data:', __FILE__, __LINE__, __METHOD__, 10);
-		//Debug::Arr($filter_data, 'Filter Data:', __FILE__, __LINE__, __METHOD__, 10);
-		$uf = new UserFactory();
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $additional_order_fields = array();
+        if ($order == null) {
+            $order = array('a.name' => 'asc'); //Default to sort by name for saved reports and such.
+            $strict = false;
+        } else {
+            $strict = true;
+        }
+        //Debug::Arr($order, 'Order Data:', __FILE__, __LINE__, __METHOD__, 10);
+        //Debug::Arr($filter_data, 'Filter Data:', __FILE__, __LINE__, __METHOD__, 10);
+        $uf = new UserFactory();
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-						LEFT JOIN '. $uf->getTable() .' as y ON ( a.created_by = y.id AND y.deleted = 0 )
-						LEFT JOIN '. $uf->getTable() .' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
+					from	' . $this->getTable() . ' as a
+						LEFT JOIN ' . $uf->getTable() . ' as y ON ( a.created_by = y.id AND y.deleted = 0 )
+						LEFT JOIN ' . $uf->getTable() . ' as z ON ( a.updated_by = z.id AND z.deleted = 0 )
 					where	a.company_id = ?
 					';
 
-		$query .= ( isset($filter_data['id']) ) ? $this->getWhereClauseSQL( 'a.id', $filter_data['id'], 'numeric_list', $ph ) : NULL;
-		$query .= ( isset($filter_data['exclude_id']) ) ? $this->getWhereClauseSQL( 'a.id', $filter_data['exclude_id'], 'not_numeric_list', $ph ) : NULL;
+        $query .= (isset($filter_data['id'])) ? $this->getWhereClauseSQL('a.id', $filter_data['id'], 'numeric_list', $ph) : null;
+        $query .= (isset($filter_data['exclude_id'])) ? $this->getWhereClauseSQL('a.id', $filter_data['exclude_id'], 'not_numeric_list', $ph) : null;
 
-		if ( isset($filter_data['user_id']) ) {
-			$query	.=	' AND a.user_id in ('. $this->getListSQL($filter_data['user_id'], $ph, 'int') .') ';
-		} else {
-			$query	.=	' AND ( a.user_id = 0 OR a.user_id is NULL ) ';
-		}
+        if (isset($filter_data['user_id'])) {
+            $query .= ' AND a.user_id in (' . $this->getListSQL($filter_data['user_id'], $ph, 'int') . ') ';
+        } else {
+            $query .= ' AND ( a.user_id = 0 OR a.user_id is NULL ) ';
+        }
 
-		$query .= ( isset($filter_data['script']) ) ? $this->getWhereClauseSQL( 'a.script', $filter_data['script'], 'lower_text_list', $ph ) : NULL;
-		$query .= ( isset($filter_data['name']) ) ? $this->getWhereClauseSQL( 'a.name', $filter_data['name'], 'lower_text_list', $ph ) : NULL;
-		$query .= ( isset($filter_data['is_default']) ) ? $this->getWhereClauseSQL( 'a.is_default', $filter_data['is_default'], 'boolean', $ph ) : NULL;
-/*
-		if ( isset($filter_data['id']) AND isset($filter_data['id'][0]) AND !in_array(-1, (array)$filter_data['id']) ) {
-			$query	.=	' AND a.id in ('. $this->getListSQL($filter_data['id'], $ph) .') ';
-		}
-		if ( isset($filter_data['script']) AND isset($filter_data['script'][0]) AND !in_array(-1, (array)$filter_data['script']) ) {
-			$query	.=	' AND a.script in ('. $this->getListSQL($filter_data['script'], $ph) .') ';
-		}
-		if ( isset($filter_data['name']) AND isset($filter_data['name'][0]) AND !in_array(-1, (array)$filter_data['name']) ) {
-			$query	.=	' AND lower( a.name ) in ('. $this->getListSQL( array_map('strtolower', (array)$filter_data['name']), $ph) .') ';
-		}
+        $query .= (isset($filter_data['script'])) ? $this->getWhereClauseSQL('a.script', $filter_data['script'], 'lower_text_list', $ph) : null;
+        $query .= (isset($filter_data['name'])) ? $this->getWhereClauseSQL('a.name', $filter_data['name'], 'lower_text_list', $ph) : null;
+        $query .= (isset($filter_data['is_default'])) ? $this->getWhereClauseSQL('a.is_default', $filter_data['is_default'], 'boolean', $ph) : null;
+        /*
+                if ( isset($filter_data['id']) AND isset($filter_data['id'][0]) AND !in_array(-1, (array)$filter_data['id']) ) {
+                    $query	.=	' AND a.id in ('. $this->getListSQL($filter_data['id'], $ph) .') ';
+                }
+                if ( isset($filter_data['script']) AND isset($filter_data['script'][0]) AND !in_array(-1, (array)$filter_data['script']) ) {
+                    $query	.=	' AND a.script in ('. $this->getListSQL($filter_data['script'], $ph) .') ';
+                }
+                if ( isset($filter_data['name']) AND isset($filter_data['name'][0]) AND !in_array(-1, (array)$filter_data['name']) ) {
+                    $query	.=	' AND lower( a.name ) in ('. $this->getListSQL( array_map('strtolower', (array)$filter_data['name']), $ph) .') ';
+                }
+        
+                if ( isset($filter_data['is_default']) ) {
+                    $ph[] = $this->toBool($filter_data['is_default']);
+                    $query	.=	' AND a.is_default = ? ';
+                }
+        */
+        $query .= (isset($filter_data['created_by'])) ? $this->getWhereClauseSQL(array('a.created_by', 'y.first_name', 'y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph) : null;
+        $query .= (isset($filter_data['updated_by'])) ? $this->getWhereClauseSQL(array('a.updated_by', 'z.first_name', 'z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph) : null;
 
-		if ( isset($filter_data['is_default']) ) {
-			$ph[] = $this->toBool($filter_data['is_default']);
-			$query	.=	' AND a.is_default = ? ';
-		}
-*/
-		$query .= ( isset($filter_data['created_by']) ) ? $this->getWhereClauseSQL( array('a.created_by', 'y.first_name', 'y.last_name'), $filter_data['created_by'], 'user_id_or_name', $ph ) : NULL;
-		$query .= ( isset($filter_data['updated_by']) ) ? $this->getWhereClauseSQL( array('a.updated_by', 'z.first_name', 'z.last_name'), $filter_data['updated_by'], 'user_id_or_name', $ph ) : NULL;
+        $query .= ' AND a.deleted = 0 ';
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict, $additional_order_fields);
 
-		$query .=	' AND a.deleted = 0 ';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict, $additional_order_fields );
+        //Debug::Arr($ph, 'Query: '. $query, __FILE__, __LINE__, __METHOD__, 10);
 
-		//Debug::Arr($ph, 'Query: '. $query, __FILE__, __LINE__, __METHOD__, 10);
+        $this->ExecuteSQL($query, $ph, $limit, $page);
 
-		$this->ExecuteSQL( $query, $ph, $limit, $page );
+        return $this;
+    }
 
-		return $this;
-	}
+    public function getArrayByListFactory($lf, $include_blank = true)
+    {
+        if (!is_object($lf)) {
+            return false;
+        }
 
-	function getArrayByListFactory($lf, $include_blank = TRUE ) {
-		if ( !is_object($lf) ) {
-			return FALSE;
-		}
+        $list = array();
+        if ($include_blank == true) {
+            $list[0] = '--';
+        }
 
-		$list = array();
-		if ( $include_blank == TRUE ) {
-			$list[0] = '--';
-		}
+        foreach ($lf as $obj) {
+            $list[$obj->getID()] = $obj->getName();
+        }
 
-		foreach ($lf as $obj) {
-			$list[$obj->getID()] = $obj->getName();
-		}
+        if (empty($list) == false) {
+            return $list;
+        }
 
-		if ( empty($list) == FALSE ) {
-			return $list;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getByCompanyIdAndScriptArray($company_id, $script, $include_blank = true)
+    {
+        $ugdlf = new UserGenericDataListFactory();
+        $ugdlf->getByUserIdAndScript($company_id, $script);
 
-	function getByCompanyIdAndScriptArray($company_id, $script, $include_blank = TRUE) {
+        $list = array();
+        if ($include_blank == true) {
+            $list[0] = '--';
+        }
 
-		$ugdlf = new UserGenericDataListFactory();
-		$ugdlf->getByUserIdAndScript($company_id, $script);
+        foreach ($ugdlf as $ugd_obj) {
+            if ($ugd_obj->getDefault() == true) {
+                $default = ' (Default)';
+            } else {
+                $default = null;
+            }
+            $list[$ugd_obj->getID()] = $ugd_obj->getName() . $default;
+        }
 
-		$list = array();
-		if ( $include_blank == TRUE ) {
-			$list[0] = '--';
-		}
+        if (empty($list) == false) {
+            return $list;
+        }
 
-		foreach ($ugdlf as $ugd_obj) {
-			if ( $ugd_obj->getDefault() == TRUE ) {
-				$default = ' (Default)';
-			} else {
-				$default = NULL;
-			}
-			$list[$ugd_obj->getID()] = $ugd_obj->getName().$default;
-		}
-
-		if ( empty($list) == FALSE ) {
-			return $list;
-		}
-
-		return FALSE;
-	}
+        return false;
+    }
 }
-?>

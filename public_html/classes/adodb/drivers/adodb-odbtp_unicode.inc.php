@@ -1,6 +1,6 @@
 <?php
 /*
-	V5.20dev  ??-???-2014  (c) 2000-2014 John Lim (jlim#natsoft.com). All rights reserved.
+    V5.20dev  ??-???-2014  (c) 2000-2014 John Lim (jlim#natsoft.com). All rights reserved.
   Released under both BSD license and Lesser GPL library license.
   Whenever there is any discrepancy between the two licenses,
   the BSD license will take precedence. See License.txt.
@@ -11,7 +11,9 @@
 // Code contributed by "Robert Twitty" <rtwitty#neutron.ushmm.org>
 
 // security - hide paths
-if (!defined('ADODB_DIR')) die();
+if (!defined('ADODB_DIR')) {
+    die();
+}
 
 /*
     Because the ODBTP server sends and reads UNICODE text data using UTF-8
@@ -24,15 +26,16 @@ if (!defined('ADODB_DIR')) die();
 */
 
 if (!defined('_ADODB_ODBTP_LAYER')) {
-	include(ADODB_DIR."/drivers/adodb-odbtp.inc.php");
+    include(ADODB_DIR . "/drivers/adodb-odbtp.inc.php");
 }
 
-class ADODB_odbtp_unicode extends ADODB_odbtp {
-	var $databaseType = 'odbtp';
-	var $_useUnicodeSQL = true;
+class ADODB_odbtp_unicode extends ADODB_odbtp
+{
+    public $databaseType = 'odbtp';
+    public $_useUnicodeSQL = true;
 
-	function ADODB_odbtp_unicode()
-	{
-		$this->ADODB_odbtp();
-	}
+    public function ADODB_odbtp_unicode()
+    {
+        $this->ADODB_odbtp();
+    }
 }

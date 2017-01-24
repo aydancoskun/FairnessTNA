@@ -1,62 +1,61 @@
-var APIAuditTrailReport = ServiceCaller.extend( {
+var APIAuditTrailReport = ServiceCaller.extend({
 
-	key_name: 'AuditTrailReport',
-	className: 'APIAuditTrailReport',
+    key_name: 'AuditTrailReport',
+    className: 'APIAuditTrailReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonAuditTrailReportData: function() {
+    getCommonAuditTrailReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonAuditTrailReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonAuditTrailReportData', arguments);
 
-	},
+    },
 
-	getAuditTrailReport: function() {
+    getAuditTrailReport: function () {
 
-		return this.argumentsHandler( this.className, 'getAuditTrailReport', arguments );
+        return this.argumentsHandler(this.className, 'getAuditTrailReport', arguments);
 
-	},
+    },
 
-	setAuditTrailReport: function() {
+    setAuditTrailReport: function () {
 
-		return this.argumentsHandler( this.className, 'setAuditTrailReport', arguments );
+        return this.argumentsHandler(this.className, 'setAuditTrailReport', arguments);
 
-	},
+    },
 
-	getAuditTrailReportDefaultData: function() {
+    getAuditTrailReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getAuditTrailReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getAuditTrailReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteAuditTrailReport: function() {
+    deleteAuditTrailReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteAuditTrailReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteAuditTrailReport', arguments);
 
-	},
+    },
 
-	validateAuditTrailReport: function() {
+    validateAuditTrailReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateAuditTrailReport', arguments );
+        return this.argumentsHandler(this.className, 'validateAuditTrailReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	copyAuditTrailReport: function() {
+    copyAuditTrailReport: function () {
 
-		return this.argumentsHandler( this.className, 'copyAuditTrailReport', arguments );
+        return this.argumentsHandler(this.className, 'copyAuditTrailReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

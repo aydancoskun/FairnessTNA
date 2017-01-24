@@ -19,33 +19,34 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-class Redirect {
-	static function page($url = NULL) {
-		if ( empty($url) AND !empty($_SERVER['HTTP_REFERER']) ) {
-			$url = $_SERVER['HTTP_REFERER'];
-		}
+class Redirect
+{
+    public static function page($url = null)
+    {
+        if (empty($url) and !empty($_SERVER['HTTP_REFERER'])) {
+            $url = $_SERVER['HTTP_REFERER'];
+        }
 
-		$url = Environment::stripDuplicateSlashes( $url );
-		Debug::Text('Redirect URL: '. $url, __FILE__, __LINE__, __METHOD__, 11);
+        $url = Environment::stripDuplicateSlashes($url);
+        Debug::Text('Redirect URL: ' . $url, __FILE__, __LINE__, __METHOD__, 11);
 
-		if ( Debug::getVerbosity() != 11 ) {
-			forceNoCacheHeaders(); //Make sure Chrome doesn't cache redirects.
-			header("Location: $url\n\n");
+        if (Debug::getVerbosity() != 11) {
+            forceNoCacheHeaders(); //Make sure Chrome doesn't cache redirects.
+            header("Location: $url\n\n");
 
-			//Prevent the rest of the script from running after redirect?
-			Debug::writeToLog();
+            //Prevent the rest of the script from running after redirect?
+            Debug::writeToLog();
 
-			ob_clean();
-			exit;
-		}
+            ob_clean();
+            exit;
+        }
 
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

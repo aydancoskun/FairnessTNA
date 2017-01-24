@@ -17,19 +17,20 @@
 //  limitations under the License.
 //
 
-class LZWDecode {
+class LZWDecode
+{
+    public $sTable = array();
+    public $data = null;
+    public $tIdx;
+    public $bitsToGet = 9;
+    public $bytePointer;
+    public $bitPointer;
+    public $nextData = 0;
+    public $nextBits = 0;
+    public $andTable = array(511, 1023, 2047, 4095);
 
-    var $sTable = array();
-    var $data = null;
-    var $tIdx;
-    var $bitsToGet = 9;
-    var $bytePointer;
-    var $bitPointer;
-    var $nextData = 0;
-    var $nextBits = 0;
-    var $andTable = array(511, 1023, 2047, 4095);
-
-    function LZWDecode(&$fpdi) {
+    public function LZWDecode(&$fpdi)
+    {
         $this->fpdi =& $fpdi;
     }
 
@@ -38,9 +39,9 @@ class LZWDecode {
      *
      * @param string data    The compressed data.
      */
-    function decode(&$data) {
-
-        if($data[0] == 0x00 && $data[1] == 0x01) {
+    public function decode(&$data)
+    {
+        if ($data[0] == 0x00 && $data[1] == 0x01) {
             $this->fpdi->error("LZW flavour not supported.");
         }
 
@@ -71,9 +72,7 @@ class LZWDecode {
 
                 $uncompData .= $this->sTable[$code];
                 $oldCode = $code;
-
             } else {
-
                 if ($code < $this->tIdx) {
                     $string = $this->sTable[$code];
                     $uncompData .= $string;
@@ -82,7 +81,7 @@ class LZWDecode {
                     $oldCode = $code;
                 } else {
                     $string = $this->sTable[$oldCode];
-                    $string = $string.$string[0];
+                    $string = $string . $string[0];
                     $uncompData .= $string;
 
                     $this->addStringToTable($string);
@@ -90,7 +89,7 @@ class LZWDecode {
                 }
             }
         }
-        
+
         return $uncompData;
     }
 
@@ -98,38 +97,23 @@ class LZWDecode {
     /**
      * Initialize the string table.
      */
-    function initsTable() {
+    public function initsTable()
+    {
         $this->sTable = array();
 
-        for ($i = 0; $i < 256; $i++)
+        for ($i = 0; $i < 256; $i++) {
             $this->sTable[$i] = chr($i);
+        }
 
         $this->tIdx = 258;
         $this->bitsToGet = 9;
     }
 
-    /**
-     * Add a new string to the string table.
-     */
-    function addStringToTable ($oldString, $newString="") {
-        $string = $oldString.$newString;
-
-        // Add this new String to the table
-        $this->sTable[$this->tIdx++] = $string;
-
-        if ($this->tIdx == 511) {
-            $this->bitsToGet = 10;
-        } else if ($this->tIdx == 1023) {
-            $this->bitsToGet = 11;
-        } else if ($this->tIdx == 2047) {
-            $this->bitsToGet = 12;
-        }
-    }
-
-    // Returns the next 9, 10, 11 or 12 bits
-    function getNextCode() {
-        if ($this->bytePointer == strlen($this->data))
+    public function getNextCode()
+    {
+        if ($this->bytePointer == strlen($this->data)) {
             return 257;
+        }
 
         $this->nextData = ($this->nextData << 8) | (ord($this->data[$this->bytePointer++]) & 0xff);
         $this->nextBits += 8;
@@ -139,13 +123,30 @@ class LZWDecode {
             $this->nextBits += 8;
         }
 
-        $code = ($this->nextData >> ($this->nextBits - $this->bitsToGet)) & $this->andTable[$this->bitsToGet-9];
+        $code = ($this->nextData >> ($this->nextBits - $this->bitsToGet)) & $this->andTable[$this->bitsToGet - 9];
         $this->nextBits -= $this->bitsToGet;
 
         return $code;
     }
+
+    // Returns the next 9, 10, 11 or 12 bits
+
+    /**
+     * Add a new string to the string table.
+     */
+    public function addStringToTable($oldString, $newString = "")
+    {
+        $string = $oldString . $newString;
+
+        // Add this new String to the table
+        $this->sTable[$this->tIdx++] = $string;
+
+        if ($this->tIdx == 511) {
+            $this->bitsToGet = 10;
+        } elseif ($this->tIdx == 1023) {
+            $this->bitsToGet = 11;
+        } elseif ($this->tIdx == 2047) {
+            $this->bitsToGet = 12;
+        }
+    }
 }
-
-
-
-?>

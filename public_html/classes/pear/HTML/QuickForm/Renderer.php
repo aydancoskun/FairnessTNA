@@ -20,7 +20,7 @@
 
 /**
  * An abstract base class for QuickForm renderers
- * 
+ *
  * The class implements a Visitor design pattern
  *
  * @abstract
@@ -28,123 +28,122 @@
  */
 class HTML_QuickForm_Renderer
 {
-   /**
-    * Constructor
-    *
-    * @access public
-    */
-    function HTML_QuickForm_Renderer()
+    /**
+     * Constructor
+     *
+     * @access public
+     */
+    public function HTML_QuickForm_Renderer()
     {
     } // end constructor
 
-   /**
-    * Called when visiting a form, before processing any form elements
-    *
-    * @param    object    An HTML_QuickForm object being visited
-    * @access   public
-    * @return   void 
-    * @abstract
-    */
-    function startForm(&$form)
+    /**
+     * Called when visiting a form, before processing any form elements
+     *
+     * @param    object    An HTML_QuickForm object being visited
+     * @access   public
+     * @return   void
+     * @abstract
+     */
+    public function startForm(&$form)
     {
         return;
     } // end func startForm
 
-   /**
-    * Called when visiting a form, after processing all form elements
-    * 
-    * @param    object     An HTML_QuickForm object being visited
-    * @access   public
-    * @return   void 
-    * @abstract
-    */
-    function finishForm(&$form)
+    /**
+     * Called when visiting a form, after processing all form elements
+     *
+     * @param    object     An HTML_QuickForm object being visited
+     * @access   public
+     * @return   void
+     * @abstract
+     */
+    public function finishForm(&$form)
     {
         return;
     } // end func finishForm
 
-   /**
-    * Called when visiting a header element
-    *
-    * @param    object     An HTML_QuickForm_header element being visited
-    * @access   public
-    * @return   void 
-    * @abstract
-    */
-    function renderHeader(&$header)
+    /**
+     * Called when visiting a header element
+     *
+     * @param    object     An HTML_QuickForm_header element being visited
+     * @access   public
+     * @return   void
+     * @abstract
+     */
+    public function renderHeader(&$header)
     {
         return;
     } // end func renderHeader
 
-   /**
-    * Called when visiting an element
-    *
-    * @param    object     An HTML_QuickForm_element object being visited
-    * @param    bool       Whether an element is required
-    * @param    string     An error message associated with an element
-    * @access   public
-    * @return   void 
-    * @abstract
-    */
-    function renderElement(&$element, $required, $error)
+    /**
+     * Called when visiting an element
+     *
+     * @param    object     An HTML_QuickForm_element object being visited
+     * @param    bool       Whether an element is required
+     * @param    string     An error message associated with an element
+     * @access   public
+     * @return   void
+     * @abstract
+     */
+    public function renderElement(&$element, $required, $error)
     {
         return;
     } // end func renderElement
 
-   /**
-    * Called when visiting a hidden element
-    * 
-    * @param    object     An HTML_QuickForm_hidden object being visited
-    * @access   public
-    * @return   void
-    * @abstract 
-    */
-    function renderHidden(&$element)
+    /**
+     * Called when visiting a hidden element
+     *
+     * @param    object     An HTML_QuickForm_hidden object being visited
+     * @access   public
+     * @return   void
+     * @abstract
+     */
+    public function renderHidden(&$element)
     {
         return;
     } // end func renderHidden
 
-   /**
-    * Called when visiting a raw HTML/text pseudo-element
-    * 
-    * Seems that this should not be used when using a template-based renderer
-    *
-    * @param    object     An HTML_QuickForm_html element being visited
-    * @access   public
-    * @return   void 
-    * @abstract
-    */
-    function renderHtml(&$data)
+    /**
+     * Called when visiting a raw HTML/text pseudo-element
+     *
+     * Seems that this should not be used when using a template-based renderer
+     *
+     * @param    object     An HTML_QuickForm_html element being visited
+     * @access   public
+     * @return   void
+     * @abstract
+     */
+    public function renderHtml(&$data)
     {
         return;
     } // end func renderHtml
 
-   /**
-    * Called when visiting a group, before processing any group elements
-    *
-    * @param    object     An HTML_QuickForm_group object being visited
-    * @param    bool       Whether a group is required
-    * @param    string     An error message associated with a group
-    * @access   public
-    * @return   void 
-    * @abstract
-    */
-    function startGroup(&$group, $required, $error)
+    /**
+     * Called when visiting a group, before processing any group elements
+     *
+     * @param    object     An HTML_QuickForm_group object being visited
+     * @param    bool       Whether a group is required
+     * @param    string     An error message associated with a group
+     * @access   public
+     * @return   void
+     * @abstract
+     */
+    public function startGroup(&$group, $required, $error)
     {
         return;
     } // end func startGroup
 
-   /**
-    * Called when visiting a group, after processing all group elements
-    *
-    * @param    object     An HTML_QuickForm_group object being visited
-    * @access   public
-    * @return   void 
-    * @abstract
-    */
-    function finishGroup(&$group)
+    /**
+     * Called when visiting a group, after processing all group elements
+     *
+     * @param    object     An HTML_QuickForm_group object being visited
+     * @access   public
+     * @return   void
+     * @abstract
+     */
+    public function finishGroup(&$group)
     {
         return;
     } // end func finishGroup
-} // end class HTML_QuickForm_Renderer
-?>
+} // end class HTML_QuickForm_Renderer;

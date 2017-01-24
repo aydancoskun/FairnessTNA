@@ -19,207 +19,216 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Users
  */
-class WageGroupFactory extends Factory {
-	protected $table = 'wage_group';
-	protected $pk_sequence_name = 'wage_group_id_seq'; //PK Sequence name
+class WageGroupFactory extends Factory
+{
+    protected $table = 'wage_group';
+    protected $pk_sequence_name = 'wage_group_id_seq'; //PK Sequence name
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'columns':
+                $retval = array(
+                    '-1030-name' => TTi18n::gettext('Name'),
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'columns':
-				$retval = array(
-										'-1030-name' => TTi18n::gettext('Name'),
+                    '-2000-created_by' => TTi18n::gettext('Created By'),
+                    '-2010-created_date' => TTi18n::gettext('Created Date'),
+                    '-2020-updated_by' => TTi18n::gettext('Updated By'),
+                    '-2030-updated_date' => TTi18n::gettext('Updated Date'),
+                );
+                break;
+            case 'unique_columns': //Columns that are displayed by default.
+                $retval = array(
+                    'name',
+                );
+                break;
+            case 'list_columns':
+                $retval = Misc::arrayIntersectByKey($this->getOptions('default_display_columns'), Misc::trimSortPrefix($this->getOptions('columns')));
+                break;
+            case 'default_display_columns': //Columns that are displayed by default.
+                $retval = array(
+                    'name',
+                );
+                break;
+        }
 
-										'-2000-created_by' => TTi18n::gettext('Created By'),
-										'-2010-created_date' => TTi18n::gettext('Created Date'),
-										'-2020-updated_by' => TTi18n::gettext('Updated By'),
-										'-2030-updated_date' => TTi18n::gettext('Updated Date'),
-							);
-				break;
-			case 'unique_columns': //Columns that are displayed by default.
-				$retval = array(
-								'name',
-								);
-				break;
-			case 'list_columns':
-				$retval = Misc::arrayIntersectByKey( $this->getOptions('default_display_columns'), Misc::trimSortPrefix( $this->getOptions('columns') ) );
-				break;
-			case 'default_display_columns': //Columns that are displayed by default.
-				$retval = array(
-								'name',
-								);
-				break;
-		}
+        return $retval;
+    }
 
-		return $retval;
-	}
+    public function _getVariableToFunctionMap($data)
+    {
+        $variable_function_map = array(
+            'id' => 'ID',
+            'company_id' => 'Company',
+            'name' => 'Name',
+            'deleted' => 'Deleted',
+        );
+        return $variable_function_map;
+    }
 
-	function _getVariableToFunctionMap( $data ) {
-		$variable_function_map = array(
-										'id' => 'ID',
-										'company_id' => 'Company',
-										'name' => 'Name',
-										'deleted' => 'Deleted',
-										);
-		return $variable_function_map;
-	}
+    public function setCompany($id)
+    {
+        $id = trim($id);
 
-	function getCompany() {
-		return (int)$this->data['company_id'];
-	}
-	function setCompany($id) {
-		$id = trim($id);
+        $clf = TTnew('CompanyListFactory');
 
-		$clf = TTnew( 'CompanyListFactory' );
+        if ($id == 0
+            or $this->Validator->isResultSetWithRows('company',
+                $clf->getByID($id),
+                TTi18n::gettext('Company is invalid')
+            )
+        ) {
+            $this->data['company_id'] = $id;
 
-		if ( $id == 0
-				OR $this->Validator->isResultSetWithRows(	'company',
-															$clf->getByID($id),
-															TTi18n::gettext('Company is invalid')
-															) ) {
-			$this->data['company_id'] = $id;
+            return true;
+        }
 
-			return TRUE;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function getName()
+    {
+        return $this->data['name'];
+    }
 
-	function isUniqueName($name) {
-		$name = trim($name);
-		if ( $name == '' ) {
-			return FALSE;
-		}
+    public function setName($name)
+    {
+        $name = trim($name);
 
-		$ph = array(
-					'company_id' => (int)$this->getCompany(),
-					'name' => TTi18n::strtolower($name),
-					);
+        if ($this->Validator->isLength('name',
+                $name,
+                TTi18n::gettext('Name is too short or too long'),
+                2,
+                100)
+            and
+            $this->Validator->isTrue('name',
+                $this->isUniqueName($name),
+                TTi18n::gettext('Group already exists'))
 
-		$query = 'select id from '. $this->table .'
+        ) {
+            $this->data['name'] = $name;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isUniqueName($name)
+    {
+        $name = trim($name);
+        if ($name == '') {
+            return false;
+        }
+
+        $ph = array(
+            'company_id' => (int)$this->getCompany(),
+            'name' => TTi18n::strtolower($name),
+        );
+
+        $query = 'select id from ' . $this->table . '
 					where company_id = ?
 						AND lower(name) = ?
 						AND deleted = 0';
-		$name_id = $this->db->GetOne($query, $ph);
-		Debug::Arr($name_id, 'Unique Name: '. $name, __FILE__, __LINE__, __METHOD__, 10);
+        $name_id = $this->db->GetOne($query, $ph);
+        Debug::Arr($name_id, 'Unique Name: ' . $name, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $name_id === FALSE ) {
-			return TRUE;
-		} else {
-			if ($name_id == $this->getId() ) {
-				return TRUE;
-			}
-		}
+        if ($name_id === false) {
+            return true;
+        } else {
+            if ($name_id == $this->getId()) {
+                return true;
+            }
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getName() {
-		return $this->data['name'];
-	}
-	function setName($name) {
-		$name = trim($name);
+    public function getCompany()
+    {
+        return (int)$this->data['company_id'];
+    }
 
-		if	(	$this->Validator->isLength(		'name',
-												$name,
-												TTi18n::gettext('Name is too short or too long'),
-												2,
-												100)
-					AND
-						$this->Validator->isTrue(		'name',
-														$this->isUniqueName($name),
-														TTi18n::gettext('Group already exists'))
+    public function Validate($ignore_warning = true)
+    {
+        Debug::Text('Validate...', __FILE__, __LINE__, __METHOD__, 10);
 
-												) {
+        if ($this->getDeleted() == true) {
+            //Check to make sure there are no wage entries using this wage group.
+            $uwlf = TTnew('UserWageListFactory');
+            $uwlf->getByWageGroupIDAndCompanyId($this->getID(), $this->getCompany());
+            if ($uwlf->getRecordCount() > 0) {
+                $this->Validator->isTRUE('in_use',
+                    false,
+                    TTi18n::gettext('This wage group is in use'));
+            }
+        }
 
-			$this->data['name'] = $name;
+        return true;
+    }
 
-			return TRUE;
-		}
+    public function postSave()
+    {
+        return true;
+    }
 
-		return FALSE;
-	}
+    public function setObjectFromArray($data)
+    {
+        if (is_array($data)) {
+            $variable_function_map = $this->getVariableToFunctionMap();
+            foreach ($variable_function_map as $key => $function) {
+                if (isset($data[$key])) {
+                    $function = 'set' . $function;
+                    switch ($key) {
+                        default:
+                            if (method_exists($this, $function)) {
+                                $this->$function($data[$key]);
+                            }
+                            break;
+                    }
+                }
+            }
 
-	function Validate( $ignore_warning = TRUE ) {
-		Debug::Text('Validate...', __FILE__, __LINE__, __METHOD__, 10);
+            $this->setCreatedAndUpdatedColumns($data);
 
-		if ( $this->getDeleted() == TRUE ) {
-			//Check to make sure there are no wage entries using this wage group.
-			$uwlf = TTnew( 'UserWageListFactory' );
-			$uwlf->getByWageGroupIDAndCompanyId( $this->getID(), $this->getCompany() );
-			if ( $uwlf->getRecordCount() > 0 ) {
-				$this->Validator->isTRUE(	'in_use',
-											FALSE,
-											TTi18n::gettext('This wage group is in use'));
+            return true;
+        }
 
-			}
-		}
+        return false;
+    }
 
-		return TRUE;
-	}
+    public function getObjectAsArray($include_columns = null)
+    {
+        $data = array();
+        $variable_function_map = $this->getVariableToFunctionMap();
+        if (is_array($variable_function_map)) {
+            foreach ($variable_function_map as $variable => $function_stub) {
+                if ($include_columns == null or (isset($include_columns[$variable]) and $include_columns[$variable] == true)) {
+                    $function = 'get' . $function_stub;
+                    switch ($variable) {
+                        default:
+                            if (method_exists($this, $function)) {
+                                $data[$variable] = $this->$function();
+                            }
+                            break;
+                    }
+                }
+            }
+            $this->getCreatedAndUpdatedColumns($data, $include_columns);
+        }
 
-	function postSave() {
-		return TRUE;
-	}
+        return $data;
+    }
 
-	function setObjectFromArray( $data ) {
-		if ( is_array( $data ) ) {
-			$variable_function_map = $this->getVariableToFunctionMap();
-			foreach( $variable_function_map as $key => $function ) {
-				if ( isset($data[$key]) ) {
-
-					$function = 'set'.$function;
-					switch( $key ) {
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$this->$function( $data[$key] );
-							}
-							break;
-					}
-				}
-			}
-
-			$this->setCreatedAndUpdatedColumns( $data );
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function getObjectAsArray( $include_columns = NULL ) {
-		$data = array();
-		$variable_function_map = $this->getVariableToFunctionMap();
-		if ( is_array( $variable_function_map ) ) {
-			foreach( $variable_function_map as $variable => $function_stub ) {
-				if ( $include_columns == NULL OR ( isset($include_columns[$variable]) AND $include_columns[$variable] == TRUE ) ) {
-
-					$function = 'get'.$function_stub;
-					switch( $variable ) {
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$data[$variable] = $this->$function();
-							}
-							break;
-					}
-
-				}
-			}
-			$this->getCreatedAndUpdatedColumns( $data, $include_columns );
-		}
-
-		return $data;
-	}
-
-	function addLog( $log_action ) {
-		return TTLog::addEntry( $this->getId(), $log_action, TTi18n::getText('Wage Group'), NULL, $this->getTable(), $this );
-	}
+    public function addLog($log_action)
+    {
+        return TTLog::addEntry($this->getId(), $log_action, TTi18n::getText('Wage Group'), null, $this->getTable(), $this);
+    }
 }
-?>

@@ -31,7 +31,8 @@ require_once 'Payment/Process/Common.php';
  * @author Ian Eure <ieure@php.net>
  * @version @version@
  */
-class Payment_Process_Dummy extends Payment_Process_Common {
+class Payment_Process_Dummy extends Payment_Process_Common
+{
     /**
      * Default options for this class.
      *
@@ -39,13 +40,13 @@ class Payment_Process_Dummy extends Payment_Process_Common {
      * @type array
      * @see Payment_Process::setOptions()
      */
-    var $_defaultOptions = array(
+    public $_defaultOptions = array(
         'randomResult' => true,
         'returnCode' => PAYMENT_PROCESS_RESULT_APPROVED,
         'returnMessage' => "Dummy payment approved"
     );
 
-    var $_returnValues = array(
+    public $_returnValues = array(
         array(
             'code' => PAYMENT_PROCESS_RESULT_APPROVED,
             'message' => "Approved"
@@ -65,11 +66,11 @@ class Payment_Process_Dummy extends Payment_Process_Common {
      *
      * @return mixed  Payment_Process_Result instance or PEAR_Error
      */
-    function &process()
+    public function &process()
     {
         // Sanity check
         if (PEAR::isError($res = $this->validate())) {
-            return($res);
+            return ($res);
         }
 
         if ($this->_options['randomResult']) {
@@ -86,9 +87,9 @@ class Payment_Process_Dummy extends Payment_Process_Common {
     }
 }
 
-class Payment_Process_Result_Dummy extends Payment_Process_Result {
-    function Payment_Process_Result_Dummy()
+class Payment_Process_Result_Dummy extends Payment_Process_Result
+{
+    public function Payment_Process_Result_Dummy()
     {
     }
 }
-?>

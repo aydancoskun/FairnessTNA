@@ -32,7 +32,7 @@
  */
 
 /**
- * 
+ *
  */
 
 require("../../shared/barcode/barcode.php");
@@ -42,47 +42,60 @@ require("../../shared/barcode/c128aobject.php");
 require("../../shared/barcode/c128bobject.php");
 require("../../shared/barcode/c128cobject.php");
 
-if (!isset($_REQUEST['style'])) $_REQUEST['style'] = BCD_DEFAULT_STYLE;
-if (!isset($_REQUEST['width'])) $_REQUEST['width'] = BCD_DEFAULT_WIDTH;
-if (!isset($_REQUEST['height'])) $_REQUEST['height'] = BCD_DEFAULT_HEIGHT;
-if (!isset($_REQUEST['xres'])) $_REQUEST['xres'] = BCD_DEFAULT_XRES;
-if (!isset($_REQUEST['font'])) $_REQUEST['font'] = BCD_DEFAULT_FONT;
-if (!isset($_REQUEST['type'])) $_REQUEST['type'] = "C39";
-if (!isset($_REQUEST['code'])) $_REQUEST['code'] = "";
+if (!isset($_REQUEST['style'])) {
+    $_REQUEST['style'] = BCD_DEFAULT_STYLE;
+}
+if (!isset($_REQUEST['width'])) {
+    $_REQUEST['width'] = BCD_DEFAULT_WIDTH;
+}
+if (!isset($_REQUEST['height'])) {
+    $_REQUEST['height'] = BCD_DEFAULT_HEIGHT;
+}
+if (!isset($_REQUEST['xres'])) {
+    $_REQUEST['xres'] = BCD_DEFAULT_XRES;
+}
+if (!isset($_REQUEST['font'])) {
+    $_REQUEST['font'] = BCD_DEFAULT_FONT;
+}
+if (!isset($_REQUEST['type'])) {
+    $_REQUEST['type'] = "C39";
+}
+if (!isset($_REQUEST['code'])) {
+    $_REQUEST['code'] = "";
+}
 
 switch (strtoupper($_REQUEST['type'])) {
-	case "I25": {
-		$obj = new I25Object($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
-		break;
-	}
-	case "C128A": {
-		$obj = new C128AObject($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
-		break;
-	}
-	case "C128B": {
-		$obj = new C128BObject($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
-		break;
-	}
-	case "C128C": {
-		$obj = new C128CObject($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
-		break;
-	}
-	case "C39":
-	default: {
-		$obj = new C39Object($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
-		break;
-	}
+    case "I25": {
+        $obj = new I25Object($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
+        break;
+    }
+    case "C128A": {
+        $obj = new C128AObject($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
+        break;
+    }
+    case "C128B": {
+        $obj = new C128BObject($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
+        break;
+    }
+    case "C128C": {
+        $obj = new C128CObject($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
+        break;
+    }
+    case "C39":
+    default: {
+        $obj = new C39Object($_REQUEST['width'], $_REQUEST['height'], $_REQUEST['style'], $_REQUEST['code']);
+        break;
+    }
 }
 
 if ($obj) {
-	$obj->SetFont($_REQUEST['font']);   
-	$obj->DrawObject($_REQUEST['xres']);
-	$obj->FlushObject();
-	$obj->DestroyObject();
-	unset($obj);  /* clean */
+    $obj->SetFont($_REQUEST['font']);
+    $obj->DrawObject($_REQUEST['xres']);
+    $obj->FlushObject();
+    $obj->DestroyObject();
+    unset($obj);  /* clean */
 }
 
 //============================================================+
-// END OF FILE                                                 
-//============================================================+
-?>
+// END OF FILE
+//============================================================+;

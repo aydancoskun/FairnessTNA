@@ -23,7 +23,7 @@ require_once("HTML/QuickForm/element.php");
 
 /**
  * Base class for input form elements
- * 
+ *
  * @author       Adam Daniel <adaniel1@eesus.jnj.com>
  * @author       Bertrand Mansion <bmansion@mamasam.com>
  * @version      1.0
@@ -37,7 +37,7 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
 
     /**
      * Class constructor
-     * 
+     *
      * @param    string     Input field name attribute
      * @param    mixed      Label(s) for the input field
      * @param    mixed      Either a typical HTML attribute string or an associative array
@@ -45,7 +45,7 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_input($elementName=null, $elementLabel=null, $attributes=null)
+    public function HTML_QuickForm_input($elementName = null, $elementLabel = null, $attributes = null)
     {
         $this->HTML_QuickForm_element($elementName, $elementLabel, $attributes);
     } //end constructor
@@ -56,66 +56,50 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
     /**
      * Sets the element type
      *
-     * @param     string    $type   Element type
+     * @param     string $type Element type
      * @since     1.0
      * @access    public
      * @return    void
      */
-    static function setType($type)
+    public static function setType($type)
     {
         self::$_type = $type;
-        self::updateAttributes(array('type'=>$type));
+        self::updateAttributes(array('type' => $type));
     } // end func setType
-    
+
     // }}}
     // {{{ setName()
 
     /**
      * Sets the input field name
-     * 
-     * @param     string    $name   Input field name attribute
+     *
+     * @param     string $name Input field name attribute
      * @since     1.0
      * @access    public
      * @return    void
      */
-    static function setName($name)
+    public static function setName($name)
     {
-        self::updateAttributes(array('name'=>$name));
+        self::updateAttributes(array('name' => $name));
     } //end func setName
-    
+
     // }}}
     // {{{ getName()
 
     /**
      * Returns the element name
-     * 
+     *
      * @since     1.0
      * @access    public
      * @return    string
      */
-    static function getName()
+    public static function getName()
     {
         return self::getAttribute('name');
     } //end func getName
-    
+
     // }}}
     // {{{ setValue()
-
-    /**
-     * Sets the value of the form element
-     *
-     * @param     string    $value      Default value of the form element
-     * @since     1.0
-     * @access    public
-     * @return    void
-     */
-    static function setValue($value)
-    {
-        self::updateAttributes(array('value'=>$value));
-    } // end func setValue
-
-    // }}}
-    // {{{ getValue()
 
     /**
      * Returns the value of the form element
@@ -124,50 +108,51 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
      * @access    public
      * @return    string
      */
-    static function getValue()
+    public static function getValue()
     {
         return self::getAttribute('value');
-    } // end func getValue
-    
+    } // end func setValue
+
     // }}}
-    // {{{ toHtml()
+    // {{{ getValue()
 
     /**
      * Returns the input field in HTML
-     * 
+     *
      * @since     1.0
      * @access    public
      * @return    string
      */
-    static function toHtml()
+    public static function toHtml()
     {
         if (self::$_flagFrozen) {
             return self::getFrozenHtml();
         } else {
             return self::_getTabs() . '<input' . self::_getAttrString(self::$_attributes) . ' />';
         }
-    } //end func toHtml
+    } // end func getValue
 
     // }}}
-    // {{{ onQuickFormEvent()
+    // {{{ toHtml()
 
     /**
      * Called by HTML_QuickForm whenever form event is made on this element
      *
-     * @param     string    $event  Name of event
-     * @param     mixed     $arg    event arguments
-     * @param     object    $caller calling object
+     * @param     string $event Name of event
+     * @param     mixed $arg event arguments
+     * @param     object $caller calling object
      * @since     1.0
      * @access    public
      * @return    void
-     * @throws    
+     * @throws
      */
-    static function onQuickFormEvent($event, $arg, &$caller)
+    public static function onQuickFormEvent($event, $arg, &$caller)
     {
         // do not use submit values for button-type elements
         $type = self::getType();
         if (('updateValue' != $event) ||
-            ('submit' != $type && 'reset' != $type && 'image' != $type && 'button' != $type)) {
+            ('submit' != $type && 'reset' != $type && 'image' != $type && 'button' != $type)
+        ) {
             parent::onQuickFormEvent($event, $arg, $caller);
         } else {
             $value = self::_findValue($caller->_constantValues);
@@ -179,15 +164,31 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
             }
         }
         return true;
+    } //end func toHtml
+
+    // }}}
+    // {{{ onQuickFormEvent()
+
+    /**
+     * Sets the value of the form element
+     *
+     * @param     string $value Default value of the form element
+     * @since     1.0
+     * @access    public
+     * @return    void
+     */
+    public static function setValue($value)
+    {
+        self::updateAttributes(array('value' => $value));
     } // end func onQuickFormEvent
 
     // }}}
     // {{{ exportValue()
 
-   /**
-    * We don't need values from button-type elements (except submit) and files
-    */
-    static function exportValue(&$submitValues, $assoc = false)
+    /**
+     * We don't need values from button-type elements (except submit) and files
+     */
+    public static function exportValue(&$submitValues, $assoc = false)
     {
         $type = self::getType();
         if ('reset' == $type || 'image' == $type || 'button' == $type || 'file' == $type) {
@@ -196,7 +197,6 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
             return parent::exportValue($submitValues, $assoc);
         }
     }
-    
+
     // }}}
-} // end class HTML_QuickForm_element
-?>
+} // end class HTML_QuickForm_element;

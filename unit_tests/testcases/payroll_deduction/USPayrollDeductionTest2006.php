@@ -19,4063 +19,4217 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 /**
  * @group USPayrollDeductionTest2006
  */
-class USPayrollDeductionTest2006 extends PHPUnit_Framework_TestCase {
-	public $company_id = NULL;
+class USPayrollDeductionTest2006 extends PHPUnit_Framework_TestCase
+{
+    public $company_id = null;
 
-	public function setUp() {
-		Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
+    public function setUp()
+    {
+        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
 
-		require_once( Environment::getBasePath().'/classes/payroll_deduction/PayrollDeduction.class.php');
+        require_once(Environment::getBasePath() . '/classes/payroll_deduction/PayrollDeduction.class.php');
 
-		$this->company_id = PRIMARY_COMPANY_ID;
+        $this->company_id = PRIMARY_COMPANY_ID;
 
-		TTDate::setTimeZone('Etc/GMT+8'); //Force to non-DST timezone. 'PST' isnt actually valid.
+        TTDate::setTimeZone('Etc/GMT+8'); //Force to non-DST timezone. 'PST' isnt actually valid.
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	public function tearDown() {
-		Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
-		return TRUE;
-	}
+    public function tearDown()
+    {
+        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
+        return true;
+    }
 
-	public function mf($amount) {
-		return Misc::MoneyFormat($amount, FALSE);
-	}
+    public function testUS_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-	//
-	//
-	//
-	// 2006
-	//
-	//
-	//
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-	//
-	// US - Federal Taxes
-	//
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	function testUS_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    //
+    //
+    //
+    // 2006
+    //
+    //
+    //
 
-		//var_dump($pd_obj->getArray());
+    //
+    // US - Federal Taxes
+    //
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-	}
+    public function mf($amount)
+    {
+        return Misc::MoneyFormat($amount, false);
+    }
 
-	function testUS_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(20); //Married
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '56.54' ); //56.54
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '56.54'); //56.54
+    }
 
-	function testUS_2006a_BiWeekly_Married_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_BiWeekly_Married_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 3 );
+        $pd_obj->setFederalFilingStatus(20); //Married
+        $pd_obj->setFederalAllowance(3);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '31.15' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '31.15');
+    }
 
-	function testUS_2006a_SemiMonthly_Single_LowIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SemiMonthly_Single_LowIncome()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '97.50' ); //97.50
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '97.50'); //97.50
+    }
 
-	function testUS_2006a_SemiMonthly_Married_LowIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SemiMonthly_Married_LowIncome()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(20); //Married
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '52.92' ); //52.92
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '52.92'); //52.92
+    }
 
-	function testUS_2006a_SemiMonthly_Single_MedIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SemiMonthly_Single_MedIncome()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 2000.00 );
+        $pd_obj->setGrossPayPeriodIncome(2000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '2000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '299.42' ); //299.42
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '2000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '299.42'); //299.42
+    }
 
-	function testUS_2006a_SemiMonthly_Single_HighIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SemiMonthly_Single_HighIncome()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+    }
 
-	function testUS_2006a_SemiMonthly_Single_LowIncome_3Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SemiMonthly_Single_LowIncome_3Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 3 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(3);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '56.25' ); //56.25
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '56.25'); //56.25
+    }
 
-	function testUS_2006a_SemiMonthly_Single_LowIncome_5Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SemiMonthly_Single_LowIncome_5Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 5 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(5);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '20.21' ); //20.21
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '20.21'); //20.21
+    }
 
-	function testUS_2006a_SemiMonthly_Single_LowIncome_8AllowancesA() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SemiMonthly_Single_LowIncome_8AllowancesA()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(8);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '0.00' ); //0.00
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '0.00'); //0.00
+    }
 
-	function testUS_2006a_SemiMonthly_Single_LowIncome_8AllowancesB() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SemiMonthly_Single_LowIncome_8AllowancesB()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(8);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1300.00 );
+        $pd_obj->setGrossPayPeriodIncome(1300.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1300.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '8.96' ); //8.96
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1300.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '8.96'); //8.96
+    }
 
 
-	//
-	// US Social Security
-	//
-	function testUS_2006a_SocialSecurity() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    //
+    // US Social Security
+    //
+    public function testUS_2006a_SocialSecurity()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setYearToDateSocialSecurityContribution( 0 );
+        $pd_obj->setYearToDateSocialSecurityContribution(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getEmployeeSocialSecurity() ), '62.00' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getEmployeeSocialSecurity()), '62.00');
+    }
 
-	function testUS_2006a_SocialSecurity_Max() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_SocialSecurity_Max()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setYearToDateSocialSecurityContribution( 5839.40 ); //5840.40
+        $pd_obj->setYearToDateSocialSecurityContribution(5839.40); //5840.40
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getEmployeeSocialSecurity() ), '1.00' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getEmployeeSocialSecurity()), '1.00');
+    }
 
-	function testUS_2006a_Medicare() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_Medicare()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setYearToDateSocialSecurityContribution( 0 );
+        $pd_obj->setYearToDateSocialSecurityContribution(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getEmployeeMedicare() ), '14.50' );
-		$this->assertEquals( $this->mf( $pd_obj->getEmployerMedicare() ), '14.50' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getEmployeeMedicare()), '14.50');
+        $this->assertEquals($this->mf($pd_obj->getEmployerMedicare()), '14.50');
+    }
 
-	function testUS_2006a_FederalUI_NoState() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_FederalUI_NoState()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setYearToDateSocialSecurityContribution( 0 );
-		$pd_obj->setYearToDateFederalUIContribution( 0 );
+        $pd_obj->setYearToDateSocialSecurityContribution(0);
+        $pd_obj->setYearToDateFederalUIContribution(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalEmployerUI() ), '62.00' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalEmployerUI()), '62.00');
+    }
 
-	function testUS_2006a_FederalUI_NoState_Max() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_FederalUI_NoState_Max()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setStateUIRate( 0 );
-		$pd_obj->setStateUIWageBase( 0 );
+        $pd_obj->setStateUIRate(0);
+        $pd_obj->setStateUIWageBase(0);
 
-		$pd_obj->setYearToDateSocialSecurityContribution( 0 );
-		$pd_obj->setYearToDateFederalUIContribution( 433 ); //434
-		$pd_obj->setYearToDateStateUIContribution( 0 );
+        $pd_obj->setYearToDateSocialSecurityContribution(0);
+        $pd_obj->setYearToDateFederalUIContribution(433); //434
+        $pd_obj->setYearToDateStateUIContribution(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalEmployerUI() ), '1.00' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalEmployerUI()), '1.00');
+    }
 
-	function testUS_2006a_FederalUI_State_Max() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testUS_2006a_FederalUI_State_Max()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setStateUIRate( 3.51 );
-		$pd_obj->setStateUIWageBase( 11000 );
+        $pd_obj->setStateUIRate(3.51);
+        $pd_obj->setStateUIWageBase(11000);
 
-		$pd_obj->setYearToDateSocialSecurityContribution( 0 );
-		$pd_obj->setYearToDateFederalUIContribution( 187.30 ); //188.30
-		$pd_obj->setYearToDateStateUIContribution( 0 );
+        $pd_obj->setYearToDateSocialSecurityContribution(0);
+        $pd_obj->setYearToDateFederalUIContribution(187.30); //188.30
+        $pd_obj->setYearToDateStateUIContribution(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalEmployerUI() ), '1.00' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalEmployerUI()), '1.00');
+    }
 
-	//
-	// State Income Taxes
-	//
+    //
+    // State Income Taxes
+    //
 
-	//
-	// MO
-	//
-	function testMO_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    //
+    // MO
+    //
+    public function testMO_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '31.00' ); //31.00
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '31.00'); //31.00
+    }
 
-	function testMO_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testMO_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(20); //Married
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '56.54' ); //56.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '33.00' ); //33.00
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '56.54'); //56.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '33.00'); //33.00
+    }
 
-	function testMO_2006a_SemiMonthly_Single_LowIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testMO_2006a_SemiMonthly_Single_LowIncome()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '97.50' ); //97.50
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '29.00' ); //33.00
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '97.50'); //97.50
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '29.00'); //33.00
+    }
 
-	function testMO_2006a_SemiMonthly_Single_LowIncome_8AllowancesB() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testMO_2006a_SemiMonthly_Single_LowIncome_8AllowancesB()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(8);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1300.00 );
+        $pd_obj->setGrossPayPeriodIncome(1300.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1300.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '8.96' ); //8.96
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '31.00' ); //31.00
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1300.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '8.96'); //8.96
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '31.00'); //31.00
+    }
 
-	function testMO_2006a_SemiMonthly_Married_HighIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testMO_2006a_SemiMonthly_Married_HighIncome()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(20); //Married
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '601.08' ); //601.08
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '202.00' ); //202.00
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '601.08'); //601.08
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '202.00'); //202.00
+    }
 
-	function testMO_2006a_StateUI() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testMO_2006a_StateUI()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setStateUIRate( 3.51 );
-		$pd_obj->setStateUIWageBase( 11000 );
+        $pd_obj->setStateUIRate(3.51);
+        $pd_obj->setStateUIWageBase(11000);
 
-		$pd_obj->setYearToDateSocialSecurityContribution( 0 );
-		$pd_obj->setYearToDateFederalUIContribution( 0 );
-		$pd_obj->setYearToDateStateUIContribution( 0 );
+        $pd_obj->setYearToDateSocialSecurityContribution(0);
+        $pd_obj->setYearToDateFederalUIContribution(0);
+        $pd_obj->setYearToDateStateUIContribution(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalEmployerUI() ), '26.90' );
-		$this->assertEquals( $this->mf( $pd_obj->getStateEmployerUI() ), '35.10' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalEmployerUI()), '26.90');
+        $this->assertEquals($this->mf($pd_obj->getStateEmployerUI()), '35.10');
+    }
 
-	function testMO_2006a_StateUI_Max() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testMO_2006a_StateUI_Max()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'MO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setStateUIRate( 3.51 );
-		$pd_obj->setStateUIWageBase( 11000 );
+        $pd_obj->setStateUIRate(3.51);
+        $pd_obj->setStateUIWageBase(11000);
 
-		$pd_obj->setYearToDateSocialSecurityContribution( 0 );
-		$pd_obj->setYearToDateFederalUIContribution( 187.30 ); //188.30
-		$pd_obj->setYearToDateStateUIContribution( 385.10 ); //386.10
+        $pd_obj->setYearToDateSocialSecurityContribution(0);
+        $pd_obj->setYearToDateFederalUIContribution(187.30); //188.30
+        $pd_obj->setYearToDateStateUIContribution(385.10); //386.10
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalEmployerUI() ), '1.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getStateEmployerUI() ), '1.00' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalEmployerUI()), '1.00');
+        $this->assertEquals($this->mf($pd_obj->getStateEmployerUI()), '1.00');
+    }
 
-	//
-	// CA
-	//
-	function testCA_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    //
+    // CA
+    //
+    public function testCA_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'CA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'CA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '17.70' ); //17.70
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '17.70'); //17.70
+    }
 
-	function testCA_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testCA_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'CA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'CA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 30 ); //Married, one person working
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(30); //Married, one person working
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '9.29' ); //9.29
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '9.29'); //9.29
+    }
 
-	function testCA_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testCA_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'CA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'CA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 30 ); //Married, one person working
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setStateFilingStatus(30); //Married, one person working
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '148.52' ); //148.52
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '148.52'); //148.52
+    }
 
-	//
-	// NY
-	//
-	function testNY_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    //
+    // NY
+    //
+    public function testNY_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'NY');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'NY');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '33.71' ); //17.70
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '33.71'); //17.70
+    }
 
-	function testNY_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testNY_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'NY');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'NY');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '32.58' ); //29.54
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '32.58'); //29.54
+    }
 
-	function testNY_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testNY_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'NY');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'NY');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '213.29' ); //213.29
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '213.29'); //213.29
+    }
 
-	//
-	// NY - NYC
-	//
-	function testNY_NYC_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    //
+    // NY - NYC
+    //
+    public function testNY_NYC_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'NY', 'NYC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'NY', 'NYC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setDistrictFilingStatus( 10 ); //Single
-		$pd_obj->setDistrictAllowance( 1 );
+        $pd_obj->setDistrictFilingStatus(10); //Single
+        $pd_obj->setDistrictAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '33.71' ); //17.70
-		$this->assertEquals( $this->mf( $pd_obj->getDistrictPayPeriodDeductions() ), '21.19' ); //21.19
-	}
-	function testNY_NYC_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '33.71'); //17.70
+        $this->assertEquals($this->mf($pd_obj->getDistrictPayPeriodDeductions()), '21.19'); //21.19
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NY', 'NYC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testNY_NYC_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NY', 'NYC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setDistrictFilingStatus( 20 ); //Married
-		$pd_obj->setDistrictAllowance( 1 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setDistrictFilingStatus(20); //Married
+        $pd_obj->setDistrictAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '32.58' ); //29.54
-		$this->assertEquals( $this->mf( $pd_obj->getDistrictPayPeriodDeductions() ), '20.48' ); //20.48
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testNY_NYC_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '32.58'); //29.54
+        $this->assertEquals($this->mf($pd_obj->getDistrictPayPeriodDeductions()), '20.48'); //20.48
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NY', 'NYC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testNY_NYC_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NY', 'NYC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setDistrictFilingStatus( 20 ); //Married
-		$pd_obj->setDistrictAllowance( 8 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setDistrictFilingStatus(20); //Married
+        $pd_obj->setDistrictAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '213.29' ); //213.29
-		$this->assertEquals( $this->mf( $pd_obj->getDistrictPayPeriodDeductions() ), '125.04' ); //125.04
-	}
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-	//
-	// NY - Yonkers
-	//
-	function testNY_Yonkers_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '213.29'); //213.29
+        $this->assertEquals($this->mf($pd_obj->getDistrictPayPeriodDeductions()), '125.04'); //125.04
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NY', 'YONKERS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // NY - Yonkers
+    //
+    public function testNY_Yonkers_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NY', 'YONKERS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '33.71' ); //17.70
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testNY_Yonkers_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '33.71'); //17.70
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NY', 'YONKERS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testNY_Yonkers_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NY', 'YONKERS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '32.58' ); //29.54
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testNY_Yonkers_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '32.58'); //29.54
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NY', 'YONKERS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testNY_Yonkers_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NY', 'YONKERS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '213.29' ); //213.29
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// IL
-	//
-	function testIL_2006a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '213.29'); //213.29
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'IL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // IL
+    //
+    public function testIL_2006a_BiWeekly_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'IL');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setUserValue1(1); //Line 1 on form
-		$pd_obj->setUserValue2(1); //Line 2 on form
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setUserValue1(1); //Line 1 on form
+        $pd_obj->setUserValue2(1); //Line 2 on form
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '26.54' ); //26.54
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testIL_2006a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '26.54'); //26.54
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'IL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testIL_2006a_BiWeekly_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'IL');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setUserValue1(2); //Line 1 on form
-		$pd_obj->setUserValue2(3); //Line 2 on form
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setUserValue1(2); //Line 1 on form
+        $pd_obj->setUserValue2(3); //Line 2 on form
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '21.92' ); //21.92
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testIL_2006a_SemiMonthly_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '21.92'); //21.92
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'IL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Bi-Weekly
+    public function testIL_2006a_SemiMonthly_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'IL');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Bi-Weekly
 
-		$pd_obj->setUserValue1(2); //Line 1 on form
-		$pd_obj->setUserValue2(3); //Line 2 on form
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setUserValue1(2); //Line 1 on form
+        $pd_obj->setUserValue2(3); //Line 2 on form
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '111.25' ); //21.25
-	}
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-	//
-	// PA
-	//
-	function testPA_2006a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '111.25'); //21.25
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'PA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // PA
+    //
+    public function testPA_2006a_BiWeekly_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'PA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '30.70' ); //30.70
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// OH
-	//
-	function testOH_2006a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '30.70'); //30.70
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'OH');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // OH
+    //
+    public function testOH_2006a_BiWeekly_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'OH');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '27.40' ); //27.40
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testOH_2006a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '27.40'); //27.40
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'OH');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testOH_2006a_BiWeekly_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'OH');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 3 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(3);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '25.08' ); //25.08
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testOH_2006a_SemiMonthly_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '25.08'); //25.08
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'OH');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 );
+    public function testOH_2006a_SemiMonthly_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'OH');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24);
 
-		$pd_obj->setStateAllowance( 3 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(3);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '184.52' ); //184.52
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// MI
-	//
-	function testMI_2006a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '184.52'); //184.52
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'MI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // MI
+    //
+    public function testMI_2006a_BiWeekly_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'MI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '34.05' ); //34.05
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testMI_2006a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '34.05'); //34.05
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'MI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testMI_2006a_BiWeekly_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'MI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 3 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(3);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '24.15' ); //24.15
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// GA
-	//
-	function testGA_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '24.15'); //24.15
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'GA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // GA
+    //
+    public function testGA_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'GA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setUserValue2(1); //Employee/Spouse
-		$pd_obj->setUserValue3(1); //Dependant
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setUserValue2(1); //Employee/Spouse
+        $pd_obj->setUserValue3(1); //Dependant
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '34.23' ); //34.23
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testGA_2006a_BiWeekly_Single_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '34.23'); //34.23
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'GA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testGA_2006a_BiWeekly_Single_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'GA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setUserValue2(3); //Employee/Spouse
-		$pd_obj->setUserValue3(3); //Dependant
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setUserValue2(3); //Employee/Spouse
+        $pd_obj->setUserValue3(3); //Dependant
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '8.08' ); //8.08
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testGA_2006a_BiWeekly_Single_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '8.08'); //8.08
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'GA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 );
+    public function testGA_2006a_BiWeekly_Single_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'GA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setUserValue2(1); //Employee/Spouse
-		$pd_obj->setUserValue3(1); //Dependant
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setUserValue2(1); //Employee/Spouse
+        $pd_obj->setUserValue3(1); //Dependant
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '212.08' ); //212.08
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testGA_2006a_BiWeekly_MarriedSeparate_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73');
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '212.08'); //212.08
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'GA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testGA_2006a_BiWeekly_MarriedSeparate_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 );
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'GA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married Separately
-		$pd_obj->setUserValue2(1); //Employee/Spouse
-		$pd_obj->setUserValue3(1); //Dependant
+        $pd_obj->setFederalFilingStatus(10);
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married Separately
+        $pd_obj->setUserValue2(1); //Employee/Spouse
+        $pd_obj->setUserValue3(1); //Dependant
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '38.38' ); //38.38
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testGA_2006a_BiWeekly_MarriedOneIncome_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '38.38'); //38.38
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'GA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testGA_2006a_BiWeekly_MarriedOneIncome_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 );
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'GA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 30 ); //Married OneIncome
-		$pd_obj->setUserValue2(1); //Employee/Spouse
-		$pd_obj->setUserValue3(1); //Dependant
+        $pd_obj->setFederalFilingStatus(10);
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(30); //Married OneIncome
+        $pd_obj->setUserValue2(1); //Employee/Spouse
+        $pd_obj->setUserValue3(1); //Dependant
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '29.92' ); //29.92
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testGA_2006a_BiWeekly_MarriedTwoIncome_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '29.92'); //29.92
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'GA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testGA_2006a_BiWeekly_MarriedTwoIncome_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 );
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'GA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 40 ); //Married OneIncome
-		$pd_obj->setUserValue2(1); //Employee/Spouse
-		$pd_obj->setUserValue3(1); //Dependant
+        $pd_obj->setFederalFilingStatus(10);
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(40); //Married OneIncome
+        $pd_obj->setUserValue2(1); //Employee/Spouse
+        $pd_obj->setUserValue3(1); //Dependant
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '38.38' ); //38.38
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testGA_2006a_BiWeekly_Head_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '38.38'); //38.38
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'GA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testGA_2006a_BiWeekly_Head_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 );
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'GA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 50 ); //Head
-		$pd_obj->setUserValue2(1); //Employee/Spouse
-		$pd_obj->setUserValue3(1); //Dependant
+        $pd_obj->setFederalFilingStatus(10);
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(50); //Head
+        $pd_obj->setUserValue2(1); //Employee/Spouse
+        $pd_obj->setUserValue3(1); //Dependant
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '31.54' ); //31.54
-	}
+        //var_dump($pd_obj->getArray());
 
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '31.54'); //31.54
+    }
 
-	//
-	// NJ
-	//
 
-	function testNJ_2006a_BiWeekly_RateA_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    //
+    // NJ
+    //
 
-		$pd_obj = new PayrollDeduction('US', 'NJ');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testNJ_2006a_BiWeekly_RateA_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NJ');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Rate A
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Rate A
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '15.38' ); //15.38
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testNJ_2006a_BiWeekly_RateB_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '15.38'); //15.38
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NJ');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testNJ_2006a_BiWeekly_RateB_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NJ');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Rate B
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Rate B
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '15.38' ); //15.38
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testNJ_2006a_BiWeekly_RateC_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '15.38'); //15.38
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NJ');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testNJ_2006a_BiWeekly_RateC_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NJ');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 30 ); //Rate B
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(30); //Rate B
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '15.96' ); //15.38
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '15.96'); //15.38
+    }
 
-	function testNJ_2006a_SemiMonthly_RateA_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'NJ');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testNJ_2006a_SemiMonthly_RateA_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NJ');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Rate A
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Rate A
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '160.00' ); //160
-	}
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-	function testNJ_2006a_SemiMonthly_RateD_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '160.00'); //160
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NJ');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testNJ_2006a_SemiMonthly_RateD_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NJ');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 40 ); //Rate D
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(40); //Rate D
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '132.42' ); //132.42
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// NC
-	//
-	function testNC_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '132.42'); //132.42
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // NC
+    //
+    public function testNC_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '50.00' ); //50.00
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testNC_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '50.00'); //50.00
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testNC_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '51.00' ); //51.00
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testNC_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '51.00'); //51.00
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'NC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testNC_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '229.00' ); //229.00
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// VA
-	//
-	function testVA_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '229.00'); //229.00
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'VA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // VA
+    //
+    public function testVA_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'VA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setUserValue1( 1 ); //Allowance
-		$pd_obj->setUserValue2( 0 ); //Age65 allowance
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setUserValue1(1); //Allowance
+        $pd_obj->setUserValue2(0); //Age65 allowance
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '38.97' ); //38.97
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testVA_2006a_BiWeekly_BlindAllowance_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '38.97'); //38.97
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'VA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testVA_2006a_BiWeekly_BlindAllowance_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'VA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setUserValue1( 1 ); //Allowance
-		$pd_obj->setUserValue2( 2 ); //Age65 allowance
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setUserValue1(1); //Allowance
+        $pd_obj->setUserValue2(2); //Age65 allowance
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '35.43' ); //35.43
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testVA_2006a_SemiMonthly_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '35.43'); //35.43
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'VA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testVA_2006a_SemiMonthly_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'VA');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setUserValue1( 4 ); //Allowance
-		$pd_obj->setUserValue2( 4 ); //Age65 allowance
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setUserValue1(4); //Allowance
+        $pd_obj->setUserValue2(4); //Age65 allowance
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '195.79' ); //192.79
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// MA
-	//
-/*
-	function testMA_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '195.79'); //192.79
+    }
 
-		$pd_obj = new PayrollDeduction('US','MA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // MA
+    //
+    /*
+        function testMA_2006a_BiWeekly_Single_LowIncome() {
+            Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','MA');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    
+            $pd_obj->setFederalFilingStatus( 10 ); //Single
+            $pd_obj->setFederalAllowance( 1 );
+    
+            $pd_obj->setStateFilingStatus( 10 ); //Single
+            $pd_obj->setStateAllowance( 1 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '45.00' ); //45.00
+        }
+    
+        function testMA_2006a_BiWeekly_Head_LowIncome() {
+            Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','MA');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    
+            $pd_obj->setFederalFilingStatus( 20 ); //Married
+            $pd_obj->setFederalAllowance( 1 );
+    
+            $pd_obj->setStateFilingStatus( 20 ); //Head of Household
+            $pd_obj->setStateAllowance( 1 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '56.54' ); //56.54
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '40.72' ); //40.72
+        }
+    
+        function testMA_2006a_BiWeekly_Blind_LowIncome() {
+            Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','MA');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    
+            $pd_obj->setFederalFilingStatus( 20 ); //Married
+            $pd_obj->setFederalAllowance( 1 );
+    
+            $pd_obj->setStateFilingStatus( 30 ); //Blind
+            $pd_obj->setStateAllowance( 1 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '56.54' ); //56.54
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '40.51' ); //40.51
+        }
+    
+        function testMA_2006a_SemiMonthly_Single_HighIncome() {
+            Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','MA');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    
+            $pd_obj->setFederalFilingStatus( 20 ); //Married
+            $pd_obj->setFederalAllowance( 1 );
+    
+            $pd_obj->setStateFilingStatus( 10 ); //Regular
+            $pd_obj->setStateAllowance( 4 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '601.08' ); //601.08
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '183.94' ); //183.94
+        }
+    
+        function testMA_2006a_SemiMonthly_Blind_HighIncome() {
+            Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','MA');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    
+            $pd_obj->setFederalFilingStatus( 20 ); //Married
+            $pd_obj->setFederalAllowance( 1 );
+    
+            $pd_obj->setStateFilingStatus( 30 ); //Regular
+            $pd_obj->setStateAllowance( 4 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    
+            //var_dump($pd_obj->getArray());
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '601.08' ); //601.08
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '179.08' ); //179.08
+        }
+    */
+    //
+    // IN
+    //
+    public function testIN_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'IN');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setUserValue1(1); //Allowance
+        $pd_obj->setUserValue2(1); //Dependant Allowance
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '45.00' ); //45.00
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testMA_2006a_BiWeekly_Head_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US','MA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '30.73'); //30.73
+    }
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 1 );
 
-		$pd_obj->setStateFilingStatus( 20 ); //Head of Household
-		$pd_obj->setStateAllowance( 1 );
+    public function testIN_2006a_SemiMonthly_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'IN');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '56.54' ); //56.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '40.72' ); //40.72
-	}
+        $pd_obj->setUserValue1(4); //Allowance
+        $pd_obj->setUserValue2(4); //Dependant allowance
 
-	function testMA_2006a_BiWeekly_Blind_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj = new PayrollDeduction('US','MA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 1 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setStateFilingStatus( 30 ); //Blind
-		$pd_obj->setStateAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '121.83'); //121.83
+    }
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+    //
+    // IN - Counties
+    //
+    public function testIN_ALL_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj = new PayrollDeduction('US', 'IN', 'ALL');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '56.54' ); //56.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '40.51' ); //40.51
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	function testMA_2006a_SemiMonthly_Single_HighIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        $pd_obj->setUserValue1(1); //Allowance
+        $pd_obj->setUserValue2(1); //Dependant Allowance
+        $pd_obj->setUserValue3(1.25); //County Rate
 
-		$pd_obj = new PayrollDeduction('US','MA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Regular
-		$pd_obj->setStateAllowance( 4 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '30.73'); //30.73
+        $this->assertEquals($this->mf($pd_obj->getDistrictPayPeriodDeductions()), '11.30'); //11.30
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    //
+    // AZ
+    //
+    public function testAZ_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '601.08' ); //601.08
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '183.94' ); //183.94
-	}
+        $pd_obj = new PayrollDeduction('US', 'AZ');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-	function testMA_2006a_SemiMonthly_Blind_HighIncome() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US','MA');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj->setUserValue1(10); //Percent of Federal
 
-		$pd_obj->setFederalFilingStatus( 20 ); //Married
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setStateFilingStatus( 30 ); //Regular
-		$pd_obj->setStateAllowance( 4 );
+        $pd_obj->setGrossPayPeriodIncome(1250.00);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1250.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '139.04'); //139.04
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '125.00'); //13.90
+    }
 
-		//var_dump($pd_obj->getArray());
+    //
+    // MD
+    //
+    public function testMD_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '601.08' ); //601.08
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '179.08' ); //179.08
-	}
-*/
-	//
-	// IN
-	//
-	function testIN_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj = new PayrollDeduction('US', 'MD', 'ALL');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj = new PayrollDeduction('US', 'IN');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setUserValue1(7.68); //County Tax Percent - Allegany
+        $pd_obj->setUserValue2(1); //Allowances
 
-		$pd_obj->setUserValue1( 1 ); //Allowance
-		$pd_obj->setUserValue2( 1 ); //Dependant Allowance
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getDistrictPayPeriodDeductions()), '70.89'); //70.89
+    }
 
-		//var_dump($pd_obj->getArray());
+    public function testMD_2006a_SemiMonthly_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '30.73' ); //30.73
-	}
+        $pd_obj = new PayrollDeduction('US', 'MD', 'ALL');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	function testIN_2006a_SemiMonthly_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setUserValue1(7.37); //County Tax Percent - Dorchester
+        $pd_obj->setUserValue2(8); //Allowances
 
-		$pd_obj = new PayrollDeduction('US', 'IN');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setUserValue1( 4 ); //Allowance
-		$pd_obj->setUserValue2( 4 ); //Dependant allowance
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getDistrictPayPeriodDeductions()), '288.66'); //288.66
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    //
+    // WI
+    //
+    public function testWI_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj = new PayrollDeduction('US', 'WI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '121.83' ); //121.83
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	//
-	// IN - Counties
-	//
-	function testIN_ALL_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'IN', 'ALL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setUserValue1( 1 ); //Allowance
-		$pd_obj->setUserValue2( 1 ); //Dependant Allowance
-		$pd_obj->setUserValue3( 1.25 ); //County Rate
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '51.95'); //51.92
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    public function testWI_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj = new PayrollDeduction('US', 'WI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '30.73' ); //30.73
-		$this->assertEquals( $this->mf( $pd_obj->getDistrictPayPeriodDeductions() ), '11.30' ); //11.30
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	//
-	// AZ
-	//
-	function testAZ_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'AZ');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setUserValue1( 10 ); //Percent of Federal
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '49.11'); //49.08
+    }
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+    public function testWI_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setGrossPayPeriodIncome( 1250.00 );
+        $pd_obj = new PayrollDeduction('US', 'WI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1250.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '139.04' ); //139.04
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '125.00' ); //13.90
-	}
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-	//
-	// MD
-	//
-	function testMD_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj = new PayrollDeduction('US', 'MD', 'ALL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setUserValue1( 7.68 ); //County Tax Percent - Allegany
-		$pd_obj->setUserValue2( 1 ); //Allowances
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '245.28'); //245.25
+    }
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+    //
+    // MN
+    //
+    public function testMN_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj = new PayrollDeduction('US', 'MN');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getDistrictPayPeriodDeductions() ), '70.89' ); //70.89
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	function testMD_2006a_SemiMonthly_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'MD', 'ALL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setUserValue1( 7.37 ); //County Tax Percent - Dorchester
-		$pd_obj->setUserValue2( 8 ); //Allowances
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '43.13'); //43.13
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    public function testMN_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj = new PayrollDeduction('US', 'MN');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getDistrictPayPeriodDeductions() ), '288.66' ); //288.66
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	//
-	// WI
-	//
-	function testWI_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'WI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '34.05'); //34.05
+    }
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+    public function testMN_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj = new PayrollDeduction('US', 'MN');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '51.95' ); //51.92
-	}
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-	function testWI_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj = new PayrollDeduction('US', 'WI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '165.15'); //165.15
+    }
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+    //
+    // CO
+    //
+    public function testCO_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj = new PayrollDeduction('US', 'CO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '49.11' ); //49.08
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	function testWI_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'WI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '37.00'); //37.13
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    public function testCO_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj = new PayrollDeduction('US', 'CO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '245.28' ); //245.25
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	//
-	// MN
-	//
-	function testMN_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'MN');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '28.00'); //27.96
+    }
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+    public function testCO_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj = new PayrollDeduction('US', 'CO');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '43.13' ); //43.13
-	}
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-	function testMN_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj = new PayrollDeduction('US', 'MN');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '121.00'); //120.77
+    }
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+    //
+    // AL
+    //
+    /*
+        function testAL_2006a_BiWeekly_Single_LowIncome() {
+            Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','AL');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    
+            $pd_obj->setFederalFilingStatus( 10 ); //Single
+            $pd_obj->setFederalAllowance( 0 );
+    
+            $pd_obj->setStateFilingStatus( 10 ); // State "S"
+            $pd_obj->setUserValue2( 1 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 1000 );
+    
+            //var_dump($pd_obj->getArray());
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '120.58' ); //120.58
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '36.09' ); //36.09
+        }
+    
+        function testAL_2006a_BiWeekly_Single_MediumIncome() {
+            Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','AL');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 12 ); //Monthly
+            $pd_obj->setFederalFilingStatus( 10 ); //Single
+            $pd_obj->setFederalAllowance( 0 );
+    
+            $pd_obj->setStateFilingStatus( 10 ); //Single
+            $pd_obj->setUserValue2( 0 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 2083 );
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '2083.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '248.70' );
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '75.88' );
+        }
+    
+    
+        function testAL_2006a_BiWeekly_Married_LowIncome() {
+            Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','AL');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    
+            $pd_obj->setFederalFilingStatus( 10 ); //Single
+            $pd_obj->setFederalAllowance( 0 );
+    
+            $pd_obj->setStateFilingStatus( 20 ); //Married
+            $pd_obj->setUserValue2( 1 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '120.58' ); //120.58
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '28.78' ); //26.86
+        }
+    
+        function testAL_2006a_BiWeekly_Married_MediumIncome() {
+            Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','AL');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 12 ); //Monthly
+            $pd_obj->setFederalFilingStatus( 10 ); //Single
+            $pd_obj->setFederalAllowance( 0 );
+    
+            $pd_obj->setStateFilingStatus( 20 ); //Married
+            $pd_obj->setUserValue2( 0 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 2083 );
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '2083.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '248.70' );
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '60.05' );
+        }
+    
+        function testAL_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
+            Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','AL');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    
+            $pd_obj->setFederalFilingStatus( 10 ); //Single
+            $pd_obj->setFederalAllowance( 1 );
+    
+            $pd_obj->setStateFilingStatus( 20 ); //Married
+            $pd_obj->setUserValue2( 8 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    
+            //var_dump($pd_obj->getArray());
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '137.98' ); //135.90
+        }
+    */
+    //
+    // SC
+    //
+    public function testSC_2006a_BiWeekly_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj = new PayrollDeduction('US', 'SC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '34.05' ); //34.05
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	function testMN_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj = new PayrollDeduction('US', 'MN');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(346.00);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '346.00');
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '13.07'); //13.07
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    public function testSC_2006a_BiWeekly_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj = new PayrollDeduction('US', 'SC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '165.15' ); //165.15
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	//
-	// CO
-	//
-	function testCO_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj = new PayrollDeduction('US', 'CO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 1 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '58.46'); //58.46
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    public function testSC_2006a_SemiMonthly_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj = new PayrollDeduction('US', 'SC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '37.00' ); //37.13
-	}
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-	function testCO_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'CO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '253.21'); //253.21
+    }
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    //
+    // KY
+    //
+    public function testKY_2006a_BiWeekly_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '28.00' ); //27.96
-	}
+        $pd_obj = new PayrollDeduction('US', 'KY');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-	function testCO_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'CO');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setGrossPayPeriodIncome(346.00);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '346.00');
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '8.90'); //8.90
+    }
 
-		//var_dump($pd_obj->getArray());
+    public function testKY_2006a_BiWeekly_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '121.00' ); //120.77
-	}
+        $pd_obj = new PayrollDeduction('US', 'KY');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-	//
-	// AL
-	//
-/*
-	function testAL_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US','AL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setStateFilingStatus( 10 ); // State "S"
-		$pd_obj->setUserValue2( 1 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setGrossPayPeriodIncome( 1000 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '46.53'); //46.53
+    }
 
-		//var_dump($pd_obj->getArray());
+    public function testKY_2006a_SemiMonthly_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '120.58' ); //120.58
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '36.09' ); //36.09
-	}
+        $pd_obj = new PayrollDeduction('US', 'KY');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24);
 
-	function testAL_2006a_BiWeekly_Single_MediumIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US','AL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 12 ); //Monthly
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setUserValue2( 0 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 2083 );
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '2083.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '248.70' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '75.88' );
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '220.24'); //220.33
+    }
 
+    //
+    // OR
+    //
+    public function testOR_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-	function testAL_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        $pd_obj = new PayrollDeduction('US', 'OR');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj = new PayrollDeduction('US','AL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setUserValue2( 1 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '120.58' ); //120.58
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '28.78' ); //26.86
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '73.87'); //73.88
+    }
 
-	function testAL_2006a_BiWeekly_Married_MediumIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    public function testOR_2006a_BiWeekly_Single_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','AL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 12 ); //Monthly
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'OR');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setUserValue2( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(3); //Should switch to married tax tables.
 
-		$pd_obj->setGrossPayPeriodIncome( 2083 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '2083.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '248.70' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '60.05' );
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testAL_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US','AL');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '43.41'); //42.82
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testOR_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setUserValue2( 8 );
+        $pd_obj = new PayrollDeduction('US', 'OR');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '137.98' ); //135.90
-	}
-*/
-	//
-	// SC
-	//
-	function testSC_2006a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'SC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '55.25'); //55.05
+    }
 
-		$pd_obj->setStateAllowance( 0 );
+    public function testOR_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'OR');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setGrossPayPeriodIncome( 346.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '346.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '13.07' ); //13.07
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testSC_2006a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'SC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '270.46'); //266.91
+    }
 
-		$pd_obj->setStateAllowance( 0 );
+    //
+    // OK
+    //
+    public function testOK_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'OK');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '58.46' ); //58.46
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testSC_2006a_SemiMonthly_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'SC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '46.00'); //46.00
+    }
 
-		$pd_obj->setStateAllowance( 1 );
+    public function testOK_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'OK');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '253.21' ); //253.21
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	//
-	// KY
-	//
-	function testKY_2006a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'KY');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '31.00'); //31.00
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testOK_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'OK');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 346.00 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '346.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '8.90' ); //8.90
-	}
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-	function testKY_2006a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'KY');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '198.00'); //198.00
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    //
+    // CT
+    //
+    public function testCT_2006a_BiWeekly_StatusA_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(10); //"A"
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '46.53' ); //46.53
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testKY_2006a_SemiMonthly_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'KY');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '20.08'); //20.08
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testCT_2006a_BiWeekly_StatusB_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setStateFilingStatus(20); //"B"
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '220.24' ); //220.33
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	//
-	// OR
-	//
-	function testOR_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'OR');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '3.63'); //3.63
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testCT_2006a_BiWeekly_StatusC_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(30); //"C"
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '73.87' ); //73.88
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testOR_2006a_BiWeekly_Single_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'OR');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '0.58'); //0.58
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testCT_2006a_BiWeekly_StatusD_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 3 ); //Should switch to married tax tables.
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(40); //"D"
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '43.41' ); //42.82
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testOR_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'OR');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '42.31'); //42.31
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testCT_2006a_BiWeekly_StatusE_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(50); //"E"
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '55.25' ); //55.05
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testOR_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'OR');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '0.00'); //0.00
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testCT_2006a_BiWeekly_StatusF_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setStateFilingStatus(60); //"F"
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '270.46' ); //266.91
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	//
-	// OK
-	//
-	function testOK_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'OK');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '16.96'); //16.75
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testCT_2006a_BiWeekly_StatusA_MedIncomeA()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(10); //"A"
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '46.00' ); //46.00
-	}
+        $pd_obj->setGrossPayPeriodIncome(1500.00);
 
-	function testOK_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'OK');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1500.00');
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '60.00'); //60.00
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testCT_2006a_BiWeekly_StatusA_MedIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(10); //"A"
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '31.00' ); //31.00
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testOK_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(2000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'OK');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '2000.00');
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '82.50'); //82.50
+    }
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+    public function testCT_2006a_BiWeekly_StatusA_MedIncomeC()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(10); //"A"
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '198.00' ); //198.00
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	//
-	// CT
-	//
-	function testCT_2006a_BiWeekly_StatusA_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(2500.00);
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '2500.00');
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '116.67'); //116.67
+    }
 
-		$pd_obj->setStateFilingStatus( 10 ); //"A"
+    public function testCT_2006a_BiWeekly_StatusA_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'CT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(10); //"A"
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '20.08' ); //20.08
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testCT_2006a_BiWeekly_StatusB_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '191.67'); //191.67
+    }
 
-		$pd_obj->setStateFilingStatus( 20 ); //"B"
+    //
+    // IA
+    //
+    public function testIA_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'IA');
+        $pd_obj->setDate(strtotime('02-Apr-06')); //02-Apr-06 as rates changed on the 1st.
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateAllowance(0);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '3.63' ); //3.63
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testCT_2006a_BiWeekly_StatusC_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '38.09'); //38.09
+    }
 
-		$pd_obj->setStateFilingStatus( 30 ); //"C"
+    public function testIA_2006a_BiWeekly_Single_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'IA');
+        $pd_obj->setDate(strtotime('02-Apr-06')); //02-Apr-06 as rates changed on the 1st.
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '0.58' ); //0.58
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testCT_2006a_BiWeekly_StatusD_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '36.55'); //36.55
+    }
 
-		$pd_obj->setStateFilingStatus( 40 ); //"D"
+    public function testIA_2006a_BiWeekly_Single_LowIncomeC()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'IA');
+        $pd_obj->setDate(strtotime('02-Apr-06')); //02-Apr-06 as rates changed on the 1st.
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateAllowance(2);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '42.31' ); //42.31
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testCT_2006a_BiWeekly_StatusE_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '29.03'); //29.03
+    }
 
-		$pd_obj->setStateFilingStatus( 50 ); //"E"
+    public function testIA_2006a_BiWeekly_Single_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'IA');
+        $pd_obj->setDate(strtotime('02-Apr-06')); //02-Apr-06 as rates changed on the 1st.
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateAllowance(2);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '0.00' ); //0.00
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testCT_2006a_BiWeekly_StatusF_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '201.85'); //201.85
+    }
 
-		$pd_obj->setStateFilingStatus( 60 ); //"F"
+    //
+    // MS
+    //
+    public function testMS_2006a_BiWeekly_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'MS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '16.96' ); //16.75
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testCT_2006a_BiWeekly_StatusA_MedIncomeA() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '39.81'); //39.81
+    }
 
-		$pd_obj->setStateFilingStatus( 10 ); //"A"
+    public function testMS_2006a_BiWeekly_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'MS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 1500.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(30); //Married - Spouse doesn't work
+        $pd_obj->setStateAllowance(0);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1500.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '60.00' ); //60.00
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testCT_2006a_BiWeekly_StatusA_MedIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '35.38'); //35.38
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testMS_2006a_BiWeekly_LowIncomeC()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 10 ); //"A"
+        $pd_obj = new PayrollDeduction('US', 'MS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 2000.00 );
+        $pd_obj->setStateFilingStatus(40); //HoH
+        $pd_obj->setStateAllowance(0);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '2000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '82.50' ); //82.50
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testCT_2006a_BiWeekly_StatusA_MedIncomeC() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '37.69'); //37.69
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testMS_2006a_SemiMonthly_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'MS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24);
 
-		$pd_obj->setStateFilingStatus( 10 ); //"A"
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(6000);
 
-		$pd_obj->setGrossPayPeriodIncome( 2500.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '2500.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '116.67' ); //116.67
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testCT_2006a_BiWeekly_StatusA_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '176.46'); //176.46
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'CT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    //
+    // AR
+    //
+    public function testAR_2006a_BiWeekly_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'AR');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 10 ); //"A"
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '191.67' ); //191.67
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// IA
-	//
-	function testIA_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '39.23'); //39.23
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'IA');
-		$pd_obj->setDate(strtotime('02-Apr-06')); //02-Apr-06 as rates changed on the 1st.
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testAR_2006a_BiWeekly_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'AR');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(3);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '38.09' ); //38.09
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testIA_2006a_BiWeekly_Single_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '36.92'); //36.92
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'IA');
-		$pd_obj->setDate(strtotime('02-Apr-06')); //02-Apr-06 as rates changed on the 1st.
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testAR_2006a_BiWeekly_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'AR');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Month
 
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(3);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '36.55' ); //36.55
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testIA_2006a_BiWeekly_Single_LowIncomeC() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '243.75'); //243.75
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'IA');
-		$pd_obj->setDate(strtotime('02-Apr-06')); //02-Apr-06 as rates changed on the 1st.
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // KS
+    //
+    public function testKS_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'KS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 2 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '29.03' ); //29.03
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testIA_2006a_BiWeekly_Single_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '39.42'); //39.42
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'IA');
-		$pd_obj->setDate(strtotime('02-Apr-06')); //02-Apr-06 as rates changed on the 1st.
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testKS_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'KS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 2 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '201.85' ); //201.85
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '23.89'); //23.89
+    }
 
-	//
-	// MS
-	//
-	function testMS_2006a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testKS_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'KS');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '39.81' ); //39.81
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '154.13'); //154.13
+    }
 
-	function testMS_2006a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    //
+    // NM
+    //
+    public function testNM_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'MS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'NM');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 30 ); //Married - Spouse doesn't work
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '35.38' ); //35.38
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testMS_2006a_BiWeekly_LowIncomeC() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '36.12'); //36.12
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'MS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testNM_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NM');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 40 ); //HoH
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '37.69' ); //37.69
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testMS_2006a_SemiMonthly_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '14.83'); //14.71
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'MS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 );
+    public function testNM_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'NM');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 6000 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '176.46' ); //176.46
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// AR
-	//
-	function testAR_2006a_BiWeekly_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '118.24'); //116.47
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'AR');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // WV
+    //
+    public function testWV_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'WV');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '39.23' ); //39.23
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testAR_2006a_BiWeekly_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '36.00'); //36.00
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'AR');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testWV_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'WV');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateAllowance( 3 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Two Earners
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '36.92' ); //36.92
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '36.00'); //36.00
+    }
 
-	function testAR_2006a_BiWeekly_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testWV_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'AR');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Month
+        $pd_obj = new PayrollDeduction('US', 'WV');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateAllowance( 3 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '243.75' ); //243.75
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '189.00'); //189
+    }
 
-	//
-	// KS
-	//
-	function testKS_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    //
+    // NE
+    //
+    public function testNE_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'KS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj = new PayrollDeduction('US', 'NE');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '39.42' ); //39.42
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '39.97'); //39.97
+    }
+    /*
+        function testNE_2006a_BiWeekly_Married_LowIncome() {
+            Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','NE');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    
+            $pd_obj->setFederalFilingStatus( 10 ); //Single
+            $pd_obj->setFederalAllowance( 1 );
+    
+            $pd_obj->setStateFilingStatus( 20 ); //Married
+            $pd_obj->setStateAllowance( 1 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 1000.00 );
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '26.08' ); //26.08
+        }
+    
+        function testNE_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
+            Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    
+            $pd_obj = new PayrollDeduction('US','NE');
+            $pd_obj->setDate(strtotime('01-Jan-06'));
+            $pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    
+            $pd_obj->setFederalFilingStatus( 10 ); //Single
+            $pd_obj->setFederalAllowance( 1 );
+    
+            $pd_obj->setStateFilingStatus( 20 ); //Married
+            $pd_obj->setStateAllowance( 8 );
+    
+            $pd_obj->setFederalTaxExempt( FALSE );
+            $pd_obj->setProvincialTaxExempt( FALSE );
+    
+            $pd_obj->setGrossPayPeriodIncome( 4000.00 );
+    
+            //var_dump($pd_obj->getArray());
+    
+            $this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
+            $this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
+            $this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '195.77' ); //195.77
+        }
+    */
+    //
+    // ID
+    //
+    public function testID_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-	function testKS_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj = new PayrollDeduction('US', 'ID');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj = new PayrollDeduction('US', 'KS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '23.89' ); //23.89
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '61.00'); //61.00
+    }
 
-	function testKS_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testID_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'KS');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'ID');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '30.00'); //30.00
+    }
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '154.13' ); //154.13
-	}
+    public function testID_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-	//
-	// NM
-	//
-	function testNM_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj = new PayrollDeduction('US', 'ID');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj = new PayrollDeduction('US', 'NM');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        //var_dump($pd_obj->getArray());
 
-		//var_dump($pd_obj->getArray());
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '182.00'); //182.00
+    }
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '36.12' ); //36.12
-	}
+    //
+    // ME
+    //
+    public function testME_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-	function testNM_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj = new PayrollDeduction('US', 'ME');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj = new PayrollDeduction('US', 'NM');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '14.83' ); //14.71
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '54.00'); //54.00
+    }
 
-	function testNM_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+    public function testME_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US', 'NM');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'ME');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '21.00'); //21.00
+    }
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '118.24' ); //116.47
-	}
+    public function testME_2006a_BiWeekly_Married_LowIncomeB()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-	//
-	// WV
-	//
-	function testWV_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj = new PayrollDeduction('US', 'ME');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj = new PayrollDeduction('US', 'WV');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setStateFilingStatus(30); //Married - Two incomes
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '43.00'); //43.00
+    }
 
-		//var_dump($pd_obj->getArray());
+    public function testME_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '36.00' ); //36.00
-	}
+        $pd_obj = new PayrollDeduction('US', 'ME');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-	function testWV_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj = new PayrollDeduction('US', 'WV');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Two Earners
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '188.00'); //188.00
+    }
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '36.00' ); //36.00
-	}
+    //
+    // HI
+    //
+    public function testHI_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-	function testWV_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj = new PayrollDeduction('US', 'HI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj = new PayrollDeduction('US', 'WV');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        //var_dump($pd_obj->getArray());
 
-		//var_dump($pd_obj->getArray());
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '60.92'); //60.92
+    }
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '189.00' ); //189
-	}
+    public function testHI_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-	//
-	// NE
-	//
-	function testNE_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj = new PayrollDeduction('US', 'HI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj = new PayrollDeduction('US', 'NE');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '46.20'); //46.20
+    }
 
-		//var_dump($pd_obj->getArray());
+    public function testHI_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '39.97' ); //39.97
-	}
-/*
-	function testNE_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+        $pd_obj = new PayrollDeduction('US', 'HI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj = new PayrollDeduction('US','NE');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '26.08' ); //26.08
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '244.99'); //244.99
+    }
 
-	function testNE_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__,10);
+    //
+    // RI
+    //
+    public function testRI_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj = new PayrollDeduction('US','NE');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $pd_obj = new PayrollDeduction('US', 'RI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		//var_dump($pd_obj->getArray());
+        //var_dump($pd_obj->getArray());
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '195.77' ); //195.77
-	}
-*/
-	//
-	// ID
-	//
-	function testID_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '33.68'); //33.68
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'ID');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testRI_2006a_BiWeekly_Single_HighIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'RI');
+        $pd_obj->setDate(strtotime('01-Jul-06'));
+        $pd_obj->setAnnualPayPeriods(12); //Monthly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(0);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(5833.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '61.00' ); //61.00
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testID_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '5833');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '1125.83');
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '312.71');
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'ID');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testRI_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'RI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '30.00' ); //30.00
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testID_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '23.58'); //23.58
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'ID');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+    public function testRI_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'RI');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '182.00' ); //182.00
-	}
+        //var_dump($pd_obj->getArray());
 
-	//
-	// ME
-	//
-	function testME_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '121.11'); //121.11
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'ME');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    //
+    // MT
+    //
+    public function testMT_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'MT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(0);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '54.00' ); //54.00
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testME_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '44.00'); //44.00
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'ME');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testMT_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'MT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '21.00' ); //21.00
-	}
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-	function testME_2006a_BiWeekly_Married_LowIncomeB() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'ME');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '184.00'); //184.00
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    //
+    // DE
+    //
+    public function testDE_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 30 ); //Married - Two incomes
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'DE');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '43.00' ); //43.00
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testME_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'ME');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '34.00'); //34.00
+    }
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+    public function testDE_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'DE');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '188.00' ); //188.00
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	//
-	// HI
-	//
-	function testHI_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'HI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '23.35'); //23.35
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testDE_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'DE');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(30); //Married - Separately
+        $pd_obj->setStateAllowance(8);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '60.92' ); //60.92
-	}
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-	function testHI_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'HI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '167.17'); //167.17
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    //
+    // ND
+    //
+    public function testND_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'ND');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '46.20' ); //46.20
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testHI_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'HI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '18.17'); //18.17
+    }
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+    public function testND_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj = new PayrollDeduction('US', 'ND');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '244.99' ); //244.99
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	//
-	// RI
-	//
-	function testRI_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'RI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '11.47'); //11.47
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testND_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'ND');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '33.68' ); //33.68
-	}
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-	function testRI_2006a_BiWeekly_Single_HighIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'RI');
-		$pd_obj->setDate(strtotime('01-Jul-06'));
-		$pd_obj->setAnnualPayPeriods( 12 ); //Monthly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '62.34'); //62.34
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 0 );
+    //
+    // VT
+    //
+    public function testVT_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'VT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 5833.00 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '5833' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '1125.83' );
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '312.71' );
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testRI_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'RI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '32.33'); //32.33
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testVT_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'VT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(1);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '23.58' ); //23.58
-	}
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-	function testRI_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-		$pd_obj = new PayrollDeduction('US', 'RI');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '20.35'); //20.35
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testVT_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj = new PayrollDeduction('US', 'VT');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setStateFilingStatus(20); //Married
+        $pd_obj->setStateAllowance(8);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '121.11' ); //121.11
-	}
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-	//
-	// MT
-	//
-	function testMT_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'MT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '111.60'); //111.60
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    //
+    // DC
+    //
+    public function testDC_2006a_BiWeekly_Single_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj = new PayrollDeduction('US', 'DC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setStateFilingStatus(10); //Single
+        $pd_obj->setStateAllowance(0);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '44.00' ); //44.00
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	function testMT_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        //var_dump($pd_obj->getArray());
 
-		$pd_obj = new PayrollDeduction('US', 'MT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '56.06'); //56.06
+    }
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+    public function testDC_2006a_BiWeekly_Married_LowIncome()
+    {
+        Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setStateAllowance( 8 );
+        $pd_obj = new PayrollDeduction('US', 'DC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(26); //Bi-Weekly
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
+        $pd_obj->setStateFilingStatus(30); //Married - Separately
+        $pd_obj->setStateAllowance(1);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '184.00' ); //184.00
-	}
+        $pd_obj->setGrossPayPeriodIncome(1000.00);
 
-	//
-	// DE
-	//
-	function testDE_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '1000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '101.54'); //101.54
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '54.18'); //54.18
+    }
 
-		$pd_obj = new PayrollDeduction('US', 'DE');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
+    public function testDC_2006a_SemiMonthly_Married_HighIncome_8Allowances()
+    {
+        Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
 
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
+        $pd_obj = new PayrollDeduction('US', 'DC');
+        $pd_obj->setDate(strtotime('01-Jan-06'));
+        $pd_obj->setAnnualPayPeriods(24); //Semi-Monthly
 
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
+        $pd_obj->setFederalFilingStatus(10); //Single
+        $pd_obj->setFederalAllowance(1);
 
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
+        $pd_obj->setStateFilingStatus(30); //Married - Separately
+        $pd_obj->setStateAllowance(8);
 
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
+        $pd_obj->setFederalTaxExempt(false);
+        $pd_obj->setProvincialTaxExempt(false);
 
-		//var_dump($pd_obj->getArray());
+        $pd_obj->setGrossPayPeriodIncome(4000.00);
 
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '34.00' ); //34.00
-	}
+        //var_dump($pd_obj->getArray());
 
-	function testDE_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'DE');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '23.35' ); //23.35
-	}
-
-	function testDE_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'DE');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 30 ); //Married - Separately
-		$pd_obj->setStateAllowance( 8 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
-
-		//var_dump($pd_obj->getArray());
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '167.17' ); //167.17
-	}
-
-	//
-	// ND
-	//
-	function testND_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'ND');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
-
-		//var_dump($pd_obj->getArray());
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '18.17' ); //18.17
-	}
-
-	function testND_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'ND');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '11.47' ); //11.47
-	}
-
-	function testND_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'ND');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
-
-		//var_dump($pd_obj->getArray());
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '62.34' ); //62.34
-	}
-
-	//
-	// VT
-	//
-	function testVT_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'VT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
-
-		//var_dump($pd_obj->getArray());
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '32.33' ); //32.33
-	}
-
-	function testVT_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'VT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 1 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '20.35' ); //20.35
-	}
-
-	function testVT_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'VT');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 20 ); //Married
-		$pd_obj->setStateAllowance( 8 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
-
-		//var_dump($pd_obj->getArray());
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '111.60' ); //111.60
-	}
-
-	//
-	// DC
-	//
-	function testDC_2006a_BiWeekly_Single_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'DC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 10 ); //Single
-		$pd_obj->setStateAllowance( 0 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
-
-		//var_dump($pd_obj->getArray());
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '56.06' ); //56.06
-	}
-
-	function testDC_2006a_BiWeekly_Married_LowIncome() {
-		Debug::text('US - BiWeekly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'DC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 26 ); //Bi-Weekly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 30 ); //Married - Separately
-		$pd_obj->setStateAllowance( 1 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 1000.00 );
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '1000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '101.54' ); //101.54
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '54.18' ); //54.18
-	}
-
-	function testDC_2006a_SemiMonthly_Married_HighIncome_8Allowances() {
-		Debug::text('US - SemiMonthly - Beginning of 2006 01-Jan-06: ', __FILE__, __LINE__, __METHOD__, 10);
-
-		$pd_obj = new PayrollDeduction('US', 'DC');
-		$pd_obj->setDate(strtotime('01-Jan-06'));
-		$pd_obj->setAnnualPayPeriods( 24 ); //Semi-Monthly
-
-		$pd_obj->setFederalFilingStatus( 10 ); //Single
-		$pd_obj->setFederalAllowance( 1 );
-
-		$pd_obj->setStateFilingStatus( 30 ); //Married - Separately
-		$pd_obj->setStateAllowance( 8 );
-
-		$pd_obj->setFederalTaxExempt( FALSE );
-		$pd_obj->setProvincialTaxExempt( FALSE );
-
-		$pd_obj->setGrossPayPeriodIncome( 4000.00 );
-
-		//var_dump($pd_obj->getArray());
-
-		$this->assertEquals( $this->mf( $pd_obj->getGrossPayPeriodIncome() ), '4000.00' );
-		$this->assertEquals( $this->mf( $pd_obj->getFederalPayPeriodDeductions() ), '823.73' ); //823.73
-		$this->assertEquals( $this->mf( $pd_obj->getStatePayPeriodDeductions() ), '263.41' ); //263.41
-	}
+        $this->assertEquals($this->mf($pd_obj->getGrossPayPeriodIncome()), '4000.00');
+        $this->assertEquals($this->mf($pd_obj->getFederalPayPeriodDeductions()), '823.73'); //823.73
+        $this->assertEquals($this->mf($pd_obj->getStatePayPeriodDeductions()), '263.41'); //263.41
+    }
 }
-?>

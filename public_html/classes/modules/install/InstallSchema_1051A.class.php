@@ -19,33 +19,34 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1051A extends InstallSchema_Base {
+class InstallSchema_1051A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        if (strncmp($this->db->databaseType, 'mysql', 5) == 0) {
+            $this->db->GenID('schedule_id_seq'); //Make sure the sequence exists so it can be updated.
+        }
 
-		if ( strncmp($this->db->databaseType, 'mysql', 5) == 0 ) {
-			$this->db->GenID( 'schedule_id_seq' ); //Make sure the sequence exists so it can be updated.
-		}
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        //Assume any company that already exists is already setup.
+        $cf = new CompanyFactory();
+        $query = 'update ' . $cf->getTable() . ' set is_setup_complete = 1';
+        $this->db->Execute($query);
 
-		//Assume any company that already exists is already setup.
-		$cf = new CompanyFactory();
-		$query = 'update '. $cf->getTable() .' set is_setup_complete = 1';
-		$this->db->Execute( $query );
-
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

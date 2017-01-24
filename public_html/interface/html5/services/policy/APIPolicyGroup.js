@@ -1,52 +1,52 @@
-var APIPolicyGroup = ServiceCaller.extend( {
+var APIPolicyGroup = ServiceCaller.extend({
 
-	key_name: 'PolicyGroup',
-	className: 'APIPolicyGroup',
+    key_name: 'PolicyGroup',
+    className: 'APIPolicyGroup',
 
-	getPolicyGroupDefaultData: function() {
+    getPolicyGroupDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPolicyGroupDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPolicyGroupDefaultData', arguments);
 
-	},
+    },
 
-	getPolicyGroup: function() {
+    getPolicyGroup: function () {
 
-		return this.argumentsHandler( this.className, 'getPolicyGroup', arguments );
+        return this.argumentsHandler(this.className, 'getPolicyGroup', arguments);
 
-	},
+    },
 
-	getCommonPolicyGroupData: function() {
+    getCommonPolicyGroupData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPolicyGroupData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPolicyGroupData', arguments);
 
-	},
+    },
 
-	validatePolicyGroup: function() {
+    validatePolicyGroup: function () {
 
-		return this.argumentsHandler( this.className, 'validatePolicyGroup', arguments );
+        return this.argumentsHandler(this.className, 'validatePolicyGroup', arguments);
 
-	},
+    },
 
-	setPolicyGroup: function() {
+    setPolicyGroup: function () {
 
-		return this.argumentsHandler( this.className, 'setPolicyGroup', arguments );
+        return this.argumentsHandler(this.className, 'setPolicyGroup', arguments);
 
-	},
+    },
 
-	deletePolicyGroup: function() {
+    deletePolicyGroup: function () {
 
-		return this.argumentsHandler( this.className, 'deletePolicyGroup', arguments );
+        return this.argumentsHandler(this.className, 'deletePolicyGroup', arguments);
 
-	},
+    },
 
-	copyPolicyGroup: function() {
+    copyPolicyGroup: function () {
 
-		return this.argumentsHandler( this.className, 'copyPolicyGroup', arguments );
+        return this.argumentsHandler(this.className, 'copyPolicyGroup', arguments);
 
-	},
+    },
 
-	exportPolicyGroup: function() {
-		return this.argumentsHandler( this.className, 'exportPolicyGroup', arguments );
-	}
+    exportPolicyGroup: function () {
+        return this.argumentsHandler(this.className, 'exportPolicyGroup', arguments);
+    }
 
-} );
+});

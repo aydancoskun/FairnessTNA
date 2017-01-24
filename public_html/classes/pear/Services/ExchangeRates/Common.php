@@ -28,8 +28,8 @@
 /**
  * Cache_Lite is needed to cache the feeds
  */
-if ( !class_exists('Cache_Lite') ) {
-	require_once 'Cache/Lite.php';
+if (!class_exists('Cache_Lite')) {
+    require_once 'Cache/Lite.php';
 }
 
 /**
@@ -40,26 +40,48 @@ if ( !class_exists('Cache_Lite') ) {
  *
  * @package Services_ExchangeRates
  */
-class Services_ExchangeRates_Common {
+class Services_ExchangeRates_Common
+{
 
-   /**
-    * Retrieves data from cache, if it's there.  If it is, but it's expired,
-    * it performs a conditional GET to see if the data is updated.  If it
-    * isn't, it down updates the modification time of the cache file and
-    * returns the data.  If the cache is not there, or the remote file has been
-    * modified, it is downloaded and cached.
-    *
-    * @param string URL of remote file to retrieve
-    * @param int Length of time to cache file locally before asking the server
-    *            if it changed.
-    * @return string File contents
-    */
-    function retrieveFile($url, $cacheLength, $cacheDir) {
+    /**
+     * Downloads XML file or returns it from cache
+     *
+     * @param string URL of XML file
+     * @param int Length of time to cache
+     * @return object XML_Tree object
+     */
+    public function retrieveXML($url, $cacheLength, $cacheDir)
+    {
+        include_once 'XML/Tree.php';
 
+        if ($data = $this->retrieveFile($url, $cacheLength, $cacheDir)) {
+            $tree = new XML_Tree();
+            $root = $tree->getTreeFromString($data);
+
+            return $root;
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieves data from cache, if it's there.  If it is, but it's expired,
+     * it performs a conditional GET to see if the data is updated.  If it
+     * isn't, it down updates the modification time of the cache file and
+     * returns the data.  If the cache is not there, or the remote file has been
+     * modified, it is downloaded and cached.
+     *
+     * @param string URL of remote file to retrieve
+     * @param int Length of time to cache file locally before asking the server
+     *            if it changed.
+     * @return string File contents
+     */
+    public function retrieveFile($url, $cacheLength, $cacheDir)
+    {
         $cacheID = md5($url);
 
         $cache = new Cache_Lite(array("cacheDir" => $cacheDir,
-                                      "lifeTime" => $cacheLength));
+            "lifeTime" => $cacheLength));
 
         if ($data = $cache->get($cacheID)) {
             return $data;
@@ -73,9 +95,9 @@ class Services_ExchangeRates_Common {
             // if $cache->get($cacheID) found the file, but it was expired,
             // $cache->_file will exist
             if (isset($cache->_file) && file_exists($cache->_file)) {
-                $req->addHeader('If-Modified-Since', gmdate("D, d M Y H:i:s", filemtime($cache->_file)) ." GMT");
+                $req->addHeader('If-Modified-Since', gmdate("D, d M Y H:i:s", filemtime($cache->_file)) . " GMT");
             }
-			$req->addHeader('User-Agent', 'Firefox (WindowsXP) – Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6');
+            $req->addHeader('User-Agent', 'Firefox (WindowsXP) – Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6');
 
             $req->sendRequest();
 
@@ -94,30 +116,5 @@ class Services_ExchangeRates_Common {
 
         Services_ExchangeRates::raiseError("Unable to retrieve file ${url} (unknown reason)", SERVICES_EXCHANGERATES_ERROR_RETRIEVAL_FAILED);
         return false;
-
     }
-
-   /**
-    * Downloads XML file or returns it from cache
-    *
-    * @param string URL of XML file
-    * @param int Length of time to cache
-    * @return object XML_Tree object
-    */
-    function retrieveXML($url, $cacheLength, $cacheDir) {
-        include_once 'XML/Tree.php';
-
-        if ($data = $this->retrieveFile($url, $cacheLength, $cacheDir)) {
-
-            $tree = new XML_Tree();
-            $root = $tree->getTreeFromString($data);
-
-            return $root;
-        }
-
-        return false;
-    }
-
 }
-
-?>

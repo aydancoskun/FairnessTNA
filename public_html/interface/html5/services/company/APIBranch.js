@@ -1,54 +1,53 @@
-var APIBranch = ServiceCaller.extend( {
+var APIBranch = ServiceCaller.extend({
 
-	key_name: 'Branch',
-	className: 'APIBranch',
+    key_name: 'Branch',
+    className: 'APIBranch',
 
-	getBranch: function() {
+    getBranch: function () {
 
-		return this.argumentsHandler( this.className, 'getBranch', arguments );
+        return this.argumentsHandler(this.className, 'getBranch', arguments);
 
-	},
+    },
 
-	getBranchDefaultData: function() {
+    getBranchDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getBranchDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getBranchDefaultData', arguments);
 
-	},
+    },
 
-	getCommonBranchData: function() {
+    getCommonBranchData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonBranchData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonBranchData', arguments);
 
-	},
+    },
 
-	validateBranch: function() {
+    validateBranch: function () {
 
-		return this.argumentsHandler( this.className, 'validateBranch', arguments );
+        return this.argumentsHandler(this.className, 'validateBranch', arguments);
 
-	},
+    },
 
-	setBranch: function() {
+    setBranch: function () {
 
-		return this.argumentsHandler( this.className, 'setBranch', arguments );
+        return this.argumentsHandler(this.className, 'setBranch', arguments);
 
-	},
+    },
 
-	deleteBranch: function() {
+    deleteBranch: function () {
 
-		return this.argumentsHandler( this.className, 'deleteBranch', arguments );
+        return this.argumentsHandler(this.className, 'deleteBranch', arguments);
 
-	},
+    },
 
-	copyBranch: function() {
+    copyBranch: function () {
 
-		return this.argumentsHandler( this.className, 'copyBranch', arguments );
+        return this.argumentsHandler(this.className, 'copyBranch', arguments);
 
-	},
+    },
 
-	exportBranch: function() {
-		return this.argumentsHandler( this.className, 'exportBranch', arguments );
-	}
+    exportBranch: function () {
+        return this.argumentsHandler(this.className, 'exportBranch', arguments);
+    }
 
 
-
-} );
+});

@@ -39,13 +39,12 @@
  * @version    Release: 2.0.0
  * @link       http://pear.php.net/package/HTML_Progress2
  */
-
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {
-    function _renderForm(&$page)
+    public function _renderForm(&$page)
     {
         $pageName = $page->getAttribute('name');
-        $tabPreview = array_slice ($page->controller->_tabs, -2, 1);
+        $tabPreview = array_slice($page->controller->_tabs, -2, 1);
 
         $header = '
 <style type="text/css">
@@ -105,50 +104,49 @@ input.flat {
 </script>
 ';
             $placeHolders = array('{%style%}', '{%javascript%}');
-            $htmlElement = array( $pb->getStyle(), $pb->getScript() );
+            $htmlElement = array($pb->getStyle(), $pb->getScript());
 
             $header = str_replace($placeHolders, $htmlElement, $header);
 
             $pbElement = $page->getElement('progressBar');
             $pbElement->setText($pb->toHtml() . '<br /><br />');
-
         } else {
             $header = str_replace('{%style%}', '', $header);
         }
 
         $formTemplate = "\n<form{attributes}>"
-                      . "\n<table style=\"font-size: 8pt;\" class=\"maintable\">"
-                      . "\n{content}"
-                      . "\n</table>"
-                      . "\n</form>";
+            . "\n<table style=\"font-size: 8pt;\" class=\"maintable\">"
+            . "\n{content}"
+            . "\n</table>"
+            . "\n</form>";
 
         $headerTemplate = "\n<tr>"
-                        . "\n\t<th colspan=\"2\">"
-                        . "\n\t\t{header}"
-                        . "\n\t</th>"
-                        . "\n</tr>";
+            . "\n\t<th colspan=\"2\">"
+            . "\n\t\t{header}"
+            . "\n\t</th>"
+            . "\n</tr>";
 
         $elementTemplate = "\n<tr valign=\"top\">"
-                         . "\n\t<td align=\"right\" width=\"30%\"><b>{label}</b></td>"
-                         . "\n\t<td align=\"left\">"
-                         . "\n{element}"
-                         . "<!-- BEGIN label_2 -->&nbsp;"
-                         . "<span style=\"font-size:90%;\">{label_2}</span>"
-                         . "<!-- END label_2 -->"
-                         . "\n\t</td>"
-                         . "\n</tr>";
+            . "\n\t<td align=\"right\" width=\"30%\"><b>{label}</b></td>"
+            . "\n\t<td align=\"left\">"
+            . "\n{element}"
+            . "<!-- BEGIN label_2 -->&nbsp;"
+            . "<span style=\"font-size:90%;\">{label_2}</span>"
+            . "<!-- END label_2 -->"
+            . "\n\t</td>"
+            . "\n</tr>";
 
         $groupTemplate = "\n\t\t<table style=\"font-size:8pt;\">"
-                       . "\n\t\t<tr>"
-                       . "\n\t\t\t{content}"
-                       . "\n\t\t</tr>"
-                       . "\n\t\t</table>";
+            . "\n\t\t<tr>"
+            . "\n\t\t\t{content}"
+            . "\n\t\t</tr>"
+            . "\n\t\t</table>";
 
         $groupElementTemplate = "<td>{element}"
-                              . "<!-- BEGIN label --><br/>"
-                              . "<span style=\"font-size:90%;\">{label}</span>"
-                              . "<!-- END label -->"
-                              . "</td>";
+            . "<!-- BEGIN label --><br/>"
+            . "<span style=\"font-size:90%;\">{label}</span>"
+            . "<!-- END label -->"
+            . "</td>";
 
         $renderer = $page->defaultRenderer();
 
@@ -157,10 +155,10 @@ input.flat {
         $renderer->setElementTemplate($elementTemplate);
 
         $groups = array('progresssize',                                   // on page 1
-                        'cellvalue','cellsize', 'cellcolor', 'cellfont',  // on page 2
-                        'borderstyle',                                    // on page 3
-                        'stringsize','stringfont'                         // on page 4
-                       );
+            'cellvalue', 'cellsize', 'cellcolor', 'cellfont',  // on page 2
+            'borderstyle',                                    // on page 3
+            'stringsize', 'stringfont'                         // on page 4
+        );
 
         foreach ($groups as $grp) {
             $renderer->setGroupTemplate($groupTemplate, $grp);
@@ -173,4 +171,3 @@ input.flat {
         echo $renderer->toHtml();
     }
 }
-?>

@@ -1,56 +1,55 @@
-var APIAccrualBalanceSummaryReport = ServiceCaller.extend( {
+var APIAccrualBalanceSummaryReport = ServiceCaller.extend({
 
-	key_name: 'AccrualBalanceSummaryReport',
-	className: 'APIAccrualBalanceSummaryReport',
+    key_name: 'AccrualBalanceSummaryReport',
+    className: 'APIAccrualBalanceSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonAccrualBalanceSummaryReportData: function() {
+    getCommonAccrualBalanceSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonAccrualBalanceSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonAccrualBalanceSummaryReportData', arguments);
 
-	},
+    },
 
-	getAccrualBalanceSummaryReport: function() {
+    getAccrualBalanceSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualBalanceSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualBalanceSummaryReport', arguments);
 
-	},
+    },
 
-	setAccrualBalanceSummaryReport: function() {
+    setAccrualBalanceSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setAccrualBalanceSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setAccrualBalanceSummaryReport', arguments);
 
-	},
+    },
 
-	getAccrualBalanceSummaryReportDefaultData: function() {
+    getAccrualBalanceSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualBalanceSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualBalanceSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteAccrualBalanceSummaryReport: function() {
+    deleteAccrualBalanceSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteAccrualBalanceSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteAccrualBalanceSummaryReport', arguments);
 
-	},
+    },
 
-	validateAccrualBalanceSummaryReport: function() {
+    validateAccrualBalanceSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateAccrualBalanceSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validateAccrualBalanceSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	}
+    }
 
 
-
-} );
+});

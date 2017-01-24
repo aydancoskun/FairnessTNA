@@ -1,60 +1,59 @@
-var APIUserLanguage = ServiceCaller.extend( {
+var APIUserLanguage = ServiceCaller.extend({
 
-	key_name: 'UserLanguage',
-	className: 'APIUserLanguage',
+    key_name: 'UserLanguage',
+    className: 'APIUserLanguage',
 
-	getCommonUserLanguageData: function() {
+    getCommonUserLanguageData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserLanguageData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserLanguageData', arguments);
 
-	},
+    },
 
-	getUserLanguage: function() {
+    getUserLanguage: function () {
 
-		return this.argumentsHandler( this.className, 'getUserLanguage', arguments );
+        return this.argumentsHandler(this.className, 'getUserLanguage', arguments);
 
-	},
+    },
 
-	setUserLanguage: function() {
+    setUserLanguage: function () {
 
-		return this.argumentsHandler( this.className, 'setUserLanguage', arguments );
+        return this.argumentsHandler(this.className, 'setUserLanguage', arguments);
 
-	},
+    },
 
-	getUserLanguageDefaultData: function() {
+    getUserLanguageDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserLanguageDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserLanguageDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserLanguage: function() {
+    deleteUserLanguage: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserLanguage', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserLanguage', arguments);
 
-	},
+    },
 
-	validateUserLanguage: function() {
+    validateUserLanguage: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserLanguage', arguments );
+        return this.argumentsHandler(this.className, 'validateUserLanguage', arguments);
 
-	},
+    },
 
-	copyUserLanguage: function() {
+    copyUserLanguage: function () {
 
-		return this.argumentsHandler( this.className, 'copyUserLanguage', arguments );
+        return this.argumentsHandler(this.className, 'copyUserLanguage', arguments);
 
-	},
+    },
 
-	exportUserLanguage: function() {
-		return this.argumentsHandler( this.className, 'exportUserLanguage', arguments );
-	},
+    exportUserLanguage: function () {
+        return this.argumentsHandler(this.className, 'exportUserLanguage', arguments);
+    },
 
-	generateInvoices: function() {
+    generateInvoices: function () {
 
-		return this.argumentsHandler( this.className, 'generateInvoices', arguments );
+        return this.argumentsHandler(this.className, 'generateInvoices', arguments);
 
-	}
+    }
 
 
-
-} );
+});

@@ -1,64 +1,64 @@
-var APIPayStub = ServiceCaller.extend( {
+var APIPayStub = ServiceCaller.extend({
 
-	key_name: 'PayStub',
-	className: 'APIPayStub',
+    key_name: 'PayStub',
+    className: 'APIPayStub',
 
-	generatePayStubs: function() {
+    generatePayStubs: function () {
 
-		return this.argumentsHandler( this.className, 'generatePayStubs', arguments );
+        return this.argumentsHandler(this.className, 'generatePayStubs', arguments);
 
-	},
+    },
 
-	getCurrentPayRun: function() {
+    getCurrentPayRun: function () {
 
-		return this.argumentsHandler( this.className, 'getCurrentPayRun', arguments );
+        return this.argumentsHandler(this.className, 'getCurrentPayRun', arguments);
 
-	},
+    },
 
-	getPayStubDefaultData: function() {
+    getPayStubDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubDefaultData', arguments);
 
-	},
+    },
 
-	getPayStub: function() {
+    getPayStub: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStub', arguments );
+        return this.argumentsHandler(this.className, 'getPayStub', arguments);
 
-	},
+    },
 
-	getCommonPayStubData: function() {
+    getCommonPayStubData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayStubData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayStubData', arguments);
 
-	},
+    },
 
-	validatePayStub: function() {
+    validatePayStub: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayStub', arguments );
+        return this.argumentsHandler(this.className, 'validatePayStub', arguments);
 
-	},
+    },
 
-	setPayStub: function() {
+    setPayStub: function () {
 
-		return this.argumentsHandler( this.className, 'setPayStub', arguments );
+        return this.argumentsHandler(this.className, 'setPayStub', arguments);
 
-	},
+    },
 
-	deletePayStub: function() {
+    deletePayStub: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayStub', arguments );
+        return this.argumentsHandler(this.className, 'deletePayStub', arguments);
 
-	},
+    },
 
-	exportPayStub: function() {
-		return this.argumentsHandler( this.className, 'exportPayStub', arguments );
-	},
+    exportPayStub: function () {
+        return this.argumentsHandler(this.className, 'exportPayStub', arguments);
+    },
 
-	generatePayStubs: function() {
+    generatePayStubs: function () {
 
-		return this.argumentsHandler( this.className, 'generatePayStubs', arguments );
+        return this.argumentsHandler(this.className, 'generatePayStubs', arguments);
 
-	}
+    }
 
-} );
+});

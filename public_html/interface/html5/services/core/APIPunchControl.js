@@ -1,14 +1,13 @@
-var APIPunchControl = ServiceCaller.extend( {
+var APIPunchControl = ServiceCaller.extend({
 
-	key_name: 'PunchControl',
-	className: 'APIPunchControl',
+    key_name: 'PunchControl',
+    className: 'APIPunchControl',
 
-	dragNdropPunch: function() {
+    dragNdropPunch: function () {
 
-		return this.argumentsHandler( this.className, 'dragNdropPunch', arguments );
+        return this.argumentsHandler(this.className, 'dragNdropPunch', arguments);
 
-	}
+    }
 
 
-
-} );
+});

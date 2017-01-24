@@ -19,92 +19,95 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Core
  */
-class APIAbout extends APIFactory {
-	protected $main_class = FALSE;
+class APIAbout extends APIFactory
+{
+    protected $main_class = false;
 
-	public function __construct() {
-		parent::__construct(); //Make sure parent constructor is always called.
+    public function __construct()
+    {
+        parent::__construct(); //Make sure parent constructor is always called.
 
-		return TRUE;
-	}
-	/**
-	 * Get about data .
-	 *
-	 */
-	function getAboutData( $ytd = 0, $all_companies = FALSE ) {
-		global $config_vars;
+        return true;
+    }
 
-		$clf = new CompanyListFactory();
-		$sslf = new SystemSettingListFactory();
-		$system_settings = $sslf->getAllArray();
-		$clf->getByID( PRIMARY_COMPANY_ID );
-		if ( $clf->getRecordCount() == 1 ) {
-			$primary_company = $clf->getCurrent();
-		}
-		$current_user = $this->getCurrentUserObject();
-		if ( isset($primary_company) AND PRIMARY_COMPANY_ID == $current_user->getCompany() ) {
-			$current_company = $primary_company;
-		} else {
-			$current_company = $clf->getByID( $current_user->getCompany() )->getCurrent();
-		}
+    /**
+     * Get about data .
+     *
+     */
+    public function getAboutData($ytd = 0, $all_companies = false)
+    {
+        global $config_vars;
 
-		//$current_user_prefs = $current_user->getUserPreferenceObject();
-		$data = $system_settings;
+        $clf = new CompanyListFactory();
+        $sslf = new SystemSettingListFactory();
+        $system_settings = $sslf->getAllArray();
+        $clf->getByID(PRIMARY_COMPANY_ID);
+        if ($clf->getRecordCount() == 1) {
+            $primary_company = $clf->getCurrent();
+        }
+        $current_user = $this->getCurrentUserObject();
+        if (isset($primary_company) and PRIMARY_COMPANY_ID == $current_user->getCompany()) {
+            $current_company = $primary_company;
+        } else {
+            $current_company = $clf->getByID($current_user->getCompany())->getCurrent();
+        }
 
-		$data['application_name'] = APPLICATION_NAME;
+        //$current_user_prefs = $current_user->getUserPreferenceObject();
+        $data = $system_settings;
 
-		$data['organization_url'] = ORGANIZATION_URL;
+        $data['application_name'] = APPLICATION_NAME;
 
-		//Get Employee counts for this month, and last month
-		$month_of_year_arr = TTDate::getMonthOfYearArray();
+        $data['organization_url'] = ORGANIZATION_URL;
 
-		//This month
-		if ( isset($ytd) AND $ytd == 1 ) {
-			$begin_month_epoch = strtotime( '-2 years' );
-		} else {
-			$begin_month_epoch = TTDate::getBeginMonthEpoch( ( TTDate::getBeginMonthEpoch( time() ) - 86400 ) );
-		}
-		$cuclf = TTnew( 'CompanyUserCountListFactory' );
-		if ( isset($config_vars['other']['primary_company_id']) AND $current_company->getId() == $config_vars['other']['primary_company_id'] AND $all_companies == TRUE ) {
-			$cuclf->getTotalMonthlyMinAvgMaxByCompanyStatusAndStartDateAndEndDate( 10, $begin_month_epoch, TTDate::getEndMonthEpoch( time() ), NULL, NULL, NULL, array('date_stamp' => 'desc') );
-		} else {
-			$cuclf->getMonthlyMinAvgMaxByCompanyIdAndStartDateAndEndDate( $current_company->getId(), $begin_month_epoch, TTDate::getEndMonthEpoch( time() ), NULL, NULL, NULL, array('date_stamp' => 'desc') );
-		}
-		Debug::Text('Company User Count Rows: '. $cuclf->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
+        //Get Employee counts for this month, and last month
+        $month_of_year_arr = TTDate::getMonthOfYearArray();
 
-		if ( $cuclf->getRecordCount() > 0 ) {
-			foreach( $cuclf as $cuc_obj ) {
-				$data['user_counts'][] = array(
-																//'label' => $month_of_year_arr[TTDate::getMonth( $begin_month_epoch )] .' '. TTDate::getYear($begin_month_epoch),
-																'label' => $month_of_year_arr[TTDate::getMonth( TTDate::strtotime( $cuc_obj->getColumn('date_stamp') ) )] .' '. TTDate::getYear( TTDate::strtotime( $cuc_obj->getColumn('date_stamp') ) ),
-																'max_active_users' => $cuc_obj->getColumn('max_active_users'),
-																'max_inactive_users' => $cuc_obj->getColumn('max_inactive_users'),
-																'max_deleted_users' => $cuc_obj->getColumn('max_deleted_users'),
-																);
-			}
-		}
+        //This month
+        if (isset($ytd) and $ytd == 1) {
+            $begin_month_epoch = strtotime('-2 years');
+        } else {
+            $begin_month_epoch = TTDate::getBeginMonthEpoch((TTDate::getBeginMonthEpoch(time()) - 86400));
+        }
+        $cuclf = TTnew('CompanyUserCountListFactory');
+        if (isset($config_vars['other']['primary_company_id']) and $current_company->getId() == $config_vars['other']['primary_company_id'] and $all_companies == true) {
+            $cuclf->getTotalMonthlyMinAvgMaxByCompanyStatusAndStartDateAndEndDate(10, $begin_month_epoch, TTDate::getEndMonthEpoch(time()), null, null, null, array('date_stamp' => 'desc'));
+        } else {
+            $cuclf->getMonthlyMinAvgMaxByCompanyIdAndStartDateAndEndDate($current_company->getId(), $begin_month_epoch, TTDate::getEndMonthEpoch(time()), null, null, null, array('date_stamp' => 'desc'));
+        }
+        Debug::Text('Company User Count Rows: ' . $cuclf->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( isset($data['user_counts']) == FALSE ) {
-			$data['user_counts'] = array();
-		}
+        if ($cuclf->getRecordCount() > 0) {
+            foreach ($cuclf as $cuc_obj) {
+                $data['user_counts'][] = array(
+                    //'label' => $month_of_year_arr[TTDate::getMonth( $begin_month_epoch )] .' '. TTDate::getYear($begin_month_epoch),
+                    'label' => $month_of_year_arr[TTDate::getMonth(TTDate::strtotime($cuc_obj->getColumn('date_stamp')))] . ' ' . TTDate::getYear(TTDate::strtotime($cuc_obj->getColumn('date_stamp'))),
+                    'max_active_users' => $cuc_obj->getColumn('max_active_users'),
+                    'max_inactive_users' => $cuc_obj->getColumn('max_inactive_users'),
+                    'max_deleted_users' => $cuc_obj->getColumn('max_deleted_users'),
+                );
+            }
+        }
 
-		$cjlf = TTnew( 'CronJobListFactory' );
-		$cjlf->getMostRecentlyRun();
-		if ( $cjlf->getRecordCount() > 0 ) {
-			$cj_obj = $cjlf->getCurrent();
-			$data['cron'] = array(
-								'last_run_date' => ( $cj_obj->getLastRunDate() == FALSE ) ? TTi18n::getText('Never') : TTDate::getDate('DATE+TIME', $cj_obj->getLastRunDate() ),
-								);
-		}
+        if (isset($data['user_counts']) == false) {
+            $data['user_counts'] = array();
+        }
 
-		//Debug::Arr($data, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
-		return $this->returnHandler( $data );
-	}
+        $cjlf = TTnew('CronJobListFactory');
+        $cjlf->getMostRecentlyRun();
+        if ($cjlf->getRecordCount() > 0) {
+            $cj_obj = $cjlf->getCurrent();
+            $data['cron'] = array(
+                'last_run_date' => ($cj_obj->getLastRunDate() == false) ? TTi18n::getText('Never') : TTDate::getDate('DATE+TIME', $cj_obj->getLastRunDate()),
+            );
+        }
+
+        //Debug::Arr($data, 'Data: ', __FILE__, __LINE__, __METHOD__, 10);
+        return $this->returnHandler($data);
+    }
 }
-?>

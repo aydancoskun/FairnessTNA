@@ -1,4 +1,4 @@
-var FormItemType = function() {
+var FormItemType = function () {
 
 };
 
@@ -28,7 +28,7 @@ FormItemType.INSIDE_EDITOR = 'insideEditor';
 FormItemType.IMAGE = 'image';
 FormItemType.COLOR_PICKER = 'colorPicker';
 
-var WidgetNamesDic = function() {
+var WidgetNamesDic = function () {
 
 };
 

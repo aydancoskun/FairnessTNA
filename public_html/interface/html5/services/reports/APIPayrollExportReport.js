@@ -1,68 +1,67 @@
-var APIPayrollExportReport = ServiceCaller.extend( {
+var APIPayrollExportReport = ServiceCaller.extend({
 
-	key_name: 'PayrollExportReport',
-	className: 'APIPayrollExportReport',
+    key_name: 'PayrollExportReport',
+    className: 'APIPayrollExportReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonPayrollExportReportData: function() {
+    getCommonPayrollExportReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayrollExportReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayrollExportReportData', arguments);
 
-	},
+    },
 
-	getPayrollExportReport: function() {
+    getPayrollExportReport: function () {
 
-		return this.argumentsHandler( this.className, 'getPayrollExportReport', arguments );
+        return this.argumentsHandler(this.className, 'getPayrollExportReport', arguments);
 
-	},
+    },
 
-	setPayrollExportReport: function() {
+    setPayrollExportReport: function () {
 
-		return this.argumentsHandler( this.className, 'setPayrollExportReport', arguments );
+        return this.argumentsHandler(this.className, 'setPayrollExportReport', arguments);
 
-	},
+    },
 
-	getPayrollExportReportDefaultData: function() {
+    getPayrollExportReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayrollExportReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayrollExportReportDefaultData', arguments);
 
-	},
+    },
 
-	deletePayrollExportReport: function() {
+    deletePayrollExportReport: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayrollExportReport', arguments );
+        return this.argumentsHandler(this.className, 'deletePayrollExportReport', arguments);
 
-	},
+    },
 
-	validatePayrollExportReport: function() {
+    validatePayrollExportReport: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayrollExportReport', arguments );
+        return this.argumentsHandler(this.className, 'validatePayrollExportReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	setCompanyFormConfig: function() {
+    setCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'setCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'setCompanyFormConfig', arguments);
 
-	},
+    },
 
-	getCompanyFormConfig: function() {
+    getCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyFormConfig', arguments);
 
-	}
+    }
 
 
-
-} );
+});

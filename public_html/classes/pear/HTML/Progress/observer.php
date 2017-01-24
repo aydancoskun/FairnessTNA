@@ -44,7 +44,6 @@
  * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  */
-
 class HTML_Progress_Observer
 {
     /**
@@ -54,7 +53,7 @@ class HTML_Progress_Observer
      * @since      1.0
      * @access     private
      */
-    var $_id;
+    public $_id;
 
     /**
      * Creates a new basic HTML_Progress_Observer instance.
@@ -62,7 +61,7 @@ class HTML_Progress_Observer
      * @since      1.0
      * @access     public
      */
-    function HTML_Progress_Observer()
+    public function HTML_Progress_Observer()
     {
         $this->_id = md5(microtime());
     }
@@ -78,15 +77,13 @@ class HTML_Progress_Observer
      * - setMaximum
      * - setValue
      *
-     * @param      mixed     $event         A hash describing the progress event.
+     * @param      mixed $event A hash describing the progress event.
      * @since      1.0
      * @access     public
      */
-    function notify($event)
+    public function notify($event)
     {
         $msg = (is_array($event)) ? serialize($event) : $event;
-        error_log ("$msg \n", 3, 'progress_observer.log');
+        error_log("$msg \n", 3, 'progress_observer.log');
     }
 }
-
-?>

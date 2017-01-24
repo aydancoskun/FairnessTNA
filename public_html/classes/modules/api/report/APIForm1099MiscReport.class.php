@@ -19,23 +19,25 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Report
  */
-class APIForm1099MiscReport extends APIReport {
-	protected $main_class = 'Form1099MiscReport';
+class APIForm1099MiscReport extends APIReport
+{
+    protected $main_class = 'Form1099MiscReport';
 
-	public function __construct() {
-		parent::__construct(); //Make sure parent constructor is always called.
+    public function __construct()
+    {
+        parent::__construct(); //Make sure parent constructor is always called.
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	function getForm1099MiscReport( $config, $format = 'pdf' ) {
-		return $this->getReport( $config, $format );
-	}
+    public function getForm1099MiscReport($config, $format = 'pdf')
+    {
+        return $this->getReport($config, $format);
+    }
 }
-?>

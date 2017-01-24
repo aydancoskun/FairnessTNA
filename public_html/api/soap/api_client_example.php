@@ -9,10 +9,10 @@ $FAIRNESS_USERNAME = '';
 $FAIRNESS_PASSWORD = '';
 
 $api_session = new FairnessClientAPI();
-$api_session->Login( $FAIRNESS_USERNAME, $FAIRNESS_PASSWORD );
-if ( $FAIRNESS_SESSION_ID == FALSE ) {
-	echo "Login Failed!<br>\n";
-	exit;
+$api_session->Login($FAIRNESS_USERNAME, $FAIRNESS_PASSWORD);
+if ($FAIRNESS_SESSION_ID == false) {
+    echo "Login Failed!<br>\n";
+    exit;
 }
 echo "Session ID: $FAIRNESS_SESSION_ID<br>\n";
 
@@ -20,14 +20,14 @@ echo "Session ID: $FAIRNESS_SESSION_ID<br>\n";
 //Get data for two employees by primary key/ID.
 // - Many other filter methods can be used, such as branch, department, user_name, province, state, etc...
 //
-$user_obj = new FairnessClientAPI( 'User' );
+$user_obj = new FairnessClientAPI('User');
 $result = $user_obj->getUser(
-									array('filter_data' => array(
-																//'id' => array(1023,11353)
-																'user_name' => 'john.doe567',
-															)
-									)
-								);
+    array('filter_data' => array(
+        //'id' => array(1023,11353)
+        'user_name' => 'john.doe567',
+    )
+    )
+);
 
 $user_data = $result->getResult();
 print $result;
@@ -158,92 +158,90 @@ Array
 //
 //Update data for the second employee, mark their status as Terminated and update Termination Date
 //
-if ( isset($user_data[1]) ) {
-	$user_data[1]['status_id'] = 20; //Terminated
-	$user_data[1]['termination_date'] = '01-Jul-09';
+if (isset($user_data[1])) {
+    $user_data[1]['status_id'] = 20; //Terminated
+    $user_data[1]['termination_date'] = '01-Jul-09';
 
-	$result = $user_obj->setUser( $user_data[1] );
-	if ( $result->isValid() === TRUE ) {
-		echo "Employee data saved successfully.<br>\n";
-	} else {
-		echo "Employee save failed.<br>\n";
-		print $result; //Show error messages
-	}
+    $result = $user_obj->setUser($user_data[1]);
+    if ($result->isValid() === true) {
+        echo "Employee data saved successfully.<br>\n";
+    } else {
+        echo "Employee save failed.<br>\n";
+        print $result; //Show error messages
+    }
 }
 
 //
 //Update employee record in a single operation. Several records can be updated in a single operation as well.
 //
 $user_data = array(
-					'id' => 11353,
-					'termination_date' => '02-Jul-09'
-					);
+    'id' => 11353,
+    'termination_date' => '02-Jul-09'
+);
 
-$result = $user_obj->setUser( $user_data );
-if ( $result->isValid() === TRUE ) {
-	echo "Employee data saved successfully.<br>\n";
+$result = $user_obj->setUser($user_data);
+if ($result->isValid() === true) {
+    echo "Employee data saved successfully.<br>\n";
 } else {
-	echo "Employee save failed.<br>\n";
-	print $result; //Show error messages
+    echo "Employee save failed.<br>\n";
+    print $result; //Show error messages
 }
 
 //
 //Add new employee, several new employees can be added in a single operation as well.
 //
 $user_data = array(
-					'status_id' => 10, //Active
-					'first_name' => 'Michael',
-					'last_name' => 'Jackson',
-					'employee_number' => 239842,
-					'user_name' => 'mjackson',
-					'password' => 'whiteglove123',
-					'hire_date' => '01-Oct-09'
-					);
+    'status_id' => 10, //Active
+    'first_name' => 'Michael',
+    'last_name' => 'Jackson',
+    'employee_number' => 239842,
+    'user_name' => 'mjackson',
+    'password' => 'whiteglove123',
+    'hire_date' => '01-Oct-09'
+);
 
-$result = $user_obj->setUser( $user_data );
-if ( $result->isValid() === TRUE ) {
-	echo "Employee added successfully.<br>\n";
-	$insert_id = $result->getResult(); //Get employees new ID on success.
+$result = $user_obj->setUser($user_data);
+if ($result->isValid() === true) {
+    echo "Employee added successfully.<br>\n";
+    $insert_id = $result->getResult(); //Get employees new ID on success.
 } else {
-	echo "Employee save failed.<br>\n";
-	print $result; //Show error messages
+    echo "Employee save failed.<br>\n";
+    print $result; //Show error messages
 }
 
 
 //
 //Get TimeSheet Summary report data in raw PHP native array format. 'csv' and 'pdf' are also valid formats.
 //
-$report_obj = new FairnessClientAPI( 'TimesheetSummaryReport' );
-$config = $report_obj->getTemplate( 'by_employee+regular+overtime+premium+absence' )->getResult();
-$result = $report_obj->getTimesheetSummaryReport( $config, 'raw' );
+$report_obj = new FairnessClientAPI('TimesheetSummaryReport');
+$config = $report_obj->getTemplate('by_employee+regular+overtime+premium+absence')->getResult();
+$result = $report_obj->getTimesheetSummaryReport($config, 'raw');
 echo "Report Data: <br>\n";
 print $result;
 
 //
 //Add punch for employee
 //
-$punch_obj = new FairnessClientAPI( 'Punch' );
+$punch_obj = new FairnessClientAPI('Punch');
 $punch_data = array(
-					'user_id' => 1023,
+    'user_id' => 1023,
 
-					'type_id' => 10, //Normal
-					'status_id' => 20, //In
+    'type_id' => 10, //Normal
+    'status_id' => 20, //In
 
-					'time_stamp' => strtotime('19-Aug-2013 5:50PM'),
+    'time_stamp' => strtotime('19-Aug-2013 5:50PM'),
 
-					'branch_id' => 296, //Branch
-					'department_id' => 896, //Department
-					'job_id' => 610, //Job
-					'job_item_id' => 9, //Task
-					);
+    'branch_id' => 296, //Branch
+    'department_id' => 896, //Department
+    'job_id' => 610, //Job
+    'job_item_id' => 9, //Task
+);
 
-$result = $punch_obj->setPunch( $punch_data );
-if ( $result->isValid() === TRUE ) {
-	echo "Punch added successfully.<br>\n";
-	$insert_id = $result->getResult(); //Get employees new ID on success.
+$result = $punch_obj->setPunch($punch_data);
+if ($result->isValid() === true) {
+    echo "Punch added successfully.<br>\n";
+    $insert_id = $result->getResult(); //Get employees new ID on success.
 } else {
-	echo "Punch save failed.<br>\n";
-	print $result; //Show error messages
+    echo "Punch save failed.<br>\n";
+    print $result; //Show error messages
 }
-
-?>

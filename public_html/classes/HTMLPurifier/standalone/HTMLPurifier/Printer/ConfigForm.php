@@ -41,7 +41,8 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
         $name,
         $doc_url = null,
         $compress = false
-    ) {
+    )
+    {
         parent::__construct();
         $this->docURL = $doc_url;
         $this->name = $name;
@@ -49,21 +50,6 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
         // initialize sub-printers
         $this->fields[0] = new HTMLPurifier_Printer_ConfigForm_default();
         $this->fields[HTMLPurifier_VarParser::BOOL] = new HTMLPurifier_Printer_ConfigForm_bool();
-    }
-
-    /**
-     * Sets default column and row size for textareas in sub-printers
-     * @param $cols Integer columns of textarea, null to use default
-     * @param $rows Integer rows of textarea, null to use default
-     */
-    public function setTextareaDimensions($cols = null, $rows = null)
-    {
-        if ($cols) {
-            $this->fields['default']->cols = $cols;
-        }
-        if ($rows) {
-            $this->fields['default']->rows = $rows;
-        }
     }
 
     /**
@@ -80,6 +66,21 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
     public static function getJavaScript()
     {
         return file_get_contents(HTMLPURIFIER_PREFIX . '/HTMLPurifier/Printer/ConfigForm.js');
+    }
+
+    /**
+     * Sets default column and row size for textareas in sub-printers
+     * @param $cols Integer columns of textarea, null to use default
+     * @param $rows Integer rows of textarea, null to use default
+     */
+    public function setTextareaDimensions($cols = null, $rows = null)
+    {
+        if ($cols) {
+            $this->fields['default']->cols = $cols;
+        }
+        if ($rows) {
+            $this->fields['default']->rows = $rows;
+        }
     }
 
     /**
@@ -201,7 +202,6 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
         $ret .= $this->end('tbody');
         return $ret;
     }
-
 }
 
 /**
@@ -320,7 +320,7 @@ class HTMLPurifier_Printer_ConfigForm_default extends HTMLPurifier_Printer
                     foreach ($array as $val => $b) {
                         $value[] = $val;
                     }
-                    //TODO does this need a break?
+                //TODO does this need a break?
                 case HTMLPurifier_VarParser::ALIST:
                     $value = implode(PHP_EOL, $value);
                     break;
@@ -357,10 +357,11 @@ class HTMLPurifier_Printer_ConfigForm_default extends HTMLPurifier_Printer
             }
             $ret .= $this->end('select');
         } elseif ($type === HTMLPurifier_VarParser::TEXT ||
-                $type === HTMLPurifier_VarParser::ITEXT ||
-                $type === HTMLPurifier_VarParser::ALIST ||
-                $type === HTMLPurifier_VarParser::HASH ||
-                $type === HTMLPurifier_VarParser::LOOKUP) {
+            $type === HTMLPurifier_VarParser::ITEXT ||
+            $type === HTMLPurifier_VarParser::ALIST ||
+            $type === HTMLPurifier_VarParser::HASH ||
+            $type === HTMLPurifier_VarParser::LOOKUP
+        ) {
             $attr['cols'] = $this->cols;
             $attr['rows'] = $this->rows;
             $ret .= $this->start('textarea', $attr);

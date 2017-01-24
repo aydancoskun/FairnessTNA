@@ -1,50 +1,49 @@
-var APIUserGenericStatus = ServiceCaller.extend( {
+var APIUserGenericStatus = ServiceCaller.extend({
 
-	key_name: 'UserGenericStatus',
-	className: 'APIUserGenericStatus',
+    key_name: 'UserGenericStatus',
+    className: 'APIUserGenericStatus',
 
-	getUserGenericStatusCountArray: function() {
+    getUserGenericStatusCountArray: function () {
 
-		return this.argumentsHandler( this.className, 'getUserGenericStatusCountArray', arguments );
+        return this.argumentsHandler(this.className, 'getUserGenericStatusCountArray', arguments);
 
-	},
+    },
 
-	getCommonUserGenericStatusData: function() {
+    getCommonUserGenericStatusData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserGenericStatusData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserGenericStatusData', arguments);
 
-	},
+    },
 
-	getUserGenericStatus: function() {
+    getUserGenericStatus: function () {
 
-		return this.argumentsHandler( this.className, 'getUserGenericStatus', arguments );
+        return this.argumentsHandler(this.className, 'getUserGenericStatus', arguments);
 
-	},
+    },
 
-	setUserGenericStatus: function() {
+    setUserGenericStatus: function () {
 
-		return this.argumentsHandler( this.className, 'setUserGenericStatus', arguments );
+        return this.argumentsHandler(this.className, 'setUserGenericStatus', arguments);
 
-	},
+    },
 
-	getUserGenericStatusDefaultData: function() {
+    getUserGenericStatusDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserGenericStatusDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserGenericStatusDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserGenericStatus: function() {
+    deleteUserGenericStatus: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserGenericStatus', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserGenericStatus', arguments);
 
-	},
+    },
 
-	validateUserGenericStatus: function() {
+    validateUserGenericStatus: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserGenericStatus', arguments );
+        return this.argumentsHandler(this.className, 'validateUserGenericStatus', arguments);
 
-	}
+    }
 
 
-
-} );
+});

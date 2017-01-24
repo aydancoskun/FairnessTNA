@@ -19,110 +19,143 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 /*
 CREATE TABLE department_branch (
-	id serial NOT NULL,
-	department_branch_id integer DEFAULT 0 NOT NULL,
-	user_id integer DEFAULT 0 NOT NULL
+    id serial NOT NULL,
+    department_branch_id integer DEFAULT 0 NOT NULL,
+    user_id integer DEFAULT 0 NOT NULL
 ) WITHOUT OIDS;
 */
 
 /**
  * @package Modules\Department
  */
-class DepartmentBranchUserFactory extends Factory {
-	protected $table = 'department_branch_user';
-	protected $pk_sequence_name = 'department_branch_user_id_seq'; //PK Sequence name
-	function getDepartmentBranch() {
-		return (int)$this->data['department_branch_id'];
-	}
-	function setDepartmentBranch($id) {
-		$id = trim($id);
-		
-		$dblf = TTnew( 'DepartmentBranchListFactory' );
-		
-		if ( $id != 0
-				OR $this->Validator->isResultSetWithRows(	'department_branch',
-															$dblf->getByID($id),
-															TTi18n::gettext('Department Branch is invalid')
-															) ) {
-			$this->data['department_branch_id'] = $id;
-		
-			return TRUE;
-		}
+class DepartmentBranchUserFactory extends Factory
+{
+    protected $table = 'department_branch_user';
+    protected $pk_sequence_name = 'department_branch_user_id_seq'; //PK Sequence name
 
-		return FALSE;
-	}
+    public function getDepartmentBranch()
+    {
+        return (int)$this->data['department_branch_id'];
+    }
 
-	function getUser() {
-		return (int)$this->data['user_id'];
-	}
-	function setUser($id) {
-		$id = trim($id);
-		
-		$ulf = TTnew( 'UserListFactory' );
-		
-		if ( $id != 0
-				OR $this->Validator->isResultSetWithRows(	'user',
-															$ulf->getByID($id),
-															TTi18n::gettext('User is invalid')
-															) ) {
-			$this->data['user_id'] = $id;
-		
-			return TRUE;
-		}
+    public function setDepartmentBranch($id)
+    {
+        $id = trim($id);
 
-		return FALSE;
-	}
-	
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {		
-		return FALSE;
-	}
-	
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;		
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;		
-	}
+        $dblf = TTnew('DepartmentBranchListFactory');
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;		
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;	
-	}
+        if ($id != 0
+            or $this->Validator->isResultSetWithRows('department_branch',
+                $dblf->getByID($id),
+                TTi18n::gettext('Department Branch is invalid')
+            )
+        ) {
+            $this->data['department_branch_id'] = $id;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getUser()
+    {
+        return (int)$this->data['user_id'];
+    }
+
+    public function setUser($id)
+    {
+        $id = trim($id);
+
+        $ulf = TTnew('UserListFactory');
+
+        if ($id != 0
+            or $this->Validator->isResultSetWithRows('user',
+                $ulf->getByID($id),
+                TTi18n::gettext('User is invalid')
+            )
+        ) {
+            $this->data['user_id'] = $id;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    //This table doesn't have any of these columns, so overload the functions.
+    public function getDeleted()
+    {
+        return false;
+    }
+
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedDate()
+    {
+        return false;
+    }
+
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
 
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {		
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {		
-		return FALSE;
-	}
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 }
-?>

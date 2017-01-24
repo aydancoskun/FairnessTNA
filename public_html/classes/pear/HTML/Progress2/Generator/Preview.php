@@ -41,16 +41,15 @@
  * @version    Release: 2.0.0
  * @link       http://pear.php.net/package/HTML_Progress2
  */
-
 class ActionPreview extends HTML_QuickForm_Action
 {
-    function perform(&$page, $actionName)
+    public function perform(&$page, $actionName)
     {
         // like in Action_Next
         $page->isFormBuilt() or $page->buildForm();
         $page->handle('display');
 
-        $stringid = $page->controller->exportValue('page4','stringid');
+        $stringid = $page->controller->exportValue('page4', 'stringid');
         $bar = $page->controller->createProgressBar();
 
         do {
@@ -60,8 +59,6 @@ class ActionPreview extends HTML_QuickForm_Action
             }
             $bar->sleep();
             $bar->moveNext();
-        } while(1);
-
+        } while (1);
     }
 }
-?>

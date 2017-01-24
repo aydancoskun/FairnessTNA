@@ -19,84 +19,89 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Accrual
  */
-class APIAccrualBalance extends APIFactory {
-	protected $main_class = 'AccrualBalanceFactory';
+class APIAccrualBalance extends APIFactory
+{
+    protected $main_class = 'AccrualBalanceFactory';
 
-	public function __construct() {
-		parent::__construct(); //Make sure parent constructor is always called.
+    public function __construct()
+    {
+        parent::__construct(); //Make sure parent constructor is always called.
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	/**
-	 * Get options for dropdown boxes.
-	 * @param string $name Name of options to return, ie: 'columns', 'type', 'status'
-	 * @param mixed $parent Parent name/ID of options to return if data is in hierarchical format. (ie: Province)
-	 * @return array
-	 */
-	function getOptions( $name = FALSE, $parent = NULL ) {
-		if ( $name == 'columns'
-				AND ( !$this->getPermissionObject()->Check('accrual', 'enabled')
-					OR !( $this->getPermissionObject()->Check('accrual', 'view') OR $this->getPermissionObject()->Check('accrual', 'view_child') ) ) ) {
-			$name = 'list_columns';
-		}
+    /**
+     * Get options for dropdown boxes.
+     * @param string $name Name of options to return, ie: 'columns', 'type', 'status'
+     * @param mixed $parent Parent name/ID of options to return if data is in hierarchical format. (ie: Province)
+     * @return array
+     */
+    public function getOptions($name = false, $parent = null)
+    {
+        if ($name == 'columns'
+            and (!$this->getPermissionObject()->Check('accrual', 'enabled')
+                or !($this->getPermissionObject()->Check('accrual', 'view') or $this->getPermissionObject()->Check('accrual', 'view_child')))
+        ) {
+            $name = 'list_columns';
+        }
 
-		return parent::getOptions( $name, $parent );
-	}
+        return parent::getOptions($name, $parent);
+    }
 
-	/**
-	 * Get accrual balance data for one or more accrual balancees.
-	 * @param array $data filter data
-	 * @return array
-	 */
-	function getAccrualBalance( $data = NULL, $disable_paging = FALSE ) {
-		if ( !$this->getPermissionObject()->Check('accrual', 'enabled')
-				OR !( $this->getPermissionObject()->Check('accrual', 'view') OR $this->getPermissionObject()->Check('accrual', 'view_own') OR $this->getPermissionObject()->Check('accrual', 'view_child')	) ) {
-			return $this->getPermissionObject()->PermissionDenied();
-		}
-		$data = $this->initializeFilterAndPager( $data, $disable_paging );
+    /**
+     * Export data to csv
+     * @param array $data filter data
+     * @param string $format file format (csv)
+     * @return array
+     */
+    public function exportAccrualBalance($format = 'csv', $data = null, $disable_paging = true)
+    {
+        $result = $this->stripReturnHandler($this->getAccrualBalance($data, $disable_paging));
+        return $this->exportRecords($format, 'export_accrual_balance', $result, ((isset($data['filter_columns'])) ? $data['filter_columns'] : null));
+    }
 
-		$data['filter_data']['permission_children_ids'] = $this->getPermissionObject()->getPermissionChildren( 'accrual', 'view' );
+    /**
+     * Get accrual balance data for one or more accrual balancees.
+     * @param array $data filter data
+     * @return array
+     */
+    public function getAccrualBalance($data = null, $disable_paging = false)
+    {
+        if (!$this->getPermissionObject()->Check('accrual', 'enabled')
+            or !($this->getPermissionObject()->Check('accrual', 'view') or $this->getPermissionObject()->Check('accrual', 'view_own') or $this->getPermissionObject()->Check('accrual', 'view_child'))
+        ) {
+            return $this->getPermissionObject()->PermissionDenied();
+        }
+        $data = $this->initializeFilterAndPager($data, $disable_paging);
 
-		$blf = TTnew( 'AccrualBalanceListFactory' );
-		$blf->getAPISearchByCompanyIdAndArrayCriteria( $this->getCurrentCompanyObject()->getId(), $data['filter_data'], $data['filter_items_per_page'], $data['filter_page'], NULL, $data['filter_sort'] );
-		Debug::Text('Record Count: '. $blf->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
-		if ( $blf->getRecordCount() > 0 ) {
-			$this->getProgressBarObject()->start( $this->getAMFMessageID(), $blf->getRecordCount() );
+        $data['filter_data']['permission_children_ids'] = $this->getPermissionObject()->getPermissionChildren('accrual', 'view');
 
-			$this->setPagerObject( $blf );
+        $blf = TTnew('AccrualBalanceListFactory');
+        $blf->getAPISearchByCompanyIdAndArrayCriteria($this->getCurrentCompanyObject()->getId(), $data['filter_data'], $data['filter_items_per_page'], $data['filter_page'], null, $data['filter_sort']);
+        Debug::Text('Record Count: ' . $blf->getRecordCount(), __FILE__, __LINE__, __METHOD__, 10);
+        if ($blf->getRecordCount() > 0) {
+            $this->getProgressBarObject()->start($this->getAMFMessageID(), $blf->getRecordCount());
 
-			$retarr = array();
-			foreach( $blf as $b_obj ) {
-				$retarr[] = $b_obj->getObjectAsArray( $data['filter_columns'], $data['filter_data']['permission_children_ids'] );
+            $this->setPagerObject($blf);
 
-				$this->getProgressBarObject()->set( $this->getAMFMessageID(), $blf->getCurrentRow() );
-			}
+            $retarr = array();
+            foreach ($blf as $b_obj) {
+                $retarr[] = $b_obj->getObjectAsArray($data['filter_columns'], $data['filter_data']['permission_children_ids']);
 
-			$this->getProgressBarObject()->stop( $this->getAMFMessageID() );
+                $this->getProgressBarObject()->set($this->getAMFMessageID(), $blf->getCurrentRow());
+            }
 
-			return $this->returnHandler( $retarr );
-		}
+            $this->getProgressBarObject()->stop($this->getAMFMessageID());
 
-		return $this->returnHandler( TRUE ); //No records returned.
-	}
+            return $this->returnHandler($retarr);
+        }
 
-
-	/**
-	 * Export data to csv
-	 * @param array $data filter data
-	 * @param string $format file format (csv)
-	 * @return array
-	 */
-	function exportAccrualBalance( $format = 'csv', $data = NULL, $disable_paging = TRUE) {
-		$result = $this->stripReturnHandler( $this->getAccrualBalance( $data, $disable_paging ) );
-		return $this->exportRecords( $format, 'export_accrual_balance', $result, ( ( isset($data['filter_columns']) ) ? $data['filter_columns'] : NULL ) );
-	}
+        return $this->returnHandler(true); //No records returned.
+    }
 }
-?>

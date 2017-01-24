@@ -1,68 +1,67 @@
-var APITaxSummaryReport = ServiceCaller.extend( {
+var APITaxSummaryReport = ServiceCaller.extend({
 
-	key_name: 'TaxSummaryReport',
-	className: 'APITaxSummaryReport',
+    key_name: 'TaxSummaryReport',
+    className: 'APITaxSummaryReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonTaxSummaryReportData: function() {
+    getCommonTaxSummaryReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonTaxSummaryReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonTaxSummaryReportData', arguments);
 
-	},
+    },
 
-	getTaxSummaryReport: function() {
+    getTaxSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'getTaxSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'getTaxSummaryReport', arguments);
 
-	},
+    },
 
-	setTaxSummaryReport: function() {
+    setTaxSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'setTaxSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'setTaxSummaryReport', arguments);
 
-	},
+    },
 
-	getTaxSummaryReportDefaultData: function() {
+    getTaxSummaryReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getTaxSummaryReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getTaxSummaryReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteTaxSummaryReport: function() {
+    deleteTaxSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteTaxSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteTaxSummaryReport', arguments);
 
-	},
+    },
 
-	validateTaxSummaryReport: function() {
+    validateTaxSummaryReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateTaxSummaryReport', arguments );
+        return this.argumentsHandler(this.className, 'validateTaxSummaryReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	setCompanyFormConfig: function() {
+    setCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'setCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'setCompanyFormConfig', arguments);
 
-	},
+    },
 
-	getCompanyFormConfig: function() {
+    getCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyFormConfig', arguments);
 
-	}
+    }
 
 
-
-} );
+});

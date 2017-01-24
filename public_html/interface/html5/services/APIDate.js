@@ -1,43 +1,43 @@
-var APIDate = ServiceCaller.extend( {
+var APIDate = ServiceCaller.extend({
 
-	key_name: '',
-	className: 'APITTDate',
+    key_name: '',
+    className: 'APITTDate',
 
-	getHours: function() {
-		return this.argumentsHandler( this.className, 'getHours', arguments );
+    getHours: function () {
+        return this.argumentsHandler(this.className, 'getHours', arguments);
 //		  this.call(this.className,'getHours',onResult,onError,args,delegate);
 
-	},
+    },
 
-	parseTimeUnit: function() {
-		return this.argumentsHandler( this.className, 'parseTimeUnit', arguments );
+    parseTimeUnit: function () {
+        return this.argumentsHandler(this.className, 'parseTimeUnit', arguments);
 
-	},
+    },
 
-	getTimeZoneOffset: function() {
-		return this.argumentsHandler( this.className, 'getTimeZoneOffset', arguments );
+    getTimeZoneOffset: function () {
+        return this.argumentsHandler(this.className, 'getTimeZoneOffset', arguments);
 //		  this.call(this.className,'getTimeZoneOffset',onResult,onError,args,delegate);
 
-	},
+    },
 
-	parseDateTime: function() {
-		return this.argumentsHandler( this.className, 'parseDateTime', arguments );
-	},
+    parseDateTime: function () {
+        return this.argumentsHandler(this.className, 'parseDateTime', arguments);
+    },
 
-	getMonthOfYearArray: function() {
-		return this.argumentsHandler( this.className, 'getMonthOfYearArray', arguments );
-	},
+    getMonthOfYearArray: function () {
+        return this.argumentsHandler(this.className, 'getMonthOfYearArray', arguments);
+    },
 
-	getDayOfMonthArray: function() {
-		return this.argumentsHandler( this.className, 'getDayOfMonthArray', arguments );
-	},
+    getDayOfMonthArray: function () {
+        return this.argumentsHandler(this.className, 'getDayOfMonthArray', arguments);
+    },
 
-	getDayOfWeekArray: function() {
-		return this.argumentsHandler( this.className, 'getDayOfWeekArray', arguments );
-	},
+    getDayOfWeekArray: function () {
+        return this.argumentsHandler(this.className, 'getDayOfWeekArray', arguments);
+    },
 
-	getAPIDate: function() {
-		return this.argumentsHandler( this.className, 'getAPIDate', arguments );
-	}
+    getAPIDate: function () {
+        return this.argumentsHandler(this.className, 'getAPIDate', arguments);
+    }
 
-} );
+});

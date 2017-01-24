@@ -20,34 +20,34 @@
 
 class HTML_QuickForm_Rule
 {
-   /**
-    * Name of the rule to use in validate method
-    *
-    * This property is used in more global rules like Callback and Regex
-    * to determine which callback and which regex is to be used for validation
-    *
-    * @var  string
-    * @access   public
-    */
-    var $name;
+    /**
+     * Name of the rule to use in validate method
+     *
+     * This property is used in more global rules like Callback and Regex
+     * to determine which callback and which regex is to be used for validation
+     *
+     * @var  string
+     * @access   public
+     */
+    public $name;
 
-   /**
-    * Validates a value
-    * 
-    * @access public
-    * @abstract
-    */
-    function validate($value)
+    /**
+     * Validates a value
+     *
+     * @access public
+     * @abstract
+     */
+    public function validate($value)
     {
         return true;
     }
 
-   /**
-    * Sets the rule name
-    * 
-    * @access public
-    */
-    function setName($ruleName)
+    /**
+     * Sets the rule name
+     *
+     * @access public
+     */
+    public function setName($ruleName)
     {
         $this->name = $ruleName;
     }
@@ -59,9 +59,8 @@ class HTML_QuickForm_Rule
      * @access    public
      * @return    array     first element is code to setup validation, second is the check itself
      */
-    function getValidationScript($options = null)
+    public function getValidationScript($options = null)
     {
         return array('', '');
     }
 }
-?>

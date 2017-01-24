@@ -1,49 +1,49 @@
-var APITimeSheetVerify = ServiceCaller.extend( {
+var APITimeSheetVerify = ServiceCaller.extend({
 
-	key_name: 'TimeSheetVerify',
-	className: 'APIPayPeriodTimeSheetVerify',
+    key_name: 'TimeSheetVerify',
+    className: 'APIPayPeriodTimeSheetVerify',
 
-	getTimeSheetVerifyDefaultData: function() {
+    getTimeSheetVerifyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getTimeSheetVerifyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getTimeSheetVerifyDefaultData', arguments);
 
-	},
+    },
 
-	getTimeSheetVerify: function() {
+    getTimeSheetVerify: function () {
 
-		return this.argumentsHandler( this.className, 'getTimeSheetVerify', arguments );
+        return this.argumentsHandler(this.className, 'getTimeSheetVerify', arguments);
 
-	},
-	getCommonTimeSheetVerifyData: function() {
+    },
+    getCommonTimeSheetVerifyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonTimeSheetVerifyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonTimeSheetVerifyData', arguments);
 
-	},
-	validateTimeSheetVerify: function() {
+    },
+    validateTimeSheetVerify: function () {
 
-		return this.argumentsHandler( this.className, 'validateTimeSheetVerify', arguments );
+        return this.argumentsHandler(this.className, 'validateTimeSheetVerify', arguments);
 
-	},
-	setTimeSheetVerify: function() {
+    },
+    setTimeSheetVerify: function () {
 
-		return this.argumentsHandler( this.className, 'setTimeSheetVerify', arguments );
+        return this.argumentsHandler(this.className, 'setTimeSheetVerify', arguments);
 
-	},
-	deleteTimeSheetVerify: function() {
+    },
+    deleteTimeSheetVerify: function () {
 
-		return this.argumentsHandler( this.className, 'deleteTimeSheetVerify', arguments );
+        return this.argumentsHandler(this.className, 'deleteTimeSheetVerify', arguments);
 
-	},
-	importData: function() {
+    },
+    importData: function () {
 
-		return this.argumentsHandler( this.className, 'importData', arguments );
+        return this.argumentsHandler(this.className, 'importData', arguments);
 
-	},
-	deleteData: function() {
+    },
+    deleteData: function () {
 
-		return this.argumentsHandler( this.className, 'deleteData', arguments );
+        return this.argumentsHandler(this.className, 'deleteData', arguments);
 
-	}
+    }
 
 
-} );
+});

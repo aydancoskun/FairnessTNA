@@ -46,11 +46,11 @@
 /**
  *  Class for first Tab:
  *  Progress main properties
- *  @ignore
+ * @ignore
  */
 class Property1 extends HTML_QuickForm_Page
 {
-    function buildForm()
+    public function buildForm()
     {
         $this->_formBuilt = true;
 
@@ -59,13 +59,13 @@ class Property1 extends HTML_QuickForm_Page
         $this->addElement('header', null, 'Progress Generator - Control Panel: main properties');
 
         $models = array(
-            ''  => '&nbsp;',
-            'ancestor.ini'  => 'Ancestor',
-            'bluesand.ini'  => 'BlueSand',
-            'redsandback.ini'  => 'RedSandBack',
-            'bullit.ini'  => 'Bullit',
-            'smallest.ini'  => 'Smallest',
-            'bgimages.ini'  => 'BgImages'
+            '' => '&nbsp;',
+            'ancestor.ini' => 'Ancestor',
+            'bluesand.ini' => 'BlueSand',
+            'redsandback.ini' => 'RedSandBack',
+            'bullit.ini' => 'Bullit',
+            'smallest.ini' => 'Smallest',
+            'bgimages.ini' => 'BgImages'
         );
         $this->addElement('select', 'model', 'pre-set UI models:', $models);
 
@@ -83,34 +83,34 @@ class Property1 extends HTML_QuickForm_Page
         $autosize[] = $this->createElement('radio', null, null, 'No', false);
         $this->addGroup($autosize, 'autosize', 'Progress best size:');
 
-        $progresssize['width']   = $this->createElement('text', 'width', null, array('size' => 4));
-        $progresssize['height']  = $this->createElement('text', 'height', null, array('size' => 4));
+        $progresssize['width'] = $this->createElement('text', 'width', null, array('size' => 4));
+        $progresssize['height'] = $this->createElement('text', 'height', null, array('size' => 4));
         $progresssize['bgcolor'] = $this->createElement('text', 'bgcolor', null, array('size' => 7));
         $this->addGroup($progresssize, 'progresssize', 'Size and color (width, height, bgcolor):', ',&nbsp;');
 
         $this->addElement('text', 'rAnimSpeed', array('Animation speed (0-1000 ; 0:fast, 1000:slow):', 'Rule type \'rangelength\', $format = array(0, 1000)'));
-        $this->addRule('rAnimSpeed', 'Should be between 0 and 1000', 'rangelength', array(0,1000), 'client');
+        $this->addRule('rAnimSpeed', 'Should be between 0 and 1000', 'rangelength', array(0, 1000), 'client');
 
-        $buttons = array('back'   => $this->controller->_buttonBack,
-                         'next'   => $this->controller->_buttonNext,
-                         'cancel' => $this->controller->_buttonCancel,
-                         'reset'  => $this->controller->_buttonReset,
-                         'apply'  => $this->controller->_buttonApply,
-                         'process'=> $this->controller->_buttonSave
-                         );
+        $buttons = array('back' => $this->controller->_buttonBack,
+            'next' => $this->controller->_buttonNext,
+            'cancel' => $this->controller->_buttonCancel,
+            'reset' => $this->controller->_buttonReset,
+            'apply' => $this->controller->_buttonApply,
+            'process' => $this->controller->_buttonSave
+        );
         $this->controller->createButtons($this, $buttons, $this->controller->_buttonAttr);
-        $this->controller->disableButton($this, array('back','apply','process'));
+        $this->controller->disableButton($this, array('back', 'apply', 'process'));
     }
 }
 
 /**
  *  Class for second Tab:
  *  Cell properties
- *  @ignore
+ * @ignore
  */
 class Property2 extends HTML_QuickForm_Page
 {
-    function buildForm()
+    public function buildForm()
     {
         $this->_formBuilt = true;
 
@@ -126,41 +126,41 @@ class Property2 extends HTML_QuickForm_Page
         $cellvalue['inc'] = $this->createElement('text', 'inc', null, array('size' => 4));
         $this->addGroup($cellvalue, 'cellvalue', 'Value (minimum, maximum, increment):', ',&nbsp;');
 
-        $cellsize['width']   = $this->createElement('text', 'width', null, array('size' => 4));
-        $cellsize['height']  = $this->createElement('text', 'height', null, array('size' => 4));
+        $cellsize['width'] = $this->createElement('text', 'width', null, array('size' => 4));
+        $cellsize['height'] = $this->createElement('text', 'height', null, array('size' => 4));
         $cellsize['spacing'] = $this->createElement('text', 'spacing', null, array('size' => 2));
-        $cellsize['count']   = $this->createElement('text', 'count', null, array('size' => 2));
+        $cellsize['count'] = $this->createElement('text', 'count', null, array('size' => 2));
         $this->addGroup($cellsize, 'cellsize', 'Size (width, height, spacing, count):', ',&nbsp;');
 
-        $cellcolor['active']   = $this->createElement('text', 'active', null, array('size' => 7));
+        $cellcolor['active'] = $this->createElement('text', 'active', null, array('size' => 7));
         $cellcolor['inactive'] = $this->createElement('text', 'inactive', null, array('size' => 7));
         $this->addGroup($cellcolor, 'cellcolor', 'Color (active, inactive):', ',&nbsp;');
 
         $cellfont['family'] = $this->createElement('text', 'family', null, array('size' => 32));
-        $cellfont['size']   = $this->createElement('text', 'size', null, array('size' => 2));
-        $cellfont['color']  = $this->createElement('text', 'color', null, array('size' => 7));
+        $cellfont['size'] = $this->createElement('text', 'size', null, array('size' => 2));
+        $cellfont['color'] = $this->createElement('text', 'color', null, array('size' => 7));
         $this->addGroup($cellfont, 'cellfont', 'Font (family, size, color):', ',&nbsp;');
 
-        $buttons = array('back'   => $this->controller->_buttonBack,
-                         'next'   => $this->controller->_buttonNext,
-                         'cancel' => $this->controller->_buttonCancel,
-                         'reset'  => $this->controller->_buttonReset,
-                         'apply'  => $this->controller->_buttonApply,
-                         'process'=> $this->controller->_buttonSave
-                         );
+        $buttons = array('back' => $this->controller->_buttonBack,
+            'next' => $this->controller->_buttonNext,
+            'cancel' => $this->controller->_buttonCancel,
+            'reset' => $this->controller->_buttonReset,
+            'apply' => $this->controller->_buttonApply,
+            'process' => $this->controller->_buttonSave
+        );
         $this->controller->createButtons($this, $buttons, $this->controller->_buttonAttr);
-        $this->controller->disableButton($this, array('apply','process'));
+        $this->controller->disableButton($this, array('apply', 'process'));
     }
 }
 
 /**
  *  Class for third Tab:
  *  Progress border properties
- *  @ignore
+ * @ignore
  */
 class Property3 extends HTML_QuickForm_Page
 {
-    function buildForm()
+    public function buildForm()
     {
         $this->_formBuilt = true;
 
@@ -174,31 +174,31 @@ class Property3 extends HTML_QuickForm_Page
 
         $this->addElement('text', 'borderclass', 'CSS class:', array('size' => 32));
 
-        $borderstyle['style'] = $this->createElement('select', 'style', null, array('solid'=>'Solid', 'dashed'=>'Dashed', 'dotted'=>'Dotted', 'inset'=>'Inset', 'outset'=>'Outset'));
+        $borderstyle['style'] = $this->createElement('select', 'style', null, array('solid' => 'Solid', 'dashed' => 'Dashed', 'dotted' => 'Dotted', 'inset' => 'Inset', 'outset' => 'Outset'));
         $borderstyle['width'] = $this->createElement('text', 'width', null, array('size' => 2));
         $borderstyle['color'] = $this->createElement('text', 'color', null, array('size' => 7));
         $this->addGroup($borderstyle, 'borderstyle', '(style, width, color):', ',&nbsp;');
 
-        $buttons = array('back'   => $this->controller->_buttonBack,
-                         'next'   => $this->controller->_buttonNext,
-                         'cancel' => $this->controller->_buttonCancel,
-                         'reset'  => $this->controller->_buttonReset,
-                         'apply'  => $this->controller->_buttonApply,
-                         'process'=> $this->controller->_buttonSave
-                         );
+        $buttons = array('back' => $this->controller->_buttonBack,
+            'next' => $this->controller->_buttonNext,
+            'cancel' => $this->controller->_buttonCancel,
+            'reset' => $this->controller->_buttonReset,
+            'apply' => $this->controller->_buttonApply,
+            'process' => $this->controller->_buttonSave
+        );
         $this->controller->createButtons($this, $buttons, $this->controller->_buttonAttr);
-        $this->controller->disableButton($this, array('apply','process'));
+        $this->controller->disableButton($this, array('apply', 'process'));
     }
 }
 
 /**
  *  Class for fourth Tab:
  *  String properties
- *  @ignore
+ * @ignore
  */
 class Property4 extends HTML_QuickForm_Page
 {
-    function buildForm()
+    public function buildForm()
     {
         $this->_formBuilt = true;
 
@@ -212,8 +212,8 @@ class Property4 extends HTML_QuickForm_Page
 
         $this->addElement('text', 'stringid', 'Id:', array('size' => 32));
 
-        $stringsize['width']   = $this->createElement('text', 'width', null, array('size' => 4));
-        $stringsize['height']  = $this->createElement('text', 'height', null, array('size' => 4));
+        $stringsize['width'] = $this->createElement('text', 'width', null, array('size' => 4));
+        $stringsize['height'] = $this->createElement('text', 'height', null, array('size' => 4));
         $stringsize['bgcolor'] = $this->createElement('text', 'bgcolor', null, array('size' => 7));
         $this->addGroup($stringsize, 'stringsize', 'Size and color (width, height, bgcolor):', ',&nbsp;');
 
@@ -229,32 +229,32 @@ class Property4 extends HTML_QuickForm_Page
         $this->addGroup($stringalign, 'stringalign', 'Horizontal alignment:');
 
         $stringfont['family'] = $this->createElement('text', 'family', null, array('size' => 40));
-        $stringfont['size']   = $this->createElement('text', 'size', null, array('size' => 2));
-        $stringfont['color']  = $this->createElement('text', 'color', null, array('size' => 7));
+        $stringfont['size'] = $this->createElement('text', 'size', null, array('size' => 2));
+        $stringfont['color'] = $this->createElement('text', 'color', null, array('size' => 7));
         $this->addGroup($stringfont, 'stringfont', 'Font (family, size, color):', ',&nbsp;');
 
         $this->addElement('textarea', 'strings', 'percent, string thrown:', array('rows' => 10, 'cols' => 50));
 
-        $buttons = array('back'   => $this->controller->_buttonBack,
-                         'next'   => $this->controller->_buttonNext,
-                         'cancel' => $this->controller->_buttonCancel,
-                         'reset'  => $this->controller->_buttonReset,
-                         'apply'  => $this->controller->_buttonApply,
-                         'process'=> $this->controller->_buttonSave
-                         );
+        $buttons = array('back' => $this->controller->_buttonBack,
+            'next' => $this->controller->_buttonNext,
+            'cancel' => $this->controller->_buttonCancel,
+            'reset' => $this->controller->_buttonReset,
+            'apply' => $this->controller->_buttonApply,
+            'process' => $this->controller->_buttonSave
+        );
         $this->controller->createButtons($this, $buttons, $this->controller->_buttonAttr);
-        $this->controller->disableButton($this, array('apply','process'));
+        $this->controller->disableButton($this, array('apply', 'process'));
     }
 }
 
 /**
  *  Class for fifth Tab:
  *  Show a preview of your progress bar design.
- *  @ignore
+ * @ignore
  */
 class Preview extends HTML_QuickForm_Page
 {
-    function buildForm()
+    public function buildForm()
     {
         $this->_formBuilt = true;
 
@@ -264,26 +264,26 @@ class Preview extends HTML_QuickForm_Page
 
         $this->addElement('static', 'progressBar', 'Your progress bar looks like:');
 
-        $buttons = array('back'   => $this->controller->_buttonBack,
-                         'next'   => $this->controller->_buttonNext,
-                         'cancel' => $this->controller->_buttonCancel,
-                         'reset'  => $this->controller->_buttonReset,
-                         'apply'  => $this->controller->_buttonApply,
-                         'process'=> $this->controller->_buttonSave
-                         );
+        $buttons = array('back' => $this->controller->_buttonBack,
+            'next' => $this->controller->_buttonNext,
+            'cancel' => $this->controller->_buttonCancel,
+            'reset' => $this->controller->_buttonReset,
+            'apply' => $this->controller->_buttonApply,
+            'process' => $this->controller->_buttonSave
+        );
         $this->controller->createButtons($this, $buttons, $this->controller->_buttonAttr);
-        $this->controller->disableButton($this, array('reset','process'));
+        $this->controller->disableButton($this, array('reset', 'process'));
     }
 }
 
 /**
  *  Class for sixth Tab:
  *  Save PHP and/or CSS code
- *  @ignore
+ * @ignore
  */
 class Save extends HTML_QuickForm_Page
 {
-    function buildForm()
+    public function buildForm()
     {
         $this->_formBuilt = true;
 
@@ -295,15 +295,14 @@ class Save extends HTML_QuickForm_Page
         $code[] = $this->createElement('checkbox', 'C', null, 'CSS');
         $this->addGroup($code, 'phpcss', 'PHP and/or StyleSheet source code:');
 
-        $buttons = array('back'   => $this->controller->_buttonBack,
-                         'next'   => $this->controller->_buttonNext,
-                         'cancel' => $this->controller->_buttonCancel,
-                         'reset'  => $this->controller->_buttonReset,
-                         'apply'  => $this->controller->_buttonApply,
-                         'process'=> $this->controller->_buttonSave
-                         );
+        $buttons = array('back' => $this->controller->_buttonBack,
+            'next' => $this->controller->_buttonNext,
+            'cancel' => $this->controller->_buttonCancel,
+            'reset' => $this->controller->_buttonReset,
+            'apply' => $this->controller->_buttonApply,
+            'process' => $this->controller->_buttonSave
+        );
         $this->controller->createButtons($this, $buttons, $this->controller->_buttonAttr);
-        $this->controller->disableButton($this, array('next','apply'));
+        $this->controller->disableButton($this, array('next', 'apply'));
     }
 }
-?>

@@ -19,55 +19,58 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
-define('FAIRNESS_API', TRUE );
+define('FAIRNESS_API', true);
 forceNoCacheHeaders(); //Send headers to disable caching.
 
 //Returns valid classes when unauthenticated.
-function getUnauthenticatedAPIClasses() {
-	return array('APIAuthentication', 'APIClientStationUnAuthenticated', 'APIAuthenticationPlugin', 'APIClientStationUnAuthenticatedPlugin', 'APIProgressBar', 'APIInstall');
+function getUnauthenticatedAPIClasses()
+{
+    return array('APIAuthentication', 'APIClientStationUnAuthenticated', 'APIAuthenticationPlugin', 'APIClientStationUnAuthenticatedPlugin', 'APIProgressBar', 'APIInstall');
 }
 
 //Returns session ID from _COOKIE, _POST, then _GET.
-function getSessionID() {
+function getSessionID()
+{
 
-	//FIXME: Work-around for bug in Mobile app v3.0.86 that uses old SessionIDs in the Cookie, but correct ones on the URL.
-	if ( isset($_COOKIE['SessionID']) AND isset($_GET['SessionID']) AND $_COOKIE['SessionID'] != $_GET['SessionID'] ) {
-		//Debug::Arr( array($_COOKIE, $_POST, $_GET), 'Input Data:', __FILE__, __LINE__, __METHOD__, 10);
-		Debug::Text( 'WARNING: Two different SessionIDs sent, COOKIE: '. $_COOKIE['SessionID'] .' GET: '. $_GET['SessionID'], __FILE__, __LINE__, __METHOD__, 10);
-		if ( isset($_SERVER['REQUEST_URI']) AND stripos( $_SERVER['REQUEST_URI'], 'APIClientStationUnAuthenticated' ) !== FALSE ) {
-			Debug::Text( 'Using GET Session ID...', __FILE__, __LINE__, __METHOD__, 10);
-			unset($_COOKIE['SessionID']);
-		}
-	}
+    //FIXME: Work-around for bug in Mobile app v3.0.86 that uses old SessionIDs in the Cookie, but correct ones on the URL.
+    if (isset($_COOKIE['SessionID']) and isset($_GET['SessionID']) and $_COOKIE['SessionID'] != $_GET['SessionID']) {
+        //Debug::Arr( array($_COOKIE, $_POST, $_GET), 'Input Data:', __FILE__, __LINE__, __METHOD__, 10);
+        Debug::Text('WARNING: Two different SessionIDs sent, COOKIE: ' . $_COOKIE['SessionID'] . ' GET: ' . $_GET['SessionID'], __FILE__, __LINE__, __METHOD__, 10);
+        if (isset($_SERVER['REQUEST_URI']) and stripos($_SERVER['REQUEST_URI'], 'APIClientStationUnAuthenticated') !== false) {
+            Debug::Text('Using GET Session ID...', __FILE__, __LINE__, __METHOD__, 10);
+            unset($_COOKIE['SessionID']);
+        }
+    }
 
-	if ( isset($_COOKIE['SessionID']) AND $_COOKIE['SessionID'] != '' ) {
-		$session_id = $_COOKIE['SessionID'];
-	} elseif ( isset($_POST['SessionID']) AND $_POST['SessionID'] != '' ) {
-		$session_id = $_POST['SessionID'];
-	} elseif ( isset($_GET['SessionID']) AND $_GET['SessionID'] != '' ) {
-		$session_id = $_GET['SessionID'];
-	} else {
-		$session_id = FALSE;
-	}
+    if (isset($_COOKIE['SessionID']) and $_COOKIE['SessionID'] != '') {
+        $session_id = $_COOKIE['SessionID'];
+    } elseif (isset($_POST['SessionID']) and $_POST['SessionID'] != '') {
+        $session_id = $_POST['SessionID'];
+    } elseif (isset($_GET['SessionID']) and $_GET['SessionID'] != '') {
+        $session_id = $_GET['SessionID'];
+    } else {
+        $session_id = false;
+    }
 
-	return $session_id;
+    return $session_id;
 }
 
 //Returns Station ID from _COOKIE, _POST, then _GET.
-function getStationID() {
-	if ( isset($_COOKIE['StationID']) AND $_COOKIE['StationID'] != '' ) {
-		$station_id = $_COOKIE['StationID'];
-	} elseif ( isset($_POST['StationID']) AND $_POST['StationID'] != '' ) {
-		$station_id = $_POST['StationID'];
-	} elseif ( isset($_GET['StationID']) AND $_GET['StationID'] != '' ) {
-		$station_id = $_GET['StationID'];
-	} else {
-		$station_id = FALSE;
-	}
+function getStationID()
+{
+    if (isset($_COOKIE['StationID']) and $_COOKIE['StationID'] != '') {
+        $station_id = $_COOKIE['StationID'];
+    } elseif (isset($_POST['StationID']) and $_POST['StationID'] != '') {
+        $station_id = $_POST['StationID'];
+    } elseif (isset($_GET['StationID']) and $_GET['StationID'] != '') {
+        $station_id = $_GET['StationID'];
+    } else {
+        $station_id = false;
+    }
 
-	return $station_id;
+    return $station_id;
 }
 
 //Make sure cron job information is always logged.
@@ -77,7 +80,6 @@ Debug::setEnable( TRUE );
 Debug::setBufferOutput( TRUE );
 Debug::setEnableLog( TRUE );
 if ( Debug::getVerbosity() <= 1 ) {
-	Debug::setVerbosity( 1 );
+    Debug::setVerbosity( 1 );
 }
-*/
-?>
+*/;

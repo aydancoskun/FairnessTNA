@@ -19,36 +19,37 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Module_Install
  */
-class InstallSchema_1065A extends InstallSchema_Base {
+class InstallSchema_1065A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        //Delete dummy pay codes created in 1064A schema.
+        $pclf = TTnew('PayCodeListFactory');
+        $pclf->getAll();
+        if ($pclf->getRecordCount() > 0) {
+            foreach ($pclf as $pc_obj) {
+                if (trim(strtolower($pc_obj->getCode())) == 'dummy') {
+                    $pc_obj->setDeleted(true);
+                    $pc_obj->Save(); //Don't call isValid() as that causes the slow SQL query check to see if this is in use to run twice.
+                }
+            }
+        }
 
-		//Delete dummy pay codes created in 1064A schema.
-		$pclf = TTnew('PayCodeListFactory');
-		$pclf->getAll();
-		if ( $pclf->getRecordCount() > 0 ) {
-			foreach( $pclf as $pc_obj ) {
-				if ( trim( strtolower( $pc_obj->getCode() ) ) == 'dummy' ) {
-					$pc_obj->setDeleted( TRUE );
-					$pc_obj->Save(); //Don't call isValid() as that causes the slow SQL query check to see if this is in use to run twice.
-				}
-			}
-		}
-		
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

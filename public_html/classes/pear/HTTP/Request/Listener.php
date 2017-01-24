@@ -37,54 +37,54 @@
 
 /**
  * This class implements the Observer part of a Subject-Observer
- * design pattern. It listens to the events sent by a 
+ * design pattern. It listens to the events sent by a
  * HTTP_Request or HTTP_Response instance.
  *
  * @package HTTP_Request
  * @author  Alexey Borzov <avb@php.net>
  * @version $Revision: 1.2 $
  */
-class HTTP_Request_Listener 
+class HTTP_Request_Listener
 {
-   /**
-    * A listener's identifier
-    * @var string
-    */
-    var $_id;
+    /**
+     * A listener's identifier
+     * @var string
+     */
+    public $_id;
 
-   /**
-    * Constructor, sets the object's identifier
-    *
-    * @access public
-    */
-    function HTTP_Request_Listener()
+    /**
+     * Constructor, sets the object's identifier
+     *
+     * @access public
+     */
+    public function HTTP_Request_Listener()
     {
         $this->_id = md5(uniqid('http_request_', 1));
     }
 
 
-   /**
-    * Returns the listener's identifier
-    *
-    * @access public
-    * @return string
-    */
-    function getId()
+    /**
+     * Returns the listener's identifier
+     *
+     * @access public
+     * @return string
+     */
+    public function getId()
     {
         return $this->_id;
     }
 
 
-   /**
-    * This method is called when Listener is notified of an event
-    *
-    * @access   public
-    * @param    object  an object the listener is attached to
-    * @param    string  Event name
-    * @param    mixed   Additional data
-    * @abstract
-    */
-    function update(&$subject, $event, $data = null)
+    /**
+     * This method is called when Listener is notified of an event
+     *
+     * @access   public
+     * @param    object  an object the listener is attached to
+     * @param    string  Event name
+     * @param    mixed   Additional data
+     * @abstract
+     */
+    public function update(&$subject, $event, $data = null)
     {
         echo "Notified of event: '$event'\n";
         if (null !== $data) {
@@ -93,4 +93,3 @@ class HTTP_Request_Listener
         }
     }
 }
-?>

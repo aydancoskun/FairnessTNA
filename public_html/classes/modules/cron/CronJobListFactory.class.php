@@ -19,142 +19,146 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Cron
  */
-class CronJobListFactory extends CronJobFactory implements IteratorAggregate {
+class CronJobListFactory extends CronJobFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        if ($order == null) {
+            $order = array('id' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		if ( $order == NULL ) {
-			$order = array( 'id' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
-
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$this->rs = $this->getCache($id);
-		if ( $this->rs === FALSE ) {
-			$ph = array(
-						'id' => (int)$id,
-						);
+        $this->rs = $this->getCache($id);
+        if ($this->rs === false) {
+            $ph = array(
+                'id' => (int)$id,
+            );
 
-			$query = '
+            $query = '
 						select	*
-						from	'. $this->getTable() .'
+						from	' . $this->getTable() . '
 						where	id = ?
 							AND deleted = 0';
-			$query .= $this->getWhereSQL( $where );
-			$query .= $this->getSortSQL( $order );
+            $query .= $this->getWhereSQL($where);
+            $query .= $this->getSortSQL($order);
 
-			$this->ExecuteSQL( $query, $ph );
+            $this->ExecuteSQL($query, $ph);
 
-			$this->saveCache($this->rs, $id);
-		}
+            $this->saveCache($this->rs, $id);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByIdAndStatus($id, $status_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByIdAndStatus($id, $status_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $status_id == '') {
-			return FALSE;
-		}
+        if ($status_id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					'status_id' => (int)$status_id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+            'status_id' => (int)$status_id,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 						AND status_id = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByName($name, $where = NULL, $order = NULL) {
-		if ( $name == '') {
-			return FALSE;
-		}
+    public function getByName($name, $where = null, $order = null)
+    {
+        if ($name == '') {
+            return false;
+        }
 
-		$ph = array(
-					'name' => $name,
-					);
+        $ph = array(
+            'name' => $name,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	name = ?
 						AND deleted = 0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getMostRecentlyRun() {
-		$query = '
+    public function getMostRecentlyRun()
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted = 0
 					ORDER BY last_run_date DESC
 					LIMIT 1';
-		//$query .= $this->getWhereSQL( $where );
-		//$query .= $this->getSortSQL( $order );
+        //$query .= $this->getWhereSQL( $where );
+        //$query .= $this->getSortSQL( $order );
 
-		$this->rs = $this->db->Execute($query);
+        $this->rs = $this->db->Execute($query);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getArrayByListFactory($lf) {
-		if ( !is_object($lf) ) {
-			return FALSE;
-		}
+    public function getArrayByListFactory($lf)
+    {
+        if (!is_object($lf)) {
+            return false;
+        }
 
-		$list = array();
-		foreach ($lf as $obj) {
-			$list[$obj->getID()] = $obj->getName(TRUE);
-		}
+        $list = array();
+        foreach ($lf as $obj) {
+            $list[$obj->getID()] = $obj->getName(true);
+        }
 
-		if ( empty($list) == FALSE ) {
-			return $list;
-		}
+        if (empty($list) == false) {
+            return $list;
+        }
 
-		return FALSE;
-	}
-
+        return false;
+    }
 }
-?>

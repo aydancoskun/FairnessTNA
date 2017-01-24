@@ -1,50 +1,50 @@
-var APIPermissionControl = ServiceCaller.extend( {
+var APIPermissionControl = ServiceCaller.extend({
 
-	key_name: 'PermissionControl',
-	className: 'APIPermissionControl',
+    key_name: 'PermissionControl',
+    className: 'APIPermissionControl',
 
-	getPermissionControl: function() {
+    getPermissionControl: function () {
 
-		return this.argumentsHandler( this.className, 'getPermissionControl', arguments );
+        return this.argumentsHandler(this.className, 'getPermissionControl', arguments);
 
-	},
-	getPermissionControlDefaultData: function() {
+    },
+    getPermissionControlDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPermissionControlDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPermissionControlDefaultData', arguments);
 
-	},
-	getPermissionOptions: function() {
+    },
+    getPermissionOptions: function () {
 
-		return this.argumentsHandler( this.className, 'getPermissionOptions', arguments );
+        return this.argumentsHandler(this.className, 'getPermissionOptions', arguments);
 
-	},
-	getCommonPermissionControlData: function() {
+    },
+    getCommonPermissionControlData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPermissionControlData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPermissionControlData', arguments);
 
-	},
-	validatePermissionControl: function() {
+    },
+    validatePermissionControl: function () {
 
-		return this.argumentsHandler( this.className, 'validatePermissionControl', arguments );
+        return this.argumentsHandler(this.className, 'validatePermissionControl', arguments);
 
-	},
-	setPermissionControl: function() {
+    },
+    setPermissionControl: function () {
 
-		return this.argumentsHandler( this.className, 'setPermissionControl', arguments );
+        return this.argumentsHandler(this.className, 'setPermissionControl', arguments);
 
-	},
-	deletePermissionControl: function() {
+    },
+    deletePermissionControl: function () {
 
-		return this.argumentsHandler( this.className, 'deletePermissionControl', arguments );
+        return this.argumentsHandler(this.className, 'deletePermissionControl', arguments);
 
-	},
-	copyPermissionControl: function() {
+    },
+    copyPermissionControl: function () {
 
-		return this.argumentsHandler( this.className, 'copyPermissionControl', arguments );
+        return this.argumentsHandler(this.className, 'copyPermissionControl', arguments);
 
-	},
+    },
 
-	exportPermissionControl: function() {
-		return this.argumentsHandler( this.className, 'exportPermissionControl', arguments );
-	},
-} );
+    exportPermissionControl: function () {
+        return this.argumentsHandler(this.className, 'exportPermissionControl', arguments);
+    },
+});

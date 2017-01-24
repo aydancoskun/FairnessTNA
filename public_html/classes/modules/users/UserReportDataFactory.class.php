@@ -19,394 +19,423 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Users
  */
-class UserReportDataFactory extends Factory {
-	protected $table = 'user_report_data';
-	protected $pk_sequence_name = 'user_report_data_id_seq'; //PK Sequence name
+class UserReportDataFactory extends Factory
+{
+    protected $table = 'user_report_data';
+    protected $pk_sequence_name = 'user_report_data_id_seq'; //PK Sequence name
 
-	protected $user_obj = NULL;
-	protected $obj_handler = NULL;
+    protected $user_obj = null;
+    protected $obj_handler = null;
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'columns':
+                $retval = array(
+                    '-1010-name' => TTi18n::gettext('Name'),
+                    '-1020-description' => TTi18n::gettext('Description'),
+                    '-1030-script_name' => TTi18n::gettext('Report'),
+                    '-1040-is_default' => TTi18n::gettext('Default'),
+                    '-1050-is_scheduled' => TTi18n::gettext('Scheduled'),
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'columns':
-				$retval = array(
-										'-1010-name' => TTi18n::gettext('Name'),
-										'-1020-description' => TTi18n::gettext('Description'),
-										'-1030-script_name' => TTi18n::gettext('Report'),
-										'-1040-is_default' => TTi18n::gettext('Default'),
-										'-1050-is_scheduled' => TTi18n::gettext('Scheduled'),
+                    '-2000-created_by' => TTi18n::gettext('Created By'),
+                    '-2010-created_date' => TTi18n::gettext('Created Date'),
+                    '-2020-updated_by' => TTi18n::gettext('Updated By'),
+                    '-2030-updated_date' => TTi18n::gettext('Updated Date'),
+                );
+                break;
+            case 'list_columns':
+                $retval = Misc::arrayIntersectByKey($this->getOptions('default_display_columns'), Misc::trimSortPrefix($this->getOptions('columns')));
+                break;
+            case 'default_display_columns': //Columns that are displayed by default.
+                $retval = array(
+                    'name',
+                    'script_name',
+                    'description',
+                    'is_default',
+                );
+                break;
+            case 'unique_columns': //Columns that are unique, and disabled for mass editing.
+                $retval = array(
+                    'name',
+                    'description',
+                );
+                break;
+            case 'linked_columns': //Columns that are linked together, mainly for Mass Edit, if one changes, they all must.
+                $retval = array();
+                break;
+        }
 
-										'-2000-created_by' => TTi18n::gettext('Created By'),
-										'-2010-created_date' => TTi18n::gettext('Created Date'),
-										'-2020-updated_by' => TTi18n::gettext('Updated By'),
-										'-2030-updated_date' => TTi18n::gettext('Updated Date'),
-							);
-				break;
-			case 'list_columns':
-				$retval = Misc::arrayIntersectByKey( $this->getOptions('default_display_columns'), Misc::trimSortPrefix( $this->getOptions('columns') ) );
-				break;
-			case 'default_display_columns': //Columns that are displayed by default.
-				$retval = array(
-								'name',
-								'script_name',
-								'description',
-								'is_default',
-								);
-				break;
-			case 'unique_columns': //Columns that are unique, and disabled for mass editing.
-				$retval = array(
-								'name',
-								'description',
-								);
-				break;
-			case 'linked_columns': //Columns that are linked together, mainly for Mass Edit, if one changes, they all must.
-				$retval = array(
-								);
-				break;
-		}
+        return $retval;
+    }
 
-		return $retval;
-	}
+    public function _getVariableToFunctionMap($data)
+    {
+        $variable_function_map = array(
+            'id' => 'ID',
+            'company_id' => 'Company',
+            'user_id' => 'User',
+            'script' => 'Script',
+            'script_name' => false,
+            'name' => 'Name',
+            'is_default' => 'Default',
+            'is_scheduled' => false,
+            'description' => 'Description',
+            'data' => 'Data',
+            'deleted' => 'Deleted',
+        );
+        return $variable_function_map;
+    }
 
-	function _getVariableToFunctionMap( $data ) {
-		$variable_function_map = array(
-										'id' => 'ID',
-										'company_id' => 'Company',
-										'user_id' => 'User',
-										'script' => 'Script',
-										'script_name' => FALSE,
-										'name' => 'Name',
-										'is_default' => 'Default',
-										'is_scheduled' => FALSE,
-										'description' => 'Description',
-										'data' => 'Data',
-										'deleted' => 'Deleted',
-										);
-		return $variable_function_map;
-	}
+    public function getUserObject()
+    {
+        return $this->getGenericObject('UserListFactory', $this->getUser(), 'user_obj');
+    }
 
-	function getUserObject() {
-		return $this->getGenericObject( 'UserListFactory', $this->getUser(), 'user_obj' );
-	}
+    public function getUser()
+    {
+        if (isset($this->data['user_id'])) {
+            return (int)$this->data['user_id'];
+        }
 
-	function getObjectHandler() {
-		if ( is_object($this->obj_handler) ) {
-			return $this->obj_handler;
-		} else {
-			$class = $this->getScript();
-			if ( class_exists( $class, TRUE ) ) {
-				$this->obj_handler = new $class();
-				return $this->obj_handler;
-			}
+        return false;
+    }
 
-			return FALSE;
-		}
-	}
+    public function setCompany($id)
+    {
+        $id = trim($id);
 
-	function getCompany() {
-		if ( isset($this->data['company_id']) ) {
-			return (int)$this->data['company_id'];
-		}
+        $clf = TTnew('CompanyListFactory');
 
-		return FALSE;
-	}
-	function setCompany($id) {
-		$id = trim($id);
+        if ($this->Validator->isResultSetWithRows('company',
+            $clf->getByID($id),
+            TTi18n::gettext('Invalid Company')
+        )
+        ) {
+            $this->data['company_id'] = $id;
 
-		$clf = TTnew( 'CompanyListFactory' );
+            return true;
+        }
 
-		if ( $this->Validator->isResultSetWithRows(			'company',
-															$clf->getByID($id),
-															TTi18n::gettext('Invalid Company')
-															) ) {
-			$this->data['company_id'] = $id;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setUser($id)
+    {
+        $id = trim($id);
 
-		return FALSE;
-	}
+        $ulf = TTnew('UserListFactory');
 
-	function getUser() {
-		if ( isset($this->data['user_id']) ) {
-			return (int)$this->data['user_id'];
-		}
+        if ($this->Validator->isResultSetWithRows('user',
+            $ulf->getByID($id),
+            TTi18n::gettext('Invalid Employee')
+        )
+        ) {
+            $this->data['user_id'] = $id;
 
-		return FALSE;
-	}
-	function setUser($id) {
-		$id = trim($id);
+            return true;
+        }
 
-		$ulf = TTnew( 'UserListFactory' );
+        return false;
+    }
 
-		if ( $this->Validator->isResultSetWithRows(	'user',
-															$ulf->getByID($id),
-															TTi18n::gettext('Invalid Employee')
-															) ) {
-			$this->data['user_id'] = $id;
+    public function setScript($value)
+    {
+        //Strip out double slashes, as sometimes those occur and they cause the saved settings to not appear.
+        $value = self::handleScriptName(trim($value));
+        if ($this->Validator->isLength('script',
+            $value,
+            TTi18n::gettext('Invalid script'),
+            1, 250)
+        ) {
+            $this->data['script'] = $value;
 
-			return TRUE;
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getScript() {
-		if ( isset($this->data['script']) ) {
-			return $this->data['script'];
-		}
+    public static function handleScriptName($script_name)
+    {
+        return str_replace('//', '/', $script_name);
+    }
 
-		return FALSE;
-	}
-	function setScript($value) {
-		//Strip out double slashes, as sometimes those occur and they cause the saved settings to not appear.
-		$value = self::handleScriptName( trim($value) );
-		if (	$this->Validator->isLength(	'script',
-											$value,
-											TTi18n::gettext('Invalid script'),
-											1, 250)
-						) {
+    public function setName($name)
+    {
+        $name = trim($name);
+        if ($this->Validator->isLength('name',
+                $name,
+                TTi18n::gettext('Name is too short or too long'),
+                1, 100)
+            and
+            $this->Validator->isTrue('name',
+                $this->isUniqueName($name),
+                TTi18n::gettext('Name already exists'))
+        ) {
+            $this->data['name'] = $name;
 
-			$this->data['script'] = $value;
+            return true;
+        }
 
-			return TRUE;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function isUniqueName($name)
+    {
+        if ($this->getCompany() == false) {
+            return false;
+        }
 
-	function isUniqueName($name) {
-		if ( $this->getCompany() == FALSE ) {
-			return FALSE;
-		}
+        //Allow no user_id to be set yet, as that would be company generic data.
 
-		//Allow no user_id to be set yet, as that would be company generic data.
+        if ($this->getScript() == false) {
+            return false;
+        }
 
-		if ( $this->getScript() == FALSE ) {
-			return FALSE;
-		}
+        $name = trim($name);
+        if ($name == '') {
+            return false;
+        }
 
-		$name = trim($name);
-		if ( $name == '' ) {
-			return FALSE;
-		}
+        $ph = array(
+            'company_id' => (int)$this->getCompany(),
+            'script' => $this->getScript(),
+            'name' => TTi18n::strtolower($name),
+        );
 
-		$ph = array(
-					'company_id' => (int)$this->getCompany(),
-					'script' => $this->getScript(),
-					'name' => TTi18n::strtolower( $name ),
-					);
-
-		$query = 'select id from '. $this->getTable() .'
+        $query = 'select id from ' . $this->getTable() . '
 					where
 						company_id = ?
 						AND script = ?
 						AND lower(name) = ? ';
-		if (  $this->getUser() != '' ) {
-			$query .= ' AND user_id = '. (int)$this->getUser();
-		} else {
-			$query .= ' AND user_id is NULL ';
-		}
+        if ($this->getUser() != '') {
+            $query .= ' AND user_id = ' . (int)$this->getUser();
+        } else {
+            $query .= ' AND user_id is NULL ';
+        }
 
-		$query .= ' AND deleted = 0';
-		$name_id = $this->db->GetOne($query, $ph);
-		Debug::Arr($name_id, 'Unique Name: '. $name, __FILE__, __LINE__, __METHOD__, 10);
+        $query .= ' AND deleted = 0';
+        $name_id = $this->db->GetOne($query, $ph);
+        Debug::Arr($name_id, 'Unique Name: ' . $name, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $name_id === FALSE ) {
-			return TRUE;
-		} else {
-			if ($name_id == $this->getId() ) {
-				return TRUE;
-			}
-		}
+        if ($name_id === false) {
+            return true;
+        } else {
+            if ($name_id == $this->getId()) {
+                return true;
+            }
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getName() {
-		if ( isset($this->data['name']) ) {
-			return $this->data['name'];
-		}
+    public function getCompany()
+    {
+        if (isset($this->data['company_id'])) {
+            return (int)$this->data['company_id'];
+        }
 
-		return FALSE;
-	}
-	function setName($name) {
-		$name = trim($name);
-		if (	$this->Validator->isLength(	'name',
-											$name,
-											TTi18n::gettext('Name is too short or too long'),
-											1, 100)
-				AND
-				$this->Validator->isTrue(		'name',
-												$this->isUniqueName($name),
-												TTi18n::gettext('Name already exists'))
-				) {
+        return false;
+    }
 
-			$this->data['name'] = $name;
+    public function getScript()
+    {
+        if (isset($this->data['script'])) {
+            return $this->data['script'];
+        }
 
-			return TRUE;
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setDefault($bool)
+    {
+        $this->data['is_default'] = $this->toBool($bool);
 
-	function getDefault() {
-		if ( isset($this->data['is_default']) ) {
-			return $this->fromBool( $this->data['is_default'] );
-		}
+        return true;
+    }
 
-		return FALSE;
-	}
-	function setDefault($bool) {
-		$this->data['is_default'] = $this->toBool($bool);
+    public function getDescription()
+    {
+        if (isset($this->data['description'])) {
+            return $this->data['description'];
+        }
 
-		return TRUE;
-	}
+        return false;
+    }
 
-	function getDescription() {
-		if ( isset($this->data['description']) ) {
-			return $this->data['description'];
-		}
+    public function setDescription($description)
+    {
+        $description = trim($description);
 
-		return FALSE;
-	}
-	function setDescription($description) {
-		$description = trim($description);
+        if ($this->Validator->isLength('description',
+            $description,
+            TTi18n::gettext('Description is invalid'),
+            0, 1024)
+        ) {
+            $this->data['description'] = $description;
 
-		if (	$this->Validator->isLength(	'description',
-											$description,
-											TTi18n::gettext('Description is invalid'),
-											0, 1024) ) {
+            return true;
+        }
 
-			$this->data['description'] = $description;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function getData()
+    {
+        return unserialize($this->data['data']);
+    }
 
-		return FALSE;
-	}
+    public function setData($value)
+    {
+        $value = serialize($value);
 
-	function getData() {
-		return unserialize( $this->data['data'] );
-	}
-	function setData($value) {
-		$value = serialize($value);
+        $this->data['data'] = $value;
 
-		$this->data['data'] = $value;
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function Validate($ignore_warning = true)
+    {
+        if ($this->Validator->hasError('name') == false and $this->getName() == '') {
+            $this->Validator->isTRUE('name',
+                false,
+                TTi18n::gettext('Name must be specified'));
+        }
 
-	function Validate( $ignore_warning = TRUE ) {
-		if ( $this->Validator->hasError('name') == FALSE AND $this->getName() == '' ) {
-			$this->Validator->isTRUE(	'name',
-										FALSE,
-										TTi18n::gettext('Name must be specified'));
-		}
+        return true;
+    }
 
-		return TRUE;
-	}
-	function preSave() {
-		if ( $this->getDefault() == TRUE ) {
-			//Remove default flag from all other entries.
-			$urdlf = TTnew( 'UserReportDataListFactory' );
-			if ( $this->getUser() == FALSE ) {
-				$urdlf->getByCompanyIdAndScriptAndDefault( $this->getUser(), $this->getScript(), TRUE );
-			} else {
-				$urdlf->getByUserIdAndScriptAndDefault( $this->getUser(), $this->getScript(), TRUE );
-			}
-			if ( $urdlf->getRecordCount() > 0 ) {
-				foreach( $urdlf as $urd_obj ) {
-					Debug::Text('Removing Default Flag From: '. $urd_obj->getId(), __FILE__, __LINE__, __METHOD__, 10);
-					$urd_obj->setDefault(FALSE);
-					if ( $urd_obj->isValid() ) {
-						$urd_obj->Save();
-					}
-				}
-			}
-		}
+    public function getName()
+    {
+        if (isset($this->data['name'])) {
+            return $this->data['name'];
+        }
 
-		return TRUE;
-	}
+        return false;
+    }
 
-	static function handleScriptName( $script_name ) {
-		return str_replace('//', '/', $script_name);
-	}
+    public function preSave()
+    {
+        if ($this->getDefault() == true) {
+            //Remove default flag from all other entries.
+            $urdlf = TTnew('UserReportDataListFactory');
+            if ($this->getUser() == false) {
+                $urdlf->getByCompanyIdAndScriptAndDefault($this->getUser(), $this->getScript(), true);
+            } else {
+                $urdlf->getByUserIdAndScriptAndDefault($this->getUser(), $this->getScript(), true);
+            }
+            if ($urdlf->getRecordCount() > 0) {
+                foreach ($urdlf as $urd_obj) {
+                    Debug::Text('Removing Default Flag From: ' . $urd_obj->getId(), __FILE__, __LINE__, __METHOD__, 10);
+                    $urd_obj->setDefault(false);
+                    if ($urd_obj->isValid()) {
+                        $urd_obj->Save();
+                    }
+                }
+            }
+        }
 
-	//Support setting created_by, updated_by especially for importing data.
-	function setObjectFromArray( $data ) {
-		if ( is_array( $data ) ) {
-			$variable_function_map = $this->getVariableToFunctionMap();
-			foreach( $variable_function_map as $key => $function ) {
-				if ( isset($data[$key]) ) {
+        return true;
+    }
 
-					$function = 'set'.$function;
-					switch( $key ) {
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$this->$function( $data[$key] );
-							}
-							break;
-					}
-				}
-			}
+    public function getDefault()
+    {
+        if (isset($this->data['is_default'])) {
+            return $this->fromBool($this->data['is_default']);
+        }
 
-			$this->setCreatedAndUpdatedColumns( $data );
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setObjectFromArray($data)
+    {
+        if (is_array($data)) {
+            $variable_function_map = $this->getVariableToFunctionMap();
+            foreach ($variable_function_map as $key => $function) {
+                if (isset($data[$key])) {
+                    $function = 'set' . $function;
+                    switch ($key) {
+                        default:
+                            if (method_exists($this, $function)) {
+                                $this->$function($data[$key]);
+                            }
+                            break;
+                    }
+                }
+            }
 
-		return FALSE;
-	}
+            $this->setCreatedAndUpdatedColumns($data);
 
-	function getObjectAsArray( $include_columns = NULL ) {
-		$data = array();
-		$variable_function_map = $this->getVariableToFunctionMap();
-		if ( is_array( $variable_function_map ) ) {
-			foreach( $variable_function_map as $variable => $function_stub ) {
-				if ( $include_columns == NULL OR ( isset($include_columns[$variable]) AND $include_columns[$variable] == TRUE ) ) {
+            return true;
+        }
 
-					$function = 'get'.$function_stub;
-					switch( $variable ) {
-						case 'is_scheduled':
-							$data[$variable] = $this->getColumn('is_scheduled');
-							break;
-						case 'script_name':
-							$report_obj = $this->getObjectHandler();
-							if ( is_object($report_obj ) ) {
-								$data[$variable] = $report_obj->title;
-							}
-							break;
-						default:
-							if ( method_exists( $this, $function ) ) {
-								$data[$variable] = $this->$function();
-							}
-							break;
-					}
+        return false;
+    }
 
-				}
-			}
-			$this->getCreatedAndUpdatedColumns( $data, $include_columns );
-		}
+    //Support setting created_by, updated_by especially for importing data.
 
-		return $data;
-	}
+    public function getObjectAsArray($include_columns = null)
+    {
+        $data = array();
+        $variable_function_map = $this->getVariableToFunctionMap();
+        if (is_array($variable_function_map)) {
+            foreach ($variable_function_map as $variable => $function_stub) {
+                if ($include_columns == null or (isset($include_columns[$variable]) and $include_columns[$variable] == true)) {
+                    $function = 'get' . $function_stub;
+                    switch ($variable) {
+                        case 'is_scheduled':
+                            $data[$variable] = $this->getColumn('is_scheduled');
+                            break;
+                        case 'script_name':
+                            $report_obj = $this->getObjectHandler();
+                            if (is_object($report_obj)) {
+                                $data[$variable] = $report_obj->title;
+                            }
+                            break;
+                        default:
+                            if (method_exists($this, $function)) {
+                                $data[$variable] = $this->$function();
+                            }
+                            break;
+                    }
+                }
+            }
+            $this->getCreatedAndUpdatedColumns($data, $include_columns);
+        }
 
-	function addLog( $log_action ) {
-		if ( $this->getUser() == FALSE AND $this->getDefault() == TRUE ) {
-			//Bypass logging on Company Default Save.
-			return TRUE;
-		}
+        return $data;
+    }
 
-		return TTLog::addEntry( $this->getId(), $log_action, TTi18n::getText('Saved Report Data'), NULL, $this->getTable() );
-	}
+    public function getObjectHandler()
+    {
+        if (is_object($this->obj_handler)) {
+            return $this->obj_handler;
+        } else {
+            $class = $this->getScript();
+            if (class_exists($class, true)) {
+                $this->obj_handler = new $class();
+                return $this->obj_handler;
+            }
+
+            return false;
+        }
+    }
+
+    public function addLog($log_action)
+    {
+        if ($this->getUser() == false and $this->getDefault() == true) {
+            //Bypass logging on Company Default Save.
+            return true;
+        }
+
+        return TTLog::addEntry($this->getId(), $log_action, TTi18n::getText('Saved Report Data'), null, $this->getTable());
+    }
 }
-?>

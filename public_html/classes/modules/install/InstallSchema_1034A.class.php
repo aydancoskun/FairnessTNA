@@ -19,46 +19,46 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1034A extends InstallSchema_Base {
+class InstallSchema_1034A extends InstallSchema_Base
+{
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
-
-		return TRUE;
-	}
+        return true;
+    }
 
 
-	function postInstall() {
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+    public function postInstall()
+    {
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-		//Go through all employee wages and update HourlyRate to the accurate annual hourly rate.
-		//Take into account wage entries that don't have the proper effective date based on the employees hire date, force a correct effective_date.
-		$uwlf = TTnew( 'UserWageListFactory' );
-		$uwlf->getAll();
-		if ( $uwlf->getRecordCount() > 0 ) {
-			foreach( $uwlf as $uw_obj ) {
-				$uw_obj->setHourlyRate( $uw_obj->calcHourlyRate( time(), TRUE ) );
-				if ( $uw_obj->getWageGroup() == 0 AND $uw_obj->isValidEffectiveDate( $uw_obj->getEffectiveDate() ) == FALSE ) {
-					//Set wage effective date to employees hire date.
-					$u_obj = $uw_obj->getUserObject();
-					if ( is_object($u_obj) ) {
-						$uw_obj->setEffectiveDate( $u_obj->getHireDate() );
-					}
-				}
-				if ( $uw_obj->isValid() ) {
-					$uw_obj->Save();
-				}
-			}
-		}
+        //Go through all employee wages and update HourlyRate to the accurate annual hourly rate.
+        //Take into account wage entries that don't have the proper effective date based on the employees hire date, force a correct effective_date.
+        $uwlf = TTnew('UserWageListFactory');
+        $uwlf->getAll();
+        if ($uwlf->getRecordCount() > 0) {
+            foreach ($uwlf as $uw_obj) {
+                $uw_obj->setHourlyRate($uw_obj->calcHourlyRate(time(), true));
+                if ($uw_obj->getWageGroup() == 0 and $uw_obj->isValidEffectiveDate($uw_obj->getEffectiveDate()) == false) {
+                    //Set wage effective date to employees hire date.
+                    $u_obj = $uw_obj->getUserObject();
+                    if (is_object($u_obj)) {
+                        $uw_obj->setEffectiveDate($u_obj->getHireDate());
+                    }
+                }
+                if ($uw_obj->isValid()) {
+                    $uw_obj->Save();
+                }
+            }
+        }
 
-		return TRUE;
-
-	}
+        return true;
+    }
 }
-?>

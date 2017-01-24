@@ -1,51 +1,51 @@
-var APIOvertimePolicy = ServiceCaller.extend( {
+var APIOvertimePolicy = ServiceCaller.extend({
 
-	key_name: 'OverTimePolicy',
-	className: 'APIOverTimePolicy',
+    key_name: 'OverTimePolicy',
+    className: 'APIOverTimePolicy',
 
-	getOverTimePolicyDefaultData: function() {
+    getOverTimePolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getOverTimePolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getOverTimePolicyDefaultData', arguments);
 
-	},
+    },
 
-	getOverTimePolicy: function() {
+    getOverTimePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getOverTimePolicy', arguments );
+        return this.argumentsHandler(this.className, 'getOverTimePolicy', arguments);
 
-	},
+    },
 
-	getCommonOverTimePolicyData: function() {
+    getCommonOverTimePolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonOverTimePolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonOverTimePolicyData', arguments);
 
-	},
+    },
 
-	validateOverTimePolicy: function() {
+    validateOverTimePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateOverTimePolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateOverTimePolicy', arguments);
 
-	},
+    },
 
-	setOverTimePolicy: function() {
+    setOverTimePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setOverTimePolicy', arguments );
+        return this.argumentsHandler(this.className, 'setOverTimePolicy', arguments);
 
-	},
+    },
 
-	deleteOverTimePolicy: function() {
+    deleteOverTimePolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteOverTimePolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteOverTimePolicy', arguments);
 
-	},
+    },
 
-	copyOverTimePolicy: function() {
-		return this.argumentsHandler( this.className, 'copyOverTimePolicy', arguments );
-	},
+    copyOverTimePolicy: function () {
+        return this.argumentsHandler(this.className, 'copyOverTimePolicy', arguments);
+    },
 
-	exportOverTimePolicy: function() {
-		return this.argumentsHandler( this.className, 'exportOverTimePolicy', arguments );
-	}
+    exportOverTimePolicy: function () {
+        return this.argumentsHandler(this.className, 'exportOverTimePolicy', arguments);
+    }
 
 
-} );
+});

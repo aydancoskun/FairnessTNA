@@ -1,68 +1,68 @@
-(function( $ ) {
+(function ($) {
 
-	$.fn.TText = function( options ) {
-		var opts = $.extend( {}, $.fn.TText.defaults, options );
+    $.fn.TText = function (options) {
+        var opts = $.extend({}, $.fn.TText.defaults, options);
 
-		var $this = this;
-		var field;
+        var $this = this;
+        var field;
 
-		this.clearErrorStyle = function() {
+        this.clearErrorStyle = function () {
 
-		};
+        };
 
-		this.setClassStyle = function( style ) {
-			if ( style ) {
-				this.css( style );
-			}
-		};
+        this.setClassStyle = function (style) {
+            if (style) {
+                this.css(style);
+            }
+        };
 
-		this.getField = function() {
-			return field;
-		};
+        this.getField = function () {
+            return field;
+        };
 
-		this.getValue = function() {
+        this.getValue = function () {
 //			return	$this.val();
-			return $this.text();
-		};
+            return $this.text();
+        };
 
-		this.setValue = function( val ) {
-			if ( !val && val !== 0 ) {
-				val = $.i18n._( 'N/A' );
-			}
+        this.setValue = function (val) {
+            if (!val && val !== 0) {
+                val = $.i18n._('N/A');
+            }
 
-			val = Global.decodeCellValue( val );
-			$this.html( ( val ) );
-			$this.height( 'auto' );
+            val = Global.decodeCellValue(val);
+            $this.html(( val ));
+            $this.height('auto');
 
-			//Set label size if there is new lines in contents
-			//if set value before add widget to UI, the height is 0, get the height so the event can be correct
-			if ( $this.height() === 0 ) {
-				var temp_span = $this.clone();
-				$( 'body' ).append( temp_span );
-				$this.height( temp_span.height() );
-				temp_span.remove();
+            //Set label size if there is new lines in contents
+            //if set value before add widget to UI, the height is 0, get the height so the event can be correct
+            if ($this.height() === 0) {
+                var temp_span = $this.clone();
+                $('body').append(temp_span);
+                $this.height(temp_span.height());
+                temp_span.remove();
 
-			}
+            }
 
-			$this.trigger( 'setSize' );
-		};
+            $this.trigger('setSize');
+        };
 
-		this.each( function() {
+        this.each(function () {
 
-			var o = $.meta ? $.extend( {}, opts, $( this ).data() ) : opts;
+            var o = $.meta ? $.extend({}, opts, $(this).data()) : opts;
 
-			field = o.field;
+            field = o.field;
 
-			if ( o.selected_able ) {
-				$( this ).addClass( 't-text-selected-able' )
-			}
+            if (o.selected_able) {
+                $(this).addClass('t-text-selected-able')
+            }
 
-		} );
+        });
 
-		return this;
+        return this;
 
-	};
+    };
 
-	$.fn.TText.defaults = {};
+    $.fn.TText.defaults = {};
 
-})( jQuery );
+})(jQuery);

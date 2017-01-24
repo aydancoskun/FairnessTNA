@@ -19,116 +19,146 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Users
  */
-class UserDefaultCompanyDeductionFactory extends Factory {
-	protected $table = 'user_default_company_deduction';
-	protected $pk_sequence_name = 'user_default_company_deduction_id_seq'; //PK Sequence name
-	
-	function getUserDefault() {
-		if ( isset($this->data['user_default_id']) ) {
-			return (int)$this->data['user_default_id'];
-		}
+class UserDefaultCompanyDeductionFactory extends Factory
+{
+    protected $table = 'user_default_company_deduction';
+    protected $pk_sequence_name = 'user_default_company_deduction_id_seq'; //PK Sequence name
 
-		return FALSE;
-	}
-	function setUserDefault($id) {
-		$id = trim($id);
+    public function getUserDefault()
+    {
+        if (isset($this->data['user_default_id'])) {
+            return (int)$this->data['user_default_id'];
+        }
 
-		Debug::Text('ID: '. $id, __FILE__, __LINE__, __METHOD__, 10);
-		$udlf = TTnew( 'UserDefaultListFactory' );
+        return false;
+    }
 
-		if (
-				$this->Validator->isResultSetWithRows(	'user_default',
-														$udlf->getByID($id),
-														TTi18n::gettext('Employee Default settings is invalid')
-													) ) {
+    public function setUserDefault($id)
+    {
+        $id = trim($id);
 
-			$this->data['user_default_id'] = $id;
+        Debug::Text('ID: ' . $id, __FILE__, __LINE__, __METHOD__, 10);
+        $udlf = TTnew('UserDefaultListFactory');
 
-			return TRUE;
-		}
+        if (
+        $this->Validator->isResultSetWithRows('user_default',
+            $udlf->getByID($id),
+            TTi18n::gettext('Employee Default settings is invalid')
+        )
+        ) {
+            $this->data['user_default_id'] = $id;
 
-		return FALSE;
-	}
+            return true;
+        }
 
-	function getCompanyDeduction() {
-		if ( isset($this->data['company_deduction_id']) ) {
-			return (int)$this->data['company_deduction_id'];
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
-	function setCompanyDeduction($id) {
-		$id = trim($id);
+    public function getCompanyDeduction()
+    {
+        if (isset($this->data['company_deduction_id'])) {
+            return (int)$this->data['company_deduction_id'];
+        }
 
-		Debug::Text('ID: '. $id, __FILE__, __LINE__, __METHOD__, 10);
-		$cdlf = TTnew( 'CompanyDeductionListFactory' );
+        return false;
+    }
 
-		if (
-				$this->Validator->isResultSetWithRows(	'company_deduction',
-														$cdlf->getByID($id),
-														TTi18n::gettext('Deduction is invalid')
-													) ) {
+    public function setCompanyDeduction($id)
+    {
+        $id = trim($id);
 
-			$this->data['company_deduction_id'] = $id;
+        Debug::Text('ID: ' . $id, __FILE__, __LINE__, __METHOD__, 10);
+        $cdlf = TTnew('CompanyDeductionListFactory');
 
-			return TRUE;
-		}
+        if (
+        $this->Validator->isResultSetWithRows('company_deduction',
+            $cdlf->getByID($id),
+            TTi18n::gettext('Deduction is invalid')
+        )
+        ) {
+            $this->data['company_deduction_id'] = $id;
 
-		return FALSE;
-	}
+            return true;
+        }
 
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
+    //This table doesn't have any of these columns, so overload the functions.
+    public function getDeleted()
+    {
+        return false;
+    }
 
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedDate()
+    {
+        return false;
+    }
+
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
 
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 }
-?>

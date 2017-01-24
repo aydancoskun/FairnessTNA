@@ -142,18 +142,19 @@ class Net_SMTP
      *   $smtp = new Net_SMTP('ssl://mail.host.com', 465);
      *   $smtp->connect();
      *
-     * @param string  $host           The server to connect to.
-     * @param integer $port           The port to connect to.
-     * @param string  $localhost      The value to give when sending EHLO or HELO.
-     * @param boolean $pipelining     Use SMTP command pipelining
-     * @param integer $timeout        Socket I/O timeout in seconds.
-     * @param array   $socket_options Socket stream_context_create() options.
+     * @param string $host The server to connect to.
+     * @param integer $port The port to connect to.
+     * @param string $localhost The value to give when sending EHLO or HELO.
+     * @param boolean $pipelining Use SMTP command pipelining
+     * @param integer $timeout Socket I/O timeout in seconds.
+     * @param array $socket_options Socket stream_context_create() options.
      *
      * @since 1.0
      */
     public function __construct($host = null, $port = null, $localhost = null,
-        $pipelining = false, $timeout = 0, $socket_options = null
-    ) {
+                                $pipelining = false, $timeout = 0, $socket_options = null
+    )
+    {
         if (isset($host)) {
             $this->host = $host;
         }
@@ -164,10 +165,10 @@ class Net_SMTP
             $this->localhost = $localhost;
         }
 
-        $this->pipelining      = $pipelining;
-        $this->socket         = new Net_Socket();
+        $this->pipelining = $pipelining;
+        $this->socket = new Net_Socket();
         $this->socket_options = $socket_options;
-        $this->timeout        = $timeout;
+        $this->timeout = $timeout;
 
         /* Include the Auth_SASL package.  If the package is available, we
          * enable the authentication methods that depend upon it. */
@@ -182,50 +183,111 @@ class Net_SMTP
     }
 
     /**
-     * Set the socket I/O timeout value in seconds plus microseconds.
+     * Add a new authentication method.
      *
-     * @param integer $seconds      Timeout value in seconds.
-     * @param integer $microseconds Additional value in microseconds.
+     * @param string $name The authentication method name (e.g. 'PLAIN')
+     * @param mixed $callback The authentication callback (given as the name of a
+     *                         function or as an (object, method name) array).
+     * @param bool $prepend Should the new method be prepended to the list of
+     *                         available methods?  This is the default behavior,
+     *                         giving the new method the highest priority.
      *
-     * @since 1.5.0
+     * @return mixed True on success or a PEAR_Error object on failure.
+     *
+     * @since 1.6.0
      */
-    public function setTimeout($seconds, $microseconds = 0)
+    public function setAuthMethod($name, $callback, $prepend = true)
     {
-        return $this->socket->setTimeout($seconds, $microseconds);
+        if (!is_string($name)) {
+            return PEAR::raiseError('Method name is not a string');
+        }
+
+        if (!is_string($callback) && !is_array($callback)) {
+            return PEAR::raiseError('Method callback must be string or array');
+        }
+
+        if (is_array($callback)) {
+            if (!is_object($callback[0]) || !is_string($callback[1])) {
+                return PEAR::raiseError('Bad mMethod callback array');
+            }
+        }
+
+        if ($prepend) {
+            $this->auth_methods = array_merge(
+                array($name => $callback), $this->auth_methods
+            );
+        } else {
+            $this->auth_methods[$name] = $callback;
+        }
+
+        return true;
     }
 
     /**
      * Set the value of the debugging flag.
      *
-     * @param boolean  $debug   New value for the debugging flag.
+     * @param boolean $debug New value for the debugging flag.
      * @param callback $handler Debug handler callback
      *
      * @since 1.1.0
      */
     public function setDebug($debug, $handler = null)
     {
-        $this->debug         = $debug;
+        $this->debug = $debug;
         $this->debug_handler = $handler;
     }
 
     /**
-     * Write the given debug text to the current debug output handler.
+     * Issue an SMTP command and verify its response.
      *
-     * @param string $message Debug mesage text.
+     * @param string $command The SMTP command string or data.
+     * @param mixed $valid The set of valid response codes. These
+     *                        may be specified as an array of integer
+     *                        values or as a single integer value.
      *
-     * @since 1.3.3
+     * @return mixed True on success or a PEAR_Error object on failure.
+     *
+     * @since 1.6.0
      */
-    protected function debug($message)
+    public function command($command, $valid)
     {
-        if ($this->debug) {
-            if ($this->debug_handler) {
-                call_user_func_array(
-                    $this->debug_handler, array(&$this, $message)
-                );
-            } else {
-                echo "DEBUG: $message\n";
-            }
+        if (PEAR::isError($error = $this->put($command))) {
+            return $error;
         }
+        if (PEAR::isError($error = $this->parseResponse($valid))) {
+            return $error;
+        }
+
+        return true;
+    }
+
+    /**
+     * Send a command to the server with an optional string of
+     * arguments.  A carriage return / linefeed (CRLF) sequence will
+     * be appended to each command string before it is sent to the
+     * SMTP server - an error will be thrown if the command string
+     * already contains any newline characters. Use send() for
+     * commands that must contain newlines.
+     *
+     * @param string $command The SMTP command to send to the server.
+     * @param string $args A string of optional arguments to append
+     *                        to the command.
+     *
+     * @return mixed The result of the send() call.
+     *
+     * @since 1.1.0
+     */
+    protected function put($command, $args = '')
+    {
+        if (!empty($args)) {
+            $command .= ' ' . $args;
+        }
+
+        if (strcspn($command, "\r\n") !== strlen($command)) {
+            return PEAR::raiseError('Commands cannot contain newlines');
+        }
+
+        return $this->send($command . "\r\n");
     }
 
     /**
@@ -252,32 +314,23 @@ class Net_SMTP
     }
 
     /**
-     * Send a command to the server with an optional string of
-     * arguments.  A carriage return / linefeed (CRLF) sequence will
-     * be appended to each command string before it is sent to the
-     * SMTP server - an error will be thrown if the command string
-     * already contains any newline characters. Use send() for
-     * commands that must contain newlines.
+     * Write the given debug text to the current debug output handler.
      *
-     * @param string $command The SMTP command to send to the server.
-     * @param string $args    A string of optional arguments to append
-     *                        to the command.
+     * @param string $message Debug mesage text.
      *
-     * @return mixed The result of the send() call.
-     *
-     * @since 1.1.0
+     * @since 1.3.3
      */
-    protected function put($command, $args = '')
+    protected function debug($message)
     {
-        if (!empty($args)) {
-            $command .= ' ' . $args;
+        if ($this->debug) {
+            if ($this->debug_handler) {
+                call_user_func_array(
+                    $this->debug_handler, array(&$this, $message)
+                );
+            } else {
+                echo "DEBUG: $message\n";
+            }
         }
-
-        if (strcspn($command, "\r\n") !== strlen($command)) {
-            return PEAR::raiseError('Commands cannot contain newlines');
-        }
-
-        return $this->send($command . "\r\n");
     }
 
     /**
@@ -287,7 +340,7 @@ class Net_SMTP
      * @param mixed $valid The set of valid response codes.  These
      *                     may be specified as an array of integer
      *                     values or as a single integer value.
-     * @param bool  $later Do not parse the response now, but wait
+     * @param bool $later Do not parse the response now, but wait
      *                     until the last command in the pipelined
      *                     command group
      *
@@ -300,7 +353,7 @@ class Net_SMTP
      */
     protected function parseResponse($valid, $later = false)
     {
-        $this->code      = -1;
+        $this->code = -1;
         $this->arguments = array();
 
         if ($later) {
@@ -350,41 +403,27 @@ class Net_SMTP
     }
 
     /**
-     * Issue an SMTP command and verify its response.
+     * Attempt to disconnect from the SMTP server.
      *
-     * @param string $command The SMTP command string or data.
-     * @param mixed  $valid   The set of valid response codes. These
-     *                        may be specified as an array of integer
-     *                        values or as a single integer value.
-     *
-     * @return mixed True on success or a PEAR_Error object on failure.
-     *
-     * @since 1.6.0
+     * @return mixed Returns a PEAR_Error with an error message on any
+     *               kind of failure, or true on success.
+     * @since 1.0
      */
-    public function command($command, $valid)
+    public function disconnect()
     {
-        if (PEAR::isError($error = $this->put($command))) {
+        if (PEAR::isError($error = $this->put('QUIT'))) {
             return $error;
         }
-        if (PEAR::isError($error = $this->parseResponse($valid))) {
+        if (PEAR::isError($error = $this->parseResponse(221))) {
             return $error;
+        }
+        if (PEAR::isError($error = $this->socket->disconnect())) {
+            return PEAR::raiseError(
+                'Failed to disconnect socket: ' . $error->getMessage()
+            );
         }
 
         return true;
-    }
-
-    /**
-     * Return a 2-tuple containing the last response from the SMTP server.
-     *
-     * @return array A two-element array: the first element contains the
-     *               response code as an integer and the second element
-     *               contains the response's arguments as a string.
-     *
-     * @since 1.1.0
-     */
-    public function getResponse()
-    {
-        return array($this->code, join("\n", $this->arguments));
     }
 
     /**
@@ -403,7 +442,7 @@ class Net_SMTP
     /**
      * Attempt to connect to the SMTP server.
      *
-     * @param int  $timeout    The timeout value (in seconds) for the
+     * @param int $timeout The timeout value (in seconds) for the
      *                         socket connection attempt.
      * @param bool $persistent Should a persistent socket connection
      *                         be used?
@@ -453,27 +492,30 @@ class Net_SMTP
     }
 
     /**
-     * Attempt to disconnect from the SMTP server.
+     * Set the socket I/O timeout value in seconds plus microseconds.
      *
-     * @return mixed Returns a PEAR_Error with an error message on any
-     *               kind of failure, or true on success.
-     * @since 1.0
+     * @param integer $seconds Timeout value in seconds.
+     * @param integer $microseconds Additional value in microseconds.
+     *
+     * @since 1.5.0
      */
-    public function disconnect()
+    public function setTimeout($seconds, $microseconds = 0)
     {
-        if (PEAR::isError($error = $this->put('QUIT'))) {
-            return $error;
-        }
-        if (PEAR::isError($error = $this->parseResponse(221))) {
-            return $error;
-        }
-        if (PEAR::isError($error = $this->socket->disconnect())) {
-            return PEAR::raiseError(
-                'Failed to disconnect socket: ' . $error->getMessage()
-            );
-        }
+        return $this->socket->setTimeout($seconds, $microseconds);
+    }
 
-        return true;
+    /**
+     * Return a 2-tuple containing the last response from the SMTP server.
+     *
+     * @return array A two-element array: the first element contains the
+     *               response code as an integer and the second element
+     *               contains the response's arguments as a string.
+     *
+     * @since 1.1.0
+     */
+    public function getResponse()
+    {
+        return array($this->code, join("\n", $this->arguments));
     }
 
     /**
@@ -504,8 +546,8 @@ class Net_SMTP
         }
 
         foreach ($this->arguments as $argument) {
-            $verb      = strtok($argument, ' ');
-            $len       = strlen($verb);
+            $verb = strtok($argument, ' ');
+            $len = strlen($verb);
             $arguments = substr($argument, $len + 1, strlen($argument) - $len - 1);
             $this->esmtp[$verb] = $arguments;
         }
@@ -518,43 +560,21 @@ class Net_SMTP
     }
 
     /**
-     * Returns the name of the best authentication method that the server
-     * has advertised.
-     *
-     * @return mixed Returns a string containing the name of the best
-     *               supported authentication method or a PEAR_Error object
-     *               if a failure condition is encountered.
-     * @since 1.1.0
-     */
-    protected function getBestAuthMethod()
-    {
-        $available_methods = explode(' ', $this->esmtp['AUTH']);
-
-        foreach ($this->auth_methods as $method => $callback) {
-            if (in_array($method, $available_methods)) {
-                return $method;
-            }
-        }
-
-        return PEAR::raiseError('No supported authentication methods');
-    }
-
-    /**
      * Attempt to do SMTP authentication.
      *
-     * @param string $uid    The userid to authenticate as.
-     * @param string $pwd    The password to authenticate with.
+     * @param string $uid The userid to authenticate as.
+     * @param string $pwd The password to authenticate with.
      * @param string $method The requested authentication method.  If none is
      *                       specified, the best supported method will be used.
-     * @param bool   $tls    Flag indicating whether or not TLS should be attempted.
-     * @param string $authz  An optional authorization identifier.  If specified, this
+     * @param bool $tls Flag indicating whether or not TLS should be attempted.
+     * @param string $authz An optional authorization identifier.  If specified, this
      *                       identifier will be used as the authorization proxy.
      *
      * @return mixed Returns a PEAR_Error with an error message on any
      *               kind of failure, or true on success.
      * @since 1.0
      */
-    public function auth($uid, $pwd , $method = '', $tls = true, $authz = '')
+    public function auth($uid, $pwd, $method = '', $tls = true, $authz = '')
     {
         /* We can only attempt a TLS connection if one has been requested,
          * we're running PHP 5.1.0 or later, have access to the OpenSSL
@@ -579,8 +599,8 @@ class Net_SMTP
                  * and STREAM_CRYPTO_METHOD_SSLv23_CLIENT constant is
                  * inconsistent across PHP versions. */
                 $crypto_method = STREAM_CRYPTO_METHOD_TLS_CLIENT
-                                 | @STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT
-                                 | @STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+                    | @STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT
+                    | @STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
             }
             if (PEAR::isError($result = $this->socket->enableCrypto(true, $crypto_method))) {
                 return $result;
@@ -623,7 +643,7 @@ class Net_SMTP
             list($object, $method) = $this->auth_methods[$method];
             $result = $object->{$method}($uid, $pwd, $authz, $this);
         } else {
-            $func   = $this->auth_methods[$method];
+            $func = $this->auth_methods[$method];
             $result = $func($uid, $pwd, $authz, $this);
         }
 
@@ -636,218 +656,25 @@ class Net_SMTP
     }
 
     /**
-     * Add a new authentication method.
+     * Returns the name of the best authentication method that the server
+     * has advertised.
      *
-     * @param string $name     The authentication method name (e.g. 'PLAIN')
-     * @param mixed  $callback The authentication callback (given as the name of a
-     *                         function or as an (object, method name) array).
-     * @param bool   $prepend  Should the new method be prepended to the list of
-     *                         available methods?  This is the default behavior,
-     *                         giving the new method the highest priority.
-     *
-     * @return mixed True on success or a PEAR_Error object on failure.
-     *
-     * @since 1.6.0
-     */
-    public function setAuthMethod($name, $callback, $prepend = true)
-    {
-        if (!is_string($name)) {
-            return PEAR::raiseError('Method name is not a string');
-        }
-
-        if (!is_string($callback) && !is_array($callback)) {
-            return PEAR::raiseError('Method callback must be string or array');
-        }
-
-        if (is_array($callback)) {
-            if (!is_object($callback[0]) || !is_string($callback[1])) {
-                return PEAR::raiseError('Bad mMethod callback array');
-            }
-        }
-
-        if ($prepend) {
-            $this->auth_methods = array_merge(
-                array($name => $callback), $this->auth_methods
-            );
-        } else {
-            $this->auth_methods[$name] = $callback;
-        }
-
-        return true;
-    }
-
-    /**
-     * Authenticates the user using the DIGEST-MD5 method.
-     *
-     * @param string $uid   The userid to authenticate as.
-     * @param string $pwd   The password to authenticate with.
-     * @param string $authz The optional authorization proxy identifier.
-     *
-     * @return mixed Returns a PEAR_Error with an error message on any
-     *               kind of failure, or true on success.
+     * @return mixed Returns a string containing the name of the best
+     *               supported authentication method or a PEAR_Error object
+     *               if a failure condition is encountered.
      * @since 1.1.0
      */
-    protected function authDigestMD5($uid, $pwd, $authz = '')
+    protected function getBestAuthMethod()
     {
-        if (PEAR::isError($error = $this->put('AUTH', 'DIGEST-MD5'))) {
-            return $error;
-        }
-        /* 334: Continue authentication request */
-        if (PEAR::isError($error = $this->parseResponse(334))) {
-            /* 503: Error: already authenticated */
-            if ($this->code === 503) {
-                return true;
+        $available_methods = explode(' ', $this->esmtp['AUTH']);
+
+        foreach ($this->auth_methods as $method => $callback) {
+            if (in_array($method, $available_methods)) {
+                return $method;
             }
-            return $error;
         }
 
-        $digest    = Auth_SASL::factory('digest-md5');
-        $challenge = base64_decode($this->arguments[0]);
-        $auth_str  = base64_encode(
-            $digest->getResponse($uid, $pwd, $challenge, $this->host, "smtp", $authz)
-        );
-
-        if (PEAR::isError($error = $this->put($auth_str))) {
-            return $error;
-        }
-        /* 334: Continue authentication request */
-        if (PEAR::isError($error = $this->parseResponse(334))) {
-            return $error;
-        }
-
-        /* We don't use the protocol's third step because SMTP doesn't
-         * allow subsequent authentication, so we just silently ignore
-         * it. */
-        if (PEAR::isError($error = $this->put(''))) {
-            return $error;
-        }
-        /* 235: Authentication successful */
-        if (PEAR::isError($error = $this->parseResponse(235))) {
-            return $error;
-        }
-    }
-
-    /**
-     * Authenticates the user using the CRAM-MD5 method.
-     *
-     * @param string $uid   The userid to authenticate as.
-     * @param string $pwd   The password to authenticate with.
-     * @param string $authz The optional authorization proxy identifier.
-     *
-     * @return mixed Returns a PEAR_Error with an error message on any
-     *               kind of failure, or true on success.
-     * @since 1.1.0
-     */
-    protected function authCRAMMD5($uid, $pwd, $authz = '')
-    {
-        if (PEAR::isError($error = $this->put('AUTH', 'CRAM-MD5'))) {
-            return $error;
-        }
-        /* 334: Continue authentication request */
-        if (PEAR::isError($error = $this->parseResponse(334))) {
-            /* 503: Error: already authenticated */
-            if ($this->code === 503) {
-                return true;
-            }
-            return $error;
-        }
-
-        $challenge = base64_decode($this->arguments[0]);
-        $cram      = Auth_SASL::factory('cram-md5');
-        $auth_str  = base64_encode($cram->getResponse($uid, $pwd, $challenge));
-
-        if (PEAR::isError($error = $this->put($auth_str))) {
-            return $error;
-        }
-
-        /* 235: Authentication successful */
-        if (PEAR::isError($error = $this->parseResponse(235))) {
-            return $error;
-        }
-    }
-
-    /**
-     * Authenticates the user using the LOGIN method.
-     *
-     * @param string $uid   The userid to authenticate as.
-     * @param string $pwd   The password to authenticate with.
-     * @param string $authz The optional authorization proxy identifier.
-     *
-     * @return mixed Returns a PEAR_Error with an error message on any
-     *               kind of failure, or true on success.
-     * @since 1.1.0
-     */
-    protected function authLogin($uid, $pwd, $authz = '')
-    {
-        if (PEAR::isError($error = $this->put('AUTH', 'LOGIN'))) {
-            return $error;
-        }
-        /* 334: Continue authentication request */
-        if (PEAR::isError($error = $this->parseResponse(334))) {
-            /* 503: Error: already authenticated */
-            if ($this->code === 503) {
-                return true;
-            }
-            return $error;
-        }
-
-        if (PEAR::isError($error = $this->put(base64_encode($uid)))) {
-            return $error;
-        }
-        /* 334: Continue authentication request */
-        if (PEAR::isError($error = $this->parseResponse(334))) {
-            return $error;
-        }
-
-        if (PEAR::isError($error = $this->put(base64_encode($pwd)))) {
-            return $error;
-        }
-
-        /* 235: Authentication successful */
-        if (PEAR::isError($error = $this->parseResponse(235))) {
-            return $error;
-        }
-
-        return true;
-    }
-
-    /**
-     * Authenticates the user using the PLAIN method.
-     *
-     * @param string $uid   The userid to authenticate as.
-     * @param string $pwd   The password to authenticate with.
-     * @param string $authz The optional authorization proxy identifier.
-     *
-     * @return mixed Returns a PEAR_Error with an error message on any
-     *               kind of failure, or true on success.
-     * @since 1.1.0
-     */
-    protected function authPlain($uid, $pwd, $authz = '')
-    {
-        if (PEAR::isError($error = $this->put('AUTH', 'PLAIN'))) {
-            return $error;
-        }
-        /* 334: Continue authentication request */
-        if (PEAR::isError($error = $this->parseResponse(334))) {
-            /* 503: Error: already authenticated */
-            if ($this->code === 503) {
-                return true;
-            }
-            return $error;
-        }
-
-        $auth_str = base64_encode($authz . chr(0) . $uid . chr(0) . $pwd);
-
-        if (PEAR::isError($error = $this->put($auth_str))) {
-            return $error;
-        }
-
-        /* 235: Authentication successful */
-        if (PEAR::isError($error = $this->parseResponse(235))) {
-            return $error;
-        }
-
-        return true;
+        return PEAR::raiseError('No supported authentication methods');
     }
 
     /**
@@ -929,7 +756,7 @@ class Net_SMTP
      * Send the RCPT TO: command.
      *
      * @param string $recipient The recipient (forward path) to add.
-     * @param string $params    String containing additional RCPT parameters,
+     * @param string $params String containing additional RCPT parameters,
      *                          such as the NOTIFY flags defined by RFC 1891.
      *
      * @return mixed Returns a PEAR_Error with an error message on any
@@ -955,31 +782,9 @@ class Net_SMTP
     }
 
     /**
-     * Quote the data so that it meets SMTP standards.
-     *
-     * This is provided as a separate public function to facilitate
-     * easier overloading for the cases where it is desirable to
-     * customize the quoting behavior.
-     *
-     * @param string &$data The message text to quote. The string must be passed
-     *                      by reference, and the text will be modified in place.
-     *
-     * @since 1.2
-     */
-    public function quotedata(&$data)
-    {
-        /* Because a single leading period (.) signifies an end to the
-         * data, legitimate leading periods need to be "doubled" ('..'). */
-        $data = preg_replace('/^\./m', '..', $data);
-
-        /* Change Unix (\n) and Mac (\r) linefeeds into CRLF's (\r\n). */
-        $data = preg_replace('/(?:\r\n|\n|\r(?!\n))/', "\r\n", $data);
-    }
-
-    /**
      * Send the DATA command.
      *
-     * @param mixed  $data    The message data, either as a string or an open
+     * @param mixed $data The message data, either as a string or an open
      *                        file resource.
      * @param string $headers The message headers.  If $headers is provided,
      *                        $data is assumed to contain only body data.
@@ -1060,7 +865,7 @@ class Net_SMTP
                 }
             }
 
-             $last = $line;
+            $last = $line;
         } else {
             /*
              * Break up the data by sending one chunk (up to 512k) at a time.
@@ -1114,6 +919,28 @@ class Net_SMTP
         }
 
         return true;
+    }
+
+    /**
+     * Quote the data so that it meets SMTP standards.
+     *
+     * This is provided as a separate public function to facilitate
+     * easier overloading for the cases where it is desirable to
+     * customize the quoting behavior.
+     *
+     * @param string &$data The message text to quote. The string must be passed
+     *                      by reference, and the text will be modified in place.
+     *
+     * @since 1.2
+     */
+    public function quotedata(&$data)
+    {
+        /* Because a single leading period (.) signifies an end to the
+         * data, legitimate leading periods need to be "doubled" ('..'). */
+        $data = preg_replace('/^\./m', '..', $data);
+
+        /* Change Unix (\n) and Mac (\r) linefeeds into CRLF's (\r\n). */
+        $data = preg_replace('/(?:\r\n|\n|\r(?!\n))/', "\r\n", $data);
     }
 
     /**
@@ -1249,6 +1076,180 @@ class Net_SMTP
      */
     public function identifySender()
     {
+        return true;
+    }
+
+    /**
+     * Authenticates the user using the DIGEST-MD5 method.
+     *
+     * @param string $uid The userid to authenticate as.
+     * @param string $pwd The password to authenticate with.
+     * @param string $authz The optional authorization proxy identifier.
+     *
+     * @return mixed Returns a PEAR_Error with an error message on any
+     *               kind of failure, or true on success.
+     * @since 1.1.0
+     */
+    protected function authDigestMD5($uid, $pwd, $authz = '')
+    {
+        if (PEAR::isError($error = $this->put('AUTH', 'DIGEST-MD5'))) {
+            return $error;
+        }
+        /* 334: Continue authentication request */
+        if (PEAR::isError($error = $this->parseResponse(334))) {
+            /* 503: Error: already authenticated */
+            if ($this->code === 503) {
+                return true;
+            }
+            return $error;
+        }
+
+        $digest = Auth_SASL::factory('digest-md5');
+        $challenge = base64_decode($this->arguments[0]);
+        $auth_str = base64_encode(
+            $digest->getResponse($uid, $pwd, $challenge, $this->host, "smtp", $authz)
+        );
+
+        if (PEAR::isError($error = $this->put($auth_str))) {
+            return $error;
+        }
+        /* 334: Continue authentication request */
+        if (PEAR::isError($error = $this->parseResponse(334))) {
+            return $error;
+        }
+
+        /* We don't use the protocol's third step because SMTP doesn't
+         * allow subsequent authentication, so we just silently ignore
+         * it. */
+        if (PEAR::isError($error = $this->put(''))) {
+            return $error;
+        }
+        /* 235: Authentication successful */
+        if (PEAR::isError($error = $this->parseResponse(235))) {
+            return $error;
+        }
+    }
+
+    /**
+     * Authenticates the user using the CRAM-MD5 method.
+     *
+     * @param string $uid The userid to authenticate as.
+     * @param string $pwd The password to authenticate with.
+     * @param string $authz The optional authorization proxy identifier.
+     *
+     * @return mixed Returns a PEAR_Error with an error message on any
+     *               kind of failure, or true on success.
+     * @since 1.1.0
+     */
+    protected function authCRAMMD5($uid, $pwd, $authz = '')
+    {
+        if (PEAR::isError($error = $this->put('AUTH', 'CRAM-MD5'))) {
+            return $error;
+        }
+        /* 334: Continue authentication request */
+        if (PEAR::isError($error = $this->parseResponse(334))) {
+            /* 503: Error: already authenticated */
+            if ($this->code === 503) {
+                return true;
+            }
+            return $error;
+        }
+
+        $challenge = base64_decode($this->arguments[0]);
+        $cram = Auth_SASL::factory('cram-md5');
+        $auth_str = base64_encode($cram->getResponse($uid, $pwd, $challenge));
+
+        if (PEAR::isError($error = $this->put($auth_str))) {
+            return $error;
+        }
+
+        /* 235: Authentication successful */
+        if (PEAR::isError($error = $this->parseResponse(235))) {
+            return $error;
+        }
+    }
+
+    /**
+     * Authenticates the user using the LOGIN method.
+     *
+     * @param string $uid The userid to authenticate as.
+     * @param string $pwd The password to authenticate with.
+     * @param string $authz The optional authorization proxy identifier.
+     *
+     * @return mixed Returns a PEAR_Error with an error message on any
+     *               kind of failure, or true on success.
+     * @since 1.1.0
+     */
+    protected function authLogin($uid, $pwd, $authz = '')
+    {
+        if (PEAR::isError($error = $this->put('AUTH', 'LOGIN'))) {
+            return $error;
+        }
+        /* 334: Continue authentication request */
+        if (PEAR::isError($error = $this->parseResponse(334))) {
+            /* 503: Error: already authenticated */
+            if ($this->code === 503) {
+                return true;
+            }
+            return $error;
+        }
+
+        if (PEAR::isError($error = $this->put(base64_encode($uid)))) {
+            return $error;
+        }
+        /* 334: Continue authentication request */
+        if (PEAR::isError($error = $this->parseResponse(334))) {
+            return $error;
+        }
+
+        if (PEAR::isError($error = $this->put(base64_encode($pwd)))) {
+            return $error;
+        }
+
+        /* 235: Authentication successful */
+        if (PEAR::isError($error = $this->parseResponse(235))) {
+            return $error;
+        }
+
+        return true;
+    }
+
+    /**
+     * Authenticates the user using the PLAIN method.
+     *
+     * @param string $uid The userid to authenticate as.
+     * @param string $pwd The password to authenticate with.
+     * @param string $authz The optional authorization proxy identifier.
+     *
+     * @return mixed Returns a PEAR_Error with an error message on any
+     *               kind of failure, or true on success.
+     * @since 1.1.0
+     */
+    protected function authPlain($uid, $pwd, $authz = '')
+    {
+        if (PEAR::isError($error = $this->put('AUTH', 'PLAIN'))) {
+            return $error;
+        }
+        /* 334: Continue authentication request */
+        if (PEAR::isError($error = $this->parseResponse(334))) {
+            /* 503: Error: already authenticated */
+            if ($this->code === 503) {
+                return true;
+            }
+            return $error;
+        }
+
+        $auth_str = base64_encode($authz . chr(0) . $uid . chr(0) . $pwd);
+
+        if (PEAR::isError($error = $this->put($auth_str))) {
+            return $error;
+        }
+
+        /* 235: Authentication successful */
+        if (PEAR::isError($error = $this->parseResponse(235))) {
+            return $error;
+        }
+
         return true;
     }
 }

@@ -22,7 +22,7 @@ require_once("HTML/QuickForm/input.php");
 
 /**
  * HTML class for a image type element
- * 
+ *
  * @author       Adam Daniel <adaniel1@eesus.jnj.com>
  * @author       Bertrand Mansion <bmansion@mamasam.com>
  * @version      1.0
@@ -35,18 +35,18 @@ class HTML_QuickForm_image extends HTML_QuickForm_input
 
     /**
      * Class constructor
-     * 
-     * @param     string    $elementName    (optional)Element name attribute
-     * @param     string    $src            (optional)Image source
-     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string 
+     *
+     * @param     string $elementName (optional)Element name attribute
+     * @param     string $src (optional)Image source
+     * @param     mixed $attributes (optional)Either a typical HTML attribute string
      *                                      or an associative array
      * @since     1.0
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_image($elementName=null, $src='', $attributes=null)
+    public function HTML_QuickForm_image($elementName = null, $src = '', $attributes = null)
     {
-        // Avoid produce Fatal error: Non-static method HTML_QuickForm_input::HTML_QuickForm_input() cannot be called statically  
+        // Avoid produce Fatal error: Non-static method HTML_QuickForm_input::HTML_QuickForm_input() cannot be called statically
         // HTML_QuickForm_input::HTML_QuickForm_input($elementName, null, $attributes);
         new HTML_QuickForm_input($elementName, null, $attributes);
         $this->setType('image');
@@ -58,13 +58,13 @@ class HTML_QuickForm_image extends HTML_QuickForm_input
 
     /**
      * Sets source for image element
-     * 
-     * @param     string    $src  source for image element
+     *
+     * @param     string $src source for image element
      * @since     1.0
      * @access    public
      * @return    void
      */
-    function setSource($src)
+    public function setSource($src)
     {
         $this->updateAttributes(array('src' => $src));
     } // end func setSource
@@ -74,13 +74,13 @@ class HTML_QuickForm_image extends HTML_QuickForm_input
 
     /**
      * Sets border size for image element
-     * 
-     * @param     string    $border  border for image element
+     *
+     * @param     string $border border for image element
      * @since     1.0
      * @access    public
      * @return    void
      */
-    function setBorder($border)
+    public function setBorder($border)
     {
         $this->updateAttributes(array('border' => $border));
     } // end func setBorder
@@ -90,13 +90,13 @@ class HTML_QuickForm_image extends HTML_QuickForm_input
 
     /**
      * Sets alignment for image element
-     * 
-     * @param     string    $align  alignment for image element
+     *
+     * @param     string $align alignment for image element
      * @since     1.0
      * @access    public
      * @return    void
      */
-    function setAlign($align)
+    public function setAlign($align)
     {
         $this->updateAttributes(array('align' => $align));
     } // end func setAlign
@@ -106,16 +106,14 @@ class HTML_QuickForm_image extends HTML_QuickForm_input
 
     /**
      * Freeze the element so that only its value is returned
-     * 
+     *
      * @access    public
      * @return    void
      */
-    function freeze()
+    public function freeze()
     {
         return false;
     } //end func freeze
 
     // }}}
-
-} // end class HTML_QuickForm_image
-?>
+} // end class HTML_QuickForm_image;

@@ -23,7 +23,7 @@ require_once("HTML/QuickForm/element.php");
 
 /**
  * HTML class for a textarea type field
- * 
+ *
  * @author       Adam Daniel <adaniel1@eesus.jnj.com>
  * @author       Bertrand Mansion <bmansion@mamasam.com>
  * @version      1.0
@@ -40,14 +40,14 @@ class HTML_QuickForm_textarea extends HTML_QuickForm_element
      * @since     1.0
      * @access    private
      */
-    static $_value = null;
+    public static $_value = null;
 
     // }}}
     // {{{ constructor
-        
+
     /**
      * Class constructor
-     * 
+     *
      * @param     string    Input field name attribute
      * @param     mixed     Label(s) for a field
      * @param     mixed     Either a typical HTML attribute string or an associative array
@@ -55,41 +55,41 @@ class HTML_QuickForm_textarea extends HTML_QuickForm_element
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_textarea($elementName=null, $elementLabel=null, $attributes=null)
+    public function HTML_QuickForm_textarea($elementName = null, $elementLabel = null, $attributes = null)
     {
         //HTML_QuickForm_element::HTML_QuickForm_element($elementName, $elementLabel, $attributes);
         new HTML_QuickForm_element($elementName, $elementLabel, $attributes);
         self::$_persistantFreeze = true;
         self::$_type = 'textarea';
     } //end constructor
-    
+
     // }}}
     // {{{ setName()
 
     /**
      * Sets the input field name
-     * 
-     * @param     string    $name   Input field name attribute
+     *
+     * @param     string $name Input field name attribute
      * @since     1.0
      * @access    public
      * @return    void
      */
-    static function setName($name)
+    public static function setName($name)
     {
-        self::updateAttributes(array('name'=>$name));
+        self::updateAttributes(array('name' => $name));
     } //end func setName
-    
+
     // }}}
     // {{{ getName()
 
     /**
      * Returns the element name
-     * 
+     *
      * @since     1.0
      * @access    public
      * @return    string
      */
-    static function getName()
+    public static function getName()
     {
         return self::getAttribute('name');
     } //end func getName
@@ -98,20 +98,96 @@ class HTML_QuickForm_textarea extends HTML_QuickForm_element
     // {{{ setValue()
 
     /**
-     * Sets value for textarea element
-     * 
-     * @param     string    $value  Value for textarea element
+     * Sets wrap type for textarea element
+     *
+     * @param     string $wrap Wrap type
      * @since     1.0
      * @access    public
      * @return    void
      */
-    static function setValue($value)
+    public static function setWrap($wrap)
     {
-        self::$_value = $value;
+        self::updateAttributes(array('wrap' => $wrap));
     } //end func setValue
-    
+
     // }}}
     // {{{ getValue()
+
+    /**
+     * Sets height in rows for textarea element
+     *
+     * @param     string $rows Height expressed in rows
+     * @since     1.0
+     * @access    public
+     * @return    void
+     */
+    public static function setRows($rows)
+    {
+        self::updateAttributes(array('rows' => $rows));
+    } // end func getValue
+
+    // }}}
+    // {{{ setWrap()
+
+    /**
+     * Sets width in cols for textarea element
+     *
+     * @param     string $cols Width expressed in cols
+     * @since     1.0
+     * @access    public
+     * @return    void
+     */
+    public static function setCols($cols)
+    {
+        self::updateAttributes(array('cols' => $cols));
+    } //end func setWrap
+
+    // }}}
+    // {{{ setRows()
+
+    /**
+     * Returns the textarea element in HTML
+     *
+     * @since     1.0
+     * @access    public
+     * @return    string
+     */
+    public static function toHtml()
+    {
+        if (self::$_flagFrozen) {
+            return self::getFrozenHtml();
+        } else {
+            return self::_getTabs() .
+                '<textarea' . self::_getAttrString(self::$_attributes) . '>' .
+                // because we wrap the form later we don't want the text indented
+                preg_replace("/(\r\n|\n|\r)/", '&#010;', htmlspecialchars(self::$_value)) .
+                '</textarea>';
+        }
+    } //end func setRows
+
+    // }}}
+    // {{{ setCols()
+
+    /**
+     * Returns the value of field without HTML tags (in this case, value is changed to a mask)
+     *
+     * @since     1.0
+     * @access    public
+     * @return    string
+     */
+    public static function getFrozenHtml()
+    {
+        $value = htmlspecialchars(self::getValue());
+        if (self::getAttribute('wrap') == 'off') {
+            $html = self::_getTabs() . '<pre>' . $value . "</pre>\n";
+        } else {
+            $html = nl2br($value) . "\n";
+        }
+        return $html . self::_getPersistantData();
+    } //end func setCols
+
+    // }}}
+    // {{{ toHtml()
 
     /**
      * Returns the value of the form element
@@ -120,104 +196,26 @@ class HTML_QuickForm_textarea extends HTML_QuickForm_element
      * @access    public
      * @return    string
      */
-    static function getValue()
+    public static function getValue()
     {
         return self::$_value;
-    } // end func getValue
-
-    // }}}
-    // {{{ setWrap()
-
-    /**
-     * Sets wrap type for textarea element
-     * 
-     * @param     string    $wrap  Wrap type
-     * @since     1.0
-     * @access    public
-     * @return    void
-     */
-    static function setWrap($wrap)
-    {
-        self::updateAttributes(array('wrap' => $wrap));
-    } //end func setWrap
-    
-    // }}}
-    // {{{ setRows()
-
-    /**
-     * Sets height in rows for textarea element
-     * 
-     * @param     string    $rows  Height expressed in rows
-     * @since     1.0
-     * @access    public
-     * @return    void
-     */
-    static function setRows($rows)
-    {
-        self::updateAttributes(array('rows' => $rows));
-    } //end func setRows
-
-    // }}}
-    // {{{ setCols()
-
-    /**
-     * Sets width in cols for textarea element
-     * 
-     * @param     string    $cols  Width expressed in cols
-     * @since     1.0
-     * @access    public
-     * @return    void
-     */ 
-    static function setCols($cols)
-    {
-        self::updateAttributes(array('cols' => $cols));
-    } //end func setCols
-
-    // }}}
-    // {{{ toHtml()
-
-    /**
-     * Returns the textarea element in HTML
-     * 
-     * @since     1.0
-     * @access    public
-     * @return    string
-     */
-    static function toHtml()
-    {
-        if (self::$_flagFrozen) {
-            return self::getFrozenHtml();
-        } else {
-            return self::_getTabs() .
-                   '<textarea' . self::_getAttrString(self::$_attributes) . '>' .
-                   // because we wrap the form later we don't want the text indented
-                   preg_replace("/(\r\n|\n|\r)/", '&#010;', htmlspecialchars(self::$_value)) .
-                   '</textarea>';
-        }
     } //end func toHtml
-    
+
     // }}}
     // {{{ getFrozenHtml()
 
     /**
-     * Returns the value of field without HTML tags (in this case, value is changed to a mask)
-     * 
+     * Sets value for textarea element
+     *
+     * @param     string $value Value for textarea element
      * @since     1.0
      * @access    public
-     * @return    string
+     * @return    void
      */
-    static function getFrozenHtml()
+    public static function setValue($value)
     {
-        $value = htmlspecialchars(self::getValue());
-        if (self::getAttribute('wrap') == 'off') {
-            $html = self::_getTabs() . '<pre>' . $value."</pre>\n";
-        } else {
-            $html = nl2br($value)."\n";
-        }
-        return $html . self::_getPersistantData();
+        self::$_value = $value;
     } //end func getFrozenHtml
 
     // }}}
-
-} //end class HTML_QuickForm_textarea
-?>
+} //end class HTML_QuickForm_textarea;

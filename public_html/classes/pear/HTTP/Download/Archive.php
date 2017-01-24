@@ -3,7 +3,7 @@
 
 /**
  * HTTP::Download::Archive
- * 
+ *
  * PHP versions 4 and 5
  *
  * @category   HTTP
@@ -25,9 +25,9 @@ require_once 'HTTP/Download.php';
  */
 require_once 'System.php';
 
-/** 
+/**
  * HTTP_Download_Archive
- * 
+ *
  * Helper class for sending Archives.
  *
  * @access   public
@@ -37,7 +37,7 @@ class HTTP_Download_Archive
 {
     /**
      * Send a bunch of files or directories as an archive
-     * 
+     *
      * Example:
      * <code>
      *  require_once 'HTTP/Download/Archive.php';
@@ -54,52 +54,51 @@ class HTTP_Download_Archive
      * @static
      * @access  public
      * @return  mixed   Returns true on success or PEAR_Error on failure.
-     * @param   string  $name       name the sent archive should have
-     * @param   mixed   $files      files/directories
-     * @param   string  $type       archive type
-     * @param   string  $add_path   path that should be prepended to the files
-     * @param   string  $strip_path path that should be stripped from the files
+     * @param   string $name name the sent archive should have
+     * @param   mixed $files files/directories
+     * @param   string $type archive type
+     * @param   string $add_path path that should be prepended to the files
+     * @param   string $strip_path path that should be stripped from the files
      */
-    function send($name, $files, $type = HTTP_DOWNLOAD_TGZ, $add_path = '', $strip_path = '')
+    public function send($name, $files, $type = HTTP_DOWNLOAD_TGZ, $add_path = '', $strip_path = '')
     {
         $tmp = System::mktemp();
-        
-        switch ($type = strToUpper($type))
-        {
+
+        switch ($type = strToUpper($type)) {
             case HTTP_DOWNLOAD_TAR:
                 include_once 'Archive/Tar.php';
                 $arc = new Archive_Tar($tmp);
                 $content_type = 'x-tar';
-            break;
+                break;
 
             case HTTP_DOWNLOAD_TGZ:
                 include_once 'Archive/Tar.php';
                 $arc = new Archive_Tar($tmp, 'gz');
                 $content_type = 'x-gzip';
-            break;
+                break;
 
             case HTTP_DOWNLOAD_BZ2:
                 include_once 'Archive/Tar.php';
                 $arc = new Archive_Tar($tmp, 'bz2');
                 $content_type = 'x-bzip2';
-            break;
+                break;
 
             case HTTP_DOWNLOAD_ZIP:
                 include_once 'Archive/Zip.php';
                 $arc = new Archive_Zip($tmp);
                 $content_type = 'x-zip';
-            break;
-            
+                break;
+
             default:
                 return PEAR::raiseError(
                     'Archive type not supported: ' . $type,
                     HTTP_DOWNLOAD_E_INVALID_ARCHIVE_TYPE
                 );
         }
-        
+
         if ($type == HTTP_DOWNLOAD_ZIP) {
-            $options = array(   'add_path' => $add_path, 
-                                'remove_path' => $strip_path);
+            $options = array('add_path' => $add_path,
+                'remove_path' => $strip_path);
             if (!$arc->create($files, $options)) {
                 return PEAR::raiseError('Archive creation failed.');
             }
@@ -112,11 +111,10 @@ class HTTP_Download_Archive
             }
         }
         unset($arc);
-        
+
         $dl = new HTTP_Download(array('file' => $tmp));
         $dl->setContentType('application/' . $content_type);
         $dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $name);
         return $dl->send();
     }
 }
-?>

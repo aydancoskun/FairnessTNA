@@ -1,544 +1,556 @@
-ContributingShiftPolicyViewController = BaseViewController.extend( {
-	el: '#contributing_shift_policy_view_container',
-	type_array: null,
-	include_holiday_type_array: null,
-	include_shift_type_array: null,
+ContributingShiftPolicyViewController = BaseViewController.extend({
+    el: '#contributing_shift_policy_view_container',
+    type_array: null,
+    include_holiday_type_array: null,
+    include_shift_type_array: null,
 
-	branch_selection_type_array: null,
-	department_selection_type_array: null,
+    branch_selection_type_array: null,
+    department_selection_type_array: null,
 
-	job_group_selection_type_array: null,
-	job_selection_type_array: null,
-
-	job_group_array: null,
-	job_item_group_array: null,
-
-	job_item_group_selection_type_array: null,
-	job_item_selection_type_array: null,
-
-	job_group_api: null,
-	job_item_group_api: null,
-	date_api: null,
+    job_group_selection_type_array: null,
+    job_selection_type_array: null,
+
+    job_group_array: null,
+    job_item_group_array: null,
+
+    job_item_group_selection_type_array: null,
+    job_item_selection_type_array: null,
+
+    job_group_api: null,
+    job_item_group_api: null,
+    date_api: null,
+
+    initialize: function (options) {
+        this._super('initialize', options);
+        this.edit_view_tpl = 'ContributingShiftPolicyEditView.html';
+        this.permission_id = 'contributing_shift_policy';
+        this.viewId = 'ContributingShiftPolicy';
+        this.script_name = 'ContributingShiftPolicyView';
+        this.table_name_key = 'contributing_shift_policy';
+        this.context_menu_name = $.i18n._('Contributing Shift Policy');
+        this.navigation_label = $.i18n._('Contributing Shift Policy') + ':';
+        this.api = new (APIFactory.getAPIClass('APIContributingShiftPolicy'))();
+
+        this.date_api = new (APIFactory.getAPIClass('APIDate'))();
+        this.render();
+        this.buildContextMenu();
+
+        this.initData();
+        this.setSelectRibbonMenuIfNecessary();
 
-	initialize: function( options ) {
-		this._super( 'initialize', options );
-		this.edit_view_tpl = 'ContributingShiftPolicyEditView.html';
-		this.permission_id = 'contributing_shift_policy';
-		this.viewId = 'ContributingShiftPolicy';
-		this.script_name = 'ContributingShiftPolicyView';
-		this.table_name_key = 'contributing_shift_policy';
-		this.context_menu_name = $.i18n._( 'Contributing Shift Policy' );
-		this.navigation_label = $.i18n._( 'Contributing Shift Policy' ) + ':';
-		this.api = new (APIFactory.getAPIClass( 'APIContributingShiftPolicy' ))();
+    },
+
+    initOptions: function () {
+        var $this = this;
+        this.initDropDownOption('type');
+        this.initDropDownOption('include_holiday_type');
+        this.initDropDownOption('include_shift_type');
+        this.initDropDownOption('branch_selection_type');
+        this.initDropDownOption('department_selection_type');
+        this.initDropDownOption('job_group_selection_type');
+        this.initDropDownOption('job_selection_type');
+        this.initDropDownOption('job_item_group_selection_type');
+        this.initDropDownOption('job_item_selection_type');
 
-		this.date_api = new (APIFactory.getAPIClass( 'APIDate' ))();
-		this.render();
-		this.buildContextMenu();
+    },
 
-		this.initData();
-		this.setSelectRibbonMenuIfNecessary();
+    buildEditViewUI: function () {
 
-	},
+        this._super('buildEditViewUI');
 
-	initOptions: function() {
-		var $this = this;
-		this.initDropDownOption( 'type' );
-		this.initDropDownOption( 'include_holiday_type' );
-		this.initDropDownOption( 'include_shift_type' );
-		this.initDropDownOption( 'branch_selection_type' );
-		this.initDropDownOption( 'department_selection_type' );
-		this.initDropDownOption( 'job_group_selection_type' );
-		this.initDropDownOption( 'job_selection_type' );
-		this.initDropDownOption( 'job_item_group_selection_type' );
-		this.initDropDownOption( 'job_item_selection_type' );
+        var $this = this;
 
-	},
+        this.setTabLabels({
+            'tab_contributing_shift_policy': $.i18n._('Contributing Shift Policy'),
+            'tab_date_criteria': $.i18n._('Date/Time Criteria'),
+            'tab_differential_criteria': $.i18n._('Differential Criteria'),
+            'tab_audit': $.i18n._('Audit')
+        });
 
-	buildEditViewUI: function() {
+        this.navigation.AComboBox({
+            api_class: (APIFactory.getAPIClass('APIContributingShiftPolicy')),
+            id: this.script_name + '_navigation',
+            allow_multiple_selection: false,
+            layout_name: ALayoutIDs.OVER_TIME_POLICY,
+            navigation_mode: true,
+            show_search_inputs: true
+        });
 
-		this._super( 'buildEditViewUI' );
+        this.setNavigation();
 
-		var $this = this;
+        //Tab 0 start
+        var tab_contributing_shift_policy = this.edit_view_tab.find('#tab_contributing_shift_policy');
 
-		this.setTabLabels( {
-			'tab_contributing_shift_policy': $.i18n._( 'Contributing Shift Policy' ),
-			'tab_date_criteria': $.i18n._( 'Date/Time Criteria' ),
-			'tab_differential_criteria': $.i18n._( 'Differential Criteria' ),
-			'tab_audit': $.i18n._( 'Audit' )
-		} );
+        var tab_contributing_shift_policy_column1 = tab_contributing_shift_policy.find('.first-column');
 
-		this.navigation.AComboBox( {
-			api_class: (APIFactory.getAPIClass( 'APIContributingShiftPolicy' )),
-			id: this.script_name + '_navigation',
-			allow_multiple_selection: false,
-			layout_name: ALayoutIDs.OVER_TIME_POLICY,
-			navigation_mode: true,
-			show_search_inputs: true} );
+        this.edit_view_tabs[0] = [];
 
-		this.setNavigation();
+        this.edit_view_tabs[0].push(tab_contributing_shift_policy_column1);
 
-		//Tab 0 start
-		var tab_contributing_shift_policy = this.edit_view_tab.find( '#tab_contributing_shift_policy' );
+        //Name
+        var form_item_input = Global.loadWidgetByName(FormItemType.TEXT_INPUT);
 
-		var tab_contributing_shift_policy_column1 = tab_contributing_shift_policy.find( '.first-column' );
+        form_item_input.TTextInput({field: 'name', width: '100%'});
+        this.addEditFieldToColumn($.i18n._('Name'), form_item_input, tab_contributing_shift_policy_column1, '');
 
-		this.edit_view_tabs[0] = [];
+        form_item_input.parent().width('45%');
 
-		this.edit_view_tabs[0].push( tab_contributing_shift_policy_column1 );
+        // Description
+        form_item_input = Global.loadWidgetByName(FormItemType.TEXT_AREA);
+        form_item_input.TTextArea({field: 'description', width: '100%'});
+        this.addEditFieldToColumn($.i18n._('Description'), form_item_input, tab_contributing_shift_policy_column1, '', null, null, true);
 
-		//Name
-		var form_item_input = Global.loadWidgetByName( FormItemType.TEXT_INPUT );
+        form_item_input.parent().width('45%');
 
-		form_item_input.TTextInput( {field: 'name', width: '100%'} );
-		this.addEditFieldToColumn( $.i18n._( 'Name' ), form_item_input, tab_contributing_shift_policy_column1, '' );
+        // Wage Group
+        form_item_input = Global.loadWidgetByName(FormItemType.AWESOME_BOX);
+        form_item_input.AComboBox({
+            api_class: (APIFactory.getAPIClass('APIContributingPayCodePolicy')),
+            allow_multiple_selection: false,
+            layout_name: ALayoutIDs.CONTRIBUTING_PAY_CODE_POLICY,
+            show_search_inputs: true,
+            set_empty: true,
+            field: 'contributing_pay_code_policy_id'
+        });
+        this.addEditFieldToColumn($.i18n._('Contributing Pay Code Policy'), form_item_input, tab_contributing_shift_policy_column1);
+
+        //Tab 1 start
+        var tab_date_criteria = this.edit_view_tab.find('#tab_date_criteria');
 
-		form_item_input.parent().width( '45%' );
+        var tab_date_criteria_column1 = tab_date_criteria.find('.first-column');
 
-		// Description
-		form_item_input = Global.loadWidgetByName( FormItemType.TEXT_AREA );
-		form_item_input.TTextArea( { field: 'description', width: '100%' } );
-		this.addEditFieldToColumn( $.i18n._( 'Description' ), form_item_input, tab_contributing_shift_policy_column1, '', null, null, true );
+        this.edit_view_tabs[1] = [];
+
+        this.edit_view_tabs[1].push(tab_date_criteria_column1);
 
-		form_item_input.parent().width( '45%' );
+        // Start Date
+        form_item_input = Global.loadWidgetByName(FormItemType.DATE_PICKER);
+        form_item_input.TDatePicker({field: 'filter_start_date'});
+        var widgetContainer = $("<div class='widget-h-box'></div>");
+        var label = $("<span class='widget-right-label'> " + $.i18n._('(Leave blank for no start date)') + "</span>");
+        widgetContainer.append(form_item_input);
+        widgetContainer.append(label);
+        this.addEditFieldToColumn($.i18n._('Start Date'), form_item_input, tab_date_criteria_column1, '', widgetContainer);
+
+        // End Date
+        form_item_input = Global.loadWidgetByName(FormItemType.DATE_PICKER);
+
+        form_item_input.TDatePicker({field: 'filter_end_date'});
+
+        widgetContainer = $("<div class='widget-h-box'></div>");
+        label = $("<span class='widget-right-label'> " + $.i18n._('(Leave blank for no end date)') + "</span>");
+
+        widgetContainer.append(form_item_input);
+        widgetContainer.append(label);
+        this.addEditFieldToColumn($.i18n._('End Date'), form_item_input, tab_date_criteria_column1, '', widgetContainer);
+
+        // Start Time
+        form_item_input = Global.loadWidgetByName(FormItemType.TIME_PICKER);
+        form_item_input.TTimePicker({field: 'filter_start_time'});
+
+        widgetContainer = $("<div class='widget-h-box'></div>");
+        label = $("<span class='widget-right-label'> " + $.i18n._('(Leave blank for no start time)') + "</span>");
+
+        widgetContainer.append(form_item_input);
+        widgetContainer.append(label);
+        this.addEditFieldToColumn($.i18n._('Start Time'), form_item_input, tab_date_criteria_column1, '', widgetContainer);
+
+        // End Time
+        form_item_input = Global.loadWidgetByName(FormItemType.TIME_PICKER);
+        form_item_input.TTimePicker({field: 'filter_end_time'});
+
+        widgetContainer = $("<div class='widget-h-box'></div>");
+        label = $("<span class='widget-right-label'> " + $.i18n._('(Leave blank for no end time)') + "</span>");
+
+        widgetContainer.append(form_item_input);
+        widgetContainer.append(label);
+        this.addEditFieldToColumn($.i18n._('End Time'), form_item_input, tab_date_criteria_column1, '', widgetContainer);
+
+        // Effective Days
+        var form_item_sun_checkbox = Global.loadWidgetByName(FormItemType.CHECKBOX);
+        form_item_sun_checkbox.TCheckbox({field: 'sun'});
+
+        var form_item_mon_checkbox = Global.loadWidgetByName(FormItemType.CHECKBOX);
+        form_item_mon_checkbox.TCheckbox({field: 'mon'});
+
+        var form_item_tue_checkbox = Global.loadWidgetByName(FormItemType.CHECKBOX);
+        form_item_tue_checkbox.TCheckbox({field: 'tue'});
+
+        var form_item_wed_checkbox = Global.loadWidgetByName(FormItemType.CHECKBOX);
+        form_item_wed_checkbox.TCheckbox({field: 'wed'});
+
+        var form_item_thu_checkbox = Global.loadWidgetByName(FormItemType.CHECKBOX);
+        form_item_thu_checkbox.TCheckbox({field: 'thu'});
+
+        var form_item_fri_checkbox = Global.loadWidgetByName(FormItemType.CHECKBOX);
+        form_item_fri_checkbox.TCheckbox({field: 'fri'});
+
+        var form_item_sat_checkbox = Global.loadWidgetByName(FormItemType.CHECKBOX);
+        form_item_sat_checkbox.TCheckbox({field: 'sat'});
+
+        widgetContainer = $("<div class=''></div>");
+
+        var sun = $("<span class='widget-top-label'> " + $.i18n._('Sun') + " <br> " + " </span>");
+        var mon = $("<span class='widget-top-label'> " + $.i18n._('Mon') + " <br> " + " </span>");
+        var tue = $("<span class='widget-top-label'> " + $.i18n._('Tue') + " <br> " + " </span>");
+        var wed = $("<span class='widget-top-label'> " + $.i18n._('Wed') + " <br> " + " </span>");
+        var thu = $("<span class='widget-top-label'> " + $.i18n._('Thu') + " <br> " + " </span>");
+        var fri = $("<span class='widget-top-label'> " + $.i18n._('Fri') + " <br> " + " </span>");
+        var sat = $("<span class='widget-top-label'> " + $.i18n._('Sat') + " <br> " + " </span>");
 
-		// Wage Group
-		form_item_input = Global.loadWidgetByName( FormItemType.AWESOME_BOX );
-		form_item_input.AComboBox( {
-			api_class: (APIFactory.getAPIClass( 'APIContributingPayCodePolicy' )),
-			allow_multiple_selection: false,
-			layout_name: ALayoutIDs.CONTRIBUTING_PAY_CODE_POLICY,
-			show_search_inputs: true,
-			set_empty: true,
-			field: 'contributing_pay_code_policy_id'} );
-		this.addEditFieldToColumn( $.i18n._( 'Contributing Pay Code Policy' ), form_item_input, tab_contributing_shift_policy_column1 );
-
-		//Tab 1 start
-		var tab_date_criteria = this.edit_view_tab.find( '#tab_date_criteria' );
+        sun.append(form_item_sun_checkbox);
+        mon.append(form_item_mon_checkbox);
+        tue.append(form_item_tue_checkbox);
+        wed.append(form_item_wed_checkbox);
+        thu.append(form_item_thu_checkbox);
+        fri.append(form_item_fri_checkbox);
+        sat.append(form_item_sat_checkbox);
 
-		var tab_date_criteria_column1 = tab_date_criteria.find( '.first-column' );
+        widgetContainer.append(sun);
+        widgetContainer.append(mon);
+        widgetContainer.append(tue);
+        widgetContainer.append(wed);
+        widgetContainer.append(thu);
+        widgetContainer.append(fri);
+        widgetContainer.append(sat);
 
-		this.edit_view_tabs[1] = [];
+        this.addEditFieldToColumn($.i18n._('Effective Days'), [form_item_sun_checkbox, form_item_mon_checkbox, form_item_tue_checkbox, form_item_wed_checkbox, form_item_thu_checkbox, form_item_fri_checkbox, form_item_sat_checkbox], tab_date_criteria_column1, '', widgetContainer, false, true);
 
-		this.edit_view_tabs[1].push( tab_date_criteria_column1 );
+        // Holidays
+        form_item_input = Global.loadWidgetByName(FormItemType.COMBO_BOX);
+        form_item_input.TComboBox({field: 'include_holiday_type_id', set_empty: false});
+        form_item_input.setSourceData(Global.addFirstItemToArray($this.include_holiday_type_array));
+        this.addEditFieldToColumn($.i18n._('Holidays'), form_item_input, tab_date_criteria_column1);
 
-		// Start Date
-		form_item_input = Global.loadWidgetByName( FormItemType.DATE_PICKER );
-		form_item_input.TDatePicker( {field: 'filter_start_date'} );
-		var widgetContainer = $( "<div class='widget-h-box'></div>" );
-		var label = $( "<span class='widget-right-label'> " + $.i18n._( '(Leave blank for no start date)' ) + "</span>" );
-		widgetContainer.append( form_item_input );
-		widgetContainer.append( label );
-		this.addEditFieldToColumn( $.i18n._( 'Start Date' ), form_item_input, tab_date_criteria_column1, '', widgetContainer );
-
-		// End Date
-		form_item_input = Global.loadWidgetByName( FormItemType.DATE_PICKER );
-
-		form_item_input.TDatePicker( {field: 'filter_end_date'} );
-
-		widgetContainer = $( "<div class='widget-h-box'></div>" );
-		label = $( "<span class='widget-right-label'> " + $.i18n._( '(Leave blank for no end date)' ) + "</span>" );
-
-		widgetContainer.append( form_item_input );
-		widgetContainer.append( label );
-		this.addEditFieldToColumn( $.i18n._( 'End Date' ), form_item_input, tab_date_criteria_column1, '', widgetContainer );
-
-		// Start Time
-		form_item_input = Global.loadWidgetByName( FormItemType.TIME_PICKER );
-		form_item_input.TTimePicker( {field: 'filter_start_time'} );
-
-		widgetContainer = $( "<div class='widget-h-box'></div>" );
-		label = $( "<span class='widget-right-label'> " + $.i18n._( '(Leave blank for no start time)' ) + "</span>" );
-
-		widgetContainer.append( form_item_input );
-		widgetContainer.append( label );
-		this.addEditFieldToColumn( $.i18n._( 'Start Time' ), form_item_input, tab_date_criteria_column1, '', widgetContainer );
-
-		// End Time
-		form_item_input = Global.loadWidgetByName( FormItemType.TIME_PICKER );
-		form_item_input.TTimePicker( {field: 'filter_end_time'} );
-
-		widgetContainer = $( "<div class='widget-h-box'></div>" );
-		label = $( "<span class='widget-right-label'> " + $.i18n._( '(Leave blank for no end time)' ) + "</span>" );
-
-		widgetContainer.append( form_item_input );
-		widgetContainer.append( label );
-		this.addEditFieldToColumn( $.i18n._( 'End Time' ), form_item_input, tab_date_criteria_column1, '', widgetContainer );
-
-		// Effective Days
-		var form_item_sun_checkbox = Global.loadWidgetByName( FormItemType.CHECKBOX );
-		form_item_sun_checkbox.TCheckbox( {field: 'sun'} );
-
-		var form_item_mon_checkbox = Global.loadWidgetByName( FormItemType.CHECKBOX );
-		form_item_mon_checkbox.TCheckbox( {field: 'mon'} );
+        // Holiday Policies
+        form_item_input = Global.loadWidgetByName(FormItemType.AWESOME_BOX);
+        form_item_input.AComboBox({
+            api_class: (APIFactory.getAPIClass('APIHolidayPolicy')),
+            allow_multiple_selection: true,
+            layout_name: ALayoutIDs.HOLIDAY_POLICY,
+            show_search_inputs: true,
+            set_empty: true,
+            field: 'holiday_policy'
+        });
+        this.addEditFieldToColumn($.i18n._('Holiday Policies'), form_item_input, tab_date_criteria_column1, '', null, true);
 
-		var form_item_tue_checkbox = Global.loadWidgetByName( FormItemType.CHECKBOX );
-		form_item_tue_checkbox.TCheckbox( {field: 'tue'} );
-
-		var form_item_wed_checkbox = Global.loadWidgetByName( FormItemType.CHECKBOX );
-		form_item_wed_checkbox.TCheckbox( {field: 'wed'} );
-
-		var form_item_thu_checkbox = Global.loadWidgetByName( FormItemType.CHECKBOX );
-		form_item_thu_checkbox.TCheckbox( {field: 'thu'} );
-
-		var form_item_fri_checkbox = Global.loadWidgetByName( FormItemType.CHECKBOX );
-		form_item_fri_checkbox.TCheckbox( {field: 'fri'} );
+        // Include Shift Type
+        form_item_input = Global.loadWidgetByName(FormItemType.COMBO_BOX);
+        form_item_input.TComboBox({field: 'include_shift_type_id', set_empty: false});
+        form_item_input.setSourceData(Global.addFirstItemToArray($this.include_shift_type_array));
 
-		var form_item_sat_checkbox = Global.loadWidgetByName( FormItemType.CHECKBOX );
-		form_item_sat_checkbox.TCheckbox( {field: 'sat'} );
+        widgetContainer = $("<div class='widget-h-box'></div>");
+        label = $("<span class='widget-right-label'> " + $.i18n._('(Between above start/end times)') + "</span>");
+        widgetContainer.append(form_item_input);
+        widgetContainer.append(label);
+        this.addEditFieldToColumn($.i18n._('Shift Criteria'), form_item_input, tab_date_criteria_column1, '', widgetContainer);
 
-		widgetContainer = $( "<div class=''></div>" );
+        //
+        // Tab2 start
+        //
+        var tab_differential_criteria = this.edit_view_tab.find('#tab_differential_criteria');
 
-		var sun = $( "<span class='widget-top-label'> " + $.i18n._( 'Sun' ) + " <br> " + " </span>" );
-		var mon = $( "<span class='widget-top-label'> " + $.i18n._( 'Mon' ) + " <br> " + " </span>" );
-		var tue = $( "<span class='widget-top-label'> " + $.i18n._( 'Tue' ) + " <br> " + " </span>" );
-		var wed = $( "<span class='widget-top-label'> " + $.i18n._( 'Wed' ) + " <br> " + " </span>" );
-		var thu = $( "<span class='widget-top-label'> " + $.i18n._( 'Thu' ) + " <br> " + " </span>" );
-		var fri = $( "<span class='widget-top-label'> " + $.i18n._( 'Fri' ) + " <br> " + " </span>" );
-		var sat = $( "<span class='widget-top-label'> " + $.i18n._( 'Sat' ) + " <br> " + " </span>" );
+        var tab_differential_criteria_column1 = tab_differential_criteria.find('.first-column');
 
-		sun.append( form_item_sun_checkbox );
-		mon.append( form_item_mon_checkbox );
-		tue.append( form_item_tue_checkbox );
-		wed.append( form_item_wed_checkbox );
-		thu.append( form_item_thu_checkbox );
-		fri.append( form_item_fri_checkbox );
-		sat.append( form_item_sat_checkbox );
+        this.edit_view_tabs[2] = [];
 
-		widgetContainer.append( sun );
-		widgetContainer.append( mon );
-		widgetContainer.append( tue );
-		widgetContainer.append( wed );
-		widgetContainer.append( thu );
-		widgetContainer.append( fri );
-		widgetContainer.append( sat );
+        this.edit_view_tabs[2].push(tab_differential_criteria_column1);
 
-		this.addEditFieldToColumn( $.i18n._( 'Effective Days' ), [form_item_sun_checkbox, form_item_mon_checkbox, form_item_tue_checkbox, form_item_wed_checkbox, form_item_thu_checkbox, form_item_fri_checkbox, form_item_sat_checkbox], tab_date_criteria_column1, '', widgetContainer, false, true );
+        // Branches
+        var v_box = $("<div class='v-box'></div>")
 
-		// Holidays
-		form_item_input = Global.loadWidgetByName( FormItemType.COMBO_BOX );
-		form_item_input.TComboBox( {field: 'include_holiday_type_id', set_empty: false } );
-		form_item_input.setSourceData( Global.addFirstItemToArray( $this.include_holiday_type_array ) );
-		this.addEditFieldToColumn( $.i18n._( 'Holidays' ), form_item_input, tab_date_criteria_column1 );
+        //Selection Type
+        form_item_input = Global.loadWidgetByName(FormItemType.COMBO_BOX);
+        form_item_input.TComboBox({field: 'branch_selection_type_id', set_empty: false});
+        form_item_input.setSourceData(Global.addFirstItemToArray($this.branch_selection_type_array));
 
-		// Holiday Policies
-		form_item_input = Global.loadWidgetByName( FormItemType.AWESOME_BOX );
-		form_item_input.AComboBox( {
-			api_class: (APIFactory.getAPIClass( 'APIHolidayPolicy' )),
-			allow_multiple_selection: true,
-			layout_name: ALayoutIDs.HOLIDAY_POLICY,
-			show_search_inputs: true,
-			set_empty: true,
-			field: 'holiday_policy'
-		} );
-		this.addEditFieldToColumn( $.i18n._( 'Holiday Policies' ), form_item_input, tab_date_criteria_column1, '', null, true );
+        form_item = this.putInputToInsideFormItem(form_item_input, 'Selection Type')
 
-		// Include Shift Type
-		form_item_input = Global.loadWidgetByName( FormItemType.COMBO_BOX );
-		form_item_input.TComboBox( {field: 'include_shift_type_id', set_empty: false } );
-		form_item_input.setSourceData( Global.addFirstItemToArray( $this.include_shift_type_array ) );
+        v_box.append(form_item);
+        v_box.append("<div class='clear-both-div'></div>");
 
-		widgetContainer = $( "<div class='widget-h-box'></div>" );
-		label = $( "<span class='widget-right-label'> " + $.i18n._( '(Between above start/end times)' ) + "</span>" );
-		widgetContainer.append( form_item_input );
-		widgetContainer.append( label );
-		this.addEditFieldToColumn( $.i18n._( 'Shift Criteria' ), form_item_input, tab_date_criteria_column1,'', widgetContainer );
+        //Selection
+        var form_item_input_1 = Global.loadWidgetByName(FormItemType.AWESOME_BOX);
 
-		//
-		// Tab2 start
-		//
-		var tab_differential_criteria = this.edit_view_tab.find( '#tab_differential_criteria' );
+        form_item_input_1.AComboBox({
+            api_class: (APIFactory.getAPIClass('APIBranch')),
+            allow_multiple_selection: true,
+            layout_name: ALayoutIDs.BRANCH,
+            show_search_inputs: true,
+            set_empty: true,
+            field: 'branch'
+        });
 
-		var tab_differential_criteria_column1 = tab_differential_criteria.find( '.first-column' );
+        var form_item = this.putInputToInsideFormItem(form_item_input_1, 'Selection');
 
-		this.edit_view_tabs[2] = [];
+        v_box.append(form_item);
+
+        // Exclude Default
+        var form_item_input_2 = Global.loadWidgetByName(FormItemType.CHECKBOX);
+
+        form_item_input_2.TCheckbox({field: 'exclude_default_branch'});
+
+        form_item = this.putInputToInsideFormItem(form_item_input_2, 'Exclude Default');
+
+        v_box.append(form_item);
+
+        this.addEditFieldToColumn($.i18n._('Branches'), [form_item_input, form_item_input_1, form_item_input_2], tab_differential_criteria_column1, '', v_box, false, true);
+
+        // Departments
+        v_box = $("<div class='v-box'></div>")
+
+        //Selection Type
+        form_item_input = Global.loadWidgetByName(FormItemType.COMBO_BOX);
+        form_item_input.TComboBox({field: 'department_selection_type_id', set_empty: false});
+        form_item_input.setSourceData(Global.addFirstItemToArray($this.department_selection_type_array));
+
+        form_item = this.putInputToInsideFormItem(form_item_input, 'Selection Type')
+
+        v_box.append(form_item);
+        v_box.append("<div class='clear-both-div'></div>");
+
+        //Selection
+        form_item_input_1 = Global.loadWidgetByName(FormItemType.AWESOME_BOX);
+
+        form_item_input_1.AComboBox({
+            api_class: (APIFactory.getAPIClass('APIDepartment')),
+            allow_multiple_selection: true,
+            layout_name: ALayoutIDs.DEPARTMENT,
+            show_search_inputs: true,
+            set_empty: true,
+            field: 'department'
+        });
+
+        form_item = this.putInputToInsideFormItem(form_item_input_1, 'Selection');
+
+        v_box.append(form_item);
+
+        // Exclude Default
+        form_item_input_2 = Global.loadWidgetByName(FormItemType.CHECKBOX);
+
+        form_item_input_2.TCheckbox({field: 'exclude_default_department'});
+
+        form_item = this.putInputToInsideFormItem(form_item_input_2, 'Exclude Default');
+
+        v_box.append(form_item);
+
+        this.addEditFieldToColumn($.i18n._('Departments'), [form_item_input, form_item_input_1, form_item_input_2], tab_differential_criteria_column1, '', v_box, false, true);
+
+    },
 
-		this.edit_view_tabs[2].push( tab_differential_criteria_column1 );
+    onFormItemChange: function (target) {
+        this.is_changed = true;
+        this.setMassEditingFieldsWhenFormChange(target);
 
-		// Branches
-		var v_box = $( "<div class='v-box'></div>" )
+        var key = target.getField();
+        var c_value = target.getValue();
 
-		//Selection Type
-		form_item_input = Global.loadWidgetByName( FormItemType.COMBO_BOX );
-		form_item_input.TComboBox( {field: 'branch_selection_type_id', set_empty: false} );
-		form_item_input.setSourceData( Global.addFirstItemToArray( $this.branch_selection_type_array ) );
+        this.current_edit_record[key] = c_value;
 
-		form_item = this.putInputToInsideFormItem( form_item_input, 'Selection Type' )
+        if (key === 'include_holiday_type_id') {
+            this.onIncludeHolidayTypeChange();
+        }
 
-		v_box.append( form_item );
-		v_box.append( "<div class='clear-both-div'></div>" );
-
-		//Selection
-		var form_item_input_1 = Global.loadWidgetByName( FormItemType.AWESOME_BOX );
-
-		form_item_input_1.AComboBox( {
-			api_class: (APIFactory.getAPIClass( 'APIBranch' )),
-			allow_multiple_selection: true,
-			layout_name: ALayoutIDs.BRANCH,
-			show_search_inputs: true,
-			set_empty: true,
-			field: 'branch'} );
-
-		var form_item = this.putInputToInsideFormItem( form_item_input_1, 'Selection' );
-
-		v_box.append( form_item );
-
-		// Exclude Default
-		var form_item_input_2 = Global.loadWidgetByName( FormItemType.CHECKBOX );
-
-		form_item_input_2.TCheckbox( {field: 'exclude_default_branch'} );
-
-		form_item = this.putInputToInsideFormItem( form_item_input_2, 'Exclude Default' );
-
-		v_box.append( form_item );
-
-		this.addEditFieldToColumn( $.i18n._( 'Branches' ), [form_item_input, form_item_input_1, form_item_input_2], tab_differential_criteria_column1, '', v_box, false, true );
-
-		// Departments
-		v_box = $( "<div class='v-box'></div>" )
-
-		//Selection Type
-		form_item_input = Global.loadWidgetByName( FormItemType.COMBO_BOX );
-		form_item_input.TComboBox( {field: 'department_selection_type_id', set_empty: false} );
-		form_item_input.setSourceData( Global.addFirstItemToArray( $this.department_selection_type_array ) );
-
-		form_item = this.putInputToInsideFormItem( form_item_input, 'Selection Type' )
-
-		v_box.append( form_item );
-		v_box.append( "<div class='clear-both-div'></div>" );
-
-		//Selection
-		form_item_input_1 = Global.loadWidgetByName( FormItemType.AWESOME_BOX );
-
-		form_item_input_1.AComboBox( {
-			api_class: (APIFactory.getAPIClass( 'APIDepartment' )),
-			allow_multiple_selection: true,
-			layout_name: ALayoutIDs.DEPARTMENT,
-			show_search_inputs: true,
-			set_empty: true,
-			field: 'department'} );
-
-		form_item = this.putInputToInsideFormItem( form_item_input_1, 'Selection' );
-
-		v_box.append( form_item );
-
-		// Exclude Default
-		form_item_input_2 = Global.loadWidgetByName( FormItemType.CHECKBOX );
-
-		form_item_input_2.TCheckbox( {field: 'exclude_default_department'} );
-
-		form_item = this.putInputToInsideFormItem( form_item_input_2, 'Exclude Default' );
-
-		v_box.append( form_item );
-
-		this.addEditFieldToColumn( $.i18n._( 'Departments' ), [form_item_input, form_item_input_1, form_item_input_2], tab_differential_criteria_column1, '', v_box, false, true );
-
-	},
-
-	onFormItemChange: function( target ) {
-		this.is_changed = true;
-		this.setMassEditingFieldsWhenFormChange( target );
-
-		var key = target.getField();
-		var c_value = target.getValue();
-
-		this.current_edit_record[key] = c_value;
-
-		if ( key === 'include_holiday_type_id' ) {
-			this.onIncludeHolidayTypeChange();
-		}
-
-		if ( key === 'branch_selection_type_id' ) {
-			this.onBranchSelectionTypeChange();
-		}
-		if ( key === 'department_selection_type_id' ) {
-			this.onDepartmentSelectionTypeChange();
-		}
-		if ( key === 'job_group_selection_type_id' ) {
-			this.onJobGroupSelectionTypeChange();
-		}
-		if ( key === 'job_selection_type_id' ) {
-			this.onJobSelectionTypeChange();
-		}
-		if ( key === 'job_item_group_selection_type_id' ) {
-			this.onJobItemGroupSelectionTypeChange();
-		}
-		if ( key === 'job_item_selection_type_id' ) {
-			this.onJobItemSelectionTypeChange();
-		}
-
-		this.validate();
-	},
-
-	setCurrentEditRecordData: function() {
-		// When mass editing, these fields may not be the common data, so their value will be undefined, so this will cause their change event cannot work properly.
-		this.setDefaultData( {
-			'branch_selection_type_id': 10,
-			'department_selection_type_id': 10,
-			'job_group_selection_type_id': 10,
-			'job_selection_type_id': 10,
-			'job_item_group_selection_type_id': 10,
-			'job_item_selection_type_id': 10,
-			'include_holiday_type_id': 10
-		} );
-
-		//Set current edit record data to all widgets
-		for ( var key in this.current_edit_record ) {
-			var widget = this.edit_view_ui_dic[key];
-			if ( Global.isSet( widget ) ) {
-				switch ( key ) {
-					default:
-						widget.setValue( this.current_edit_record[key] );
-						break;
-				}
-
-			}
-		}
-
-		this.onBranchSelectionTypeChange();
-		this.onDepartmentSelectionTypeChange();
-		this.onJobGroupSelectionTypeChange();
-		this.onJobSelectionTypeChange();
-		this.onJobItemGroupSelectionTypeChange();
-		this.onJobItemSelectionTypeChange();
-
-		this.collectUIDataToCurrentEditRecord();
-		this.onIncludeHolidayTypeChange();
-		this.setEditViewDataDone();
-
-	},
-
-	onIncludeHolidayTypeChange: function() {
-		if ( this.current_edit_record['include_holiday_type_id'] === 10 ) {
-			this.detachElement( 'holiday_policy' );
-		} else {
-			this.attachElement( 'holiday_policy' );
-		}
-
-		this.editFieldResize();
-
-	},
-
-	onBranchSelectionTypeChange: function() {
-		this.edit_view_ui_dic['branch'].setEnabled( false );
-	},
-
-	onDepartmentSelectionTypeChange: function() {
-			this.edit_view_ui_dic['department'].setEnabled( false );
-	},
-
-	onJobGroupSelectionTypeChange: function() {
-
-	},
-
-	onJobSelectionTypeChange: function() {
-	},
-
-	onJobItemGroupSelectionTypeChange: function() {
-	},
-
-	onJobItemSelectionTypeChange: function() {
-	},
-
-	onTabShow: function( e, ui ) {
-		var key = this.edit_view_tab_selected_index;
-		this.editFieldResize( key );
-
-		if ( !this.current_edit_record ) {
-			return;
-		}
-
-		//Handle most cases that one tab and on audit tab
-		if ( this.edit_view_tab_selected_index == 1 ) {
-				this.edit_view_tab.find( '#tab_date_criteria' ).find( '.first-column' ).css( 'display', 'none' );
-				this.edit_view.find( '.permission-defined-div' ).css( 'display', 'block' );
-			this.buildContextMenu( true );
-			this.setEditMenu();
-		} else if ( this.edit_view_tab_selected_index == 2 ) {
-				this.edit_view_tab.find( '#tab_differential_criteria' ).find( '.first-column' ).css( 'display', 'none' );
-				this.edit_view.find( '.permission-defined-div' ).css( 'display', 'block' );
-			this.buildContextMenu( true );
-			this.setEditMenu();
-		} else if ( this.edit_view_tab_selected_index === 3 ) {
-
-			if ( this.current_edit_record.id ) {
-				this.edit_view_tab.find( '#tab_audit' ).find( '.first-column-sub-view' ).css( 'display', 'block' );
-				this.initSubLogView( 'tab_audit' );
-			} else {
-
-				this.edit_view_tab.find( '#tab_audit' ).find( '.first-column-sub-view' ).css( 'display', 'none' );
-				this.edit_view.find( '.save-and-continue-div' ).css( 'display', 'block' );
-			}
-
-		} else {
-			this.buildContextMenu( true );
-			this.setEditMenu();
-		}
-
-	},
-
-	initTabData: function() {
-		//Handle most case that one tab and one audit tab
-
-		if ( this.edit_view_tab_selected_index == 1 ) {
-				this.edit_view_tab.find( '#tab_date_criteria' ).find( '.first-column' ).css( 'display', 'none' );
-				this.edit_view.find( '.permission-defined-div' ).css( 'display', 'block' );
-		} else if ( this.edit_view_tab_selected_index == 2 ) {
-				this.edit_view_tab.find( '#tab_differential_criteria' ).find( '.first-column' ).css( 'display', 'none' );
-				this.edit_view.find( '.permission-defined-div' ).css( 'display', 'block' );
-		} else if ( this.edit_view_tab.tabs( 'option', 'selected' ) === 3 ) {
-			if ( this.current_edit_record.id ) {
-				this.edit_view_tab.find( '#tab_audit' ).find( '.first-column-sub-view' ).css( 'display', 'block' );
-				this.initSubLogView( 'tab_audit' );
-			} else {
-				this.edit_view_tab.find( '#tab_audit' ).find( '.first-column-sub-view' ).css( 'display', 'none' );
-				this.edit_view.find( '.save-and-continue-div' ).css( 'display', 'block' );
-			}
-		}
-	},
-
-	buildSearchFields: function() {
-
-		this._super( 'buildSearchFields' );
-		this.search_fields = [
-
-			new SearchField( {label: $.i18n._( 'Name' ),
-				in_column: 1,
-				field: 'name',
-				multiple: true,
-				basic_search: true,
-				adv_search: false,
-				form_item_type: FormItemType.TEXT_INPUT} ),
-
-			new SearchField( {label: $.i18n._( 'Contributing Pay Code' ),
-				in_column: 1,
-				field: 'contributing_pay_code_policy_id',
-				layout_name: ALayoutIDs.CONTRIBUTING_PAY_CODE_POLICY,
-				api_class: (APIFactory.getAPIClass( 'APIContributingPayCodePolicy' )),
-				multiple: true,
-				basic_search: true,
-				adv_search: false,
-				form_item_type: FormItemType.AWESOME_BOX} ),
-
-			new SearchField( {label: $.i18n._( 'Created By' ),
-				in_column: 2,
-				field: 'created_by',
-				layout_name: ALayoutIDs.USER,
-				api_class: (APIFactory.getAPIClass( 'APIUser' )),
-				multiple: true,
-				basic_search: true,
-				adv_search: false,
-				form_item_type: FormItemType.AWESOME_BOX} ),
-
-			new SearchField( {label: $.i18n._( 'Updated By' ),
-				in_column: 2,
-				field: 'updated_by',
-				layout_name: ALayoutIDs.USER,
-				api_class: (APIFactory.getAPIClass( 'APIUser' )),
-				multiple: true,
-				basic_search: true,
-				adv_search: false,
-				form_item_type: FormItemType.AWESOME_BOX} )];
-	}
-
-
-} );
+        if (key === 'branch_selection_type_id') {
+            this.onBranchSelectionTypeChange();
+        }
+        if (key === 'department_selection_type_id') {
+            this.onDepartmentSelectionTypeChange();
+        }
+        if (key === 'job_group_selection_type_id') {
+            this.onJobGroupSelectionTypeChange();
+        }
+        if (key === 'job_selection_type_id') {
+            this.onJobSelectionTypeChange();
+        }
+        if (key === 'job_item_group_selection_type_id') {
+            this.onJobItemGroupSelectionTypeChange();
+        }
+        if (key === 'job_item_selection_type_id') {
+            this.onJobItemSelectionTypeChange();
+        }
+
+        this.validate();
+    },
+
+    setCurrentEditRecordData: function () {
+        // When mass editing, these fields may not be the common data, so their value will be undefined, so this will cause their change event cannot work properly.
+        this.setDefaultData({
+            'branch_selection_type_id': 10,
+            'department_selection_type_id': 10,
+            'job_group_selection_type_id': 10,
+            'job_selection_type_id': 10,
+            'job_item_group_selection_type_id': 10,
+            'job_item_selection_type_id': 10,
+            'include_holiday_type_id': 10
+        });
+
+        //Set current edit record data to all widgets
+        for (var key in this.current_edit_record) {
+            var widget = this.edit_view_ui_dic[key];
+            if (Global.isSet(widget)) {
+                switch (key) {
+                    default:
+                        widget.setValue(this.current_edit_record[key]);
+                        break;
+                }
+
+            }
+        }
+
+        this.onBranchSelectionTypeChange();
+        this.onDepartmentSelectionTypeChange();
+        this.onJobGroupSelectionTypeChange();
+        this.onJobSelectionTypeChange();
+        this.onJobItemGroupSelectionTypeChange();
+        this.onJobItemSelectionTypeChange();
+
+        this.collectUIDataToCurrentEditRecord();
+        this.onIncludeHolidayTypeChange();
+        this.setEditViewDataDone();
+
+    },
+
+    onIncludeHolidayTypeChange: function () {
+        if (this.current_edit_record['include_holiday_type_id'] === 10) {
+            this.detachElement('holiday_policy');
+        } else {
+            this.attachElement('holiday_policy');
+        }
+
+        this.editFieldResize();
+
+    },
+
+    onBranchSelectionTypeChange: function () {
+        this.edit_view_ui_dic['branch'].setEnabled(false);
+    },
+
+    onDepartmentSelectionTypeChange: function () {
+        this.edit_view_ui_dic['department'].setEnabled(false);
+    },
+
+    onJobGroupSelectionTypeChange: function () {
+
+    },
+
+    onJobSelectionTypeChange: function () {
+    },
+
+    onJobItemGroupSelectionTypeChange: function () {
+    },
+
+    onJobItemSelectionTypeChange: function () {
+    },
+
+    onTabShow: function (e, ui) {
+        var key = this.edit_view_tab_selected_index;
+        this.editFieldResize(key);
+
+        if (!this.current_edit_record) {
+            return;
+        }
+
+        //Handle most cases that one tab and on audit tab
+        if (this.edit_view_tab_selected_index == 1) {
+            this.edit_view_tab.find('#tab_date_criteria').find('.first-column').css('display', 'none');
+            this.edit_view.find('.permission-defined-div').css('display', 'block');
+            this.buildContextMenu(true);
+            this.setEditMenu();
+        } else if (this.edit_view_tab_selected_index == 2) {
+            this.edit_view_tab.find('#tab_differential_criteria').find('.first-column').css('display', 'none');
+            this.edit_view.find('.permission-defined-div').css('display', 'block');
+            this.buildContextMenu(true);
+            this.setEditMenu();
+        } else if (this.edit_view_tab_selected_index === 3) {
+
+            if (this.current_edit_record.id) {
+                this.edit_view_tab.find('#tab_audit').find('.first-column-sub-view').css('display', 'block');
+                this.initSubLogView('tab_audit');
+            } else {
+
+                this.edit_view_tab.find('#tab_audit').find('.first-column-sub-view').css('display', 'none');
+                this.edit_view.find('.save-and-continue-div').css('display', 'block');
+            }
+
+        } else {
+            this.buildContextMenu(true);
+            this.setEditMenu();
+        }
+
+    },
+
+    initTabData: function () {
+        //Handle most case that one tab and one audit tab
+
+        if (this.edit_view_tab_selected_index == 1) {
+            this.edit_view_tab.find('#tab_date_criteria').find('.first-column').css('display', 'none');
+            this.edit_view.find('.permission-defined-div').css('display', 'block');
+        } else if (this.edit_view_tab_selected_index == 2) {
+            this.edit_view_tab.find('#tab_differential_criteria').find('.first-column').css('display', 'none');
+            this.edit_view.find('.permission-defined-div').css('display', 'block');
+        } else if (this.edit_view_tab.tabs('option', 'selected') === 3) {
+            if (this.current_edit_record.id) {
+                this.edit_view_tab.find('#tab_audit').find('.first-column-sub-view').css('display', 'block');
+                this.initSubLogView('tab_audit');
+            } else {
+                this.edit_view_tab.find('#tab_audit').find('.first-column-sub-view').css('display', 'none');
+                this.edit_view.find('.save-and-continue-div').css('display', 'block');
+            }
+        }
+    },
+
+    buildSearchFields: function () {
+
+        this._super('buildSearchFields');
+        this.search_fields = [
+
+            new SearchField({
+                label: $.i18n._('Name'),
+                in_column: 1,
+                field: 'name',
+                multiple: true,
+                basic_search: true,
+                adv_search: false,
+                form_item_type: FormItemType.TEXT_INPUT
+            }),
+
+            new SearchField({
+                label: $.i18n._('Contributing Pay Code'),
+                in_column: 1,
+                field: 'contributing_pay_code_policy_id',
+                layout_name: ALayoutIDs.CONTRIBUTING_PAY_CODE_POLICY,
+                api_class: (APIFactory.getAPIClass('APIContributingPayCodePolicy')),
+                multiple: true,
+                basic_search: true,
+                adv_search: false,
+                form_item_type: FormItemType.AWESOME_BOX
+            }),
+
+            new SearchField({
+                label: $.i18n._('Created By'),
+                in_column: 2,
+                field: 'created_by',
+                layout_name: ALayoutIDs.USER,
+                api_class: (APIFactory.getAPIClass('APIUser')),
+                multiple: true,
+                basic_search: true,
+                adv_search: false,
+                form_item_type: FormItemType.AWESOME_BOX
+            }),
+
+            new SearchField({
+                label: $.i18n._('Updated By'),
+                in_column: 2,
+                field: 'updated_by',
+                layout_name: ALayoutIDs.USER,
+                api_class: (APIFactory.getAPIClass('APIUser')),
+                multiple: true,
+                basic_search: true,
+                adv_search: false,
+                form_item_type: FormItemType.AWESOME_BOX
+            })];
+    }
+
+
+});

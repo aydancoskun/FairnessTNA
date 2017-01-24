@@ -19,38 +19,40 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\PayStub
  */
-class PayStub extends PayStubFactory {
-	protected $tmp_data = NULL;
+class PayStub extends PayStubFactory
+{
+    protected $tmp_data = null;
 
-	function childConstruct() {
-		$this->StartTransaction();
+    public function childConstruct()
+    {
+        $this->StartTransaction();
 
-		return TRUE;
-	}
+        return true;
+    }
 
 
-	function Done() {
-		Debug::Arr($this->tmp_data, 'Pay Stub TMP Data: ', __FILE__, __LINE__, __METHOD__, 10);
-		//Call pre-save() first, so calculates the totals.
-		$this->setEnableCalcTotal(TRUE);
-		$this->preSave();
+    public function Done()
+    {
+        Debug::Arr($this->tmp_data, 'Pay Stub TMP Data: ', __FILE__, __LINE__, __METHOD__, 10);
+        //Call pre-save() first, so calculates the totals.
+        $this->setEnableCalcTotal(true);
+        $this->preSave();
 
-		if ( $this->Validate() ) {
-			$this->CommitTransaction();
-			//$this->FailTransaction();
-			return TRUE;
-		}
+        if ($this->Validate()) {
+            $this->CommitTransaction();
+            //$this->FailTransaction();
+            return true;
+        }
 
-		$this->FailTransaction(); //Fails Transaction
-		$this->CommitTransaction(); //Rollback occurs here. This is important when looping over many employees that may have a pay stub that fails.
+        $this->FailTransaction(); //Fails Transaction
+        $this->CommitTransaction(); //Rollback occurs here. This is important when looping over many employees that may have a pay stub that fails.
 
-		return FALSE;
-	}
+        return false;
+    }
 }
-?>

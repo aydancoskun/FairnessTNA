@@ -1,47 +1,46 @@
-var APIEthnicGroup = ServiceCaller.extend( {
+var APIEthnicGroup = ServiceCaller.extend({
 
-	key_name: 'EthnicGroup',
-	className: 'APIEthnicGroup',
+    key_name: 'EthnicGroup',
+    className: 'APIEthnicGroup',
 
-	getEthnicGroupDefaultData: function() {
-		return this.argumentsHandler( this.className, 'getEthnicGroupDefaultData', arguments );
+    getEthnicGroupDefaultData: function () {
+        return this.argumentsHandler(this.className, 'getEthnicGroupDefaultData', arguments);
 
-	},
+    },
 
-	getEthnicGroup: function() {
-		return this.argumentsHandler( this.className, 'getEthnicGroup', arguments );
-	},
+    getEthnicGroup: function () {
+        return this.argumentsHandler(this.className, 'getEthnicGroup', arguments);
+    },
 
-	getCommonEthnicGroupData: function() {
+    getCommonEthnicGroupData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonEthnicGroupData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonEthnicGroupData', arguments);
 
-	},
+    },
 
-	validateEthnicGroup: function() {
+    validateEthnicGroup: function () {
 
-		return this.argumentsHandler( this.className, 'validateEthnicGroup', arguments );
+        return this.argumentsHandler(this.className, 'validateEthnicGroup', arguments);
 
-	},
+    },
 
-	setEthnicGroup: function() {
+    setEthnicGroup: function () {
 
-		return this.argumentsHandler( this.className, 'setEthnicGroup', arguments );
+        return this.argumentsHandler(this.className, 'setEthnicGroup', arguments);
 
-	},
+    },
 
-	deleteEthnicGroup: function() {
+    deleteEthnicGroup: function () {
 
-		return this.argumentsHandler( this.className, 'deleteEthnicGroup', arguments );
+        return this.argumentsHandler(this.className, 'deleteEthnicGroup', arguments);
 
-	},
+    },
 
-	copyEthnicGroup: function() {
+    copyEthnicGroup: function () {
 
-		return this.argumentsHandler( this.className, 'copyEthnicGroup', arguments );
+        return this.argumentsHandler(this.className, 'copyEthnicGroup', arguments);
 
-	}
+    }
 
 
-
-} );
+});

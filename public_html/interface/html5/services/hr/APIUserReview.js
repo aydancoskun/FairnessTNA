@@ -1,47 +1,47 @@
-var APIUserReview = ServiceCaller.extend( {
+var APIUserReview = ServiceCaller.extend({
 
-	key_name: 'UserReview',
-	className: 'APIUserReview',
+    key_name: 'UserReview',
+    className: 'APIUserReview',
 
-	getUserReviewDefaultData: function() {
+    getUserReviewDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserReviewDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserReviewDefaultData', arguments);
 
-	},
+    },
 
-	getUserReview: function() {
+    getUserReview: function () {
 
-		return this.argumentsHandler( this.className, 'getUserReview', arguments );
+        return this.argumentsHandler(this.className, 'getUserReview', arguments);
 
-	},
+    },
 
-	getCommonUserReviewData: function() {
+    getCommonUserReviewData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserReviewData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserReviewData', arguments);
 
-	},
+    },
 
-	validateUserReview: function() {
+    validateUserReview: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserReview', arguments );
+        return this.argumentsHandler(this.className, 'validateUserReview', arguments);
 
-	},
+    },
 
-	setUserReview: function() {
+    setUserReview: function () {
 
-		return this.argumentsHandler( this.className, 'setUserReview', arguments );
+        return this.argumentsHandler(this.className, 'setUserReview', arguments);
 
-	},
+    },
 
-	deleteUserReview: function() {
+    deleteUserReview: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserReview', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserReview', arguments);
 
-	},
+    },
 
-	copyUserReview: function() {
-		return this.argumentsHandler( this.className, 'copyUserReview', arguments );
-	}
+    copyUserReview: function () {
+        return this.argumentsHandler(this.className, 'copyUserReview', arguments);
+    }
 
 
-} );
+});

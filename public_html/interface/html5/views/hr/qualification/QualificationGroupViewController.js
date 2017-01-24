@@ -1,668 +1,683 @@
-QualificationGroupViewController = BaseViewController.extend( {
-	el: '#qualification_group_view_container',
-	tree_mode: null,
-	grid_table_name: null,
-	grid_select_id_array: null,
-	//Must set el here and can only set string, so events can work
-	initialize: function( options ) {
-		this._super( 'initialize', options );
-		this.edit_view_tpl = 'QualificationGroupEditView.html';
-		this.permission_id = 'qualification';
-		this.viewId = 'QualificationGroup';
-		this.table_name_key = 'qualification_group';
-		this.context_menu_name = $.i18n._( 'Qualification Groups' );
-		this.grid_table_name = $.i18n._( 'Qualification Groups' );
-		this.navigation_label = $.i18n._( 'Qualification Group' ) + ':';
-		this.tree_mode = true;
-		this.api = new (APIFactory.getAPIClass( 'APIQualificationGroup' ))();
-		this.invisible_context_menu_dic[ContextMenuIconName.copy] = true; //Hide some context menus
-		this.invisible_context_menu_dic[ContextMenuIconName.mass_edit] = true;
-		this.invisible_context_menu_dic[ContextMenuIconName.delete_and_next] = true;
-		this.invisible_context_menu_dic[ContextMenuIconName.save_and_continue] = true;
-		this.invisible_context_menu_dic[ContextMenuIconName.save_and_next] = true;
-		this.invisible_context_menu_dic[ContextMenuIconName.export_excel] = true;
-		this.grid_select_id_array = [];
-		this.render();
-		this.buildContextMenu();
-		this.initData();
-		this.setSelectRibbonMenuIfNecessary( 'QualificationGroup' );
-
-
-	},
-
-	onDeleteDone: function( result ) {
-		this.grid_select_id_array = [];
-		this.setDefaultMenu();
-	},
-
-	onSaveDone: function( result ) {
-		this.grid_select_id_array = [];
-	},
-
-	onEditClick: function( editId, noRefreshUI ) {
-		var $this = this;
-		this.is_viewing = false;
-		LocalCacheData.current_doing_context_action = 'edit';
-		$this.openEditView();
-
-		var filter = {};
-		var grid_selected_id_array = this.getGridSelectIdArray();
-		var grid_selected_length = grid_selected_id_array.length;
-		var selectedId;
-
-		if ( Global.isSet( editId ) ) {
-			selectedId = editId;
-		} else {
+QualificationGroupViewController = BaseViewController.extend({
+    el: '#qualification_group_view_container',
+    tree_mode: null,
+    grid_table_name: null,
+    grid_select_id_array: null,
+    //Must set el here and can only set string, so events can work
+    initialize: function (options) {
+        this._super('initialize', options);
+        this.edit_view_tpl = 'QualificationGroupEditView.html';
+        this.permission_id = 'qualification';
+        this.viewId = 'QualificationGroup';
+        this.table_name_key = 'qualification_group';
+        this.context_menu_name = $.i18n._('Qualification Groups');
+        this.grid_table_name = $.i18n._('Qualification Groups');
+        this.navigation_label = $.i18n._('Qualification Group') + ':';
+        this.tree_mode = true;
+        this.api = new (APIFactory.getAPIClass('APIQualificationGroup'))();
+        this.invisible_context_menu_dic[ContextMenuIconName.copy] = true; //Hide some context menus
+        this.invisible_context_menu_dic[ContextMenuIconName.mass_edit] = true;
+        this.invisible_context_menu_dic[ContextMenuIconName.delete_and_next] = true;
+        this.invisible_context_menu_dic[ContextMenuIconName.save_and_continue] = true;
+        this.invisible_context_menu_dic[ContextMenuIconName.save_and_next] = true;
+        this.invisible_context_menu_dic[ContextMenuIconName.export_excel] = true;
+        this.grid_select_id_array = [];
+        this.render();
+        this.buildContextMenu();
+        this.initData();
+        this.setSelectRibbonMenuIfNecessary('QualificationGroup');
+
+
+    },
+
+    onDeleteDone: function (result) {
+        this.grid_select_id_array = [];
+        this.setDefaultMenu();
+    },
+
+    onSaveDone: function (result) {
+        this.grid_select_id_array = [];
+    },
+
+    onEditClick: function (editId, noRefreshUI) {
+        var $this = this;
+        this.is_viewing = false;
+        LocalCacheData.current_doing_context_action = 'edit';
+        $this.openEditView();
+
+        var filter = {};
+        var grid_selected_id_array = this.getGridSelectIdArray();
+        var grid_selected_length = grid_selected_id_array.length;
+        var selectedId;
+
+        if (Global.isSet(editId)) {
+            selectedId = editId;
+        } else {
+
+            if (this.is_viewing) {
+                selectedId = this.current_edit_record.id;
+            } else if (grid_selected_length > 0) {
+                selectedId = grid_selected_id_array[0];
+            } else {
+                return;
+            }
+        }
+
+        filter.filter_data = {};
+
+        this.api['get' + this.api.key_name](filter, false, false, {
+            onResult: function (result) {
+                var result_data = result.getResult();
+
+                result_data = Global.buildTreeRecord(result_data);
+
+                result_data = Global.getParentIdByTreeRecord(result_data, selectedId);
+
+                if (!result_data) {
+                    result_data = [];
+                }
+
+                result_data = result_data[0];
+
+                if ($this.sub_view_mode && $this.parent_key) {
+                    result_data[$this.parent_key] = $this.parent_value;
+                }
+
+                $this.current_edit_record = result_data;
+                $this.current_edit_record.id = selectedId;
+
+                $this.initEditView();
+
+            }
+        });
+
+    },
+
+    _continueDoCopyAsNew: function () {
 
-			if ( this.is_viewing ) {
-				selectedId = this.current_edit_record.id;
-			} else if ( grid_selected_length > 0 ) {
-				selectedId = grid_selected_id_array[0];
-			} else {
-				return;
-			}
-		}
-
-		filter.filter_data = {};
-
-		this.api['get' + this.api.key_name]( filter, false, false, {onResult: function( result ) {
-			var result_data = result.getResult();
-
-			result_data = Global.buildTreeRecord( result_data );
-
-			result_data = Global.getParentIdByTreeRecord( result_data, selectedId );
-
-			if ( !result_data ) {
-				result_data = [];
-			}
-
-			result_data = result_data[0];
-
-			if ( $this.sub_view_mode && $this.parent_key ) {
-				result_data[$this.parent_key] = $this.parent_value;
-			}
+        LocalCacheData.current_doing_context_action = 'copy_as_new';
+        var $this = this;
+        if (Global.isSet(this.edit_view)) {
+
+            this.current_edit_record.id = '';
+            var navigation_div = this.edit_view.find('.navigation-div');
+            navigation_div.css('display', 'none');
+            this.setEditMenu();
+            this.setTabStatus();
+            this.is_changed = false;
+            ProgressBar.closeOverlay();
 
-			$this.current_edit_record = result_data;
-			$this.current_edit_record.id = selectedId;
+        } else {
 
-			$this.initEditView();
+            var filter = {};
+            var grid_selected_id_array = this.getGridSelectIdArray();
+            var grid_selected_length = grid_selected_id_array.length;
 
-		}} );
+            if (grid_selected_length > 0) {
+                var selectedId = grid_selected_id_array[0];
+            } else {
+                TAlertManager.showAlert($.i18n._('No selected record'));
+                return;
+            }
 
-	},
+            filter.filter_data = {};
 
-	_continueDoCopyAsNew: function() {
+            this.api['get' + this.api.key_name](filter, false, false, {
+                onResult: function (result) {
+                    var result_data = result.getResult();
 
-		LocalCacheData.current_doing_context_action = 'copy_as_new';
-		var $this = this;
-		if ( Global.isSet( this.edit_view ) ) {
+                    result_data = Global.buildTreeRecord(result_data);
 
-			this.current_edit_record.id = '';
-			var navigation_div = this.edit_view.find( '.navigation-div' );
-			navigation_div.css( 'display', 'none' );
-			this.setEditMenu();
-			this.setTabStatus();
-			this.is_changed = false;
-			ProgressBar.closeOverlay();
+                    result_data = Global.getParentIdByTreeRecord(result_data, selectedId);
 
-		} else {
+                    if (!result_data) {
+                        TAlertManager.showAlert($.i18n._('Record does not exist'));
+                        $this.onCancelClick();
+                        return;
+                    }
 
-			var filter = {};
-			var grid_selected_id_array = this.getGridSelectIdArray();
-			var grid_selected_length = grid_selected_id_array.length;
+                    $this.openEditView(); // Put it here is to avoid if the selected one is not existed in data or have deleted by other pragram. in this case, the edit view should not be opend.
 
-			if ( grid_selected_length > 0 ) {
-				var selectedId = grid_selected_id_array[0];
-			} else {
-				TAlertManager.showAlert( $.i18n._( 'No selected record' ) );
-				return;
-			}
 
-			filter.filter_data = {};
+                    result_data = result_data[0];
 
-			this.api['get' + this.api.key_name]( filter, false, false, {onResult: function( result ) {
-				var result_data = result.getResult();
+                    if ($this.sub_view_mode && $this.parent_key) {
+                        result_data[$this.parent_key] = $this.parent_value;
+                    }
 
-				result_data = Global.buildTreeRecord( result_data );
+                    $this.current_edit_record = result_data;
+                    $this.current_edit_record.id = '';
 
-				result_data = Global.getParentIdByTreeRecord( result_data, selectedId );
+                    $this.initEditView();
 
-				if ( !result_data ) {
-					TAlertManager.showAlert( $.i18n._( 'Record does not exist' ) );
-					$this.onCancelClick();
-					return;
-				}
+                }
+            });
+        }
 
-				$this.openEditView(); // Put it here is to avoid if the selected one is not existed in data or have deleted by other pragram. in this case, the edit view should not be opend.
+    },
 
+    onViewClick: function (editId, noRefreshUI) {
+        var $this = this;
+        $this.is_viewing = true;
+        LocalCacheData.current_doing_context_action = 'view';
+        $this.openEditView();
 
-				result_data = result_data[0];
+        var filter = {};
+        var grid_selected_id_array = this.getGridSelectIdArray();
+        var grid_selected_length = grid_selected_id_array.length;
+        var selectedId;
 
-				if ( $this.sub_view_mode && $this.parent_key ) {
-					result_data[$this.parent_key] = $this.parent_value;
-				}
+        if (Global.isSet(editId)) {
+            selectedId = editId;
+        } else {
+            if (grid_selected_length > 0) {
+                selectedId = grid_selected_id_array[0];
+            } else {
+                return;
+            }
+        }
 
-				$this.current_edit_record = result_data;
-				$this.current_edit_record.id = '';
+        filter.filter_data = {};
 
-				$this.initEditView();
+        this.api['get' + this.api.key_name](filter, false, false, {
+            onResult: function (result) {
 
-			}} );
-		}
+                var result_data = result.getResult();
 
-	},
+                result_data = Global.buildTreeRecord(result_data);
 
-	onViewClick: function( editId, noRefreshUI ) {
-		var $this = this;
-		$this.is_viewing = true;
-		LocalCacheData.current_doing_context_action = 'view';
-		$this.openEditView();
+                result_data = Global.getParentIdByTreeRecord(result_data, selectedId);
 
-		var filter = {};
-		var grid_selected_id_array = this.getGridSelectIdArray();
-		var grid_selected_length = grid_selected_id_array.length;
-		var selectedId;
+                if (!result_data) {
+                    result_data = [];
+                }
 
-		if ( Global.isSet( editId ) ) {
-			selectedId = editId;
-		} else {
-			if ( grid_selected_length > 0 ) {
-				selectedId = grid_selected_id_array[0];
-			} else {
-				return;
-			}
-		}
+                result_data = result_data[0];
 
-		filter.filter_data = {};
+                if (!result_data) {
+                    TAlertManager.showAlert($.i18n._('Record does not exist'));
+                    $this.onCancelClick();
+                    return;
+                }
 
-		this.api['get' + this.api.key_name]( filter, false, false, {onResult: function( result ) {
 
-			var result_data = result.getResult();
+                $this.current_edit_record = result_data;
+                $this.current_edit_record.id = selectedId;
 
-			result_data = Global.buildTreeRecord( result_data );
+                $this.initEditView();
 
-			result_data = Global.getParentIdByTreeRecord( result_data, selectedId );
+            }
+        });
 
-			if ( !result_data ) {
-				result_data = [];
-			}
+    },
 
-			result_data = result_data[0];
+    addIdFieldToNavigation: function (array) {
+        $.each(array, function (key, item) {
+            $(item).each(function (i_key, i_item) {
+                i_item.id = i_item._id_;
+            });
+        });
 
-			if ( !result_data ) {
-				TAlertManager.showAlert( $.i18n._( 'Record does not exist' ) );
-				$this.onCancelClick();
-				return;
-			}
+        return array;
+    },
 
+    setEditViewData: function () {
 
+        var $this = this;
 
-			$this.current_edit_record = result_data;
-			$this.current_edit_record.id = selectedId;
+        this.is_changed = false;
 
-			$this.initEditView();
+        if (!this.edit_only_mode) {
 
-		}} );
+            var navigation_div = this.edit_view.find('.navigation-div');
 
-	},
+            if (Global.isSet(this.current_edit_record.id) && this.current_edit_record.id) {
+                navigation_div.css('display', 'block');
+                //Set Navigation Awesomebox
 
-	addIdFieldToNavigation: function( array ) {
-		$.each( array, function( key, item ) {
-			$( item ).each( function( i_key, i_item ) {
-				i_item.id = i_item._id_;
-			} );
-		} );
+                //init navigation only when open edit view
+                if (!this.navigation.getSourceData()) {
+                    this.navigation.setSourceData(Global.addFirstItemToArray(this.grid_current_page_items));
 
-		return array;
-	},
+                    var default_args = {};
+                    default_args.filter_data = Global.convertLayoutFilterToAPIFilter(this.select_layout);
+                    default_args.filter_sort = this.select_layout.data.filter_sort;
+                    this.navigation.setDefaultArgs(default_args);
+                }
 
-	setEditViewData: function() {
+                this.navigation.setValue(this.current_edit_record);
 
-		var $this = this;
+            } else {
+                navigation_div.css('display', 'none');
+            }
+        }
 
-		this.is_changed = false;
+        for (var key in this.edit_view_ui_dic) {
 
-		if ( !this.edit_only_mode ) {
+            //Set all UI field to current edit reocrd, we need validate all UI fielld when save and validate
+            if (!Global.isSet($this.current_edit_record[key]) && !this.is_mass_editing) {
+                $this.current_edit_record[key] = false;
+            }
 
-			var navigation_div = this.edit_view.find( '.navigation-div' );
+        }
 
-			if ( Global.isSet( this.current_edit_record.id ) && this.current_edit_record.id ) {
-				navigation_div.css( 'display', 'block' );
-				//Set Navigation Awesomebox
+        this.setNavigationArrowsStatus();
 
-				//init navigation only when open edit view
-				if ( !this.navigation.getSourceData() ) {
-					this.navigation.setSourceData( Global.addFirstItemToArray( this.grid_current_page_items ) );
+        // Create this function alone because of the column value of view is different from each other, some columns need to be handle specially. and easily to rewrite this function in sub-class.
 
-					var default_args = {};
-					default_args.filter_data = Global.convertLayoutFilterToAPIFilter( this.select_layout );
-					default_args.filter_sort = this.select_layout.data.filter_sort;
-					this.navigation.setDefaultArgs( default_args );
-				}
+        this.setCurrentEditRecordData();
 
-				this.navigation.setValue( this.current_edit_record );
+        //Init *Please save this record before modifying any related data* box
+        this.edit_view.find('.save-and-continue-div').SaveAndContinueBox({related_view_controller: this});
+        this.edit_view.find('.save-and-continue-div').css('display', 'none');
 
-			} else {
-				navigation_div.css( 'display', 'none' );
-			}
-		}
+        if (this.edit_view_tab.tabs('option', 'selected') === 1) {
+            if (this.current_edit_record.id) {
+                this.edit_view_tab.find('#tab_audit').find('.first-column-sub-view').css('display', 'block');
+                this.initSubLogView('tab_audit');
+            } else {
+                this.edit_view_tab.find('#tab_audit').find('.first-column-sub-view').css('display', 'none');
+                this.edit_view.find('.save-and-continue-div').css('display', 'block');
+            }
+        }
 
-		for ( var key in this.edit_view_ui_dic ) {
+        this.switchToProperTab();
+    },
 
-			//Set all UI field to current edit reocrd, we need validate all UI fielld when save and validate
-			if ( !Global.isSet( $this.current_edit_record[key] ) && !this.is_mass_editing ) {
-				$this.current_edit_record[key] = false;
-			}
+    setCurrentEditRecordData: function () {
+        //Set current edit record data to all widgets
+        for (var key in this.current_edit_record) {
+            var widget = this.edit_view_ui_dic[key];
+            if (Global.isSet(widget)) {
+                switch (key) {
+                    case 'parent_id':
+                        widget.setSourceData(Global.addFirstItemToArray(this.grid_current_page_items));
+                        widget.setValue(this.current_edit_record[key]);
+                        break;
+                    default:
+                        widget.setValue(this.current_edit_record[key]);
+                        break;
+                }
 
-		}
+            }
+        }
 
-		this.setNavigationArrowsStatus();
+        this.collectUIDataToCurrentEditRecord();
 
-		// Create this function alone because of the column value of view is different from each other, some columns need to be handle specially. and easily to rewrite this function in sub-class.
+        this.setEditViewDataDone();
+    },
 
-		this.setCurrentEditRecordData();
+    buildEditViewUI: function () {
 
-		//Init *Please save this record before modifying any related data* box
-		this.edit_view.find( '.save-and-continue-div' ).SaveAndContinueBox( {related_view_controller: this} );
-		this.edit_view.find( '.save-and-continue-div' ).css( 'display', 'none' );
+        var $this = this;
 
-		if ( this.edit_view_tab.tabs( 'option', 'selected' ) === 1 ) {
-			if ( this.current_edit_record.id ) {
-				this.edit_view_tab.find( '#tab_audit' ).find( '.first-column-sub-view' ).css( 'display', 'block' );
-				this.initSubLogView( 'tab_audit' );
-			} else {
-				this.edit_view_tab.find( '#tab_audit' ).find( '.first-column-sub-view' ).css( 'display', 'none' );
-				this.edit_view.find( '.save-and-continue-div' ).css( 'display', 'block' );
-			}
-		}
+        //No navigation when edit only mode
+        if (!this.edit_only_mode) {
+            var navigation_div = this.edit_view.find('.navigation-div');
+            var label = navigation_div.find('.navigation-label');
 
-		this.switchToProperTab();
-	},
+            var navigation_widget_div = navigation_div.find('.navigation-widget-div');
 
-	setCurrentEditRecordData: function() {
-		//Set current edit record data to all widgets
-		for ( var key in this.current_edit_record ) {
-			var widget = this.edit_view_ui_dic[key];
-			if ( Global.isSet( widget ) ) {
-				switch ( key ) {
-					case 'parent_id':
-						widget.setSourceData( Global.addFirstItemToArray( this.grid_current_page_items ) );
-						widget.setValue( this.current_edit_record[key] );
-						break;
-					default:
-						widget.setValue( this.current_edit_record[key] );
-						break;
-				}
+            this.navigation = Global.loadWidgetByName(FormItemType.AWESOME_BOX);
 
-			}
-		}
+            label.text(this.navigation_label);
 
-		this.collectUIDataToCurrentEditRecord();
+            navigation_widget_div.append(this.navigation);
+        }
 
-		this.setEditViewDataDone();
-	},
+        this.edit_view_close_icon = this.edit_view.find('.close-icon');
+        this.edit_view_close_icon.hide();
+        this.edit_view_close_icon.click(function () {
+            $this.onCloseIconClick();
+        });
 
-	buildEditViewUI: function() {
+        this.setTabLabels({
+            'tab_qualification_group': $.i18n._('Qualification Group'),
+            'tab_audit': $.i18n._('Audit')
+        });
 
-		var $this = this;
+        this.navigation.AComboBox({
+            id: this.script_name + '_navigation',
+            tree_mode: true,
+            allow_multiple_selection: false,
+            layout_name: ALayoutIDs.TREE_COLUMN,
+            navigation_mode: true,
+            show_search_inputs: false
+        });
 
-		//No navigation when edit only mode
-		if ( !this.edit_only_mode ) {
-			var navigation_div = this.edit_view.find( '.navigation-div' );
-			var label = navigation_div.find( '.navigation-label' );
+        this.setNavigation();
 
-			var navigation_widget_div = navigation_div.find( '.navigation-widget-div' );
 
-			this.navigation = Global.loadWidgetByName( FormItemType.AWESOME_BOX );
+        //Tab 0 start
 
-			label.text( this.navigation_label );
+        var tab_qualification_group = this.edit_view_tab.find('#tab_qualification_group');
 
-			navigation_widget_div.append( this.navigation );
-		}
+        var tab_qualification_group_column1 = tab_qualification_group.find('.first-column');
 
-		this.edit_view_close_icon = this.edit_view.find( '.close-icon' );
-		this.edit_view_close_icon.hide();
-		this.edit_view_close_icon.click( function() {
-			$this.onCloseIconClick();
-		} );
+        this.edit_view_tabs[0] = [];
 
-		this.setTabLabels( {
-			'tab_qualification_group': $.i18n._( 'Qualification Group' ),
-			'tab_audit': $.i18n._( 'Audit' )
-		} );
+        this.edit_view_tabs[0].push(tab_qualification_group_column1);
 
-		this.navigation.AComboBox( {
-			id: this.script_name + '_navigation',
-			tree_mode: true,
-			allow_multiple_selection: false,
-			layout_name: ALayoutIDs.TREE_COLUMN,
-			navigation_mode: true,
-			show_search_inputs: false
-		} );
+        //Parent
+        //Group
+        var form_item_input = Global.loadWidgetByName(FormItemType.AWESOME_BOX);
 
-		this.setNavigation();
+        form_item_input.AComboBox({
+            tree_mode: true,
+            allow_multiple_selection: false,
+            layout_name: ALayoutIDs.TREE_COLUMN,
+            set_empty: true,
+            field: 'parent_id'
+        });
+        this.addEditFieldToColumn($.i18n._('Parent'), form_item_input, tab_qualification_group_column1, '');
 
+        //Name
+        form_item_input = Global.loadWidgetByName(FormItemType.TEXT_INPUT);
 
-		//Tab 0 start
+        form_item_input.TTextInput({field: 'name', width: '100%'});
+        this.addEditFieldToColumn($.i18n._('Name'), form_item_input, tab_qualification_group_column1, '');
 
-		var tab_qualification_group = this.edit_view_tab.find( '#tab_qualification_group' );
+        form_item_input.parent().width('45%');
 
-		var tab_qualification_group_column1 = tab_qualification_group.find( '.first-column' );
+    },
 
-		this.edit_view_tabs[0] = [];
+    getAllColumns: function (callBack) {
 
-		this.edit_view_tabs[0].push( tab_qualification_group_column1 );
+        var $this = this;
 
-		//Parent
-		//Group
-		var form_item_input = Global.loadWidgetByName( FormItemType.AWESOME_BOX );
+        this.api.getOptions('columns', {
+            onResult: function (columns_result) {
 
-		form_item_input.AComboBox( {
-			tree_mode: true,
-			allow_multiple_selection: false,
-			layout_name: ALayoutIDs.TREE_COLUMN,
-			set_empty:true,
-			field: 'parent_id'
-		} );
-		this.addEditFieldToColumn( $.i18n._( 'Parent' ), form_item_input, tab_qualification_group_column1, '' );
+                var columns_result_data = columns_result.getResult();
+                $this.all_columns = Global.buildColumnArray(columns_result_data);
 
-		//Name
-		form_item_input = Global.loadWidgetByName( FormItemType.TEXT_INPUT );
+                if (callBack) {
+                    callBack();
+                }
 
-		form_item_input.TTextInput( {field: 'name', width: '100%'} );
-		this.addEditFieldToColumn( $.i18n._( 'Name' ), form_item_input, tab_qualification_group_column1, '' );
+            }
+        });
 
-		form_item_input.parent().width( '45%' );
+    },
 
-	},
+    initLayout: function () {
 
-	getAllColumns: function( callBack ) {
+        var $this = this;
 
-		var $this = this;
+        $this.getDefaultDisplayColumns(function () {
+            $this.setSelectLayout();
+            $this.search();
 
-		this.api.getOptions( 'columns', {onResult: function( columns_result ) {
 
-			var columns_result_data = columns_result.getResult();
-			$this.all_columns = Global.buildColumnArray( columns_result_data );
+        });
 
-			if ( callBack ) {
-				callBack();
-			}
+    },
 
-		}} );
+    setSelectLayout: function (column_start_from) {
 
-	},
+        var $this = this;
+        var grid;
+        if (!Global.isSet(this.grid)) {
+            grid = $(this.el).find('#grid');
 
-	initLayout: function() {
+            grid.attr('id', this.ui_id + '_grid');  //Grid's id is ScriptName + _grid
 
-		var $this = this;
+            grid = $(this.el).find('#' + this.ui_id + '_grid');
+        }
 
-		$this.getDefaultDisplayColumns( function() {
-			$this.setSelectLayout();
-			$this.search();
+        var column_info_array = [];
 
+        if (!this.select_layout) { //Set to defalt layout if no layout at all
+            this.select_layout = {id: ''};
+            this.select_layout.data = {filter_data: {}, filter_sort: {}};
+            this.select_layout.data.display_columns = this.default_display_columns;
+        }
+        var layout_data = this.select_layout.data;
 
-		} );
+        if (layout_data.display_columns.length < 1) {
+            layout_data.display_columns = this.default_display_columns;
+        }
 
-	},
+        var display_columns = this.buildDisplayColumns(layout_data.display_columns);
+        //Set Data Grid on List view
+        var len = display_columns.length;
 
-	setSelectLayout: function( column_start_from ) {
+        var start_from = 0;
 
-		var $this = this;
-		var grid;
-		if ( !Global.isSet( this.grid ) ) {
-			grid = $( this.el ).find( '#grid' );
+        if (Global.isSet(column_start_from) && column_start_from > 0) {
+            start_from = column_start_from;
+        }
 
-			grid.attr( 'id', this.ui_id + '_grid' );  //Grid's id is ScriptName + _grid
+        var view_column_data = display_columns[0];
 
-			grid = $( this.el ).find( '#' + this.ui_id + '_grid' );
-		}
+        var column_info = {
+            name: view_column_data.value,
+            index: view_column_data.value,
+            label: $this.grid_table_name,
+            width: 100,
+            sortable: false,
+            title: false
+        };
 
-		var column_info_array = [];
+        column_info_array.push(column_info);
 
-		if ( !this.select_layout ) { //Set to defalt layout if no layout at all
-			this.select_layout = {id: ''};
-			this.select_layout.data = {filter_data: {}, filter_sort: {}};
-			this.select_layout.data.display_columns = this.default_display_columns;
-		}
-		var layout_data = this.select_layout.data;
+        if (!this.grid) {
 
-		if ( layout_data.display_columns.length < 1 ) {
-			layout_data.display_columns = this.default_display_columns;
-		}
+            this.grid = grid;
 
-		var display_columns = this.buildDisplayColumns( layout_data.display_columns );
-		//Set Data Grid on List view
-		var len = display_columns.length;
+            this.grid.jqGrid({
+                altRows: true,
+                tree_mode: true,
+                data: [],
+                datatype: 'local',
+                sortable: false,
+                width: Global.bodyWidth() - 14,
+                rowNum: 10000,
+                colNames: [],
+                onSelectRow: $.proxy(this.onGridSelectRow, this),
+                colModel: column_info_array,
+                viewrecords: true
+            });
 
-		var start_from = 0;
+        } else {
 
-		if ( Global.isSet( column_start_from ) && column_start_from > 0 ) {
-			start_from = column_start_from;
-		}
+            this.grid.jqGrid('GridUnload');
+            this.grid = null;
 
-		var view_column_data = display_columns[0];
+            grid = $(this.el).find('#' + this.ui_id + '_grid');
+            this.grid = $(grid);
 
-		var column_info = {name: view_column_data.value, index: view_column_data.value, label: $this.grid_table_name, width: 100, sortable: false, title: false};
+            this.grid.jqGrid({
+                altRows: true,
+                tree_mode: true,
+                onSelectRow: $.proxy(this.onGridSelectRow, this),
+                data: [],
+                rowNum: 10000,
+                sortable: false,
+                datatype: 'local',
+                width: Global.bodyWidth() - 14,
+                colNames: [],
+                colModel: column_info_array,
+                viewrecords: true
+            });
 
-		column_info_array.push( column_info );
+        }
 
-		if ( !this.grid ) {
+        this.bindGridColumnEvents();
 
-			this.grid = grid;
+        this.setGridHeaderStyle(); //Set Sort Style
 
-			this.grid.jqGrid( {
-				altRows: true,
-				tree_mode: true,
-				data: [],
-				datatype: 'local',
-				sortable: false,
-				width: Global.bodyWidth() - 14,
-				rowNum: 10000,
-				colNames: [],
-				onSelectRow: $.proxy( this.onGridSelectRow, this ),
-				colModel: column_info_array,
-				viewrecords: true
-			} );
+        this.filter_data = this.select_layout.data.filter_data;
 
-		} else {
+        this.showGridBorders();
 
-			this.grid.jqGrid( 'GridUnload' );
-			this.grid = null;
+        $this.setGridSize();
 
-			grid = $( this.el ).find( '#' + this.ui_id + '_grid' );
-			this.grid = $( grid );
+    },
 
-			this.grid.jqGrid( {
-				altRows: true,
-				tree_mode: true,
-				onSelectRow: $.proxy( this.onGridSelectRow, this ),
-				data: [],
-				rowNum: 10000,
-				sortable: false,
-				datatype: 'local',
-				width: Global.bodyWidth() - 14,
-				colNames: [],
-				colModel: column_info_array,
-				viewrecords: true
-			} );
+    _setGridSizeGridHeight: function (header_size) {
+        this._setGridSizeGroupheight(header_size);
+    },
 
-		}
+    getGridSelectIdArray: function () {
+        var result = [];
+        result = this.grid_select_id_array;
 
-		this.bindGridColumnEvents();
+        return result;
+    },
 
-		this.setGridHeaderStyle(); //Set Sort Style
+    reSetGridTreeData: function (val) {
 
-		this.filter_data = this.select_layout.data.filter_data;
+        var $this = this;
+        var col_model = this.grid.getGridParam('colModel');
+        this.grid.jqGrid('GridUnload');
+        this.grid = null;
 
-		this.showGridBorders();
+        var grid = $(this.el).find('#' + this.ui_id + '_grid');
+        this.grid = $(grid);
 
-		$this.setGridSize();
+        this.grid = this.grid.jqGrid({
+            datastr: val,
+            altRows: true,
+            datatype: 'jsonstring',
+            sortable: false,
+            width: Global.bodyWidth() - 14,
+            colNames: [],
+            rowNum: 10000,
+            colModel: col_model,
+            onSelectRow: function (id) {
+                $this.grid_select_id_array = [id];
+                $this.setDefaultMenu();
+            },
+            ondblClickRow: function () {
+                $this.onGridDblClickRow();
+            },
+            gridview: true,
+            treeGrid: true,
+            treeGridModel: 'adjacency',
+            treedatatype: 'local',
+            ExpandColumn: 'name',
+            jsonReader: {
+                repeatitems: false,
+                root: function (obj) {
+                    return obj;
+                },
+                page: function (obj) {
+                    return 1;
+                },
+                total: function (obj) {
+                    return 1;
+                },
+                records: function (obj) {
+                    return obj.length;
+                }
+            }
+        });
+    },
 
-	},
+    search: function (set_default_menu, page_action, page_number) {
 
-	_setGridSizeGridHeight: function(header_size) {
-		this._setGridSizeGroupheight( header_size );
-	},
+        if (!Global.isSet(set_default_menu)) {
+            set_default_menu = true;
+        }
 
-	getGridSelectIdArray: function() {
-		var result = [];
-		result = this.grid_select_id_array;
+        var $this = this;
+        var filter = {};
+        filter.filter_data = {};
+        filter.filter_sort = {};
+        filter.filter_columns = this.getFilterColumnsFromDisplayColumns();
+        filter.filter_items_per_page = 0; // Default to 0 to load user preference defined
 
-		return result;
-	},
+        if (this.sub_view_mode && this.parent_key) {
+            this.select_layout.data.filter_data[this.parent_key] = this.parent_value;
 
-	reSetGridTreeData: function( val ) {
+            //If sub view controller set custom filters, get it
+            if (Global.isSet(this.getSubViewFilter)) {
 
-		var $this = this;
-		var col_model = this.grid.getGridParam( 'colModel' );
-		this.grid.jqGrid( 'GridUnload' );
-		this.grid = null;
+                this.select_layout.data.filter_data = this.getSubViewFilter(this.select_layout.data.filter_data);
 
-		var grid = $( this.el ).find( '#' + this.ui_id + '_grid' );
-		this.grid = $( grid );
+            }
+        }
 
-		this.grid = this.grid.jqGrid( {
-			datastr: val,
-			altRows: true,
-			datatype: 'jsonstring',
-			sortable: false,
-			width: Global.bodyWidth() - 14,
-			colNames: [],
-			rowNum: 10000,
-			colModel: col_model,
-			onSelectRow: function( id ) {
-				$this.grid_select_id_array = [id];
-				$this.setDefaultMenu();
-			},
-			ondblClickRow: function() {
-				$this.onGridDblClickRow();
-			},
-			gridview: true,
-			treeGrid: true,
-			treeGridModel: 'adjacency',
-			treedatatype: 'local',
-			ExpandColumn: 'name',
-			jsonReader: {
-				repeatitems: false,
-				root: function( obj ) {
-					return obj;
-				},
-				page: function( obj ) {
-					return 1;
-				},
-				total: function( obj ) {
-					return 1;
-				},
-				records: function( obj ) {
-					return obj.length;
-				}
-			}
-		} );
-	},
+        this.last_select_ids = this.getGridSelectIdArray();
 
-	search: function( set_default_menu, page_action, page_number ) {
+        //select_layout will not be null, it's set in setSelectLayout function
+        filter.filter_data = Global.convertLayoutFilterToAPIFilter(this.select_layout);
+        filter.filter_sort = this.select_layout.data.filter_sort;
 
-		if ( !Global.isSet( set_default_menu ) ) {
-			set_default_menu = true;
-		}
+        this.api['get' + this.api.key_name](filter, false, false, {
+            onResult: function (result) {
 
-		var $this = this;
-		var filter = {};
-		filter.filter_data = {};
-		filter.filter_sort = {};
-		filter.filter_columns = this.getFilterColumnsFromDisplayColumns();
-		filter.filter_items_per_page = 0; // Default to 0 to load user preference defined
+                var result_data = result.getResult();
 
-		if ( this.sub_view_mode && this.parent_key ) {
-			this.select_layout.data.filter_data[this.parent_key] = this.parent_value;
+                result_data = Global.buildTreeRecord(result_data);
+                $this.grid_current_page_items = result_data; // For tree mode only
 
-			//If sub view controller set custom filters, get it
-			if ( Global.isSet( this.getSubViewFilter ) ) {
+                if (!Global.isArray(result_data)) {
+                    $this.showNoResultCover();
+                } else {
+                    $this.removeNoResultCover();
+                }
 
-				this.select_layout.data.filter_data = this.getSubViewFilter( this.select_layout.data.filter_data );
+                $this.reSetGridTreeData(result_data);
 
-			}
-		}
+                $this.setGridSize();
 
-		this.last_select_ids = this.getGridSelectIdArray();
+                ProgressBar.closeOverlay(); //Add this in initData
+                if (set_default_menu) {
+                    $this.setDefaultMenu();
+                }
 
-		//select_layout will not be null, it's set in setSelectLayout function
-		filter.filter_data = Global.convertLayoutFilterToAPIFilter( this.select_layout );
-		filter.filter_sort = this.select_layout.data.filter_sort;
+                if (LocalCacheData.paging_type === 0) {
+                    if (!$this.pager_data || $this.pager_data.is_last_page) {
+                        $this.paging_widget.css('display', 'none');
+                    } else {
+                        $this.paging_widget.css('display', 'block');
+                    }
+                }
+                $this.reSelectLastSelectItems();
+                $this.autoOpenEditViewIfNecessary();
+                $this.searchDone();
 
-		this.api['get' + this.api.key_name]( filter, false, false, {onResult: function( result ) {
+            }
+        });
 
-			var result_data = result.getResult();
+    },
 
-			result_data = Global.buildTreeRecord( result_data );
-			$this.grid_current_page_items = result_data; // For tree mode only
+    getRecordFromGridById: function (id) {
+        var data = this.grid.getGridParam('data');
+        var result = null;
+        /* jshint ignore:start */
+        //id could be string or number.
+        $.each(data, function (index, value) {
 
-			if ( !Global.isArray( result_data ) ) {
-				$this.showNoResultCover();
-			} else {
-				$this.removeNoResultCover();
-			}
+            if (value['_id_'] == id) {
+                result = Global.clone(value);
+                return false;
+            }
 
-			$this.reSetGridTreeData( result_data );
+        });
+        /* jshint ignore:end */
 
-			$this.setGridSize();
+        if (result) {
+            result.id = result['_id_'];
+        }
+        return result;
 
-			ProgressBar.closeOverlay(); //Add this in initData
-			if ( set_default_menu ) {
-				$this.setDefaultMenu();
-			}
+    },
 
-			if ( LocalCacheData.paging_type === 0 ) {
-				if ( !$this.pager_data || $this.pager_data.is_last_page ) {
-					$this.paging_widget.css( 'display', 'none' );
-				} else {
-					$this.paging_widget.css( 'display', 'block' );
-				}
-			}
-			$this.reSelectLastSelectItems();
-			$this.autoOpenEditViewIfNecessary();
-			$this.searchDone();
 
-		}} );
+    render: function () {
 
-	},
+        var $this = this;
 
-	getRecordFromGridById: function( id ) {
-		var data = this.grid.getGridParam( 'data' );
-		var result = null;
-		/* jshint ignore:start */
-		//id could be string or number.
-		$.each( data, function( index, value ) {
+        $(window).resize(function () {
+            if ($this.grid) {
+                $this.setGridSize();
 
-			if ( value['_id_'] == id ) {
-				result = Global.clone( value );
-				return false;
-			}
+            }
 
-		} );
-		/* jshint ignore:end */
+        });
+    }
 
-		if ( result ) {
-			result.id = result['_id_'];
-		}
-		return result;
-
-	},
-
-
-
-	render: function() {
-
-		var $this = this;
-
-		$( window ).resize( function() {
-			if ( $this.grid ) {
-				$this.setGridSize();
-
-			}
-
-		} );
-	}
-
-} );
+});

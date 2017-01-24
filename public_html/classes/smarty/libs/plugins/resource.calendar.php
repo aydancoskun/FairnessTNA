@@ -37,32 +37,31 @@ define('SMARTY_CALENDAR_TEMPLATE_BASENAME', 'calendar.tpl');
 
 function smarty_resource_calendar_source($tpl_name, &$tpl_source, &$smarty)
 {
-  // Look for the template in the same directory as the plugin.
-  $tpl_dir = dirname(__FILE__);
-  $tpl_filename = $tpl_dir . '/' . SMARTY_CALENDAR_TEMPLATE_BASENAME;
-  $tpl_file = fopen($tpl_filename, 'r');
-  $tpl_source = fread($tpl_file, filesize($tpl_filename));
-  fclose($tpl_file);
-  return true;
+    // Look for the template in the same directory as the plugin.
+    $tpl_dir = dirname(__FILE__);
+    $tpl_filename = $tpl_dir . '/' . SMARTY_CALENDAR_TEMPLATE_BASENAME;
+    $tpl_file = fopen($tpl_filename, 'r');
+    $tpl_source = fread($tpl_file, filesize($tpl_filename));
+    fclose($tpl_file);
+    return true;
 }
 
 function smarty_resource_calendar_timestamp($tpl_name, &$tpl_timestamp,
                                             &$smarty)
 {
-  // Look for the template in the same directory as the plugin.
-  $tpl_dir = dirname(__FILE__);
-  $tpl_filename = $tpl_dir . '/' . SMARTY_CALENDAR_TEMPLATE_BASENAME;
-  $tpl_timestamp = filemtime($tpl_filename);
-  return true;
+    // Look for the template in the same directory as the plugin.
+    $tpl_dir = dirname(__FILE__);
+    $tpl_filename = $tpl_dir . '/' . SMARTY_CALENDAR_TEMPLATE_BASENAME;
+    $tpl_timestamp = filemtime($tpl_filename);
+    return true;
 }
 
 function smarty_resource_calendar_secure($tpl_name, &$smarty)
 {
-  return true;
+    return true;
 }
 
 function smarty_resource_calendar_trusted($tpl_name, &$smarty)
 {
-  // unused for templates
+    // unused for templates
 }
-?>

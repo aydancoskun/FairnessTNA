@@ -21,22 +21,22 @@
 require_once('HTML/QuickForm/Rule.php');
 
 /**
-* Email validation rule
-* @version     1.0
-*/
+ * Email validation rule
+ * @version     1.0
+ */
 class HTML_QuickForm_Rule_Email extends HTML_QuickForm_Rule
 {
-    var $regex = '/^((\"[^\"\f\n\r\t\v\b]+\")|([\w\!\#\$\%\&\'\*\+\-\~\/\^\`\|\{\}]+(\.[\w\!\#\$\%\&\'\*\+\-\~\/\^\`\|\{\}]+)*))@((\[(((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9])))\])|(((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9])))|((([A-Za-z0-9\-])+\.)+[A-Za-z\-]+))$/';
+    public $regex = '/^((\"[^\"\f\n\r\t\v\b]+\")|([\w\!\#\$\%\&\'\*\+\-\~\/\^\`\|\{\}]+(\.[\w\!\#\$\%\&\'\*\+\-\~\/\^\`\|\{\}]+)*))@((\[(((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9])))\])|(((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9]))\.((25[0-5])|(2[0-4][0-9])|([0-1]?[0-9]?[0-9])))|((([A-Za-z0-9\-])+\.)+[A-Za-z\-]+))$/';
 
     /**
      * Validates an email address
      *
-     * @param     string    $email          Email address
-     * @param     boolean   $checkDomain    True if dns check should be performed
+     * @param     string $email Email address
+     * @param     boolean $checkDomain True if dns check should be performed
      * @access    public
      * @return    boolean   true if email is valid
      */
-    function validate($email, $checkDomain = false)
+    public function validate($email, $checkDomain = false)
     {
         if (preg_match($this->regex, $email)) {
             if ($checkDomain && function_exists('checkdnsrr')) {
@@ -52,10 +52,8 @@ class HTML_QuickForm_Rule_Email extends HTML_QuickForm_Rule
     } // end func validate
 
 
-    function getValidationScript($options = null)
+    public function getValidationScript($options = null)
     {
         return array("  var regex = " . $this->regex . ";\n", "{jsVar} != '' && !regex.test({jsVar})");
     } // end func getValidationScript
-
-} // end class HTML_QuickForm_Rule_Email
-?>
+} // end class HTML_QuickForm_Rule_Email;

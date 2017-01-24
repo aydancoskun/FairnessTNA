@@ -19,133 +19,141 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
-
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Import
  */
-class ImportAccrual extends Import {
+class ImportAccrual extends Import
+{
+    public $class_name = 'APIAccrual';
 
-	public $class_name = 'APIAccrual';
+    public $accrual_policy_account_options = false;
 
-	public $accrual_policy_account_options = FALSE;
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'columns':
+                $apf = TTNew('AccrualFactory');
+                $retval = Misc::prependArray($this->getUserIdentificationColumns(), Misc::arrayIntersectByKey(array('accrual_policy_account', 'type', 'amount', 'date_stamp'), Misc::trimSortPrefix($apf->getOptions('columns'))));
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+                break;
+            case 'column_aliases':
+                //Used for converting column names after they have been parsed.
+                $retval = array(
+                    'type' => 'type_id',
+                    'accrual_policy_account' => 'accrual_policy_account_id',
+                );
+                break;
+            case 'import_options':
+                $retval = array(
+                    '-1010-fuzzy_match' => TTi18n::getText('Enable smart matching.'),
+                );
+                break;
+            case 'parse_hint':
+                $upf = TTnew('UserPreferenceFactory');
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'columns':
-				$apf = TTNew('AccrualFactory');
-				$retval = Misc::prependArray( $this->getUserIdentificationColumns(), Misc::arrayIntersectByKey( array('accrual_policy_account', 'type', 'amount', 'date_stamp'), Misc::trimSortPrefix( $apf->getOptions('columns') ) ) );
+                $retval = array(
+                    'date_stamp' => $upf->getOptions('date_format'),
+                    'amount' => $upf->getOptions('time_unit_format'),
+                );
+                break;
+        }
 
-				break;
-			case 'column_aliases':
-				//Used for converting column names after they have been parsed.
-				$retval = array(
-								'type' => 'type_id',
-								'accrual_policy_account' => 'accrual_policy_account_id',
-								);
-				break;
-			case 'import_options':
-				$retval = array(
-								'-1010-fuzzy_match' => TTi18n::getText('Enable smart matching.'),
-								);
-				break;
-			case 'parse_hint':
-				$upf = TTnew('UserPreferenceFactory');
-
-				$retval = array(
-								'date_stamp' => $upf->getOptions('date_format'),
-								'amount' => $upf->getOptions('time_unit_format'),
-								);
-				break;
-		}
-
-		return $retval;
-	}
+        return $retval;
+    }
 
 
-	function _preParseRow( $row_number, $raw_row ) {
-		$retval = $this->getObject()->stripReturnHandler( $this->getObject()->getAccrualDefaultData() );
+    public function _preParseRow($row_number, $raw_row)
+    {
+        $retval = $this->getObject()->stripReturnHandler($this->getObject()->getAccrualDefaultData());
 
-		return $retval;
-	}
+        return $retval;
+    }
 
-	function _postParseRow( $row_number, $raw_row ) {
-		$raw_row['user_id'] = $this->getUserIdByRowData( $raw_row );
-		if ( $raw_row['user_id'] == FALSE ) {
-			unset($raw_row['user_id']);
-		}
+    public function _postParseRow($row_number, $raw_row)
+    {
+        $raw_row['user_id'] = $this->getUserIdByRowData($raw_row);
+        if ($raw_row['user_id'] == false) {
+            unset($raw_row['user_id']);
+        }
 
-		if ( isset($raw_row['date_stamp']) ) {
-			$raw_row['time_stamp'] = $raw_row['date_stamp']; //AcrualFactory wants time_stamp column not date_stamp, so convert that here.
-		}
+        if (isset($raw_row['date_stamp'])) {
+            $raw_row['time_stamp'] = $raw_row['date_stamp']; //AcrualFactory wants time_stamp column not date_stamp, so convert that here.
+        }
 
-		return $raw_row;
-	}
+        return $raw_row;
+    }
 
-	function _import( $validate_only ) {
-		return $this->getObject()->setAccrual( $this->getParsedData(), $validate_only );
-	}
+    public function _import($validate_only)
+    {
+        return $this->getObject()->setAccrual($this->getParsedData(), $validate_only);
+    }
 
-	//
-	// Generic parser functions.
-	//
-	function getAccrualPolicyAccountOptions() {
-		//Get accrual policies
-		$aplf = TTNew('AccrualPolicyAccountListFactory');
-		$aplf->getByCompanyId( $this->company_id );
-		$this->accrual_policy_account_options = (array)$aplf->getArrayByListFactory( $aplf, FALSE, TRUE );
-		unset($aplf);
+    //
+    // Generic parser functions.
+    //
 
-		return TRUE;
-	}
-	function parse_accrual_policy_account( $input, $default_value = NULL, $parse_hint = NULL ) {
-		if ( trim($input) == '' ) {
-			return 0; //Default Wage Group
-		}
+    public function parse_accrual_policy_account($input, $default_value = null, $parse_hint = null)
+    {
+        if (trim($input) == '') {
+            return 0; //Default Wage Group
+        }
 
-		if ( !is_array( $this->accrual_policy_account_options ) ) {
-			$this->getAccrualPolicyAccountOptions();
-		}
+        if (!is_array($this->accrual_policy_account_options)) {
+            $this->getAccrualPolicyAccountOptions();
+        }
 
-		$retval = $this->findClosestMatch( $input, $this->accrual_policy_account_options );
-		if ( $retval === FALSE ) {
-			$retval = -1; //Make sure this fails.
-		}
+        $retval = $this->findClosestMatch($input, $this->accrual_policy_account_options);
+        if ($retval === false) {
+            $retval = -1; //Make sure this fails.
+        }
 
-		return $retval;
-	}
+        return $retval;
+    }
 
-	function parse_date_stamp( $input, $default_value = NULL, $parse_hint = NULL ) {
-		return $this->parse_date( $input, $default_value, $parse_hint );
-	}
+    public function getAccrualPolicyAccountOptions()
+    {
+        //Get accrual policies
+        $aplf = TTNew('AccrualPolicyAccountListFactory');
+        $aplf->getByCompanyId($this->company_id);
+        $this->accrual_policy_account_options = (array)$aplf->getArrayByListFactory($aplf, false, true);
+        unset($aplf);
 
-	function parse_type( $input, $default_value = NULL, $parse_hint = NULL ) {
-		$af = TTnew('AccrualFactory');
-		$options = $af->getOptions( 'user_type' );
+        return true;
+    }
 
-		if ( isset($options[$input]) ) {
-			return $input;
-		} else {
-			if ( $this->getImportOptions('fuzzy_match') == TRUE ) {
-				return $this->findClosestMatch( $input, $options, 50 );
-			} else {
-				return array_search( strtolower($input), array_map('strtolower', $options) );
-			}
-		}
-	}
+    public function parse_date_stamp($input, $default_value = null, $parse_hint = null)
+    {
+        return $this->parse_date($input, $default_value, $parse_hint);
+    }
 
-	function parse_amount( $input, $default_value = NULL, $parse_hint = NULL, $raw_row = NULL ) {
-		$val = new Validator();
+    public function parse_type($input, $default_value = null, $parse_hint = null)
+    {
+        $af = TTnew('AccrualFactory');
+        $options = $af->getOptions('user_type');
 
-		TTDate::setTimeUnitFormat( $parse_hint );
+        if (isset($options[$input])) {
+            return $input;
+        } else {
+            if ($this->getImportOptions('fuzzy_match') == true) {
+                return $this->findClosestMatch($input, $options, 50);
+            } else {
+                return array_search(strtolower($input), array_map('strtolower', $options));
+            }
+        }
+    }
 
-		$retval = TTDate::parseTimeUnit( $val->stripNonTimeUnit($input) );
+    public function parse_amount($input, $default_value = null, $parse_hint = null, $raw_row = null)
+    {
+        $val = new Validator();
 
-		return $retval;
-	}
+        TTDate::setTimeUnitFormat($parse_hint);
+
+        $retval = TTDate::parseTimeUnit($val->stripNonTimeUnit($input));
+
+        return $retval;
+    }
 }
-?>

@@ -25,160 +25,160 @@ require_once('HTML/QuickForm/Renderer.php');
 /**
  * A concrete renderer for HTML_QuickForm,
  * based on QuickForm 2.x built-in one
- * 
+ *
  * @access public
  */
 class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
 {
-   /**
-    * The HTML of the form  
-    * @var      string
-    * @access   private
-    */
-    var $_html;
+    /**
+     * The HTML of the form
+     * @var      string
+     * @access   private
+     */
+    public $_html;
 
-   /**
-    * Header Template string
-    * @var      string
-    * @access   private
-    */
-    var $_headerTemplate = 
+    /**
+     * Header Template string
+     * @var      string
+     * @access   private
+     */
+    public $_headerTemplate =
         "\n\t<tr>\n\t\t<td style=\"white-space: nowrap; background-color: #CCCCCC;\" align=\"left\" valign=\"top\" colspan=\"2\"><b>{header}</b></td>\n\t</tr>";
 
-   /**
-    * Element template string
-    * @var      string
-    * @access   private
-    */
-    var $_elementTemplate = 
+    /**
+     * Element template string
+     * @var      string
+     * @access   private
+     */
+    public $_elementTemplate =
         "\n\t<tr>\n\t\t<td align=\"right\" valign=\"top\"><!-- BEGIN required --><span style=\"color: #ff0000\">*</span><!-- END required --><b>{label}</b></td>\n\t\t<td valign=\"top\" align=\"left\"><!-- BEGIN error --><span style=\"color: #ff0000\">{error}</span><br /><!-- END error -->\t{element}</td>\n\t</tr>";
 
-   /**
-    * Form template string
-    * @var      string
-    * @access   private
-    */
-    var $_formTemplate = 
+    /**
+     * Form template string
+     * @var      string
+     * @access   private
+     */
+    public $_formTemplate =
         "\n<form{attributes}>\n<div>\n{hidden}<table border=\"0\">\n{content}\n</table>\n</div>\n</form>";
 
-   /**
-    * Required Note template string
-    * @var      string
-    * @access   private
-    */
-    var $_requiredNoteTemplate = 
+    /**
+     * Required Note template string
+     * @var      string
+     * @access   private
+     */
+    public $_requiredNoteTemplate =
         "\n\t<tr>\n\t\t<td></td>\n\t<td align=\"left\" valign=\"top\">{requiredNote}</td>\n\t</tr>";
 
-   /**
-    * Array containing the templates for customised elements
-    * @var      array
-    * @access   private
-    */
-    var $_templates = array();
+    /**
+     * Array containing the templates for customised elements
+     * @var      array
+     * @access   private
+     */
+    public $_templates = array();
 
-   /**
-    * Array containing the templates for group wraps.
-    * 
-    * These templates are wrapped around group elements and groups' own
-    * templates wrap around them. This is set by setGroupTemplate().
-    * 
-    * @var      array
-    * @access   private
-    */
-    var $_groupWraps = array();
+    /**
+     * Array containing the templates for group wraps.
+     *
+     * These templates are wrapped around group elements and groups' own
+     * templates wrap around them. This is set by setGroupTemplate().
+     *
+     * @var      array
+     * @access   private
+     */
+    public $_groupWraps = array();
 
-   /**
-    * Array containing the templates for elements within groups
-    * @var      array
-    * @access   private
-    */
-    var $_groupTemplates = array();
+    /**
+     * Array containing the templates for elements within groups
+     * @var      array
+     * @access   private
+     */
+    public $_groupTemplates = array();
 
-   /**
-    * True if we are inside a group 
-    * @var      bool
-    * @access   private
-    */
-    var $_inGroup = false;
+    /**
+     * True if we are inside a group
+     * @var      bool
+     * @access   private
+     */
+    public $_inGroup = false;
 
-   /**
-    * Array with HTML generated for group elements
-    * @var      array
-    * @access   private
-    */
-    var $_groupElements = array();
+    /**
+     * Array with HTML generated for group elements
+     * @var      array
+     * @access   private
+     */
+    public $_groupElements = array();
 
-   /**
-    * Template for an element inside a group
-    * @var      string
-    * @access   private
-    */
-    var $_groupElementTemplate = '';
+    /**
+     * Template for an element inside a group
+     * @var      string
+     * @access   private
+     */
+    public $_groupElementTemplate = '';
 
-   /**
-    * HTML that wraps around the group elements
-    * @var      string
-    * @access   private
-    */
-    var $_groupWrap = '';
+    /**
+     * HTML that wraps around the group elements
+     * @var      string
+     * @access   private
+     */
+    public $_groupWrap = '';
 
-   /**
-    * HTML for the current group
-    * @var      string
-    * @access   private
-    */
-    var $_groupTemplate = '';
-    
-   /**
-    * Collected HTML of the hidden fields
-    * @var      string
-    * @access   private
-    */
-    var $_hiddenHtml = '';
+    /**
+     * HTML for the current group
+     * @var      string
+     * @access   private
+     */
+    public $_groupTemplate = '';
 
-   /**
-    * Constructor
-    *
-    * @access public
-    */
-    function HTML_QuickForm_Renderer_Default()
+    /**
+     * Collected HTML of the hidden fields
+     * @var      string
+     * @access   private
+     */
+    public $_hiddenHtml = '';
+
+    /**
+     * Constructor
+     *
+     * @access public
+     */
+    public function HTML_QuickForm_Renderer_Default()
     {
         $this->HTML_QuickForm_Renderer();
     } // end constructor
 
-   /**
-    * returns the HTML generated for the form
-    *
-    * @access public
-    * @return string
-    */
-    function toHtml()
+    /**
+     * returns the HTML generated for the form
+     *
+     * @access public
+     * @return string
+     */
+    public function toHtml()
     {
         return $this->_html;
     } // end func toHtml
-    
-   /**
-    * Called when visiting a form, before processing any form elements
-    *
-    * @param    object      An HTML_QuickForm object being visited
-    * @access   public
-    * @return   void
-    */
-    function startForm(&$form)
+
+    /**
+     * Called when visiting a form, before processing any form elements
+     *
+     * @param    object      An HTML_QuickForm object being visited
+     * @access   public
+     * @return   void
+     */
+    public function startForm(&$form)
     {
         $this->_html = '';
         $this->_hiddenHtml = '';
     } // end func startForm
 
-   /**
-    * Called when visiting a form, after processing all form elements
-    * Adds required note, form attributes, validation javascript and form content.
-    * 
-    * @param    object      An HTML_QuickForm object being visited
-    * @access   public
-    * @return   void
-    */
-    function finishForm(&$form)
+    /**
+     * Called when visiting a form, after processing all form elements
+     * Adds required note, form attributes, validation javascript and form content.
+     *
+     * @param    object      An HTML_QuickForm object being visited
+     * @access   public
+     * @return   void
+     */
+    public function finishForm(&$form)
     {
         // add a required note, if one is needed
         if (!empty($form->_required) && !$form->_freezeAll) {
@@ -197,15 +197,15 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
             $this->_html = $script . "\n" . $this->_html;
         }
     } // end func finishForm
-      
-   /**
-    * Called when visiting a header element
-    *
-    * @param    object     An HTML_QuickForm_header element being visited
-    * @access   public
-    * @return   void
-    */
-    function renderHeader(&$header)
+
+    /**
+     * Called when visiting a header element
+     *
+     * @param    object     An HTML_QuickForm_header element being visited
+     * @access   public
+     * @return   void
+     */
+    public function renderHeader(&$header)
     {
         $name = $header->getName();
         if (!empty($name) && isset($this->_templates[$name])) {
@@ -215,18 +215,47 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
         }
     } // end func renderHeader
 
-   /**
-    * Helper method for renderElement
-    *
-    * @param    string      Element name
-    * @param    mixed       Element label (if using an array of labels, you should set the appropriate template)
-    * @param    bool        Whether an element is required
-    * @param    string      Error message associated with the element
-    * @access   private
-    * @see      renderElement()
-    * @return   string      Html for element
-    */
-    function _prepareTemplate($name, $label, $required, $error)
+    /**
+     * Renders an element Html
+     * Called when visiting an element
+     *
+     * @param object     An HTML_QuickForm_element object being visited
+     * @param bool       Whether an element is required
+     * @param string     An error message associated with an element
+     * @access public
+     * @return void
+     */
+    public function renderElement(&$element, $required, $error)
+    {
+        if (!$this->_inGroup) {
+            $html = $this->_prepareTemplate($element->getName(), $element->getLabel(), $required, $error);
+            $this->_html .= str_replace('{element}', $element->toHtml(), $html);
+        } elseif (!empty($this->_groupElementTemplate)) {
+            $html = str_replace('{label}', $element->getLabel(), $this->_groupElementTemplate);
+            if ($required) {
+                $html = str_replace('<!-- BEGIN required -->', '', $html);
+                $html = str_replace('<!-- END required -->', '', $html);
+            } else {
+                $html = preg_replace("/([ \t\n\r]*)?<!-- BEGIN required -->(\s|\S)*<!-- END required -->([ \t\n\r]*)?/i", '', $html);
+            }
+            $this->_groupElements[] = str_replace('{element}', $element->toHtml(), $html);
+        } else {
+            $this->_groupElements[] = $element->toHtml();
+        }
+    } // end func _prepareTemplate
+
+    /**
+     * Helper method for renderElement
+     *
+     * @param    string      Element name
+     * @param    mixed       Element label (if using an array of labels, you should set the appropriate template)
+     * @param    bool        Whether an element is required
+     * @param    string      Error message associated with the element
+     * @access   private
+     * @see      renderElement()
+     * @return   string      Html for element
+     */
+    public function _prepareTemplate($name, $label, $required, $error)
     {
         if (is_array($label)) {
             $nameLabel = array_shift($label);
@@ -252,8 +281,8 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
             $html = preg_replace("/([ \t\n\r]*)?<!-- BEGIN error -->(\s|\S)*<!-- END error -->([ \t\n\r]*)?/i", '', $html);
         }
         if (is_array($label)) {
-            foreach($label as $key => $text) {
-                $key  = is_int($key)? $key + 2: $key;
+            foreach ($label as $key => $text) {
+                $key = is_int($key) ? $key + 2 : $key;
                 $html = str_replace("{label_{$key}}", $text, $html);
                 $html = str_replace("<!-- BEGIN label_{$key} -->", '', $html);
                 $html = str_replace("<!-- END label_{$key} -->", '', $html);
@@ -263,98 +292,67 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
             $html = preg_replace('/\s*<!-- BEGIN label_(\S+) -->.*<!-- END label_\1 -->\s*/i', '', $html);
         }
         return $html;
-    } // end func _prepareTemplate
-
-   /**
-    * Renders an element Html
-    * Called when visiting an element
-    *
-    * @param object     An HTML_QuickForm_element object being visited
-    * @param bool       Whether an element is required
-    * @param string     An error message associated with an element
-    * @access public
-    * @return void
-    */
-    function renderElement(&$element, $required, $error)
-    {
-        if (!$this->_inGroup) {
-            $html = $this->_prepareTemplate($element->getName(), $element->getLabel(), $required, $error);
-            $this->_html .= str_replace('{element}', $element->toHtml(), $html);
-
-        } elseif (!empty($this->_groupElementTemplate)) {
-            $html = str_replace('{label}', $element->getLabel(), $this->_groupElementTemplate);
-            if ($required) {
-                $html = str_replace('<!-- BEGIN required -->', '', $html);
-                $html = str_replace('<!-- END required -->', '', $html);
-            } else {
-                $html = preg_replace("/([ \t\n\r]*)?<!-- BEGIN required -->(\s|\S)*<!-- END required -->([ \t\n\r]*)?/i", '', $html);
-            }
-            $this->_groupElements[] = str_replace('{element}', $element->toHtml(), $html);
-
-        } else {
-            $this->_groupElements[] = $element->toHtml();
-        }
     } // end func renderElement
-   
-   /**
-    * Renders an hidden element
-    * Called when visiting a hidden element
-    * 
-    * @param object     An HTML_QuickForm_hidden object being visited
-    * @access public
-    * @return void
-    */
-    function renderHidden(&$element)
+
+    /**
+     * Renders an hidden element
+     * Called when visiting a hidden element
+     *
+     * @param object     An HTML_QuickForm_hidden object being visited
+     * @access public
+     * @return void
+     */
+    public function renderHidden(&$element)
     {
         $this->_hiddenHtml .= $element->toHtml() . "\n";
     } // end func renderHidden
 
-   /**
-    * Called when visiting a raw HTML/text pseudo-element
-    * 
-    * @param  object     An HTML_QuickForm_html element being visited
-    * @access public
-    * @return void
-    */
-    function renderHtml(&$data)
+    /**
+     * Called when visiting a raw HTML/text pseudo-element
+     *
+     * @param  object     An HTML_QuickForm_html element being visited
+     * @access public
+     * @return void
+     */
+    public function renderHtml(&$data)
     {
         $this->_html .= $data->toHtml();
     } // end func renderHtml
 
-   /**
-    * Called when visiting a group, before processing any group elements
-    *
-    * @param object     An HTML_QuickForm_group object being visited
-    * @param bool       Whether a group is required
-    * @param string     An error message associated with a group
-    * @access public
-    * @return void
-    */
-    function startGroup(&$group, $required, $error)
+    /**
+     * Called when visiting a group, before processing any group elements
+     *
+     * @param object     An HTML_QuickForm_group object being visited
+     * @param bool       Whether a group is required
+     * @param string     An error message associated with a group
+     * @access public
+     * @return void
+     */
+    public function startGroup(&$group, $required, $error)
     {
         $name = $group->getName();
-        $this->_groupTemplate        = $this->_prepareTemplate($name, $group->getLabel(), $required, $error);
-        $this->_groupElementTemplate = empty($this->_groupTemplates[$name])? '': $this->_groupTemplates[$name];
-        $this->_groupWrap            = empty($this->_groupWraps[$name])? '': $this->_groupWraps[$name];
-        $this->_groupElements        = array();
-        $this->_inGroup              = true;
+        $this->_groupTemplate = $this->_prepareTemplate($name, $group->getLabel(), $required, $error);
+        $this->_groupElementTemplate = empty($this->_groupTemplates[$name]) ? '' : $this->_groupTemplates[$name];
+        $this->_groupWrap = empty($this->_groupWraps[$name]) ? '' : $this->_groupWraps[$name];
+        $this->_groupElements = array();
+        $this->_inGroup = true;
     } // end func startGroup
 
-   /**
-    * Called when visiting a group, after processing all group elements
-    *
-    * @param    object      An HTML_QuickForm_group object being visited
-    * @access   public
-    * @return   void
-    */
-    function finishGroup(&$group)
+    /**
+     * Called when visiting a group, after processing all group elements
+     *
+     * @param    object      An HTML_QuickForm_group object being visited
+     * @access   public
+     * @return   void
+     */
+    public function finishGroup(&$group)
     {
         $separator = $group->_separator;
         if (is_array($separator)) {
             $count = count($separator);
-            $html  = '';
+            $html = '';
             for ($i = 0; $i < count($this->_groupElements); $i++) {
-                $html .= (0 == $i? '': $separator[($i - 1) % $count]) . $this->_groupElements[$i];
+                $html .= (0 == $i ? '' : $separator[($i - 1) % $count]) . $this->_groupElements[$i];
             }
         } else {
             if (is_null($separator)) {
@@ -365,32 +363,14 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
         if (!empty($this->_groupWrap)) {
             $html = str_replace('{content}', $html, $this->_groupWrap);
         }
-        $this->_html   .= str_replace('{element}', $html, $this->_groupTemplate);
+        $this->_html .= str_replace('{element}', $html, $this->_groupTemplate);
         $this->_inGroup = false;
     } // end func finishGroup
 
     /**
-     * Sets element template 
+     * Sets template for a group wrapper
      *
-     * @param       string      The HTML surrounding an element 
-     * @param       string      (optional) Name of the element to apply template for
-     * @access      public
-     * @return      void
-     */
-    function setElementTemplate($html, $element = null)
-    {
-        if (is_null($element)) {
-            $this->_elementTemplate = $html;
-        } else {
-            $this->_templates[$element] = $html;
-        }
-    } // end func setElementTemplate
-
-
-    /**
-     * Sets template for a group wrapper 
-     * 
-     * This template is contained within a group-as-element template 
+     * This template is contained within a group-as-element template
      * set via setTemplate() and contains group's element templates, set
      * via setGroupElementTemplate()
      *
@@ -399,59 +379,35 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
      * @access      public
      * @return      void
      */
-    function setGroupTemplate($html, $group)
+    public function setGroupTemplate($html, $group)
     {
         $this->_groupWraps[$group] = $html;
-    } // end func setGroupTemplate
+    } // end func setElementTemplate
 
-    /**
+/**
      * Sets element template for elements within a group
      *
-     * @param       string      The HTML surrounding an element 
+     * @param       string      The HTML surrounding an element
      * @param       string      Name of the group to apply template for
      * @access      public
      * @return      void
      */
-    function setGroupElementTemplate($html, $group)
+    public function setGroupElementTemplate($html, $group)
     {
         $this->_groupTemplates[$group] = $html;
-    } // end func setGroupElementTemplate
+    } // end func setGroupTemplate
 
     /**
      * Sets header template
      *
-     * @param       string      The HTML surrounding the header 
+     * @param       string      The HTML surrounding the header
      * @access      public
      * @return      void
      */
-    function setHeaderTemplate($html)
+    public function setHeaderTemplate($html)
     {
         $this->_headerTemplate = $html;
-    } // end func setHeaderTemplate
-
-    /**
-     * Sets form template 
-     *
-     * @param     string    The HTML surrounding the form tags 
-     * @access    public
-     * @return    void
-     */
-    function setFormTemplate($html)
-    {
-        $this->_formTemplate = $html;
-    } // end func setFormTemplate
-
-    /**
-     * Sets the note indicating required fields template
-     *
-     * @param       string      The HTML surrounding the required note 
-     * @access      public
-     * @return      void
-     */
-    function setRequiredNoteTemplate($html)
-    {
-        $this->_requiredNoteTemplate = $html;
-    } // end func setRequiredNoteTemplate
+    } // end func setGroupElementTemplate
 
     /**
      * Clears all the HTML out of the templates that surround notes, elements, etc.
@@ -460,12 +416,52 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
      * @access  public
      * @return  void
      */
-    function clearAllTemplates()
+    public function clearAllTemplates()
     {
         $this->setElementTemplate('{element}');
         $this->setFormTemplate("\n\t<form{attributes}>{content}\n\t</form>\n");
         $this->setRequiredNoteTemplate('');
         $this->_templates = array();
+    } // end func setHeaderTemplate
+
+    /**
+     * Sets element template
+     *
+     * @param       string      The HTML surrounding an element
+     * @param       string      (optional) Name of the element to apply template for
+     * @access      public
+     * @return      void
+     */
+    public function setElementTemplate($html, $element = null)
+    {
+        if (is_null($element)) {
+            $this->_elementTemplate = $html;
+        } else {
+            $this->_templates[$element] = $html;
+        }
+    } // end func setFormTemplate
+
+    /**
+     * Sets form template
+     *
+     * @param     string    The HTML surrounding the form tags
+     * @access    public
+     * @return    void
+     */
+    public function setFormTemplate($html)
+    {
+        $this->_formTemplate = $html;
+    } // end func setRequiredNoteTemplate
+
+    /**
+     * Sets the note indicating required fields template
+     *
+     * @param       string      The HTML surrounding the required note
+     * @access      public
+     * @return      void
+     */
+    public function setRequiredNoteTemplate($html)
+    {
+        $this->_requiredNoteTemplate = $html;
     } // end func clearAllTemplates
-} // end class HTML_QuickForm_Renderer_Default
-?>
+} // end class HTML_QuickForm_Renderer_Default;

@@ -1,12 +1,12 @@
-var APICompanyGenericTag = ServiceCaller.extend( {
+var APICompanyGenericTag = ServiceCaller.extend({
 
-	key_name: 'CompanyGenericTag',
-	className: 'APICompanyGenericTag',
+    key_name: 'CompanyGenericTag',
+    className: 'APICompanyGenericTag',
 
-	getCompanyGenericTag: function() {
+    getCompanyGenericTag: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyGenericTag', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyGenericTag', arguments);
 
-	},
+    },
 
-} );
+});

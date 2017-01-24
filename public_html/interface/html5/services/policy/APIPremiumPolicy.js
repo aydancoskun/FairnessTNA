@@ -1,51 +1,51 @@
-var APIPremiumPolicy = ServiceCaller.extend( {
+var APIPremiumPolicy = ServiceCaller.extend({
 
-	key_name: 'PremiumPolicy',
-	className: 'APIPremiumPolicy',
+    key_name: 'PremiumPolicy',
+    className: 'APIPremiumPolicy',
 
-	getPremiumPolicyDefaultData: function() {
+    getPremiumPolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPremiumPolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPremiumPolicyDefaultData', arguments);
 
-	},
+    },
 
-	getPremiumPolicy: function() {
+    getPremiumPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getPremiumPolicy', arguments );
+        return this.argumentsHandler(this.className, 'getPremiumPolicy', arguments);
 
-	},
+    },
 
-	getCommonPremiumPolicyData: function() {
+    getCommonPremiumPolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPremiumPolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPremiumPolicyData', arguments);
 
-	},
+    },
 
-	validatePremiumPolicy: function() {
+    validatePremiumPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validatePremiumPolicy', arguments );
+        return this.argumentsHandler(this.className, 'validatePremiumPolicy', arguments);
 
-	},
+    },
 
-	setPremiumPolicy: function() {
+    setPremiumPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setPremiumPolicy', arguments );
+        return this.argumentsHandler(this.className, 'setPremiumPolicy', arguments);
 
-	},
+    },
 
-	deletePremiumPolicy: function() {
+    deletePremiumPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deletePremiumPolicy', arguments );
+        return this.argumentsHandler(this.className, 'deletePremiumPolicy', arguments);
 
-	},
+    },
 
-	copyPremiumPolicy: function() {
-		return this.argumentsHandler( this.className, 'copyPremiumPolicy', arguments );
-	},
+    copyPremiumPolicy: function () {
+        return this.argumentsHandler(this.className, 'copyPremiumPolicy', arguments);
+    },
 
-	exportPremiumPolicy: function() {
-		return this.argumentsHandler( this.className, 'exportPremiumPolicy', arguments );
-	}
+    exportPremiumPolicy: function () {
+        return this.argumentsHandler(this.className, 'exportPremiumPolicy', arguments);
+    }
 
 
-} );
+});

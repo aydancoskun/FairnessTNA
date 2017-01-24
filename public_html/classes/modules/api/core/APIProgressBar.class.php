@@ -19,33 +19,36 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Core
  */
-class APIProgressBar {
-	protected $main_class = 'ProgressBar';
+class APIProgressBar
+{
+    protected $main_class = 'ProgressBar';
 
-	protected $obj = NULL;
+    protected $obj = null;
 
-	public function __construct() {
-		$this->obj = new ProgressBar();
+    public function __construct()
+    {
+        $this->obj = new ProgressBar();
 
-		return TRUE;
-	}
+        return true;
+    }
 
-	function get( $key = FALSE ) {
-		if ( $key != '' ) {
-			return $this->obj->get( $key );
-		}
+    public function get($key = false)
+    {
+        if ($key != '') {
+            return $this->obj->get($key);
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function test( $key, $total_iterations = 10 ) {
-		return $this->obj->test( $key, $total_iterations = 10 );
-	}
+    public function test($key, $total_iterations = 10)
+    {
+        return $this->obj->test($key, $total_iterations = 10);
+    }
 }
-?>

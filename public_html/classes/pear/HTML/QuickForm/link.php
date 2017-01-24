@@ -22,7 +22,7 @@ require_once 'HTML/QuickForm/static.php';
 
 /**
  * HTML class for a link type field
- * 
+ *
  * @author       Adam Daniel <adaniel1@eesus.jnj.com>
  * @author       Bertrand Mansion <bmansion@mamasam.com>
  * @version      1.0
@@ -39,25 +39,25 @@ class HTML_QuickForm_link extends HTML_QuickForm_static
      * @since     1.0
      * @access    private
      */
-    static $_text = "";
+    public static $_text = "";
 
     // }}}
     // {{{ constructor
-    
+
     /**
      * Class constructor
-     * 
-     * @param     string    $elementLabel   (optional)Link label
-     * @param     string    $href           (optional)Link href
-     * @param     string    $text           (optional)Link display text
-     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string 
+     *
+     * @param     string $elementLabel (optional)Link label
+     * @param     string $href (optional)Link href
+     * @param     string $text (optional)Link display text
+     * @param     mixed $attributes (optional)Either a typical HTML attribute string
      *                                      or an associative array
      * @since     1.0
      * @access    public
      * @return    void
-     * @throws    
+     * @throws
      */
-    function HTML_QuickForm_link($elementName=null, $elementLabel=null, $href=null, $text=null, $attributes=null)
+    public function HTML_QuickForm_link($elementName = null, $elementLabel = null, $href = null, $text = null, $attributes = null)
     {
         //HTML_QuickForm_element::HTML_QuickForm_element($elementName, $elementLabel, $attributes);
         new HTML_QuickForm_element($elementName, $elementLabel, $attributes);
@@ -66,59 +66,77 @@ class HTML_QuickForm_link extends HTML_QuickForm_static
         self::setHref($href);
         self::$_text = $text;
     } //end constructor
-    
+
     // }}}
     // {{{ setName()
 
     /**
-     * Sets the input field name
-     * 
-     * @param     string    $name   Input field name attribute
+     * Sets the links href
+     *
+     * @param     string $href
      * @since     1.0
      * @access    public
      * @return    void
-     * @throws    
+     * @throws
      */
-    static function setName($name)
+    public static function setHref($href)
     {
-        self::updateAttributes(array('name'=>$name));
+        self::updateAttributes(array('href' => $href));
     } //end func setName
-    
+
     // }}}
     // {{{ getName()
 
     /**
-     * Returns the element name
-     * 
+     * Sets the input field name
+     *
+     * @param     string $name Input field name attribute
      * @since     1.0
      * @access    public
-     * @return    string
-     * @throws    
+     * @return    void
+     * @throws
      */
-    static function getName()
+    public static function setName($name)
     {
-        return self::getAttribute('name');
+        self::updateAttributes(array('name' => $name));
     } //end func getName
 
     // }}}
     // {{{ setValue()
 
     /**
+     * Returns the element name
+     *
+     * @since     1.0
+     * @access    public
+     * @return    string
+     * @throws
+     */
+    public static function getName()
+    {
+        return self::getAttribute('name');
+    } //end func setValue
+
+    // }}}
+    // {{{ getValue()
+
+    /**
      * Sets value for textarea element
-     * 
-     * @param     string    $value  Value for password element
+     *
+     * @param     string $value Value for password element
      * @since     1.0
      * @access    public
      * @return    void
-     * @throws    
+     * @throws
      */
-    static function setValue($value)
+    public static function setValue($value)
     {
         return;
-    } //end func setValue
-    
+    } // end func getValue
+
+
     // }}}
-    // {{{ getValue()
+    // {{{ setHref()
 
     /**
      * Returns the value of the form element
@@ -126,29 +144,11 @@ class HTML_QuickForm_link extends HTML_QuickForm_static
      * @since     1.0
      * @access    public
      * @return    void
-     * @throws    
+     * @throws
      */
-    static function getValue()
+    public static function getValue()
     {
         return;
-    } // end func getValue
-
-    
-    // }}}
-    // {{{ setHref()
-
-    /**
-     * Sets the links href
-     *
-     * @param     string    $href
-     * @since     1.0
-     * @access    public
-     * @return    void
-     * @throws    
-     */
-    static function setHref($href)
-    {
-        self::updateAttributes(array('href'=>$href));
     } // end func setHref
 
     // }}}
@@ -156,38 +156,36 @@ class HTML_QuickForm_link extends HTML_QuickForm_static
 
     /**
      * Returns the textarea element in HTML
-     * 
+     *
      * @since     1.0
      * @access    public
      * @return    string
-     * @throws    
+     * @throws
      */
-    static function toHtml()
+    public static function toHtml()
     {
         $tabs = self::_getTabs();
-        $html = "$tabs<a".self::_getAttrString(self::$_attributes).">";
+        $html = "$tabs<a" . self::_getAttrString(self::$_attributes) . ">";
         $html .= self::$_text;
         $html .= "</a>";
         return $html;
     } //end func toHtml
-    
+
     // }}}
     // {{{ getFrozenHtml()
 
     /**
      * Returns the value of field without HTML tags (in this case, value is changed to a mask)
-     * 
+     *
      * @since     1.0
      * @access    public
      * @return    string
-     * @throws    
+     * @throws
      */
-    static function getFrozenHtml()
+    public static function getFrozenHtml()
     {
         return;
     } //end func getFrozenHtml
 
     // }}}
-
-} //end class HTML_QuickForm_textarea
-?>
+} //end class HTML_QuickForm_textarea;

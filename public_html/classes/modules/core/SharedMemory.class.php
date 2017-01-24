@@ -19,56 +19,61 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Core
  */
-require_once( Environment::getBasePath() .'/classes/pear/System/SharedMemory.php');
-class SharedMemory {
-	protected $obj = NULL;
+require_once(Environment::getBasePath() . '/classes/pear/System/SharedMemory.php');
 
-	function __construct() {
-		global $config_vars;
+class SharedMemory
+{
+    protected $obj = null;
 
-		$shared_memory = new System_SharedMemory();
-		if ( isset($config_vars['cache']['redis_host']) AND $config_vars['cache']['redis_host'] != '' ) {
-			$split_server = explode(',', $config_vars['cache']['redis_host'] );
-			$host = $split_server[0]; //Use just the master server.
-			
-			$this->obj = $shared_memory->Factory( 'Redis', array('host' => $host, 'db' => ( isset($config_vars['cache']['redis_db']) ) ? $config_vars['cache']['redis_db'] : '', 'timeout' => 1 ) );
-		} else {
-			if ( OPERATING_SYSTEM == 'WIN' ) {
-				$this->obj = $shared_memory->Factory( 'File', array('tmp' => $config_vars['cache']['dir'] ) );
-			} else {
-				$this->obj = $shared_memory->Factory( 'File', array('tmp' => $config_vars['cache']['dir'] ) );
-				////$this->obj = &System_SharedMemory::Factory( 'Systemv', array( 'size' => $size ) ); //Run into size issues all the time.
-			}
-		}
+    public function __construct()
+    {
+        global $config_vars;
 
-		return TRUE;
-	}
+        $shared_memory = new System_SharedMemory();
+        if (isset($config_vars['cache']['redis_host']) and $config_vars['cache']['redis_host'] != '') {
+            $split_server = explode(',', $config_vars['cache']['redis_host']);
+            $host = $split_server[0]; //Use just the master server.
 
-	function set( $key, $value ) {
-		if ( is_string( $key ) ) {
-			return $this->obj->set( $key, $value );
-		}
-		return FALSE;
-	}
+            $this->obj = $shared_memory->Factory('Redis', array('host' => $host, 'db' => (isset($config_vars['cache']['redis_db'])) ? $config_vars['cache']['redis_db'] : '', 'timeout' => 1));
+        } else {
+            if (OPERATING_SYSTEM == 'WIN') {
+                $this->obj = $shared_memory->Factory('File', array('tmp' => $config_vars['cache']['dir']));
+            } else {
+                $this->obj = $shared_memory->Factory('File', array('tmp' => $config_vars['cache']['dir']));
+                ////$this->obj = &System_SharedMemory::Factory( 'Systemv', array( 'size' => $size ) ); //Run into size issues all the time.
+            }
+        }
 
-	function get( $key ) {
-		if ( is_string( $key ) ) {
-			return $this->obj->get( $key );
-		}
-		return FALSE;
-	}
+        return true;
+    }
 
-	function delete( $key ) {
-		if ( is_string( $key ) ) {
-			return $this->obj->rm( $key );
-		}
-		return FALSE;
-	}
+    public function set($key, $value)
+    {
+        if (is_string($key)) {
+            return $this->obj->set($key, $value);
+        }
+        return false;
+    }
+
+    public function get($key)
+    {
+        if (is_string($key)) {
+            return $this->obj->get($key);
+        }
+        return false;
+    }
+
+    public function delete($key)
+    {
+        if (is_string($key)) {
+            return $this->obj->rm($key);
+        }
+        return false;
+    }
 }
-?>

@@ -218,7 +218,6 @@
     height: auto;
 }
 
-
 .install-wizard .user {
     height: calc(100% - 120px)
 }
@@ -407,8 +406,8 @@ progress::-moz-progress-bar {
     padding-top: 5px;
     position: absolute;
     width: 100%;
-    background:#f8f8f8;
-    left:0;
+    background: #f8f8f8;
+    left: 0;
 }
 
 .wizard .menu ul {
@@ -568,13 +567,12 @@ progress::-moz-progress-bar {
     float: left;
 }
 
-
 /*reset forgot password wizard*/
 .reset-forgot-password {
     height: 180px;
     margin: 0;
     padding: 0;
-    top:40%;
+    top: 40%;
     width: 500px;
 }
 

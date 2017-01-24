@@ -19,95 +19,96 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package PayrollDeduction\US
  */
-class PayrollDeduction_US_MI extends PayrollDeduction_US {
+class PayrollDeduction_US_MI extends PayrollDeduction_US
+{
+    public $state_options = array(
+        20140101 => array( //01-Jan-14
+            'rate' => 4.25,
+            'allowance' => 4000
+        ),
+        20130101 => array( //01-Jan-13
+            'rate' => 4.25,
+            'allowance' => 3950
+        ),
+        20110101 => array( //01-Jan-11
+            'rate' => 4.35,
+            'allowance' => 3700
+        ),
+        20090101 => array( //01-Jan-09
+            'rate' => 4.35,
+            'allowance' => 3600
+        ),
+        20071001 => array( //01-Oct-07
+            'rate' => 4.35,
+            'allowance' => 3400
+        ),
+        20070101 => array(
+            'rate' => 3.9,
+            'allowance' => 3400
+        ),
+        20060101 => array(
+            'rate' => 3.9,
+            'allowance' => 3300
+        )
+    );
 
-	var $state_options = array(
-								20140101 => array( //01-Jan-14
-													'rate' => 4.25,
-													'allowance' => 4000
-													),
-								20130101 => array( //01-Jan-13
-													'rate' => 4.25,
-													'allowance' => 3950
-													),
-								20110101 => array( //01-Jan-11
-													'rate' => 4.35,
-													'allowance' => 3700
-													),
-								20090101 => array( //01-Jan-09
-													'rate' => 4.35,
-													'allowance' => 3600
-													),
-								20071001 => array( //01-Oct-07
-													'rate' => 4.35,
-													'allowance' => 3400
-													),
-								20070101 => array(
-													'rate' => 3.9,
-													'allowance' => 3400
-													),
-								20060101 => array(
-													'rate' => 3.9,
-													'allowance' => 3300
-													)
-								);
+    public function getStateTaxPayable()
+    {
+        $annual_income = $this->getStateAnnualTaxableIncome();
 
-	function getStateAnnualTaxableIncome() {
-		$annual_income = $this->getAnnualTaxableIncome();
+        $retval = 0;
 
-		$allowance = $this->getStateAllowanceAmount();
+        if ($annual_income > 0) {
+            $retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
+            if ($retarr == false) {
+                return false;
+            }
 
-		$income = bcsub( $annual_income, $allowance);
+            $rate = bcdiv($retarr['rate'], 100);
+            $retval = bcmul($annual_income, $rate);
+        }
 
-		Debug::text('State Annual Taxable Income: '. $income, __FILE__, __LINE__, __METHOD__, 10);
+        if ($retval < 0) {
+            $retval = 0;
+        }
 
-		return $income;
-	}
+        Debug::text('State Annual Tax Payable: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
+        return $retval;
+    }
 
-	function getStateAllowanceAmount() {
-		$retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
-		if ( $retarr == FALSE ) {
-			return FALSE;
-		}
+    public function getStateAnnualTaxableIncome()
+    {
+        $annual_income = $this->getAnnualTaxableIncome();
 
-		$allowance = $retarr['allowance'];
+        $allowance = $this->getStateAllowanceAmount();
 
-		$retval = bcmul( $this->getStateAllowance(), $allowance );
+        $income = bcsub($annual_income, $allowance);
 
-		Debug::text('State Allowance Amount: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
+        Debug::text('State Annual Taxable Income: ' . $income, __FILE__, __LINE__, __METHOD__, 10);
 
-		return $retval;
-	}
+        return $income;
+    }
 
-	function getStateTaxPayable() {
-		$annual_income = $this->getStateAnnualTaxableIncome();
+    public function getStateAllowanceAmount()
+    {
+        $retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
+        if ($retarr == false) {
+            return false;
+        }
 
-		$retval = 0;
+        $allowance = $retarr['allowance'];
 
-		if ( $annual_income > 0 ) {
-			$retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
-			if ( $retarr == FALSE ) {
-				return FALSE;
-			}
+        $retval = bcmul($this->getStateAllowance(), $allowance);
 
-			$rate = bcdiv( $retarr['rate'], 100);
-			$retval = bcmul( $annual_income, $rate );
-		}
+        Debug::text('State Allowance Amount: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $retval < 0 ) {
-			$retval = 0;
-		}
-
-		Debug::text('State Annual Tax Payable: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
-
-		return $retval;
-	}
+        return $retval;
+    }
 }
-?>

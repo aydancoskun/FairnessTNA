@@ -36,7 +36,7 @@
  *
  * @category    Mail
  * @package     Mail
- * @author      Chuck Hagenbuch <chuck@horde.org> 
+ * @author      Chuck Hagenbuch <chuck@horde.org>
  * @copyright   2010 Chuck Hagenbuch
  * @license     http://opensource.org/licenses/bsd-license.php New BSD License
  * @version     CVS: $Id$
@@ -49,7 +49,8 @@
  * @package Mail
  * @version $Revision$
  */
-class Mail_mock extends Mail {
+class Mail_mock extends Mail
+{
 
     /**
      * Array of messages that have been sent with the mock.
@@ -85,12 +86,14 @@ class Mail_mock extends Mail {
     public function __construct($params)
     {
         if (isset($params['preSendCallback']) &&
-            is_callable($params['preSendCallback'])) {
+            is_callable($params['preSendCallback'])
+        ) {
             $this->_preSendCallback = $params['preSendCallback'];
         }
 
         if (isset($params['postSendCallback']) &&
-            is_callable($params['postSendCallback'])) {
+            is_callable($params['postSendCallback'])
+        ) {
             $this->_postSendCallback = $params['postSendCallback'];
         }
     }
@@ -123,7 +126,7 @@ class Mail_mock extends Mail {
     {
         if ($this->_preSendCallback) {
             call_user_func_array($this->_preSendCallback,
-                                 array(&$this, $recipients, $headers, $body));
+                array(&$this, $recipients, $headers, $body));
         }
 
         $entry = array('recipients' => $recipients, 'headers' => $headers, 'body' => $body);
@@ -131,10 +134,9 @@ class Mail_mock extends Mail {
 
         if ($this->_postSendCallback) {
             call_user_func_array($this->_postSendCallback,
-                                 array(&$this, $recipients, $headers, $body));
+                array(&$this, $recipients, $headers, $body));
         }
 
         return true;
     }
-
 }

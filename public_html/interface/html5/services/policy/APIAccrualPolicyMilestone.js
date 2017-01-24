@@ -1,43 +1,43 @@
-var APIAccrualPolicyMilestone = ServiceCaller.extend( {
+var APIAccrualPolicyMilestone = ServiceCaller.extend({
 
-	key_name: 'AccrualPolicyMilestone',
-	className: 'APIAccrualPolicyMilestone',
+    key_name: 'AccrualPolicyMilestone',
+    className: 'APIAccrualPolicyMilestone',
 
-	getAccrualPolicyMilestoneDefaultData: function() {
+    getAccrualPolicyMilestoneDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicyMilestoneDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicyMilestoneDefaultData', arguments);
 
-	},
+    },
 
-	getAccrualPolicyMilestone: function() {
+    getAccrualPolicyMilestone: function () {
 
-		return this.argumentsHandler( this.className, 'getAccrualPolicyMilestone', arguments );
+        return this.argumentsHandler(this.className, 'getAccrualPolicyMilestone', arguments);
 
-	},
+    },
 
-	getCommonAccrualPolicyMilestoneData: function() {
+    getCommonAccrualPolicyMilestoneData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonAccrualPolicyMilestoneData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonAccrualPolicyMilestoneData', arguments);
 
-	},
+    },
 
-	validateAccrualPolicyMilestone: function() {
+    validateAccrualPolicyMilestone: function () {
 
-		return this.argumentsHandler( this.className, 'validateAccrualPolicyMilestone', arguments );
+        return this.argumentsHandler(this.className, 'validateAccrualPolicyMilestone', arguments);
 
-	},
+    },
 
-	setAccrualPolicyMilestone: function() {
+    setAccrualPolicyMilestone: function () {
 
-		return this.argumentsHandler( this.className, 'setAccrualPolicyMilestone', arguments );
+        return this.argumentsHandler(this.className, 'setAccrualPolicyMilestone', arguments);
 
-	},
+    },
 
-	deleteAccrualPolicyMilestone: function() {
+    deleteAccrualPolicyMilestone: function () {
 
-		return this.argumentsHandler( this.className, 'deleteAccrualPolicyMilestone', arguments );
+        return this.argumentsHandler(this.className, 'deleteAccrualPolicyMilestone', arguments);
 
-	}
+    }
 
 
-} );
+});

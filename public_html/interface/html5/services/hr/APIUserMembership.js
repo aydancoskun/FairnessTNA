@@ -1,60 +1,59 @@
-var APIUserMembership = ServiceCaller.extend( {
+var APIUserMembership = ServiceCaller.extend({
 
-	key_name: 'UserMembership',
-	className: 'APIUserMembership',
+    key_name: 'UserMembership',
+    className: 'APIUserMembership',
 
-	getCommonUserMembershipData: function() {
+    getCommonUserMembershipData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonUserMembershipData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonUserMembershipData', arguments);
 
-	},
+    },
 
-	getUserMembership: function() {
+    getUserMembership: function () {
 
-		return this.argumentsHandler( this.className, 'getUserMembership', arguments );
+        return this.argumentsHandler(this.className, 'getUserMembership', arguments);
 
-	},
+    },
 
-	setUserMembership: function() {
+    setUserMembership: function () {
 
-		return this.argumentsHandler( this.className, 'setUserMembership', arguments );
+        return this.argumentsHandler(this.className, 'setUserMembership', arguments);
 
-	},
+    },
 
-	getUserMembershipDefaultData: function() {
+    getUserMembershipDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getUserMembershipDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getUserMembershipDefaultData', arguments);
 
-	},
+    },
 
-	deleteUserMembership: function() {
+    deleteUserMembership: function () {
 
-		return this.argumentsHandler( this.className, 'deleteUserMembership', arguments );
+        return this.argumentsHandler(this.className, 'deleteUserMembership', arguments);
 
-	},
+    },
 
-	validateUserMembership: function() {
+    validateUserMembership: function () {
 
-		return this.argumentsHandler( this.className, 'validateUserMembership', arguments );
+        return this.argumentsHandler(this.className, 'validateUserMembership', arguments);
 
-	},
+    },
 
-	copyUserMembership: function() {
+    copyUserMembership: function () {
 
-		return this.argumentsHandler( this.className, 'copyUserMembership', arguments );
+        return this.argumentsHandler(this.className, 'copyUserMembership', arguments);
 
-	},
+    },
 
-	exportUserMembership: function() {
-		return this.argumentsHandler( this.className, 'exportUserMembership', arguments );
-	},
+    exportUserMembership: function () {
+        return this.argumentsHandler(this.className, 'exportUserMembership', arguments);
+    },
 
-	generateInvoices: function() {
+    generateInvoices: function () {
 
-		return this.argumentsHandler( this.className, 'generateInvoices', arguments );
+        return this.argumentsHandler(this.className, 'generateInvoices', arguments);
 
-	}
+    }
 
 
-
-} );
+});

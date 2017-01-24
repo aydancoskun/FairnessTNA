@@ -7,23 +7,22 @@
 
 function smarty_function_URLBuilder($params, &$smarty)
 {
-
     $values = $params['values'];
     $script = $params['script'];
-    $merge = strtolower(trim( $params['merge']) );
+    $merge = strtolower(trim($params['merge']));
 
     if ($merge == 'false') {
-        $merge = FALSE;
+        $merge = false;
     } else {
-        $merge = TRUE;
+        $merge = true;
     }
 
-/*
-    if ( empty($script) ) {
-        $smarty->trigger_error("URLBuilder: missing 'script' parameter");
-    }
-*/
-    if ( !empty($values) ) {
+    /*
+        if ( empty($script) ) {
+            $smarty->trigger_error("URLBuilder: missing 'script' parameter");
+        }
+    */
+    if (!empty($values)) {
         $values_arr = explode(",", $values);
 
         $url_builder_arr = array();
@@ -36,7 +35,7 @@ function smarty_function_URLBuilder($params, &$smarty)
 
         $retval = URLBuilder::getURL($url_builder_arr, $script, $merge);
     } else {
-        $retval = URLBuilder::getURL(NULL,$script);
+        $retval = URLBuilder::getURL(null, $script);
     }
 
     //Debug::Text('URL: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
@@ -44,6 +43,4 @@ function smarty_function_URLBuilder($params, &$smarty)
     return $retval;
 }
 
-/* vim: set expandtab: */
-
-?>
+/* vim: set expandtab: */;

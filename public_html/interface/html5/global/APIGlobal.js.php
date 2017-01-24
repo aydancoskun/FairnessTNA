@@ -19,10 +19,10 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
-define('FAIRNESS_JSON_API', TRUE );
-if ( isset($_GET['disable_db']) AND $_GET['disable_db'] == 1 ) {
-	$disable_database_connection = TRUE;
+ ********************************************************************************/
+define('FAIRNESS_JSON_API', true);
+if (isset($_GET['disable_db']) and $_GET['disable_db'] == 1) {
+    $disable_database_connection = true;
 }
 require_once('../../../includes/global.inc.php');
 require_once('../../../includes/API.inc.php');
@@ -32,20 +32,21 @@ header('Content-Type: application/javascript; charset=UTF-8');
 TTi18n::chooseBestLocale(); //Make sure we set the locale as best we can when not logged in, this is needed for getPreLoginData as well.
 $auth = TTNew('APIAuthentication');
 ?>
-var APIGlobal = function() {};
-APIGlobal.pre_login_data = <?php echo json_encode( $auth->getPreLoginData() );?>; //Convert getPreLoginData() array to JS.
+var APIGlobal = function () {
+};
+APIGlobal.pre_login_data = <?php echo json_encode($auth->getPreLoginData());?>; //Convert getPreLoginData() array to JS.
 
 need_load_pre_login_data = false;
-var new_session = getCookie( 'NewSessionID' );
-if ( new_session ) {
-	setCookie( 'SessionID', new_session, 30, APIGlobal.pre_login_data.cookie_base_url );
+var new_session = getCookie('NewSessionID');
+if (new_session) {
+    setCookie('SessionID', new_session, 30, APIGlobal.pre_login_data.cookie_base_url);
 
-	//Allow NewSessionID cookie to be accessible from one level higher subdomain.
-	var host = window.location.hostname;
-	host = host.substring( (host.indexOf( '.' ) + 1) );
-	setCookie( 'NewSessionID', null, 0, APIGlobal.pre_login_data.cookie_base_url, host );
+    //Allow NewSessionID cookie to be accessible from one level higher subdomain.
+    var host = window.location.hostname;
+    host = host.substring((host.indexOf('.') + 1));
+    setCookie('NewSessionID', null, 0, APIGlobal.pre_login_data.cookie_base_url, host);
 
-	need_load_pre_login_data = true; // need load it again since APIGlobal.pre_login_data.is_logged_in will be false when first load
+    need_load_pre_login_data = true; // need load it again since APIGlobal.pre_login_data.is_logged_in will be false when first load
 }
 delete new_session, host;
 <?php

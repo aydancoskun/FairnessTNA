@@ -19,238 +19,257 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_Base {
+class InstallSchema_Base
+{
+    protected $schema_sql_file_name = null;
+    protected $schema_failure_state_file = null;
+    protected $version = null;
+    protected $db = null;
+    protected $is_upgrade = false;
+    protected $install_obj = false;
 
-	protected $schema_sql_file_name = NULL;
-	protected $schema_failure_state_file = NULL;
-	protected $version = NULL;
-	protected $db = NULL;
-	protected $is_upgrade = FALSE;
-	protected $install_obj = FALSE;
+    public function __construct($install_obj = false)
+    {
+        if (is_object($install_obj)) {
+            $this->install_obj = $install_obj;
+        }
 
-	function __construct( $install_obj = FALSE ) {
-		if ( is_object( $install_obj ) ) {
-			$this->install_obj = $install_obj;
-		}
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function setDatabaseConnection($db)
+    {
+        $this->db = $db;
+    }
 
-	function setDatabaseConnection( $db ) {
-		$this->db = $db;
-	}
+    public function getIsUpgrade()
+    {
+        return $this->is_upgrade;
+    }
 
-	function getDatabaseConnection() {
-		return $this->db;
-	}
+    public function setIsUpgrade($val)
+    {
+        $this->is_upgrade = (bool)$val;
+    }
 
-	function setIsUpgrade( $val ) {
-		$this->is_upgrade = (bool)$val;
-	}
-	function getIsUpgrade() {
-		return $this->is_upgrade;
-	}
+    public function checkTableExists($table_name)
+    {
+        Debug::text('Table Name: ' . $table_name, __FILE__, __LINE__, __METHOD__, 9);
+        $db_conn = $this->getDatabaseConnection();
 
-	function setVersion($value) {
-		$this->version = $value;
-	}
-	function getVersion() {
-		return $this->version;
-	}
+        if ($db_conn == false) {
+            return false;
+        }
 
-	function setSchemaSQLFilename($file_name) {
-		$this->schema_sql_file_name = $file_name;
-	}
-	function getSchemaSQLFilename() {
-		return $this->schema_sql_file_name;
-	}
+        $table_arr = $db_conn->MetaTables();
 
-	function getSchemaGroup() {
-		$schema_group = substr( $this->getVersion(), -1, 1 );
-		Debug::text('Schema: '. $this->getVersion() .' Group: '. $schema_group, __FILE__, __LINE__, __METHOD__, 9);
+        if (in_array($table_name, $table_arr)) {
+            Debug::text('Exists - Table Name: ' . $table_name, __FILE__, __LINE__, __METHOD__, 9);
+            return true;
+        }
 
-		return strtoupper($schema_group);
-	}
+        Debug::text('Does not Exist - Table Name: ' . $table_name, __FILE__, __LINE__, __METHOD__, 9);
+        return false;
+    }
 
-	//Copied from Install class.
-	function checkTableExists( $table_name ) {
-		Debug::text('Table Name: '. $table_name, __FILE__, __LINE__, __METHOD__, 9);
-		$db_conn = $this->getDatabaseConnection();
+    public function getDatabaseConnection()
+    {
+        return $this->db;
+    }
 
-		if ( $db_conn == FALSE ) {
-			return FALSE;
-		}
+    public function InstallSchema()
+    {
+        $this->getDatabaseConnection()->StartTrans();
 
-		$table_arr = $db_conn->MetaTables();
+        Debug::text('Installing Schema Version: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        if ($this->preInstall() == true) {
+            if ($this->_InstallSchema() == true) {
+                if ($this->postInstall() == true) {
+                    $retval = $this->_postPostInstall();
+                    if ($retval == true) {
+                        Debug::text('Clearing schema failure state file: ' . $this->schema_failure_state_file, __FILE__, __LINE__, __METHOD__, 9);
+                        @unlink($this->schema_failure_state_file); //Clear state when schema is applied successfully, including postInstall.
 
-		if ( in_array($table_name, $table_arr ) ) {
-			Debug::text('Exists - Table Name: '. $table_name, __FILE__, __LINE__, __METHOD__, 9);
-			return TRUE;
-		}
+                        $this->getDatabaseConnection()->CompleteTrans();
 
-		Debug::text('Does not Exist - Table Name: '. $table_name, __FILE__, __LINE__, __METHOD__, 9);
-		return FALSE;
-	}
+                        return $retval;
+                    }
+                }
+            }
+        }
 
-	//load Schema file data
-	function getSchemaSQLFileData() {
-		//Read SQL data into memory
-		if ( is_readable( $this->getSchemaSQLFilename() ) ) {
-			Debug::text('Schema SQL File is readable: '. $this->getSchemaSQLFilename(), __FILE__, __LINE__, __METHOD__, 9);
-			$contents = file_get_contents( $this->getSchemaSQLFilename() );
+        $this->getDatabaseConnection()->FailTrans();
 
-			Debug::Arr($contents, 'SQL File Data: ', __FILE__, __LINE__, __METHOD__, 9);
-			return $contents;
-		}
+        return false;
+    }
 
-		Debug::text('Schema SQL File is NOT readable, or is empty!', __FILE__, __LINE__, __METHOD__, 9);
+    public function getVersion()
+    {
+        return $this->version;
+    }
 
-		return FALSE;
-	}
+    public function setVersion($value)
+    {
+        $this->version = $value;
+    }
 
-	function removeSchemaSQLFileComments( $sql ) {
-		$retval = '';
+    private function _InstallSchema()
+    {
+        //Run the actual SQL queries here
 
-		$split_sql = explode("\n", $sql);
-		if ( is_array($split_sql) ) {
-			foreach( $split_sql as $sql_line ) {
-				if ( substr( trim($sql_line), 0, 2 ) != '--') {
-					$retval .= $sql_line."\n"; //Make sure the newlines are put back in the proper place, otherwise it can other SQL parse errors.
-				} else {
-					Debug::text('Skipping SQL Comment: '. $sql_line, __FILE__, __LINE__, __METHOD__, 9);
-				}
-			}
-		}
+        $sql = $this->removeSchemaSQLFileComments($this->getSchemaSQLFileData());
+        if ($sql == false) {
+            return false;
+        }
 
-		return $retval;
-	}
+        global $config_vars;
+        if (isset($config_vars['cache']['dir'])) {
+            $this->schema_failure_state_file = $config_vars['cache']['dir'] . DIRECTORY_SEPARATOR . 'fn_schema_failure.state';
+        }
 
-	private function _InstallSchema() {
-		//Run the actual SQL queries here
+        //Save a state file if any SQL query fails, so we can continue on from where it left off.
+        //Only do this for MySQL though, as PostgreSQL has DDL transactions.
 
-		$sql = $this->removeSchemaSQLFileComments( $this->getSchemaSQLFileData() );
-		if ( $sql == FALSE ) {
-			return FALSE;
-		}
+        $schema_failure_state = array();
+        if (file_exists($this->schema_failure_state_file) and strncmp($this->getDatabaseConnection()->databaseType, 'mysql', 5) == 0) {
+            $schema_failure_state = unserialize(file_get_contents($this->schema_failure_state_file));
+            Debug::Arr($schema_failure_state, 'Schema Failure State: ' . $this->schema_failure_state_file, __FILE__, __LINE__, __METHOD__, 9);
+        } else {
+            Debug::text('No previous Schema failure state file: ' . $this->schema_failure_state_file, __FILE__, __LINE__, __METHOD__, 9);
+        }
 
-		global $config_vars;
-		if ( isset($config_vars['cache']['dir']) ) {
-			$this->schema_failure_state_file = $config_vars['cache']['dir'] . DIRECTORY_SEPARATOR . 'fn_schema_failure.state';
-		}
+        if ($sql !== false and strlen($sql) > 0) {
+            Debug::text('Schema SQL has data, executing commands!', __FILE__, __LINE__, __METHOD__, 9);
 
-		//Save a state file if any SQL query fails, so we can continue on from where it left off.
-		//Only do this for MySQL though, as PostgreSQL has DDL transactions.
+            $i = 0;
 
-		$schema_failure_state = array();
-		if ( file_exists( $this->schema_failure_state_file ) AND strncmp( $this->getDatabaseConnection()->databaseType, 'mysql', 5) == 0 ) {
-			$schema_failure_state = unserialize( file_get_contents( $this->schema_failure_state_file ) );
-			Debug::Arr($schema_failure_state, 'Schema Failure State: '. $this->schema_failure_state_file, __FILE__, __LINE__, __METHOD__, 9);
-		} else {
-			Debug::text('No previous Schema failure state file: '. $this->schema_failure_state_file, __FILE__, __LINE__, __METHOD__, 9);
-		}
+            //Split into individual SQL queries, as MySQL apparently doesn't like more then one query
+            //in a single query() call.
+            $split_sql = explode(';', $sql);
+            if (is_array($split_sql)) {
+                foreach ($split_sql as $sql_line) {
+                    if (isset($schema_failure_state[$this->getVersion()])) {
+                        if ($i < ($schema_failure_state[$this->getVersion()])) {
+                            Debug::text('Skipping already committed SQL command on line: ' . $i . ' of: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+                            $i++;
+                            continue;
+                        }
+                    }
 
-		if ( $sql !== FALSE AND strlen($sql) > 0 ) {
-			Debug::text('Schema SQL has data, executing commands!', __FILE__, __LINE__, __METHOD__, 9);
+                    //Debug::text('SQL Line: '. trim($sql_line), __FILE__, __LINE__, __METHOD__, 9);
+                    if (trim($sql_line) != '' and substr(trim($sql_line), 0, 2) != '--') {
+                        try {
+                            $this->getDatabaseConnection()->Execute($sql_line);
+                        } catch (Exception $e) {
+                            $schema_failure_state = array($this->getVersion() => $i);
+                            Debug::text('SQL Command failed on line: ' . $i . ' of: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+                            @file_put_contents($this->schema_failure_state_file, serialize($schema_failure_state));
+                            throw new DBError($e);
+                            return false;
+                        }
+                    }
 
-			$i = 0;
+                    $i++;
+                }
+            }
 
-			//Split into individual SQL queries, as MySQL apparently doesn't like more then one query
-			//in a single query() call.
-			$split_sql = explode(';', $sql);
-			if ( is_array($split_sql) ) {
-				foreach( $split_sql as $sql_line ) {
-					if ( isset($schema_failure_state[$this->getVersion()]) ) {
-						if ( $i < ( $schema_failure_state[$this->getVersion()] ) ) {
-							Debug::text('Skipping already committed SQL command on line: '. $i .' of: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
-							$i++;
-							continue;
-						}
-					}
-					
-					//Debug::text('SQL Line: '. trim($sql_line), __FILE__, __LINE__, __METHOD__, 9);
-					if ( trim($sql_line) != '' AND substr( trim($sql_line), 0, 2 ) != '--' ) {
-						try {
-							$this->getDatabaseConnection()->Execute( $sql_line );
-						} catch ( Exception $e ) {
-							$schema_failure_state = array( $this->getVersion() => $i );
-							Debug::text('SQL Command failed on line: '. $i .' of: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
-							@file_put_contents( $this->schema_failure_state_file, serialize( $schema_failure_state ) );
-							throw new DBError($e);
-							return FALSE;
-						}
-					}
+            //Save state that all schema changes succeeded so they aren't run again even if postInstall fails.
+            $schema_failure_state = array($this->getVersion() => $i);
+            Debug::text('Schema upgrade succeeded, last line: ' . $i . ' of: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+            @file_put_contents($this->schema_failure_state_file, serialize($schema_failure_state));
+        } else {
+            Debug::text('Schema SQL does not have data, not executing commands, continuing...', __FILE__, __LINE__, __METHOD__, 9);
+        }
 
-					$i++;
-				}
-			}
+        //Clear state file only once postInstall() has completed.
 
-			//Save state that all schema changes succeeded so they aren't run again even if postInstall fails.
-			$schema_failure_state = array( $this->getVersion() => $i );
-			Debug::text('Schema upgrade succeeded, last line: '. $i .' of: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
-			@file_put_contents( $this->schema_failure_state_file, serialize( $schema_failure_state ) );
-		} else {
-			Debug::text('Schema SQL does not have data, not executing commands, continuing...', __FILE__, __LINE__, __METHOD__, 9);
-		}
+        return true;
+    }
 
-		//Clear state file only once postInstall() has completed.
-		
-		return TRUE;
-	}
+    //Copied from Install class.
 
-	private function _postPostInstall() {
-		Debug::text('Modify Schema version in system settings table!', __FILE__, __LINE__, __METHOD__, 9);
-		//Modify schema version in system_settings table.
+    public function removeSchemaSQLFileComments($sql)
+    {
+        $retval = '';
 
-		$sslf = TTnew( 'SystemSettingListFactory' );
-		$sslf->getByName('schema_version_group_'. $this->getSchemaGroup() );
-		if ( $sslf->getRecordCount() == 1 ) {
-			$obj = $sslf->getCurrent();
-		} else {
-			$obj = TTnew( 'SystemSettingListFactory' );
-		}
+        $split_sql = explode("\n", $sql);
+        if (is_array($split_sql)) {
+            foreach ($split_sql as $sql_line) {
+                if (substr(trim($sql_line), 0, 2) != '--') {
+                    $retval .= $sql_line . "\n"; //Make sure the newlines are put back in the proper place, otherwise it can other SQL parse errors.
+                } else {
+                    Debug::text('Skipping SQL Comment: ' . $sql_line, __FILE__, __LINE__, __METHOD__, 9);
+                }
+            }
+        }
 
-		$obj->setName( 'schema_version_group_'. $this->getSchemaGroup() );
-		$obj->setValue( $this->getVersion() );
-		if ( $obj->isValid() ) {
-			Debug::text('Setting Schema Version to: '. $this->getVersion() .' Group: '. $this->getSchemaGroup(), __FILE__, __LINE__, __METHOD__, 9);
-			$obj->Save();
+        return $retval;
+    }
 
-			return TRUE;
-		}
+    //load Schema file data
 
-		return FALSE;
-	}
+    public function getSchemaSQLFileData()
+    {
+        //Read SQL data into memory
+        if (is_readable($this->getSchemaSQLFilename())) {
+            Debug::text('Schema SQL File is readable: ' . $this->getSchemaSQLFilename(), __FILE__, __LINE__, __METHOD__, 9);
+            $contents = file_get_contents($this->getSchemaSQLFilename());
 
-	function InstallSchema() {
-		$this->getDatabaseConnection()->StartTrans();
+            Debug::Arr($contents, 'SQL File Data: ', __FILE__, __LINE__, __METHOD__, 9);
+            return $contents;
+        }
 
-		Debug::text('Installing Schema Version: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
-		if ( $this->preInstall() == TRUE ) {
-			if ( $this->_InstallSchema() == TRUE ) {
-				if ( $this->postInstall() == TRUE ) {
-					$retval = $this->_postPostInstall();
-					if ( $retval == TRUE ) {
-						Debug::text('Clearing schema failure state file: '. $this->schema_failure_state_file, __FILE__, __LINE__, __METHOD__, 9);
-						@unlink( $this->schema_failure_state_file ); //Clear state when schema is applied successfully, including postInstall.
+        Debug::text('Schema SQL File is NOT readable, or is empty!', __FILE__, __LINE__, __METHOD__, 9);
 
-						$this->getDatabaseConnection()->CompleteTrans();
+        return false;
+    }
 
-						return $retval;
-					}
+    public function getSchemaSQLFilename()
+    {
+        return $this->schema_sql_file_name;
+    }
 
-				}
-			}
-		}
+    public function setSchemaSQLFilename($file_name)
+    {
+        $this->schema_sql_file_name = $file_name;
+    }
 
-		$this->getDatabaseConnection()->FailTrans();
+    private function _postPostInstall()
+    {
+        Debug::text('Modify Schema version in system settings table!', __FILE__, __LINE__, __METHOD__, 9);
+        //Modify schema version in system_settings table.
 
-		return FALSE;
-	}
+        $sslf = TTnew('SystemSettingListFactory');
+        $sslf->getByName('schema_version_group_' . $this->getSchemaGroup());
+        if ($sslf->getRecordCount() == 1) {
+            $obj = $sslf->getCurrent();
+        } else {
+            $obj = TTnew('SystemSettingListFactory');
+        }
+
+        $obj->setName('schema_version_group_' . $this->getSchemaGroup());
+        $obj->setValue($this->getVersion());
+        if ($obj->isValid()) {
+            Debug::text('Setting Schema Version to: ' . $this->getVersion() . ' Group: ' . $this->getSchemaGroup(), __FILE__, __LINE__, __METHOD__, 9);
+            $obj->Save();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getSchemaGroup()
+    {
+        $schema_group = substr($this->getVersion(), -1, 1);
+        Debug::text('Schema: ' . $this->getVersion() . ' Group: ' . $schema_group, __FILE__, __LINE__, __METHOD__, 9);
+
+        return strtoupper($schema_group);
+    }
 }
-?>

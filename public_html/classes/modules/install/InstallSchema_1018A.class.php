@@ -19,33 +19,34 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema_1018A extends InstallSchema_Base {
+class InstallSchema_1018A extends InstallSchema_Base
+{
+    protected $station_users = array();
 
-	protected $station_users = array();
+    public function preInstall()
+    {
+        Debug::text('preInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function preInstall() {
-		Debug::text('preInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function postInstall()
+    {
+        // @codingStandardsIgnoreStart
+        global $cache;
+        //assuming this is needed elsewhere?
+        // @codingStandardsIgnoreEnd
+        Debug::text('postInstall: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
-	function postInstall() {
-		// @codingStandardsIgnoreStart
-		global $cache;
-		//assuming this is needed elsewhere?
-		// @codingStandardsIgnoreEnd
-		Debug::text('postInstall: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
-
-		Debug::text('l: '. $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
+        Debug::text('l: ' . $this->getVersion(), __FILE__, __LINE__, __METHOD__, 9);
 
 
-		return TRUE;
-	}
+        return true;
+    }
 }
-?>

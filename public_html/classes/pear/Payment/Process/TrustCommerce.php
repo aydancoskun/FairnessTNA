@@ -24,7 +24,7 @@ require_once('Payment/Process/Common.php');
 require_once('Net/Curl.php');
 
 $GLOBALS['_Payment_Process_TrustCommerce'] = array(
-    PAYMENT_PROCESS_ACTION_NORMAL   => 'sale',
+    PAYMENT_PROCESS_ACTION_NORMAL => 'sale',
     PAYMENT_PROCESS_ACTION_AUTHONLY => 'preauth',
     PAYMENT_PROCESS_ACTION_POSTAUTH => 'postauth'
 );
@@ -40,10 +40,11 @@ $GLOBALS['_Payment_Process_TrustCommerce'] = array(
  * that you use it in a production envorinment without further testing.
  *
  * @package Payment_Process
- * @author Robert Peake <robert.peake@trustcommerce.com> 
+ * @author Robert Peake <robert.peake@trustcommerce.com>
  * @version @version@
  */
-class Payment_Process_TrustCommerce extends Payment_Process_Common {
+class Payment_Process_TrustCommerce extends Payment_Process_Common
+{
     /**
      * Front-end -> back-end field map.
      *
@@ -53,7 +54,7 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
      * @see _prepare()
      * @access private
      */
-    var $_fieldMap = array(
+    public $_fieldMap = array(
         // Required
         'login' => 'custid',
         'password' => 'password',
@@ -74,28 +75,28 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
     );
 
     /**
-    * $_typeFieldMap
-    *
-    * @author Robert Peake <robert.peake@trustcommerce.com>
-    * @access protected
-    */
-    var $_typeFieldMap = array(
+     * $_typeFieldMap
+     *
+     * @author Robert Peake <robert.peake@trustcommerce.com>
+     * @access protected
+     */
+    public $_typeFieldMap = array(
 
-           'CreditCard' => array(
+        'CreditCard' => array(
 
-                    'cardNumber' => 'cc',
-                    'cvv' => 'cvv',
-                    'expDate' => 'exp'
+            'cardNumber' => 'cc',
+            'cvv' => 'cvv',
+            'expDate' => 'exp'
 
-           ),
+        ),
 
-           'eCheck' => array(
+        'eCheck' => array(
 
-                    'routingCode' => 'routing',
-                    'accountNumber' => 'account',
-                    'name' => 'name'
+            'routingCode' => 'routing',
+            'accountNumber' => 'account',
+            'name' => 'name'
 
-           )
+        )
     );
 
     /**
@@ -104,7 +105,7 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
      * @see Payment_Process::setOptions()
      * @access private
      */
-    var $_defaultOptions = array();
+    public $_defaultOptions = array();
 
     /**
      * Has the transaction been processed?
@@ -112,31 +113,31 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
      * @type boolean
      * @access private
      */
-    var $_processed = false;
+    public $_processed = false;
 
     /**
      * The response body sent back from the gateway.
      *
      * @access private
      */
-    var $_responseBody = '';
+    public $_responseBody = '';
+
+    public function Payment_Process_TrustCommerce($options = false)
+    {
+        $this->__construct($options);
+    }
 
     /**
      * Constructor.
      *
-     * @param  array  $options  Class options to set.
+     * @param  array $options Class options to set.
      * @see Payment_Process::setOptions()
      * @return void
      */
-    function __construct($options = false)
+    public function __construct($options = false)
     {
         parent::__construct($options);
         $this->_driver = 'TrustCommerce';
-    }
-
-    function Payment_Process_TrustCommerce($options = false)
-    {
-        $this->__construct($options);
     }
 
     /**
@@ -144,18 +145,18 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
      *
      * @return mixed Payment_Process_Result on success, PEAR_Error on failure
      */
-    function &process()
+    public function &process()
     {
         // Sanity check
         $result = $this->validate();
-        if(PEAR::isError($result)) {
+        if (PEAR::isError($result)) {
             return $result;
         }
 
         // Prepare the data
         $result = $this->_prepare();
         if (PEAR::isError($result)) {
-            return $result; 
+            return $result;
         }
 
         // Don't die partway through
@@ -163,14 +164,14 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
 
         $fields = $this->_prepareQueryString();
 
-        if(function_exists('tclink_send')) {
+        if (function_exists('tclink_send')) {
             /** USE TCLINK **/
             $result = tclink_send($fields);
             $r_keys = array_keys($result);
-            for($i=0;$i<sizeof($r_keys);$i++) {
+            for ($i = 0; $i < sizeof($r_keys); $i++) {
                 $key = $r_keys[$i];
                 $value = $result[$key];
-                $result_string .= $key.'='.$value."\n";
+                $result_string .= $key . '=' . $value . "\n";
             }
             if (PEAR::isError($result_string)) {
                 PEAR::popErrorHandling();
@@ -207,8 +208,8 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
         PEAR::popErrorHandling();
 
         $response = Payment_Process_Result::factory($this->_driver,
-                                                     $this->_responseBody, 
-                                                     $this);
+            $this->_responseBody,
+            $this);
 
         if (!PEAR::isError($response)) {
             $response->parse();
@@ -218,50 +219,40 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
     }
 
     /**
-     * Get (completed) transaction status.
-     *
-     * @return boolean status.
-     */
-    function getStatus()
-    {
-        return false;
-    }
-
-    /**
      * Prepare the POST query string.
      *
      * @access private
      * @return string The query string
      */
-    function _prepareQueryString()
+    public function _prepareQueryString()
     {
-
         $data = $this->_data;
 
         /* expiration is expressed as mmyy */
         $fulldate = $data['exp'];
-        $month = strtok($fulldate,'/');
+        $month = strtok($fulldate, '/');
         $year = strtok('');
-        $exp = $month.substr($year,2,2);
+        $exp = $month . substr($year, 2, 2);
         $data['exp'] = $exp;
         /* end expiration mangle */
 
         /* amount is expressed in cents with leading zeroes */
-        $data['amount'] = $data['amount']*100;
+        $data['amount'] = $data['amount'] * 100;
         if (strlen($data['amount']) == 1) {
-            $data['amount'] = "00".$data['amount'];
-        } else if(strlen($data['amount']) < 3) {
-            $data['amount'] = "0".$data['amount'];
-        } else if(strlen($data['amount']) > 8) {
-            $amount_message = 'Amount: '.$data['amount'].' too large.';
+            $data['amount'] = "00" . $data['amount'];
+        } elseif (strlen($data['amount']) < 3) {
+            $data['amount'] = "0" . $data['amount'];
+        } elseif (strlen($data['amount']) > 8) {
+            $amount_message = 'Amount: ' . $data['amount'] . ' too large.';
             PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
             PEAR::raiseError($amount_message);
             PEAR::popErrorHandling();
         }
         /* end amount mangle */
 
-        if ($this->_payment->getType() == 'CreditCard' && 
-            $this->action != PAYMENT_PROCESS_ACTION_POSTAUTH) {
+        if ($this->_payment->getType() == 'CreditCard' &&
+            $this->action != PAYMENT_PROCESS_ACTION_POSTAUTH
+        ) {
             $data['media'] = 'cc';
         }
 
@@ -274,33 +265,43 @@ class Payment_Process_TrustCommerce extends Payment_Process_Common {
         foreach ($data as $key => $val) {
             if (strlen($val)) {
                 $return[$key] = $val;
-                $sets[] = $key.'='.urlencode($val);
+                $sets[] = $key . '=' . urlencode($val);
             }
         }
-        
-        $this->_options['authorizeUri'] = 'https://vault.trustcommerce.com/trans/?'.implode('&',$sets);
+
+        $this->_options['authorizeUri'] = 'https://vault.trustcommerce.com/trans/?' . implode('&', $sets);
 
         return $return;
     }
+
+    /**
+     * Get (completed) transaction status.
+     *
+     * @return boolean status.
+     */
+    public function getStatus()
+    {
+        return false;
+    }
 }
 
-class Payment_Process_Result_TrustCommerce extends Payment_Process_Result {
-
-    var $_statusCodeMap = array('approved' => PAYMENT_PROCESS_RESULT_APPROVED,
-                                'accepted' => PAYMENT_PROCESS_RESULT_APPROVED,
-                                'declined' => PAYMENT_PROCESS_RESULT_DECLINED,
-                                'baddata' => PAYMENT_PROCESS_RESULT_OTHER,
-                                'error' => PAYMENT_PROCESS_RESULT_OTHER);
+class Payment_Process_Result_TrustCommerce extends Payment_Process_Result
+{
+    public $_statusCodeMap = array('approved' => PAYMENT_PROCESS_RESULT_APPROVED,
+        'accepted' => PAYMENT_PROCESS_RESULT_APPROVED,
+        'declined' => PAYMENT_PROCESS_RESULT_DECLINED,
+        'baddata' => PAYMENT_PROCESS_RESULT_OTHER,
+        'error' => PAYMENT_PROCESS_RESULT_OTHER);
 
     /**
      * TrustCommerce status codes
      *
-     * This array holds response codes. 
+     * This array holds response codes.
      *
      * @see getStatusText()
      * @access private
      */
-    var $_statusCodeMessages = array(
+    public $_statusCodeMessages = array(
         'approved' => 'The transaction was successfully authorized.',
         'accepted' => 'The transaction has been successfully accepted into the system.',
         'decline' => 'The transaction was declined, see declinetype for further details.',
@@ -308,7 +309,7 @@ class Payment_Process_Result_TrustCommerce extends Payment_Process_Result {
         'error' => 'System error when processing the transaction, see errortype for details.',
     );
 
-    var $_avsCodeMap = array(
+    public $_avsCodeMap = array(
         'N' => PAYMENT_PROCESS_AVS_MISMATCH,
         'U' => PAYMENT_PROCESS_AVS_NOAPPLY,
         'G' => PAYMENT_PROCESS_AVS_NOAPPLY,
@@ -318,70 +319,65 @@ class Payment_Process_Result_TrustCommerce extends Payment_Process_Result {
         'O' => PAYMENT_PROCESS_AVS_ERROR
     );
 
-    var $_avsCodeMessages = array(
-         'X' => 'Exact match, 9 digit zipcode.',
-         'Y' => 'Exact match, 5 digit zipcode.',
-         'A' => 'Street address match only.',
-         'W' => '9 digit zipcode match only.',
-         'Z' => '5 digit zipcode match only.',
-         'N' => 'No mtach on street address or zipcode.',
-         'U' => 'AVS unavailable on this card.',
-         'G' => 'Non-US card issuer, AVS unavailable.',
-         'R' => 'Card issuer system currently down, try again later.',
-         'E' => 'Error, ineligible - not a mail/phone order.',
-         'S' => 'Service not supported.',
-         'O' => 'General decline or other error'
+    public $_avsCodeMessages = array(
+        'X' => 'Exact match, 9 digit zipcode.',
+        'Y' => 'Exact match, 5 digit zipcode.',
+        'A' => 'Street address match only.',
+        'W' => '9 digit zipcode match only.',
+        'Z' => '5 digit zipcode match only.',
+        'N' => 'No mtach on street address or zipcode.',
+        'U' => 'AVS unavailable on this card.',
+        'G' => 'Non-US card issuer, AVS unavailable.',
+        'R' => 'Card issuer system currently down, try again later.',
+        'E' => 'Error, ineligible - not a mail/phone order.',
+        'S' => 'Service not supported.',
+        'O' => 'General decline or other error'
     );
 
-    var $_cvvCodeMap = array('cvv' => PAYMENT_PROCESS_CVV_MISMATCH
+    public $_cvvCodeMap = array('cvv' => PAYMENT_PROCESS_CVV_MISMATCH
     );
 
-    var $_cvvCodeMessages = array( 'cvv' => 'The CVV number is not valid.'
+    public $_cvvCodeMessages = array('cvv' => 'The CVV number is not valid.'
     );
 
-    var $_fieldMap = array('status'  => 'code',
-                           'avs'  => 'avsCode',
-                           'transid'  => 'transactionId'
+    public $_fieldMap = array('status' => 'code',
+        'avs' => 'avsCode',
+        'transid' => 'transactionId'
     );
 
 
-    function Payment_Process_Response_TrustCommerce($rawResponse) 
+    public function Payment_Process_Response_TrustCommerce($rawResponse)
     {
         $this->Payment_Process_Response($rawResponse);
     }
 
-    function parse()
+    public function parse()
     {
-      $array = preg_split("/\n/",$this->_rawResponse,0,PREG_SPLIT_NO_EMPTY);
-      for($i=0;$i<sizeof($array);$i++)
-      {
-          $response_line = $array[$i];
-          $response_array = preg_split("/=/",$response_line);
-          $key = $response_array[0];
-          $value = $response_array[1];
-          $responseArray[$key] = $value;
-      }
-      $this->_mapFields($responseArray);
+        $array = preg_split("/\n/", $this->_rawResponse, 0, PREG_SPLIT_NO_EMPTY);
+        for ($i = 0; $i < sizeof($array); $i++) {
+            $response_line = $array[$i];
+            $response_array = preg_split("/=/", $response_line);
+            $key = $response_array[0];
+            $value = $response_array[1];
+            $responseArray[$key] = $value;
+        }
+        $this->_mapFields($responseArray);
     }
 
-    function _mapFields($responseArray)
+    public function _mapFields($responseArray)
     {
-        foreach($this->_fieldMap as $key => $val) {
+        foreach ($this->_fieldMap as $key => $val) {
             $this->$val = $responseArray[$key];
         }
-        if (!isset($this->_statusCodeMessages[$this->messageCode])) 
-        {
+        if (!isset($this->_statusCodeMessages[$this->messageCode])) {
             $message = $this->_statusCodeMessages[$responseArray['status']];
-            if($responseArray['error'])
-            {
-                $message .= "\nError type: ".$responseArray['error'].'.';
-                if($responseArray['offenders'])
-                {
-                    $message .= "\nOffending fields: ".$responseArray['offenders'].'.';
+            if ($responseArray['error']) {
+                $message .= "\nError type: " . $responseArray['error'] . '.';
+                if ($responseArray['offenders']) {
+                    $message .= "\nOffending fields: " . $responseArray['offenders'] . '.';
                 }
             }
             $this->_statusCodeMessages[$this->messageCode] = $message;
-        } 
+        }
     }
 }
-?>

@@ -206,244 +206,261 @@ define("BCD_C128_BAR_4", 4);
  * @since 2001-03-25
  * @license http://www.gnu.org/copyleft/lesser.html LGPL
  */
-class BarcodeObject {
-	/**
-	 * @var Image width in pixels.
-	 * @access protected
-	 */
-	protected $mWidth;
-	
-	/**
-	 * @var Image height in pixels.
-	 * @access protected
-	 */
-	protected $mHeight;
-	
-	/**
-	 * @var Numeric code for Barcode style.
-	 * @access protected
-	 */
-	protected $mStyle;
-	
-	/**
-	 * @var Background color.
-	 * @access protected
-	 */
-	protected $mBgcolor;
-	
-	/**
-	 * @var Brush color.
-	 * @access protected
-	 */
-	protected $mBrush;
-	
-	/**
-	 * @var Image object.
-	 * @access protected
-	 */
-	protected $mImg;
-	
-	/**
-	 * @var Numeric code for character font.
-	 * @access protected
-	 */
-	protected $mFont;
-	
-	/**
-	 * @var Error message.
-	 * @access protected
-	 */
-	protected $mError;
-	
-	/**
-	 * @var Character Set.
-	 * @access protected
-	 */
-	protected $mCharSet;
-	
-	/**
-	 * @var Allowed symbols.
-	 * @access protected
-	 */
-	protected $mChars;
+class BarcodeObject
+{
+    /**
+     * @var Image width in pixels.
+     * @access protected
+     */
+    protected $mWidth;
 
-	/**
-	 * Class Constructor.
-	 * @param int $Width Image width in pixels.
-	 * @param int $Height Image height in pixels. 
-	 * @param int $Style Barcode style.
-	 */
-	public function __construct($Width=BCD_DEFAULT_WIDTH, $Height=BCD_DEFAULT_HEIGHT, $Style=BCD_DEFAULT_STYLE) {
-		$this->mWidth = $Width;
-		$this->mHeight = $Height;
-		$this->mStyle = $Style;
-		$this->mFont = BCD_DEFAULT_FONT;
-		$this->mImg = ImageCreate($this->mWidth, $this->mHeight);
-		$dbColor = $this->mStyle & BCS_REVERSE_COLOR ? BCD_DEFAULT_FOREGROUND_COLOR : BCD_DEFAULT_BACKGROUND_COLOR;
-		$dfColor = $this->mStyle & BCS_REVERSE_COLOR ? BCD_DEFAULT_BACKGROUND_COLOR : BCD_DEFAULT_FOREGROUND_COLOR;
-		$this->mBgcolor = ImageColorAllocate($this->mImg, ($dbColor & 0xFF0000) >> 16,
-		($dbColor & 0x00FF00) >> 8, $dbColor & 0x0000FF);
-		$this->mBrush = ImageColorAllocate($this->mImg, ($dfColor & 0xFF0000) >> 16,
-		($dfColor & 0x00FF00) >> 8, $dfColor & 0x0000FF);
-		if (!($this->mStyle & BCS_TRANSPARENT)) {
-			ImageFill($this->mImg, $this->mWidth, $this->mHeight, $this->mBgcolor);
-		}
-	}
-	
-	/**
-	 * Class Destructor.
-	 * Destroy image object.
-	 */
-	public function __destructor() {
-		$this->DestroyObject();
-	}
+    /**
+     * @var Image height in pixels.
+     * @access protected
+     */
+    protected $mHeight;
 
-	/**
-	 * Returns the image object.
-	 * @return object image.
-	 * @author Nicola Asuni
-	 * @since 1.5.2
-	 */
-	public function getImage() {
-		return $this->mImg;
-	}
-	
-	/**
-	 * Abstract method used to draw the barcode image.
-	 * @param int $xres Horizontal resolution.
-	 */
-	public function DrawObject($xres)	{
-		/* there is not implementation neded, is simply the asbsract function. */
-		return false;
-	}
-	
-	/**
-	 * Draws the barcode border.
-	 * @access protected
-	 */
-	protected function DrawBorder() {
-		ImageRectangle($this->mImg, 0, 0, $this->mWidth-1, $this->mHeight-1, $this->mBrush);
-	}
-	
-	/**
-	 * Draws the alphanumeric code.
-	 * @param int $Font Font type.
-	 * @param int $xPos Horiziontal position.
-	 * @param int $yPos Vertical position.
-	 * @param int $Char Alphanumeric code to write.
-	 * @access protected
-	 */
-	protected function DrawChar($Font, $xPos, $yPos, $Char) {
-		ImageString($this->mImg,$Font,$xPos,$yPos,$Char,$this->mBrush);
-	}
-	
-	/**
-	 * Draws a character string.
-	 * @param int $Font Font type.
-	 * @param int $xPos Horiziontal position.
-	 * @param int $yPos Vertical position.
-	 * @param int $Char string to write.
-	 * @access protected
-	 */
-	protected function DrawText($Font, $xPos, $yPos, $Char) {
-		ImageString($this->mImg,$Font,$xPos,$yPos,$Char,$this->mBrush);
-	}
+    /**
+     * @var Numeric code for Barcode style.
+     * @access protected
+     */
+    protected $mStyle;
 
-	/**
-	 * Draws a single barcode bar.
-	 * @param int $xPos Horiziontal position.
-	 * @param int $yPos Vertical position.
-	 * @param int $xSize Horizontal size.
+    /**
+     * @var Background color.
+     * @access protected
+     */
+    protected $mBgcolor;
+
+    /**
+     * @var Brush color.
+     * @access protected
+     */
+    protected $mBrush;
+
+    /**
+     * @var Image object.
+     * @access protected
+     */
+    protected $mImg;
+
+    /**
+     * @var Numeric code for character font.
+     * @access protected
+     */
+    protected $mFont;
+
+    /**
+     * @var Error message.
+     * @access protected
+     */
+    protected $mError;
+
+    /**
+     * @var Character Set.
+     * @access protected
+     */
+    protected $mCharSet;
+
+    /**
+     * @var Allowed symbols.
+     * @access protected
+     */
+    protected $mChars;
+
+    /**
+     * Class Constructor.
+     * @param int $Width Image width in pixels.
+     * @param int $Height Image height in pixels.
+     * @param int $Style Barcode style.
+     */
+    public function __construct($Width = BCD_DEFAULT_WIDTH, $Height = BCD_DEFAULT_HEIGHT, $Style = BCD_DEFAULT_STYLE)
+    {
+        $this->mWidth = $Width;
+        $this->mHeight = $Height;
+        $this->mStyle = $Style;
+        $this->mFont = BCD_DEFAULT_FONT;
+        $this->mImg = ImageCreate($this->mWidth, $this->mHeight);
+        $dbColor = $this->mStyle & BCS_REVERSE_COLOR ? BCD_DEFAULT_FOREGROUND_COLOR : BCD_DEFAULT_BACKGROUND_COLOR;
+        $dfColor = $this->mStyle & BCS_REVERSE_COLOR ? BCD_DEFAULT_BACKGROUND_COLOR : BCD_DEFAULT_FOREGROUND_COLOR;
+        $this->mBgcolor = ImageColorAllocate($this->mImg, ($dbColor & 0xFF0000) >> 16,
+            ($dbColor & 0x00FF00) >> 8, $dbColor & 0x0000FF);
+        $this->mBrush = ImageColorAllocate($this->mImg, ($dfColor & 0xFF0000) >> 16,
+            ($dfColor & 0x00FF00) >> 8, $dfColor & 0x0000FF);
+        if (!($this->mStyle & BCS_TRANSPARENT)) {
+            ImageFill($this->mImg, $this->mWidth, $this->mHeight, $this->mBgcolor);
+        }
+    }
+
+    /**
+     * Class Destructor.
+     * Destroy image object.
+     */
+    public function __destructor()
+    {
+        $this->DestroyObject();
+    }
+
+    /**
+     * Destroy the barcode image.
+     */
+    public function DestroyObject()
+    {
+        ImageDestroy($this->mImg);
+    }
+
+    /**
+     * Returns the image object.
+     * @return object image.
+     * @author Nicola Asuni
+     * @since 1.5.2
+     */
+    public function getImage()
+    {
+        return $this->mImg;
+    }
+
+    /**
+     * Abstract method used to draw the barcode image.
+     * @param int $xres Horizontal resolution.
+     */
+    public function DrawObject($xres)
+    {
+        /* there is not implementation neded, is simply the asbsract function. */
+        return false;
+    }
+
+    /**
+     * Returns the current error message.
+     * @return string error message.
+     */
+    public function GetError()
+    {
+        return $this->mError;
+    }
+
+    /**
+     * Returns the font height.
+     * @param int $font font type.
+     * @return int font height.
+     */
+    public function GetFontHeight($font)
+    {
+        return ImageFontHeight($font);
+    }
+
+    /**
+     * Returns the font width.
+     * @param int $font font type.
+     * @return int font width.
+     */
+    public function GetFontWidth($font)
+    {
+        return ImageFontWidth($font);
+    }
+
+    /**
+     * Set font type.
+     * @param int $font font type.
+     */
+    public function SetFont($font)
+    {
+        $this->mFont = $font;
+    }
+
+    /**
+     * Returns barcode style.
+     * @return int barcode style.
+     */
+    public function GetStyle()
+    {
+        return $this->mStyle;
+    }
+
+    /**
+     * Set barcode style.
+     * @param int $Style barcode style.
+     */
+    public function SetStyle($Style)
+    {
+        $this->mStyle = $Style;
+    }
+
+    /**
+     * Flush the barcode image.
+     */
+    public function FlushObject()
+    {
+        if (($this->mStyle & BCS_BORDER)) {
+            $this->DrawBorder();
+        }
+        if ($this->mStyle & BCS_IMAGE_PNG) {
+            Header("Content-Type: image/png");
+            ImagePng($this->mImg);
+        } elseif ($this->mStyle & BCS_IMAGE_JPEG) {
+            Header("Content-Type: image/jpeg");
+            ImageJpeg($this->mImg);
+        }
+    }
+
+    /**
+     * Draws the barcode border.
+     * @access protected
+     */
+    protected function DrawBorder()
+    {
+        ImageRectangle($this->mImg, 0, 0, $this->mWidth - 1, $this->mHeight - 1, $this->mBrush);
+    }
+
+    /**
+     * Draws the alphanumeric code.
+     * @param int $Font Font type.
+     * @param int $xPos Horiziontal position.
+     * @param int $yPos Vertical position.
+     * @param int $Char Alphanumeric code to write.
+     * @access protected
+     */
+    protected function DrawChar($Font, $xPos, $yPos, $Char)
+    {
+        ImageString($this->mImg, $Font, $xPos, $yPos, $Char, $this->mBrush);
+    }
+
+    /**
+     * Draws a character string.
+     * @param int $Font Font type.
+     * @param int $xPos Horiziontal position.
+     * @param int $yPos Vertical position.
+     * @param int $Char string to write.
+     * @access protected
+     */
+    protected function DrawText($Font, $xPos, $yPos, $Char)
+    {
+        ImageString($this->mImg, $Font, $xPos, $yPos, $Char, $this->mBrush);
+    }
+
+    /**
+     * Draws a single barcode bar.
+     * @param int $xPos Horiziontal position.
+     * @param int $yPos Vertical position.
+     * @param int $xSize Horizontal size.
      * @param int $xSize Vertical size.
      * @return bool trur in case of success, false otherwise.
      * @access protected
-	 */
-	protected function DrawSingleBar($xPos, $yPos, $xSize, $ySize) {
-		if ($xPos>=0 && $xPos<=$this->mWidth && ($xPos+$xSize)<=$this->mWidth &&
-		$yPos>=0 && $yPos<=$this->mHeight && ($yPos+$ySize)<=$this->mHeight) {
-			for ($i=0;$i<$xSize;$i++) {
-				ImageLine($this->mImg, $xPos+$i, $yPos, $xPos+$i, $yPos+$ySize, $this->mBrush);
-			}
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Returns the current error message.
-	 * @return string error message.
-	 */
-	public function GetError() {
-		return $this->mError;
-	}
-	
-	/**
-	 * Returns the font height.
-	 * @param int $font font type.
-	 * @return int font height.
-	 */
-	public function GetFontHeight($font) {
-		return ImageFontHeight($font);
-	}
-	
-	/**
-	 * Returns the font width.
-	 * @param int $font font type.
-	 * @return int font width.
-	 */
-	public function GetFontWidth($font) {
-		return ImageFontWidth($font);
-	}
-	
-	/**
-	 * Set font type.
-	 * @param int $font font type.
-	 */
-	public function SetFont($font) {
-		$this->mFont = $font;
-	}
-	
-	/**
-	 * Returns barcode style.
-	 * @return int barcode style.
-	 */
-	public function GetStyle() {
-		return $this->mStyle;
-	}
-
-	/**
-	 * Set barcode style.
-	 * @param int $Style barcode style.
-	 */
-	public function SetStyle ($Style) {
-		$this->mStyle = $Style;
-	}
-
-	/**
-	 * Flush the barcode image.
-	 */
-	public function FlushObject() {
-		if (($this->mStyle & BCS_BORDER)) {
-			$this->DrawBorder();
-		}
-		if ($this->mStyle & BCS_IMAGE_PNG) {
-			Header("Content-Type: image/png");
-			ImagePng($this->mImg);
-		} else if ($this->mStyle & BCS_IMAGE_JPEG) {
-			Header("Content-Type: image/jpeg");
-			ImageJpeg($this->mImg);
-		}
-	}
-	
-	/**
-	 * Destroy the barcode image.
-	 */
-	public function DestroyObject() {
-		ImageDestroy($this->mImg);
-	}
+     */
+    protected function DrawSingleBar($xPos, $yPos, $xSize, $ySize)
+    {
+        if ($xPos >= 0 && $xPos <= $this->mWidth && ($xPos + $xSize) <= $this->mWidth &&
+            $yPos >= 0 && $yPos <= $this->mHeight && ($yPos + $ySize) <= $this->mHeight
+        ) {
+            for ($i = 0; $i < $xSize; $i++) {
+                ImageLine($this->mImg, $xPos + $i, $yPos, $xPos + $i, $yPos + $ySize, $this->mBrush);
+            }
+            return true;
+        }
+        return false;
+    }
 }
 
 //============================================================+
 // END OF FILE
-//============================================================+
-?>
+//============================================================+;

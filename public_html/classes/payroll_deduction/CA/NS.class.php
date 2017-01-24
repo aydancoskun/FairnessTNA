@@ -19,35 +19,36 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package PayrollDeduction\CA
  */
-class PayrollDeduction_CA_NS extends PayrollDeduction_CA {
-	var $provincial_income_tax_rate_options = array(
-													20110101 => array(
-																	array( 'income' => 29590,	'rate' => 8.79,	'constant' => 0 ),
-																	array( 'income' => 59180,	'rate' => 14.95,'constant' => 1823 ),
-																	array( 'income' => 93000,	'rate' => 16.67,'constant' => 2841 ),
-																	array( 'income' => 150000,	'rate' => 17.5,	'constant' => 3613 ),
-																	array( 'income' => 150000,	'rate' => 21.0,	'constant' => 8863 ),
-																),
-													20100701 => array(
-																	array( 'income' => 29590,	'rate' => 8.79,	'constant' => 0 ),
-																	array( 'income' => 59180,	'rate' => 14.95,'constant' => 1823 ),
-																	array( 'income' => 93000,	'rate' => 16.67,'constant' => 2841 ),
-																	array( 'income' => 150000,	'rate' => 17.5,	'constant' => 3613 ),
-																	array( 'income' => 150000,	'rate' => 24.5,	'constant' => 14113 ),
-																),
-													20070101 => array(
-																	array( 'income' => 29590,	'rate' => 8.79,	'constant' => 0 ),
-																	array( 'income' => 59180,	'rate' => 14.95,'constant' => 1823 ),
-																	array( 'income' => 93000,	'rate' => 16.67,'constant' => 2841 ),
-																	array( 'income' => 93000,	'rate' => 17.5,	'constant' => 3613 ),
-																),
-													);
+class PayrollDeduction_CA_NS extends PayrollDeduction_CA
+{
+    public $provincial_income_tax_rate_options = array(
+        20110101 => array(
+            array('income' => 29590, 'rate' => 8.79, 'constant' => 0),
+            array('income' => 59180, 'rate' => 14.95, 'constant' => 1823),
+            array('income' => 93000, 'rate' => 16.67, 'constant' => 2841),
+            array('income' => 150000, 'rate' => 17.5, 'constant' => 3613),
+            array('income' => 150000, 'rate' => 21.0, 'constant' => 8863),
+        ),
+        20100701 => array(
+            array('income' => 29590, 'rate' => 8.79, 'constant' => 0),
+            array('income' => 59180, 'rate' => 14.95, 'constant' => 1823),
+            array('income' => 93000, 'rate' => 16.67, 'constant' => 2841),
+            array('income' => 150000, 'rate' => 17.5, 'constant' => 3613),
+            array('income' => 150000, 'rate' => 24.5, 'constant' => 14113),
+        ),
+        20070101 => array(
+            array('income' => 29590, 'rate' => 8.79, 'constant' => 0),
+            array('income' => 59180, 'rate' => 14.95, 'constant' => 1823),
+            array('income' => 93000, 'rate' => 16.67, 'constant' => 2841),
+            array('income' => 93000, 'rate' => 17.5, 'constant' => 3613),
+        ),
+    );
 
 //	function getProvincialSurtax() {
 //		/*
@@ -77,4 +78,3 @@ class PayrollDeduction_CA_NS extends PayrollDeduction_CA {
 //		return $V1;
 //	}
 }
-?>

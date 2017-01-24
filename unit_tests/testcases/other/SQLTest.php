@@ -1,4 +1,5 @@
 <?php
+
 /*********************************************************************************
  * This file is part of "Fairness", a Payroll and Time Management program.
  * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
@@ -19,58 +20,60 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
+class SQLTest extends PHPUnit_Framework_TestCase
+{
+    public function setUp()
+    {
+        global $dd;
+        Debug::text('Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10);
 
-class SQLTest extends PHPUnit_Framework_TestCase {
-	public function setUp() {
-		global $dd;
-		Debug::text( 'Running setUp(): ', __FILE__, __LINE__, __METHOD__, 10 );
+        $dd = new DemoData();
+        $dd->setEnableQuickPunch(false); //Helps prevent duplicate punch IDs and validation failures.
+        $dd->setUserNamePostFix('_' . uniqid(null, true)); //Needs to be super random to prevent conflicts and random failing tests.
+        $this->company_id = $dd->createCompany();
+        Debug::text('Company ID: ' . $this->company_id, __FILE__, __LINE__, __METHOD__, 10);
+        $this->assertGreaterThan(0, $this->company_id);
 
-		$dd = new DemoData();
-		$dd->setEnableQuickPunch( FALSE ); //Helps prevent duplicate punch IDs and validation failures.
-		$dd->setUserNamePostFix( '_' . uniqid( NULL, TRUE ) ); //Needs to be super random to prevent conflicts and random failing tests.
-		$this->company_id = $dd->createCompany();
-		Debug::text( 'Company ID: ' . $this->company_id, __FILE__, __LINE__, __METHOD__, 10 );
-		$this->assertGreaterThan( 0, $this->company_id );
+        //$dd->createPermissionGroups( $this->company_id, 40 ); //Administrator only.
 
-		//$dd->createPermissionGroups( $this->company_id, 40 ); //Administrator only.
+        $dd->createCurrency($this->company_id, 10);
 
-		$dd->createCurrency( $this->company_id, 10 );
+        $this->branch_id = $dd->createBranch($this->company_id, 10); //NY
 
-		$this->branch_id = $dd->createBranch( $this->company_id, 10 ); //NY
+        //$dd->createPayStubAccount( $this->company_id );
+        //$dd->createPayStubAccountLink( $this->company_id );
 
-		//$dd->createPayStubAccount( $this->company_id );
-		//$dd->createPayStubAccountLink( $this->company_id );
+        $dd->createUserWageGroups($this->company_id);
 
-		$dd->createUserWageGroups( $this->company_id );
+        $this->user_id = $dd->createUser($this->company_id, 100);
+        $this->assertGreaterThan(0, $this->user_id);
 
-		$this->user_id = $dd->createUser( $this->company_id, 100 );
-		$this->assertGreaterThan( 0, $this->user_id );
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function tearDown()
+    {
+        Debug::text('Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10);
 
-	public function tearDown() {
-		Debug::text( 'Running tearDown(): ', __FILE__, __LINE__, __METHOD__, 10 );
+        return true;
+    }
 
-		return TRUE;
-	}
+    public function getListFactoryClassList($equal_parts = 1)
+    {
+        global $global_class_map;
 
-	function getListFactoryClassList( $equal_parts = 1 ) {
-		global $global_class_map;
+        $retarr = array();
 
-		$retarr = array();
+        //Get all ListFactory classes
+        foreach ($global_class_map as $class_name => $class_file_name) {
+            if (strpos($class_name, 'ListFactory') !== false) {
+                $retarr[] = $class_name;
+            }
+        }
 
-		//Get all ListFactory classes
-		foreach ( $global_class_map as $class_name => $class_file_name ) {
-			if ( strpos( $class_name, 'ListFactory' ) !== FALSE ) {
-				$retarr[] = $class_name;
-			}
-		}
+        $chunk_size = ceil((count($retarr) / $equal_parts));
 
-		$chunk_size = ceil( ( count( $retarr ) / $equal_parts ) );
-
-		return array_chunk( $retarr, $chunk_size );
-	}
-
+        return array_chunk($retarr, $chunk_size);
+    }
 }

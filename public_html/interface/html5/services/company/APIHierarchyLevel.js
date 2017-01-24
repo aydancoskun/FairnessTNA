@@ -1,63 +1,62 @@
-var APIHierarchyLevel = ServiceCaller.extend( {
+var APIHierarchyLevel = ServiceCaller.extend({
 
-	key_name: 'HierarchyLevel',
-	className: 'APIHierarchyLevel',
+    key_name: 'HierarchyLevel',
+    className: 'APIHierarchyLevel',
 
-	validateHierarchyLevel: function() {
+    validateHierarchyLevel: function () {
 
-		return this.argumentsHandler( this.className, 'validateHierarchyLevel', arguments );
+        return this.argumentsHandler(this.className, 'validateHierarchyLevel', arguments);
 
-	},
+    },
 
-	getHierarchyLevel: function() {
+    getHierarchyLevel: function () {
 
-		return this.argumentsHandler( this.className, 'getHierarchyLevel', arguments );
+        return this.argumentsHandler(this.className, 'getHierarchyLevel', arguments);
 
-	},
+    },
 
-	getHierarchyLevelDefaultData: function() {
+    getHierarchyLevelDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getHierarchyLevelDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getHierarchyLevelDefaultData', arguments);
 
-	},
+    },
 
-	getCommonHierarchyLevelData: function() {
+    getCommonHierarchyLevelData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonHierarchyLevelData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonHierarchyLevelData', arguments);
 
-	},
+    },
 
-	setHierarchyLevel: function() {
+    setHierarchyLevel: function () {
 
-		return this.argumentsHandler( this.className, 'setHierarchyLevel', arguments );
+        return this.argumentsHandler(this.className, 'setHierarchyLevel', arguments);
 
-	},
+    },
 
-	deleteHierarchyLevel: function() {
+    deleteHierarchyLevel: function () {
 
-		return this.argumentsHandler( this.className, 'deleteHierarchyLevel', arguments );
+        return this.argumentsHandler(this.className, 'deleteHierarchyLevel', arguments);
 
-	},
+    },
 
-	copyHierarchyLevel: function() {
+    copyHierarchyLevel: function () {
 
-		return this.argumentsHandler( this.className, 'copyHierarchyLevel', arguments );
+        return this.argumentsHandler(this.className, 'copyHierarchyLevel', arguments);
 
-	},
-
-
-	getHierarchyLevelOptions: function() {
-
-		return this.argumentsHandler( this.className, 'getHierarchyLevelOptions', arguments );
-
-	},
-
-	ReMapHierarchyLevels: function() {
-
-		return this.argumentsHandler( this.className, 'ReMapHierarchyLevels', arguments );
-
-	}
+    },
 
 
+    getHierarchyLevelOptions: function () {
 
-} );
+        return this.argumentsHandler(this.className, 'getHierarchyLevelOptions', arguments);
+
+    },
+
+    ReMapHierarchyLevels: function () {
+
+        return this.argumentsHandler(this.className, 'ReMapHierarchyLevels', arguments);
+
+    }
+
+
+});

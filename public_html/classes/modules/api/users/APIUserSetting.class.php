@@ -19,39 +19,42 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package API\Company
  */
-class APIUserSetting extends APIFactory {
-	protected $main_class = 'UserSettingFactory';
+class APIUserSetting extends APIFactory
+{
+    protected $main_class = 'UserSettingFactory';
 
-	public function __construct() {
-		parent::__construct(); //Make sure parent constructor is always called.
+    public function __construct()
+    {
+        parent::__construct(); //Make sure parent constructor is always called.
 
-		return TRUE;
-	}
-	
-	function getUserSetting( $name ) {
-		$retarr = UserSettingFactory::getUserSetting( $this->getCurrentUserObject()->getId(), $name );
-		if ( $retarr == TRUE ) {
-			return $this->returnHandler( $retarr );
-		}
-		
-		return $this->returnHandler( TRUE);
-	}
-	
-	function setUserSetting( $name, $value, $type_id = 10 ) {
-		$retval = UserSettingFactory::setUserSetting( $this->getCurrentUserObject()->getId(), $name, $value, $type_id );
-		return $this->returnHandler($retval);
-	}
-	
-	function deleteUserSetting( $name ) {
-		$retval = UserSettingFactory::deleteUserSetting( $this->getCurrentUserObject()->getId(), $name );
-		return $this->returnHandler($retval);
-	}
+        return true;
+    }
 
+    public function getUserSetting($name)
+    {
+        $retarr = UserSettingFactory::getUserSetting($this->getCurrentUserObject()->getId(), $name);
+        if ($retarr == true) {
+            return $this->returnHandler($retarr);
+        }
+
+        return $this->returnHandler(true);
+    }
+
+    public function setUserSetting($name, $value, $type_id = 10)
+    {
+        $retval = UserSettingFactory::setUserSetting($this->getCurrentUserObject()->getId(), $name, $value, $type_id);
+        return $this->returnHandler($retval);
+    }
+
+    public function deleteUserSetting($name)
+    {
+        $retval = UserSettingFactory::deleteUserSetting($this->getCurrentUserObject()->getId(), $name);
+        return $this->returnHandler($retval);
+    }
 }
-?>

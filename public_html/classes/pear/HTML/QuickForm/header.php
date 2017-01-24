@@ -21,7 +21,7 @@
 require_once 'HTML/QuickForm/static.php';
 
 /**
- * A pseudo-element used for adding headers to form  
+ * A pseudo-element used for adding headers to form
  *
  * @author Alexey Borzov <borz_off@cs.msu.su>
  * @access public
@@ -30,15 +30,15 @@ class HTML_QuickForm_header extends HTML_QuickForm_static
 {
     // {{{ constructor
 
-   /**
-    * Class constructor
-    * 
-    * @param string $elementName    Header name
-    * @param string $text           Header text
-    * @access public
-    * @return void
-    */
-    function HTML_QuickForm_header($elementName = null, $text = null)
+    /**
+     * Class constructor
+     *
+     * @param string $elementName Header name
+     * @param string $text Header text
+     * @access public
+     * @return void
+     */
+    public function HTML_QuickForm_header($elementName = null, $text = null)
     {
         $this->HTML_QuickForm_static($elementName, null, $text);
         $this->_type = 'header';
@@ -47,19 +47,17 @@ class HTML_QuickForm_header extends HTML_QuickForm_static
     // }}}
     // {{{ accept()
 
-   /**
-    * Accepts a renderer
-    *
-    * @param object     An HTML_QuickForm_Renderer object
-    * @access public
-    * @return void 
-    */
-    function accept(&$renderer)
+    /**
+     * Accepts a renderer
+     *
+     * @param object     An HTML_QuickForm_Renderer object
+     * @access public
+     * @return void
+     */
+    public function accept(&$renderer)
     {
         $renderer->renderHeader($this);
     } // end func accept
 
     // }}}
-
-} //end class HTML_QuickForm_header
-?>
+} //end class HTML_QuickForm_header;

@@ -18,12 +18,13 @@
 // $Id: IniCommented.php 306554 2010-12-21 20:04:20Z cweiske $
 
 /**
-* Config parser for PHP .ini files with comments
-*
-* @author      Bertrand Mansion <bmansion@mamasam.com>
-* @package     Config
-*/
-class Config_Container_IniCommented {
+ * Config parser for PHP .ini files with comments
+ *
+ * @author      Bertrand Mansion <bmansion@mamasam.com>
+ * @package     Config
+ */
+class Config_Container_IniCommented
+{
 
     /**
      * Options for this class:
@@ -31,30 +32,30 @@ class Config_Container_IniCommented {
      *
      * @var array
      */
-    var $options = array(
+    public $options = array(
         'linebreak' => "\n"
     );
 
     /**
-    * Constructor
-    *
-    * @access public
-    * @param    string  $options    (optional)Options to be used by renderer
-    */
-    function Config_Container_IniCommented($options = array())
+     * Constructor
+     *
+     * @access public
+     * @param    string $options (optional)Options to be used by renderer
+     */
+    public function Config_Container_IniCommented($options = array())
     {
         $this->options = array_merge($this->options, $options);
     } // end constructor
 
     /**
-    * Parses the data of the given configuration file
-    *
-    * @access public
-    * @param string $datasrc    path to the configuration file
-    * @param object $obj        reference to a config object
-    * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
-    */
-    function &parseDatasrc($datasrc, &$obj)
+     * Parses the data of the given configuration file
+     *
+     * @access public
+     * @param string $datasrc path to the configuration file
+     * @param object $obj reference to a config object
+     * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
+     */
+    public function &parseDatasrc($datasrc, &$obj)
     {
         $return = true;
         if (!file_exists($datasrc)) {
@@ -88,9 +89,9 @@ class Config_Container_IniCommented {
                 if (PEAR::isError($values)) {
                     return PEAR::raiseError($values);
                 }
-                
+
                 if (count($values)) {
-                    foreach($values as $value) {
+                    foreach ($values as $value) {
                         if ($value[0] == 'normal') {
                             $currentSection->createDirective(trim($match[1]), $value[1]);
                         }
@@ -117,7 +118,7 @@ class Config_Container_IniCommented {
      * <samp>
      * mydirective = "Item, number \"1\"", Item 2 ; "This" is really, really tricky
      * </samp>
-     * @param  string  $text    value of a directive to parse for quotes/multiple values
+     * @param  string $text value of a directive to parse for quotes/multiple values
      * @return array   The array returned contains multiple values, if any (unquoted literals
      *                 to be used as is), and a comment, if any.  The format of the array is:
      *
@@ -129,8 +130,8 @@ class Config_Container_IniCommented {
      * @author Greg Beaver <cellog@users.sourceforge.net>
      * @access private
      */
-    function _quoteAndCommaParser($text)
-    {   
+    public function _quoteAndCommaParser($text)
+    {
         $text = trim($text);
         if ($text == '') {
             $emptyNode = array();
@@ -140,16 +141,16 @@ class Config_Container_IniCommented {
         }
 
         // tokens
-		$tokens['normal'] = array('"', ';', ',');
+        $tokens['normal'] = array('"', ';', ',');
         $tokens['quote'] = array('"', '\\');
         $tokens['escape'] = false; // cycle
         $tokens['after_quote'] = array(',', ';');
-        
+
         // events
         $events['normal'] = array('"' => 'quote', ';' => 'comment', ',' => 'normal');
         $events['quote'] = array('"' => 'after_quote', '\\' => 'escape');
         $events['after_quote'] = array(',' => 'normal', ';' => 'comment');
-        
+
         // state stack
         $stack = array();
 
@@ -168,11 +169,12 @@ class Config_Container_IniCommented {
 
             if ($tokens[$state]) {
                 if (in_array($char, $tokens[$state])) {
-                    switch($events[$state][$char]) {
-                        case 'quote' :
+                    switch ($events[$state][$char]) {
+                        case 'quote':
                             if ($state == 'normal' &&
                                 isset($return[$returnpos]) &&
-                                !empty($return[$returnpos][1])) {
+                                !empty($return[$returnpos][1])
+                            ) {
                                 return PEAR::raiseError(
                                     'invalid ini syntax, quotes cannot follow'
                                     . " text '$text'",
@@ -189,22 +191,22 @@ class Config_Container_IniCommented {
                             array_push($stack, 'quote');
 
                             continue 2;
-                        break;
-                        case 'comment' :
+                            break;
+                        case 'comment':
                             // comments go to the end of the line, so we are done
                             $return[++$returnpos] = array('comment', substr($text, $pos));
                             return $return;
-                        break;
-                        case 'after_quote' :
+                            break;
+                        case 'after_quote':
                             array_push($stack, 'after_quote');
-                        break;
-                        case 'escape' :
+                            break;
+                        case 'escape':
                             // don't save the first slash
                             array_push($stack, 'escape');
                             continue 2;
-                        break;
-                        case 'normal' :
-                        // start a new segment
+                            break;
+                        case 'normal':
+                            // start a new segment
                             if ($state == 'normal') {
                                 $returnpos++;
                                 continue 2;
@@ -215,13 +217,13 @@ class Config_Container_IniCommented {
                                 }
                                 $returnpos++;
                             }
-                        break;
-                        default :
+                            break;
+                        default:
                             PEAR::raiseError(
                                 "::_quoteAndCommaParser oops, state missing",
                                 null, PEAR_ERROR_DIE
                             );
-                        break;
+                            break;
                     }
                 } else {
                     if ($state != 'after_quote') {
@@ -231,17 +233,18 @@ class Config_Container_IniCommented {
                         // add this character to the current ini segment if
                         // non-empty, or if in a quote
                         if ($state == 'quote') {
-							$return[$returnpos][1] .= $char;
+                            $return[$returnpos][1] .= $char;
                         } elseif (!empty($return[$returnpos][1]) ||
-                                 (empty($return[$returnpos][1]) && trim($char) != '')) {
+                            (empty($return[$returnpos][1]) && trim($char) != '')
+                        ) {
                             if (!isset($return[$returnpos])) {
                                 $return[$returnpos] = array('normal', '');
                             }
                             $return[$returnpos][1] .= $char;
                             if (strcasecmp('true', $return[$returnpos][1]) == 0) {
-                              $return[$returnpos][1] = TRUE;
+                                $return[$returnpos][1] = true;
                             } elseif (strcasecmp('false', $return[$returnpos][1]) == 0) {
-                              $return[$returnpos][1] = FALSE;
+                                $return[$returnpos][1] = false;
                             }
                         }
                     } else {
@@ -255,37 +258,37 @@ class Config_Container_IniCommented {
                     }
                 }
             } else {
-				if ( $state == 'escape' ) {
-					$return[$returnpos][1] .= '\\'.$char;
-				} else {
-					// no tokens, so add this one and cycle to previous state
-					$return[$returnpos][1] .= $char;
-				}
-				//$return[$returnpos][1] .= $char;
-				array_pop($stack);
+                if ($state == 'escape') {
+                    $return[$returnpos][1] .= '\\' . $char;
+                } else {
+                    // no tokens, so add this one and cycle to previous state
+                    $return[$returnpos][1] .= $char;
+                }
+                //$return[$returnpos][1] .= $char;
+                array_pop($stack);
             }
         } while (++$pos < strlen($text));
         return $return;
     } // end func _quoteAndCommaParser
-    
+
     /**
      * Retrieve the state off of a state stack for the Quote and Comma Parser
-     * @param  array  $stack    The parser state stack
+     * @param  array $stack The parser state stack
      * @author Greg Beaver <cellog@users.sourceforge.net>
      * @access private
      */
-    function _getQACEvent($stack)
+    public function _getQACEvent($stack)
     {
         return array_pop($stack);
     } // end func _getQACEvent
 
     /**
-    * Returns a formatted string of the object
-    * @param    object  $obj    Container object to be output as string
-    * @access   public
-    * @return   string
-    */
-    function toString(&$obj)
+     * Returns a formatted string of the object
+     * @param    object $obj Container object to be output as string
+     * @access   public
+     * @return   string
+     */
+    public function toString(&$obj)
     {
         static $childrenCount, $commaString;
 
@@ -297,7 +300,7 @@ class Config_Container_IniCommented {
                 $string = $this->options['linebreak'];
                 break;
             case 'comment':
-                $string = ';'.$obj->content . $this->options['linebreak'];
+                $string = ';' . $obj->content . $this->options['linebreak'];
                 break;
             case 'directive':
                 $count = $obj->parent->countChildren('directive', $obj->name);
@@ -306,23 +309,24 @@ class Config_Container_IniCommented {
                     $content = 'FALSE';
                 } elseif ($content === true) {
                     $content = 'TRUE';
-                } elseif (	strlen(trim($content)) < strlen($content) ||
-							strpos($content, ',') !== false ||
-							strpos($content, ';') !== false ||
-							strpos($content, ':') !== false ||
-							strpos($content, '\\') !== false ||
-							strpos($content, '/') !== false ||
-							strpos($content, '=') !== false ||
-							strpos($content, '"') !== false ||
-							strpos($content, '%') !== false ||
-							strpos($content, '~') !== false ||
-							strpos($content, '!') !== false ||
-							strpos($content, '|') !== false ||
-							strpos($content, '&') !== false ||
-							strpos($content, '(') !== false ||
-							strpos($content, ')') !== false ||
-							$content === 'none') {
-					$content = '"'. $content .'"';
+                } elseif (strlen(trim($content)) < strlen($content) ||
+                    strpos($content, ',') !== false ||
+                    strpos($content, ';') !== false ||
+                    strpos($content, ':') !== false ||
+                    strpos($content, '\\') !== false ||
+                    strpos($content, '/') !== false ||
+                    strpos($content, '=') !== false ||
+                    strpos($content, '"') !== false ||
+                    strpos($content, '%') !== false ||
+                    strpos($content, '~') !== false ||
+                    strpos($content, '!') !== false ||
+                    strpos($content, '|') !== false ||
+                    strpos($content, '&') !== false ||
+                    strpos($content, '(') !== false ||
+                    strpos($content, ')') !== false ||
+                    $content === 'none'
+                ) {
+                    $content = '"' . $content . '"';
                 }
                 if ($count > 1) {
                     // multiple values for a directive are separated by a comma
@@ -330,19 +334,19 @@ class Config_Container_IniCommented {
                         $childrenCount[$obj->name]++;
                     } else {
                         $childrenCount[$obj->name] = 0;
-                        $commaString[$obj->name] = $obj->name.' = ';
+                        $commaString[$obj->name] = $obj->name . ' = ';
                     }
-                    if ($childrenCount[$obj->name] == $count-1) {
+                    if ($childrenCount[$obj->name] == $count - 1) {
                         // Clean the static for future calls to toString
                         $string .= $commaString[$obj->name] . $content
                             . $this->options['linebreak'];
                         unset($childrenCount[$obj->name]);
                         unset($commaString[$obj->name]);
                     } else {
-                        $commaString[$obj->name] .= $content.', ';
+                        $commaString[$obj->name] .= $content . ', ';
                     }
                 } else {
-                    $string = $obj->name.' = '.$content . $this->options['linebreak'];
+                    $string = $obj->name . ' = ' . $content . $this->options['linebreak'];
                 }
                 break;
             case 'section':
@@ -360,5 +364,4 @@ class Config_Container_IniCommented {
         }
         return $string;
     } // end func toString
-} // end class Config_Container_IniCommented
-?>
+} // end class Config_Container_IniCommented;

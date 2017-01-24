@@ -40,21 +40,20 @@ require_once 'HTML/Page2.php';
  * @version    Release: 2.0.0
  * @link       http://pear.php.net/package/HTML_Progress2
  */
-
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {
-    function _renderForm(&$page)
+    public function _renderForm(&$page)
     {
         $pageName = $page->getAttribute('name');
-        $tabPreview = array_slice ($page->controller->_tabs, -2, 1);
+        $tabPreview = array_slice($page->controller->_tabs, -2, 1);
         $tab = '  ';
 
         $p = new HTML_Page2(array(
-                 'lineend'  => PHP_EOL,
-                 'tab'      => $tab,
-                 'doctype'  => 'XHTML 1.0 Strict',
-                 'language' => 'en',
-                 'cache'    => 'false'
+            'lineend' => PHP_EOL,
+            'tab' => $tab,
+            'doctype' => 'XHTML 1.0 Strict',
+            'language' => 'en',
+            'cache' => 'false'
         ));
         $p->disableXmlProlog();
         $p->setTitle('PEAR::HTML_Progress2 - Generator');
@@ -105,42 +104,42 @@ input.flat {
             $pb = $page->controller->createProgressBar();
             $pb->setTab($tab);
 
-            $p->addStyleDeclaration( $styles . $pb->getStyle() );
-            $p->addScriptDeclaration( $pb->getScript() );
+            $p->addStyleDeclaration($styles . $pb->getStyle());
+            $p->addScriptDeclaration($pb->getScript());
 
             $pbElement = $page->getElement('progressBar');
             $pbElement->setText($pb->toHtml() . '<br /><br />');
         } else {
-            $p->addStyleDeclaration( $styles );
+            $p->addStyleDeclaration($styles);
         }
 
         $formTemplate = "\n<form{attributes}>"
-                      . "\n<table style=\"font-size: 8pt;\" class=\"maintable\">"
-                      . "\n{content}"
-                      . "\n</table>"
-                      . "\n</form>";
+            . "\n<table style=\"font-size: 8pt;\" class=\"maintable\">"
+            . "\n{content}"
+            . "\n</table>"
+            . "\n</form>";
 
         $headerTemplate = "\n<tr>"
-                        . "\n\t<th colspan=\"2\">"
-                        . "\n\t\t{header}"
-                        . "\n\t</th>"
-                        . "\n</tr>";
+            . "\n\t<th colspan=\"2\">"
+            . "\n\t\t{header}"
+            . "\n\t</th>"
+            . "\n</tr>";
 
         $elementTemplate = "\n\t<tr>"
-                         . "\n\t\t<td align=\"right\" valign=\"top\" width=\"30%\">"
-                         . "<!-- BEGIN required --><span style=\"color: #ff0000\">*</span><!-- END required -->"
-                         . "<b>{label}</b></td>"
-                         . "\n\t\t<td valign=\"top\" align=\"left\">"
-                         . "<!-- BEGIN error --><span style=\"color: #ff0000\">{error}</span><br /><!-- END error -->"
-                         . "\t{element}</td>"
-                         . "\n\t</tr>";
+            . "\n\t\t<td align=\"right\" valign=\"top\" width=\"30%\">"
+            . "<!-- BEGIN required --><span style=\"color: #ff0000\">*</span><!-- END required -->"
+            . "<b>{label}</b></td>"
+            . "\n\t\t<td valign=\"top\" align=\"left\">"
+            . "<!-- BEGIN error --><span style=\"color: #ff0000\">{error}</span><br /><!-- END error -->"
+            . "\t{element}</td>"
+            . "\n\t</tr>";
 
         $groupTemplate = "<table><tr>{content}</tr></table>";
 
         $groupElementTemplate = "<td>{element}<br />"
-                              . "<span style=\"font-size:10px;\">"
-                              . "<span class=\"label\">{label}</span>"
-                              . "</span></td>";
+            . "<span style=\"font-size:10px;\">"
+            . "<span class=\"label\">{label}</span>"
+            . "</span></td>";
 
         $renderer = $page->defaultRenderer();
 
@@ -152,8 +151,7 @@ input.flat {
 
         $page->accept($renderer);
 
-        $p->addBodyContent( $renderer->toHtml() );
+        $p->addBodyContent($renderer->toHtml());
         $p->display();
     }
 }
-?>

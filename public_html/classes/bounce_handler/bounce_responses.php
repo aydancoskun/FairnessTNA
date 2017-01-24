@@ -9,7 +9,7 @@
  * @author   Multiple <cfortune@users.noreply.github.com>
  * @license  http://opensource.org/licenses/BSD-2-Clause  BSD
  * @link     https://github.com/cfortune/PHP-Bounce-Handler/
-*/
+ */
 
 // text in messages from which to figure out what kind of bounce
 $bouncelist = array(
@@ -247,8 +247,8 @@ $autorespondlist = array(
     '^away from.{0,15}office',
     '^.?auto(mated|matic).{0,5}(reply|response)',
     '^out.?of (the )?office',
-    '^(I am|I\'m|I will).{0,15}\s(away|on vacation|on leave|out of office|'.
-      'out of the office)',
+    '^(I am|I\'m|I will).{0,15}\s(away|on vacation|on leave|out of office|' .
+    'out of the office)',
     '^Thank you for your e-?mail',
     '^This is an automated',
     '^Vacation.{0,10}(alert|reply|response)',

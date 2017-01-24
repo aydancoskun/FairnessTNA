@@ -19,118 +19,119 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package PayrollDeduction\US
  */
-class PayrollDeduction_US_VA extends PayrollDeduction_US {
+class PayrollDeduction_US_VA extends PayrollDeduction_US
+{
+    public $state_income_tax_rate_options = array(
+        20060101 => array(
+            0 => array(
+                array('income' => 3000, 'rate' => 2, 'constant' => 0),
+                array('income' => 5000, 'rate' => 3, 'constant' => 60),
+                array('income' => 17000, 'rate' => 5, 'constant' => 120),
+                array('income' => 17000, 'rate' => 5.75, 'constant' => 720),
+            ),
+        ),
+    );
 
-	var $state_income_tax_rate_options = array(
-												20060101 => array(
-															0 => array(
-																	array( 'income' => 3000,	'rate' => 2,	'constant' => 0 ),
-																	array( 'income' => 5000,	'rate' => 3,	'constant' => 60 ),
-																	array( 'income' => 17000,	'rate' => 5,	'constant' => 120 ),
-																	array( 'income' => 17000,	'rate' => 5.75,	'constant' => 720 ),
-																),
-															),
-												);
+    public $state_options = array(
+        20080101 => array(
+            'standard_deduction' => 3000,
+            'allowance' => 930,
+            'age65_allowance' => 800,
+        ),
+        20060101 => array(
+            'standard_deduction' => 3000,
+            'allowance' => 900,
+            'age65_allowance' => 800,
+        )
+    );
 
-	var $state_options = array(
-								20080101 => array(
-													'standard_deduction' => 3000,
-													'allowance' => 930,
-													'age65_allowance' => 800,
-													),
-								20060101 => array(
-													'standard_deduction' => 3000,
-													'allowance' => 900,
-													'age65_allowance' => 800,
-													)
-								);
+    public function getStateTaxPayable()
+    {
+        $annual_income = $this->getStateAnnualTaxableIncome();
 
-	function getStateAnnualTaxableIncome() {
-		$annual_income = $this->getAnnualTaxableIncome();
-		$state_standard_deduction = $this->getStateStandardDeductionAmount();
-		$state_allowance = $this->getStateAllowanceAmount();
-		$state_age65_allowance = $this->getStateAge65AllowanceAmount();
+        $retval = 0;
 
-		$income = bcsub( bcsub( bcsub( $annual_income, $state_standard_deduction ), $state_allowance), $state_age65_allowance);
+        if ($annual_income > 0) {
+            $rate = $this->getData()->getStateRate($annual_income);
+            $state_constant = $this->getData()->getStateConstant($annual_income);
+            $state_rate_income = $this->getData()->getStateRatePreviousIncome($annual_income);
 
-		Debug::text('State Annual Taxable Income: '. $income, __FILE__, __LINE__, __METHOD__, 10);
+            $retval = bcadd(bcmul(bcsub($annual_income, $state_rate_income), $rate), $state_constant);
+            //$retval = bcadd( bcmul( $annual_income, $rate ), $state_constant );
+        }
 
-		return $income;
-	}
+        if ($retval < 0) {
+            $retval = 0;
+        }
 
-	function getStateStandardDeductionAmount() {
-		$retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
-		if ( $retarr == FALSE ) {
-			return FALSE;
+        Debug::text('State Annual Tax Payable: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		}
+        return $retval;
+    }
 
-		$retval = $retarr['standard_deduction'];
+    public function getStateAnnualTaxableIncome()
+    {
+        $annual_income = $this->getAnnualTaxableIncome();
+        $state_standard_deduction = $this->getStateStandardDeductionAmount();
+        $state_allowance = $this->getStateAllowanceAmount();
+        $state_age65_allowance = $this->getStateAge65AllowanceAmount();
 
-		Debug::text('State Standard Deduction Amount: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
+        $income = bcsub(bcsub(bcsub($annual_income, $state_standard_deduction), $state_allowance), $state_age65_allowance);
 
-		return $retval;
-	}
+        Debug::text('State Annual Taxable Income: ' . $income, __FILE__, __LINE__, __METHOD__, 10);
 
-	function getStateAllowanceAmount() {
-		$retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
-		if ( $retarr == FALSE ) {
-			return FALSE;
+        return $income;
+    }
 
-		}
+    public function getStateStandardDeductionAmount()
+    {
+        $retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
+        if ($retarr == false) {
+            return false;
+        }
 
-		$allowance_arr = $retarr['allowance'];
+        $retval = $retarr['standard_deduction'];
 
-		$retval = bcmul( $this->getUserValue1(), $allowance_arr );
+        Debug::text('State Standard Deduction Amount: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		Debug::text('State Allowance Amount: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
+        return $retval;
+    }
 
-		return $retval;
-	}
+    public function getStateAllowanceAmount()
+    {
+        $retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
+        if ($retarr == false) {
+            return false;
+        }
 
-	function getStateAge65AllowanceAmount() {
-		$retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
-		if ( $retarr == FALSE ) {
-			return FALSE;
+        $allowance_arr = $retarr['allowance'];
 
-		}
+        $retval = bcmul($this->getUserValue1(), $allowance_arr);
 
-		$allowance_arr = $retarr['age65_allowance'];
+        Debug::text('State Allowance Amount: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		$retval = bcmul( $this->getUserValue2(), $allowance_arr );
+        return $retval;
+    }
 
-		Debug::text('State Age65 Allowance Amount: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
+    public function getStateAge65AllowanceAmount()
+    {
+        $retarr = $this->getDataFromRateArray($this->getDate(), $this->state_options);
+        if ($retarr == false) {
+            return false;
+        }
 
-		return $retval;
-	}
+        $allowance_arr = $retarr['age65_allowance'];
 
-	function getStateTaxPayable() {
-		$annual_income = $this->getStateAnnualTaxableIncome();
+        $retval = bcmul($this->getUserValue2(), $allowance_arr);
 
-		$retval = 0;
+        Debug::text('State Age65 Allowance Amount: ' . $retval, __FILE__, __LINE__, __METHOD__, 10);
 
-		if ( $annual_income > 0 ) {
-			$rate = $this->getData()->getStateRate($annual_income);
-			$state_constant = $this->getData()->getStateConstant($annual_income);
-			$state_rate_income = $this->getData()->getStateRatePreviousIncome($annual_income);
-
-			$retval = bcadd( bcmul( bcsub( $annual_income, $state_rate_income ), $rate ), $state_constant );
-			//$retval = bcadd( bcmul( $annual_income, $rate ), $state_constant );
-		}
-
-		if ( $retval < 0 ) {
-			$retval = 0;
-		}
-
-		Debug::text('State Annual Tax Payable: '. $retval, __FILE__, __LINE__, __METHOD__, 10);
-
-		return $retval;
-	}
+        return $retval;
+    }
 }
-?>

@@ -1,68 +1,67 @@
-var APIForm1099MiscReport = ServiceCaller.extend( {
+var APIForm1099MiscReport = ServiceCaller.extend({
 
-	key_name: 'Form1099MiscReport',
-	className: 'APIForm1099MiscReport',
+    key_name: 'Form1099MiscReport',
+    className: 'APIForm1099MiscReport',
 
-	getTemplate: function() {
+    getTemplate: function () {
 
-		return this.argumentsHandler( this.className, 'getTemplate', arguments );
+        return this.argumentsHandler(this.className, 'getTemplate', arguments);
 
-	},
+    },
 
-	getCommonForm1099MiscReportData: function() {
+    getCommonForm1099MiscReportData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonForm1099MiscReportData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonForm1099MiscReportData', arguments);
 
-	},
+    },
 
-	getForm1099MiscReport: function() {
+    getForm1099MiscReport: function () {
 
-		return this.argumentsHandler( this.className, 'getForm1099MiscReport', arguments );
+        return this.argumentsHandler(this.className, 'getForm1099MiscReport', arguments);
 
-	},
+    },
 
-	setForm1099MiscReport: function() {
+    setForm1099MiscReport: function () {
 
-		return this.argumentsHandler( this.className, 'setForm1099MiscReport', arguments );
+        return this.argumentsHandler(this.className, 'setForm1099MiscReport', arguments);
 
-	},
+    },
 
-	getForm1099MiscReportDefaultData: function() {
+    getForm1099MiscReportDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getForm1099MiscReportDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getForm1099MiscReportDefaultData', arguments);
 
-	},
+    },
 
-	deleteForm1099MiscReport: function() {
+    deleteForm1099MiscReport: function () {
 
-		return this.argumentsHandler( this.className, 'deleteForm1099MiscReport', arguments );
+        return this.argumentsHandler(this.className, 'deleteForm1099MiscReport', arguments);
 
-	},
+    },
 
-	validateForm1099MiscReport: function() {
+    validateForm1099MiscReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateForm1099MiscReport', arguments );
+        return this.argumentsHandler(this.className, 'validateForm1099MiscReport', arguments);
 
-	},
+    },
 
-	validateReport: function() {
+    validateReport: function () {
 
-		return this.argumentsHandler( this.className, 'validateReport', arguments );
+        return this.argumentsHandler(this.className, 'validateReport', arguments);
 
-	},
+    },
 
-	setCompanyFormConfig: function() {
+    setCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'setCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'setCompanyFormConfig', arguments);
 
-	},
+    },
 
-	getCompanyFormConfig: function() {
+    getCompanyFormConfig: function () {
 
-		return this.argumentsHandler( this.className, 'getCompanyFormConfig', arguments );
+        return this.argumentsHandler(this.className, 'getCompanyFormConfig', arguments);
 
-	}
+    }
 
 
-
-} );
+});

@@ -26,7 +26,7 @@ require_once 'XML/RPC.php';
 /**
  * Generates the dump of the XML_RPC_Value and echoes it
  *
- * @param object $value  the XML_RPC_Value object to dump
+ * @param object $value the XML_RPC_Value object to dump
  *
  * @return void
  */
@@ -53,85 +53,81 @@ class XML_RPC_Dump
      * The indentation array cache
      * @var array
      */
-    var $arIndent      = array();
+    public $arIndent = array();
 
     /**
      * The spaces used for indenting the XML
      * @var string
      */
-    var $strBaseIndent = '    ';
+    public $strBaseIndent = '    ';
 
     /**
      * Returns the dump in XML format without printing it out
      *
-     * @param object $value   the XML_RPC_Value object to dump
-     * @param int    $nLevel  the level of indentation
+     * @param object $value the XML_RPC_Value object to dump
+     * @param int $nLevel the level of indentation
      *
      * @return string  the dump
      */
-    function generateDump($value, $nLevel = 0)
+    public function generateDump($value, $nLevel = 0)
     {
         if (!is_object($value) && get_class($value) != 'xml_rpc_value') {
             require_once 'PEAR.php';
             PEAR::raiseError('Tried to dump non-XML_RPC_Value variable' . "\r\n",
-                             0, PEAR_ERROR_PRINT);
+                0, PEAR_ERROR_PRINT);
             if (is_object($value)) {
                 $strType = get_class($value);
             } else {
                 $strType = gettype($value);
             }
             return $this->getIndent($nLevel) . 'NOT A XML_RPC_Value: '
-                   . $strType . "\r\n";
+                . $strType . "\r\n";
         }
 
         switch ($value->kindOf()) {
-        case 'struct':
-            $ret = $this->genStruct($value, $nLevel);
-            break;
-        case 'array':
-            $ret = $this->genArray($value, $nLevel);
-            break;
-        case 'scalar':
-            $ret = $this->genScalar($value->scalarval(), $nLevel);
-            break;
-        default:
-            require_once 'PEAR.php';
-            PEAR::raiseError('Illegal type "' . $value->kindOf()
-                             . '" in XML_RPC_Value' . "\r\n", 0,
-                             PEAR_ERROR_PRINT);
+            case 'struct':
+                $ret = $this->genStruct($value, $nLevel);
+                break;
+            case 'array':
+                $ret = $this->genArray($value, $nLevel);
+                break;
+            case 'scalar':
+                $ret = $this->genScalar($value->scalarval(), $nLevel);
+                break;
+            default:
+                require_once 'PEAR.php';
+                PEAR::raiseError('Illegal type "' . $value->kindOf()
+                    . '" in XML_RPC_Value' . "\r\n", 0,
+                    PEAR_ERROR_PRINT);
         }
 
         return $ret;
     }
 
     /**
-     * Returns the scalar value dump
+     * Returns the indent for a specific level and caches it for faster use
      *
-     * @param object $value   the scalar XML_RPC_Value object to dump
-     * @param int    $nLevel  the level of indentation
+     * @param int $nLevel the level
      *
-     * @return string  Dumped version of the scalar value
+     * @return string  the indented string
      */
-    function genScalar($value, $nLevel)
+    public function getIndent($nLevel)
     {
-        if (gettype($value) == 'object') {
-            $strClass = ' ' . get_class($value);
-        } else {
-            $strClass = '';
+        if (!isset($this->arIndent[$nLevel])) {
+            $this->arIndent[$nLevel] = str_repeat($this->strBaseIndent, $nLevel);
         }
-        return $this->getIndent($nLevel) . gettype($value) . $strClass
-               . ' ' . $value . "\r\n";
+        return $this->arIndent[$nLevel];
     }
 
     /**
      * Returns the dump of a struct
      *
-     * @param object $value   the struct XML_RPC_Value object to dump
-     * @param int    $nLevel  the level of indentation
+     * @param object $value the struct XML_RPC_Value object to dump
+     * @param int $nLevel the level of indentation
      *
      * @return string  Dumped version of the scalar value
      */
-    function genStruct($value, $nLevel)
+    public function genStruct($value, $nLevel)
     {
         $value->structreset();
         $strOutput = $this->getIndent($nLevel) . 'struct' . "\r\n";
@@ -145,36 +141,40 @@ class XML_RPC_Dump
     /**
      * Returns the dump of an array
      *
-     * @param object $value   the array XML_RPC_Value object to dump
-     * @param int    $nLevel  the level of indentation
+     * @param object $value the array XML_RPC_Value object to dump
+     * @param int $nLevel the level of indentation
      *
      * @return string  Dumped version of the scalar value
      */
-    function genArray($value, $nLevel)
+    public function genArray($value, $nLevel)
     {
-        $nSize     = $value->arraysize();
+        $nSize = $value->arraysize();
         $strOutput = $this->getIndent($nLevel) . 'array' . "\r\n";
-        for($nA = 0; $nA < $nSize; $nA++) {
+        for ($nA = 0; $nA < $nSize; $nA++) {
             $strOutput .= $this->getIndent($nLevel + 1) . $nA . "\r\n";
             $strOutput .= $this->generateDump($value->arraymem($nA),
-                                              $nLevel + 2);
+                $nLevel + 2);
         }
         return $strOutput;
     }
 
     /**
-     * Returns the indent for a specific level and caches it for faster use
+     * Returns the scalar value dump
      *
-     * @param int $nLevel  the level
+     * @param object $value the scalar XML_RPC_Value object to dump
+     * @param int $nLevel the level of indentation
      *
-     * @return string  the indented string
+     * @return string  Dumped version of the scalar value
      */
-    function getIndent($nLevel)
+    public function genScalar($value, $nLevel)
     {
-        if (!isset($this->arIndent[$nLevel])) {
-            $this->arIndent[$nLevel] = str_repeat($this->strBaseIndent, $nLevel);
+        if (gettype($value) == 'object') {
+            $strClass = ' ' . get_class($value);
+        } else {
+            $strClass = '';
         }
-        return $this->arIndent[$nLevel];
+        return $this->getIndent($nLevel) . gettype($value) . $strClass
+            . ' ' . $value . "\r\n";
     }
 }
 
@@ -184,6 +184,4 @@ class XML_RPC_Dump
  * c-basic-offset: 4
  * c-hanging-comment-ender-p: nil
  * End:
- */
-
-?>
+ */;

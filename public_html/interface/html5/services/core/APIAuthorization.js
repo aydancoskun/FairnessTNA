@@ -1,43 +1,43 @@
-var APIAuthorization = ServiceCaller.extend( {
+var APIAuthorization = ServiceCaller.extend({
 
-	key_name: 'Authorization',
-	className: 'APIAuthorization',
+    key_name: 'Authorization',
+    className: 'APIAuthorization',
 
-	getAuthorizationDefaultData: function() {
+    getAuthorizationDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getAuthorizationDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getAuthorizationDefaultData', arguments);
 
-	},
+    },
 
-	getAuthorization: function() {
+    getAuthorization: function () {
 
-		return this.argumentsHandler( this.className, 'getAuthorization', arguments );
+        return this.argumentsHandler(this.className, 'getAuthorization', arguments);
 
-	},
+    },
 
-	getCommonAuthorizationData: function() {
+    getCommonAuthorizationData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonAuthorizationData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonAuthorizationData', arguments);
 
-	},
+    },
 
-	validateAuthorization: function() {
+    validateAuthorization: function () {
 
-		return this.argumentsHandler( this.className, 'validateAuthorization', arguments );
+        return this.argumentsHandler(this.className, 'validateAuthorization', arguments);
 
-	},
+    },
 
-	setAuthorization: function() {
+    setAuthorization: function () {
 
-		return this.argumentsHandler( this.className, 'setAuthorization', arguments );
+        return this.argumentsHandler(this.className, 'setAuthorization', arguments);
 
-	},
+    },
 
-	deleteAuthorization: function() {
+    deleteAuthorization: function () {
 
-		return this.argumentsHandler( this.className, 'deleteAuthorization', arguments );
+        return this.argumentsHandler(this.className, 'deleteAuthorization', arguments);
 
-	}
+    }
 
 
-} );
+});

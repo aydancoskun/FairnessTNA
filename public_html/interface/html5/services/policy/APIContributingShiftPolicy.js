@@ -1,51 +1,51 @@
-var APIContributingShiftPolicy = ServiceCaller.extend( {
+var APIContributingShiftPolicy = ServiceCaller.extend({
 
-	key_name: 'ContributingShiftPolicy',
-	className: 'APIContributingShiftPolicy',
+    key_name: 'ContributingShiftPolicy',
+    className: 'APIContributingShiftPolicy',
 
-	getContributingShiftPolicyDefaultData: function() {
+    getContributingShiftPolicyDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getContributingShiftPolicyDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getContributingShiftPolicyDefaultData', arguments);
 
-	},
+    },
 
-	getContributingShiftPolicy: function() {
+    getContributingShiftPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'getContributingShiftPolicy', arguments );
+        return this.argumentsHandler(this.className, 'getContributingShiftPolicy', arguments);
 
-	},
+    },
 
-	getCommonContributingShiftPolicyData: function() {
+    getCommonContributingShiftPolicyData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonContributingShiftPolicyData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonContributingShiftPolicyData', arguments);
 
-	},
+    },
 
-	validateContributingShiftPolicy: function() {
+    validateContributingShiftPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'validateContributingShiftPolicy', arguments );
+        return this.argumentsHandler(this.className, 'validateContributingShiftPolicy', arguments);
 
-	},
+    },
 
-	setContributingShiftPolicy: function() {
+    setContributingShiftPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'setContributingShiftPolicy', arguments );
+        return this.argumentsHandler(this.className, 'setContributingShiftPolicy', arguments);
 
-	},
+    },
 
-	deleteContributingShiftPolicy: function() {
+    deleteContributingShiftPolicy: function () {
 
-		return this.argumentsHandler( this.className, 'deleteContributingShiftPolicy', arguments );
+        return this.argumentsHandler(this.className, 'deleteContributingShiftPolicy', arguments);
 
-	},
+    },
 
-	copyContributingShiftPolicy: function() {
-		return this.argumentsHandler( this.className, 'copyContributingShiftPolicy', arguments );
-	},
+    copyContributingShiftPolicy: function () {
+        return this.argumentsHandler(this.className, 'copyContributingShiftPolicy', arguments);
+    },
 
-	exportContributingShiftPolicy: function() {
-		return this.argumentsHandler( this.className, 'exportContributingShiftPolicy', arguments );
-	}
+    exportContributingShiftPolicy: function () {
+        return this.argumentsHandler(this.className, 'exportContributingShiftPolicy', arguments);
+    }
 
 
-} );
+});

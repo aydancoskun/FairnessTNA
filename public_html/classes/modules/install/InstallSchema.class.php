@@ -19,88 +19,92 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Install
  */
-class InstallSchema extends Install {
+class InstallSchema extends Install
+{
+    protected $schema_version = null;
+    protected $obj = null;
 
-	protected $schema_version = NULL;
-	protected $obj = NULL;
+    public function __construct($database_type, $version, $db_conn, $is_upgrade = false)
+    {
+        Debug::text('Database Type: ' . $database_type . ' Version: ' . $version, __FILE__, __LINE__, __METHOD__, 10);
+        $this->database_type = $database_type;
+        $this->schema_version = $version;
 
-	function __construct( $database_type, $version, $db_conn, $is_upgrade = FALSE ) {
-		Debug::text('Database Type: '. $database_type .' Version: '. $version, __FILE__, __LINE__, __METHOD__, 10);
-		$this->database_type = $database_type;
-		$this->schema_version = $version;
+        if ($database_type == '') {
+            return false;
+        }
 
-		if ( $database_type == '' ) {
-			return FALSE;
-		}
+        if ($version == '') {
+            return false;
+        }
 
-		if ( $version == '' ) {
-			return FALSE;
-		}
+        $schema_class_file_name = Environment::getBasePath() . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'InstallSchema_' . $version . '.class.php';
+        $schema_sql_file_name = $this->getSchemaSQLFilename($version);
+        if (file_exists($schema_class_file_name)
+            and file_exists($schema_sql_file_name)
+        ) {
+            include_once($schema_class_file_name);
 
-		$schema_class_file_name = Environment::getBasePath() . DIRECTORY_SEPARATOR .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR .'install'. DIRECTORY_SEPARATOR .'InstallSchema_'. $version .'.class.php';
-		$schema_sql_file_name = $this->getSchemaSQLFilename( $version );
-		if ( file_exists($schema_class_file_name)
-				AND file_exists($schema_sql_file_name ) ) {
+            $class_name = 'InstallSchema_' . $version;
 
-			include_once( $schema_class_file_name );
+            $this->obj = new $class_name($this); //Pass current Install class object to the schema class, so we can call common functions.
+            $this->obj->setDatabaseConnection($db_conn);
+            $this->obj->setIsUpgrade($is_upgrade);
+            $this->obj->setVersion($version);
+            $this->obj->setSchemaSQLFilename($this->getSchemaSQLFilename());
 
-			$class_name = 'InstallSchema_'. $version;
+            return true;
+        } else {
+            Debug::text('Schema Install Class File DOES NOT Exists - File Name: ' . $schema_class_file_name . ' Schema SQL File: ' . $schema_sql_file_name, __FILE__, __LINE__, __METHOD__, 10);
+        }
 
-			$this->obj = new $class_name( $this ); //Pass current Install class object to the schema class, so we can call common functions.
-			$this->obj->setDatabaseConnection( $db_conn );
-			$this->obj->setIsUpgrade( $is_upgrade );
-			$this->obj->setVersion( $version );
-			$this->obj->setSchemaSQLFilename( $this->getSchemaSQLFilename() );
+        return false;
+    }
 
-			return TRUE;
-		} else {
-			Debug::text('Schema Install Class File DOES NOT Exists - File Name: '. $schema_class_file_name .' Schema SQL File: '. $schema_sql_file_name, __FILE__, __LINE__, __METHOD__, 10);
-		}
+    public function getSchemaSQLFilename()
+    {
+        return $this->getSQLFileDirectory() . $this->schema_version . '.sql';
+    }
 
-		return FALSE;
-	}
+    public function getSQLFileDirectory()
+    {
+        return Environment::getBasePath() . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'sql' . DIRECTORY_SEPARATOR . $this->database_type . DIRECTORY_SEPARATOR;
+    }
 
-	function getSQLFileDirectory() {
-		return Environment::getBasePath() . DIRECTORY_SEPARATOR .'classes'. DIRECTORY_SEPARATOR .'modules'. DIRECTORY_SEPARATOR .'install'. DIRECTORY_SEPARATOR .'sql'. DIRECTORY_SEPARATOR . $this->database_type . DIRECTORY_SEPARATOR;
-	}
+    //load Schema file data
 
-	function getSchemaSQLFilename() {
-		return $this->getSQLFileDirectory() . $this->schema_version .'.sql';
-	}
+    public function getSchemaSQLFileData()
+    {
+    }
 
-	//load Schema file data
-	function getSchemaSQLFileData() {
+    public function __call($function_name, $args = array())
+    {
+        if ($this->getObject() !== false) {
+            //Debug::text('Calling Sub-Class Function: '. $function_name, __FILE__, __LINE__, __METHOD__, 10);
+            if (is_callable(array($this->getObject(), $function_name))) {
+                $return = call_user_func_array(array($this->getObject(), $function_name), $args);
 
-	}
+                return $return;
+            }
+        }
 
-	private function getObject() {
-		if ( is_object($this->obj) ) {
-			return $this->obj;
-		}
+        Debug::text('Sub-Class Function Call FAILED!:' . $function_name, __FILE__, __LINE__, __METHOD__, 10);
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function __call($function_name, $args = array() ) {
-		if ( $this->getObject() !== FALSE ) {
-			//Debug::text('Calling Sub-Class Function: '. $function_name, __FILE__, __LINE__, __METHOD__, 10);
-			if ( is_callable( array($this->getObject(), $function_name) ) ) {
-				$return = call_user_func_array(array($this->getObject(), $function_name), $args);
+    private function getObject()
+    {
+        if (is_object($this->obj)) {
+            return $this->obj;
+        }
 
-				return $return;
-			}
-		}
-
-		Debug::text('Sub-Class Function Call FAILED!:'. $function_name, __FILE__, __LINE__, __METHOD__, 10);
-
-		return FALSE;
-	}
-
+        return false;
+    }
 }
-?>

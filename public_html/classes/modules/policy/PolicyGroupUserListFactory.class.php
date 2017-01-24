@@ -19,198 +19,205 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class PolicyGroupUserListFactory extends PolicyGroupUserFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class PolicyGroupUserListFactory extends PolicyGroupUserFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable();
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+					from	' . $this->getTable();
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$pgf = new PolicyGroupFactory();
+        $pgf = new PolicyGroupFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id
-					);
+        $ph = array(
+            'company_id' => (int)$company_id
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a
-					LEFT JOIN '. $pgf->getTable() .' as pgf ON a.policy_group_id = pgf.id
+					from	' . $this->getTable() . ' as a
+					LEFT JOIN ' . $pgf->getTable() . ' as pgf ON a.policy_group_id = pgf.id
 					where	pgf.company_id = ?
 						AND ( pgf.deleted = 0 )';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPolicyGroupId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByPolicyGroupId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$pgf = new PolicyGroupFactory();
+        $pgf = new PolicyGroupFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $pgf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $pgf->getTable() . ' as b
 					where	b.id = a.policy_group_id
 						AND a.policy_group_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getTotalByPolicyGroupId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getTotalByPolicyGroupId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$pgf = new PolicyGroupFactory();
+        $pgf = new PolicyGroupFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	count(*)
-					from	'. $this->getTable() .' as a,
-							'. $pgf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $pgf->getTable() . ' as b
 					where	b.id = a.policy_group_id
 						AND a.policy_group_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		//$this->ExecuteSQL( $query, $ph );
-		return (int)$this->db->getOne( $query, $ph );
-	}
+        //$this->ExecuteSQL( $query, $ph );
+        return (int)$this->db->getOne($query, $ph);
+    }
 
-	function getByUserId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByUserId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$uf = new UserFactory();
+        $uf = new UserFactory();
 
-		$ph = array();
+        $ph = array();
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $uf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $uf->getTable() . ' as b
 					where	b.id = a.user_id
-						AND a.user_id in ('. $this->getListSQL( $id, $ph, 'int' ) .')
+						AND a.user_id in (' . $this->getListSQL($id, $ph, 'int') . ')
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPolicyGroupIdAndUserId($id, $user_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByPolicyGroupIdAndUserId($id, $user_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $user_id == '') {
-			return FALSE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		$pgf = new PolicyGroupFactory();
+        $pgf = new PolicyGroupFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					'user_id' => (int)$user_id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+            'user_id' => (int)$user_id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $pgf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $pgf->getTable() . ' as b
 					where	b.id = a.policy_group_id
 						AND a.policy_group_id = ?
 						AND a.user_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPolicyGroupIdArray($id) {
-		$pgotplf = new PolicyGroupOverTimePolicyListFactory();
+    public function getByPolicyGroupIdArray($id)
+    {
+        $pgotplf = new PolicyGroupOverTimePolicyListFactory();
 
-		$pgotplf->getByPolicyGroupId($id);
+        $pgotplf->getByPolicyGroupId($id);
 
-		$list = array();
-		foreach ($pgotplf as $obj) {
-			$list[$obj->getOverTimePolicy()] = NULL;
-		}
+        $list = array();
+        foreach ($pgotplf as $obj) {
+            $list[$obj->getOverTimePolicy()] = null;
+        }
 
-		if ( empty($list) == FALSE ) {
-			return $list;
-		}
+        if (empty($list) == false) {
+            return $list;
+        }
 
-		return array();
-	}
+        return array();
+    }
 }
-?>

@@ -41,28 +41,30 @@ require_once 'Services/ExchangeRates/Common.php';
  * @link http://www.unece.org/etrades/unedocs/repository/codelists/xml/CountryCodeList.xml
  * @package Services_ExchangeRates
  */
-class Services_ExchangeRates_Countries_UN extends Services_ExchangeRates_Common {
+class Services_ExchangeRates_Countries_UN extends Services_ExchangeRates_Common
+{
 
-   /**
-    * URL of XML feed
-    * @var string
-    */
-   var $feedUrl = 'https://github.com/aydancoskun/fairness';
+    /**
+     * URL of XML feed
+     * @var string
+     */
+    public $feedUrl = 'https://github.com/aydancoskun/fairness';
     //var $feedUrl = 'http://www.unece.org/etrades/unedocs/repository/codelists/xml/CountryCodeList.xml';
 
-   /**
-    * Retrieves currency codes and their associated names (e.g. USD => US Dollar)
-    * from the UN or the cache.  The default cache length is 1 month.
-    *
-    * @param int Optionally override default 1 month cache length (in seconds)
-    * @return array Array of currency codes to currency names
-    */
-    function retrieve($cacheLength, $cacheDir) {
+    /**
+     * Retrieves currency codes and their associated names (e.g. USD => US Dollar)
+     * from the UN or the cache.  The default cache length is 1 month.
+     *
+     * @param int Optionally override default 1 month cache length (in seconds)
+     * @return array Array of currency codes to currency names
+     */
+    public function retrieve($cacheLength, $cacheDir)
+    {
 
         // retrieve the feed from the server or cache
         $root = $this->retrieveXML($this->feedUrl, $cacheLength, $cacheDir);
 
-        foreach($root->children as $curr) {
+        foreach ($root->children as $curr) {
             // Filter out blank or unwanted elements
             if ($curr->name == "Country") {
                 // loop through and put them into an array
@@ -71,9 +73,5 @@ class Services_ExchangeRates_Countries_UN extends Services_ExchangeRates_Common 
         }
 
         return $countries;
-
     }
-
 }
-
-?>

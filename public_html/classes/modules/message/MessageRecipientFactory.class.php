@@ -19,210 +19,236 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Message
  */
-class MessageRecipientFactory extends Factory {
-	protected $table = 'message_recipient';
-	protected $pk_sequence_name = 'message_recipient_id_seq'; //PK Sequence name
-	protected $obj_handler = NULL;
+class MessageRecipientFactory extends Factory
+{
+    protected $table = 'message_recipient';
+    protected $pk_sequence_name = 'message_recipient_id_seq'; //PK Sequence name
+    protected $obj_handler = null;
 
-	function _getFactoryOptions( $name, $parent = NULL ) {
+    public function _getFactoryOptions($name, $parent = null)
+    {
+        $retval = null;
+        switch ($name) {
+            case 'status':
+                $retval = array(
+                    10 => TTi18n::gettext('UNREAD'),
+                    20 => TTi18n::gettext('READ')
+                );
+                break;
+        }
 
-		$retval = NULL;
-		switch( $name ) {
-			case 'status':
-				$retval = array(
-										10 => TTi18n::gettext('UNREAD'),
-										20 => TTi18n::gettext('READ')
-									);
-				break;
-		}
+        return $retval;
+    }
 
-		return $retval;
-	}
+    public function getUser()
+    {
+        return (int)$this->data['user_id'];
+    }
 
-	function getUser() {
-		return (int)$this->data['user_id'];
-	}
-	function setUser($id) {
-		$id = trim($id);
+    public function setUser($id)
+    {
+        $id = trim($id);
 
-		$ulf = TTnew( 'UserListFactory' );
+        $ulf = TTnew('UserListFactory');
 
-		if ( $id == 0
-				OR $this->Validator->isResultSetWithRows(	'user',
-															$ulf->getByID($id),
-															TTi18n::gettext('Invalid Employee')
-															) ) {
-			$this->data['user_id'] = $id;
+        if ($id == 0
+            or $this->Validator->isResultSetWithRows('user',
+                $ulf->getByID($id),
+                TTi18n::gettext('Invalid Employee')
+            )
+        ) {
+            $this->data['user_id'] = $id;
 
-			return TRUE;
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
 
-	function getMessageSender() {
-		if ( isset($this->data['message_sender_id']) ) {
-			return (int)$this->data['message_sender_id'];
-		}
+    public function getMessageSender()
+    {
+        if (isset($this->data['message_sender_id'])) {
+            return (int)$this->data['message_sender_id'];
+        }
 
-		return FALSE;
-	}
-	function setMessageSender($id) {
-		$id = trim($id);
+        return false;
+    }
 
-		$mslf = TTnew( 'MessageSenderListFactory' );
+    public function setMessageSender($id)
+    {
+        $id = trim($id);
 
-		if ( $this->Validator->isResultSetWithRows(	'message_sender_id',
-													$mslf->getByID($id),
-													TTi18n::gettext('Message Sender is invalid')
-													) ) {
-			$this->data['message_sender_id'] = $id;
+        $mslf = TTnew('MessageSenderListFactory');
 
-			return TRUE;
-		}
+        if ($this->Validator->isResultSetWithRows('message_sender_id',
+            $mslf->getByID($id),
+            TTi18n::gettext('Message Sender is invalid')
+        )
+        ) {
+            $this->data['message_sender_id'] = $id;
 
-		return FALSE;
-	}
+            return true;
+        }
 
-	function getMessageControl() {
-		if ( isset($this->data['message_control_id']) ) {
-			return (int)$this->data['message_control_id'];
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
-	function setMessageControl($id) {
-		$id = trim($id);
+    public function getMessageControl()
+    {
+        if (isset($this->data['message_control_id'])) {
+            return (int)$this->data['message_control_id'];
+        }
 
-		$mclf = TTnew( 'MessageControlListFactory' );
+        return false;
+    }
 
-		if ( $this->Validator->isResultSetWithRows(	'message_control_id',
-													$mclf->getByID($id),
-													TTi18n::gettext('Message Control is invalid')
-													) ) {
-			$this->data['message_control_id'] = $id;
+    public function setMessageControl($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $mclf = TTnew('MessageControlListFactory');
 
-		return FALSE;
-	}
+        if ($this->Validator->isResultSetWithRows('message_control_id',
+            $mclf->getByID($id),
+            TTi18n::gettext('Message Control is invalid')
+        )
+        ) {
+            $this->data['message_control_id'] = $id;
 
-	function getStatus() {
-		if ( isset($this->data['status_id']) ) {
-			return (int)$this->data['status_id'];
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setStatus($status) {
-		$status = trim($status);
+        return false;
+    }
 
-		if ( $this->Validator->inArrayKey(	'status',
-											$status,
-											TTi18n::gettext('Incorrect Status'),
-											$this->getOptions('status')) ) {
+    public function getStatusDate()
+    {
+        if (isset($this->data['status_date'])) {
+            return $this->data['status_date'];
+        }
 
-			$this->setStatusDate();
+        return false;
+    }
 
-			$this->data['status_id'] = $status;
+    public function isAck()
+    {
+        if ($this->getRequireAck() == true and $this->getAckDate() == '') {
+            return false;
+        }
 
-			return TRUE;
-		}
+        return true;
+    }
 
-		return FALSE;
-	}
+    public function getAckDate()
+    {
+        if (isset($this->data['ack_date'])) {
+            return $this->data['ack_date'];
+        }
 
-	function getStatusDate() {
-		if ( isset($this->data['status_date']) ) {
-			return $this->data['status_date'];
-		}
+        return false;
+    }
 
-		return FALSE;
-	}
-	function setStatusDate($epoch = NULL) {
-		$epoch = ( !is_int($epoch) ) ? trim($epoch) : $epoch; //Dont trim integer values, as it changes them to strings.
+    public function setAck($bool)
+    {
+        $this->data['ack'] = $this->toBool($bool);
 
-		if ($epoch == NULL) {
-			$epoch = TTDate::getTime();
-		}
+        if ($this->getAck() == true) {
+            $this->setAckDate();
+            $this->setAckBy();
+        }
 
-		if	(	$this->Validator->isDate(		'status_date',
-												$epoch,
-												TTi18n::gettext('Incorrect Date')) ) {
+        return true;
+    }
 
-			$this->data['status_date'] = $epoch;
+    public function getAck()
+    {
+        return $this->fromBool($this->data['ack']);
+    }
 
-			return TRUE;
-		}
+    public function setAckDate($epoch = null)
+    {
+        $epoch = (!is_int($epoch)) ? trim($epoch) : $epoch; //Dont trim integer values, as it changes them to strings.
 
-		return FALSE;
+        if ($epoch == null) {
+            $epoch = TTDate::getTime();
+        }
 
-	}
+        if ($this->Validator->isDate('ack_date',
+            $epoch,
+            TTi18n::gettext('Invalid Acknowledge Date'))
+        ) {
+            $this->data['ack_date'] = $epoch;
 
-	function isAck() {
-		if ($this->getRequireAck() == TRUE AND $this->getAckDate() == '' ) {
-			return FALSE;
-		}
+            return true;
+        }
 
-		return TRUE;
-	}
+        return false;
+    }
 
-	function getAck() {
-		return $this->fromBool( $this->data['ack'] );
-	}
-	function setAck($bool) {
-		$this->data['ack'] = $this->toBool($bool);
+    public function preSave()
+    {
+        if ($this->getStatus() == false) {
+            $this->setStatus(10); //UNREAD
+        }
+        return true;
+    }
 
-		if ( $this->getAck() == TRUE ) {
-			$this->setAckDate();
-			$this->setAckBy();
-		}
+    public function getStatus()
+    {
+        if (isset($this->data['status_id'])) {
+            return (int)$this->data['status_id'];
+        }
 
-		return TRUE;
-	}
+        return false;
+    }
 
-	function getAckDate() {
-		if ( isset($this->data['ack_date']) ) {
-			return $this->data['ack_date'];
-		}
+    public function setStatus($status)
+    {
+        $status = trim($status);
 
-		return FALSE;
-	}
-	function setAckDate($epoch = NULL) {
-		$epoch = ( !is_int($epoch) ) ? trim($epoch) : $epoch; //Dont trim integer values, as it changes them to strings.
+        if ($this->Validator->inArrayKey('status',
+            $status,
+            TTi18n::gettext('Incorrect Status'),
+            $this->getOptions('status'))
+        ) {
+            $this->setStatusDate();
 
-		if ($epoch == NULL) {
-			$epoch = TTDate::getTime();
-		}
+            $this->data['status_id'] = $status;
 
-		if	(	$this->Validator->isDate(		'ack_date',
-												$epoch,
-												TTi18n::gettext('Invalid Acknowledge Date') ) ) {
+            return true;
+        }
 
-			$this->data['ack_date'] = $epoch;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setStatusDate($epoch = null)
+    {
+        $epoch = (!is_int($epoch)) ? trim($epoch) : $epoch; //Dont trim integer values, as it changes them to strings.
 
-		return FALSE;
+        if ($epoch == null) {
+            $epoch = TTDate::getTime();
+        }
 
-	}
+        if ($this->Validator->isDate('status_date',
+            $epoch,
+            TTi18n::gettext('Incorrect Date'))
+        ) {
+            $this->data['status_date'] = $epoch;
 
-	function preSave() {
-		if ( $this->getStatus() == FALSE ) {
-			$this->setStatus( 10 ); //UNREAD
-		}
-		return TRUE;
-	}
-	function postSave() {
-		return TRUE;
-	}
+            return true;
+        }
+
+        return false;
+    }
+
+    public function postSave()
+    {
+        return true;
+    }
 }
-?>

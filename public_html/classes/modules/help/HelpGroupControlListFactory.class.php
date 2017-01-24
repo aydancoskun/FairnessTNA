@@ -19,85 +19,85 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Help
  */
-class HelpGroupControlListFactory extends HelpGroupControlFactory implements IteratorAggregate {
+class HelpGroupControlListFactory extends HelpGroupControlFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $strict_order = true;
+        if ($order == null) {
+            $order = array('created_date' => 'desc');
+            //$strict_order = FALSE;
+        }
 
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-
-		$strict_order = TRUE;
-		if ( $order == NULL ) {
-			$order = array('created_date' => 'desc');
-			//$strict_order = FALSE;
-		}
-
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					WHERE deleted=0
 				';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict_order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict_order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '' ) {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 						AND deleted=0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByScriptAndName($script, $name = NULL, $where = NULL, $order = NULL) {
-		if ( $script == '' ) {
-			return FALSE;
-		}
+    public function getByScriptAndName($script, $name = null, $where = null, $order = null)
+    {
+        if ($script == '') {
+            return false;
+        }
 
-		if ( $name == '' ) {
-			$name = NULL;
-		}
+        if ($name == '') {
+            $name = null;
+        }
 
-		$ph = array(
-					'script' => $script,
-					'name' => $name,
-					);
+        $ph = array(
+            'script' => $script,
+            'name' => $name,
+        );
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	script_name = ?
 						AND name = ?
 						AND deleted=0';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
-
+        return $this;
+    }
 }
-?>

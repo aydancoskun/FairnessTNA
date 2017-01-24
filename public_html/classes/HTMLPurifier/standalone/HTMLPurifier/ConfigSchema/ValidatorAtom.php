@@ -39,17 +39,6 @@ class HTMLPurifier_ConfigSchema_ValidatorAtom
     /**
      * @return HTMLPurifier_ConfigSchema_ValidatorAtom
      */
-    public function assertIsString()
-    {
-        if (!is_string($this->contents)) {
-            $this->error('must be a string');
-        }
-        return $this;
-    }
-
-    /**
-     * @return HTMLPurifier_ConfigSchema_ValidatorAtom
-     */
     public function assertIsBool()
     {
         if (!is_bool($this->contents)) {
@@ -59,14 +48,12 @@ class HTMLPurifier_ConfigSchema_ValidatorAtom
     }
 
     /**
-     * @return HTMLPurifier_ConfigSchema_ValidatorAtom
+     * @param string $msg
+     * @throws HTMLPurifier_ConfigSchema_Exception
      */
-    public function assertIsArray()
+    protected function error($msg)
     {
-        if (!is_array($this->contents)) {
-            $this->error('must be an array');
-        }
-        return $this;
+        throw new HTMLPurifier_ConfigSchema_Exception(ucfirst($this->member) . ' in ' . $this->context . ' ' . $msg);
     }
 
     /**
@@ -88,6 +75,17 @@ class HTMLPurifier_ConfigSchema_ValidatorAtom
         $this->assertIsString();
         if (!ctype_alnum($this->contents)) {
             $this->error('must be alphanumeric');
+        }
+        return $this;
+    }
+
+    /**
+     * @return HTMLPurifier_ConfigSchema_ValidatorAtom
+     */
+    public function assertIsString()
+    {
+        if (!is_string($this->contents)) {
+            $this->error('must be a string');
         }
         return $this;
     }
@@ -118,12 +116,14 @@ class HTMLPurifier_ConfigSchema_ValidatorAtom
     }
 
     /**
-     * @param string $msg
-     * @throws HTMLPurifier_ConfigSchema_Exception
+     * @return HTMLPurifier_ConfigSchema_ValidatorAtom
      */
-    protected function error($msg)
+    public function assertIsArray()
     {
-        throw new HTMLPurifier_ConfigSchema_Exception(ucfirst($this->member) . ' in ' . $this->context . ' ' . $msg);
+        if (!is_array($this->contents)) {
+            $this->error('must be an array');
+        }
+        return $this;
     }
 }
 

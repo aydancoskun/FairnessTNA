@@ -19,231 +19,238 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\PayPeriod
  */
-class PayPeriodScheduleUserListFactory extends PayPeriodScheduleUserFactory implements IteratorAggregate {
-
-	function getAll($limit = NULL, $page = NULL, $where = NULL, $order = NULL) {
-		$query = '
+class PayPeriodScheduleUserListFactory extends PayPeriodScheduleUserFactory implements IteratorAggregate
+{
+    public function getAll($limit = null, $page = null, $where = null, $order = null)
+    {
+        $query = '
 					select	*
-					from	'. $this->getTable();
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+					from	' . $this->getTable();
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, NULL, $limit, $page );
+        $this->ExecuteSQL($query, null, $limit, $page);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getById($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getById($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-		$query = '
+        $query = '
 					select	*
-					from	'. $this->getTable() .'
+					from	' . $this->getTable() . '
 					where	id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyId($company_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyId($company_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		$ppsf = new PayPeriodScheduleFactory();
+        $ppsf = new PayPeriodScheduleFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+        );
 
-		$query = '
+        $query = '
 					SELECT a.*
-					FROM '. $this->getTable() .' as a
-						LEFT JOIN '. $ppsf->getTable() .' as b ON a.pay_period_schedule_id = b.id
+					FROM ' . $this->getTable() . ' as a
+						LEFT JOIN ' . $ppsf->getTable() . ' as b ON a.pay_period_schedule_id = b.id
 					WHERE
 							b.company_id = ?
 							AND ( b.deleted = 0 )
 					';
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
 
-	function getByCompanyIDAndPayPeriodScheduleId($company_id, $id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIDAndPayPeriodScheduleId($company_id, $id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $id == '') {
-			return FALSE;
-		}
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'a.user_id' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($order == null) {
+            $order = array('a.user_id' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
 
-		$ppsf = new PayPeriodScheduleFactory();
+        $ppsf = new PayPeriodScheduleFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $ppsf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $ppsf->getTable() . ' as b
 					where	b.id = a.pay_period_schedule_id
 						AND b.company_id = ?
 						AND a.pay_period_schedule_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByCompanyIDAndPayPeriodScheduleIdAndUserID($company_id, $id, $user_id, $where = NULL, $order = NULL) {
-		if ( $company_id == '') {
-			return FALSE;
-		}
+    public function getByCompanyIDAndPayPeriodScheduleIdAndUserID($company_id, $id, $user_id, $where = null, $order = null)
+    {
+        if ($company_id == '') {
+            return false;
+        }
 
-		if ( $id == '') {
-			return FALSE;
-		}
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $user_id == '') {
-			return FALSE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		$ppsf = new PayPeriodScheduleFactory();
+        $ppsf = new PayPeriodScheduleFactory();
 
-		$ph = array(
-					'company_id' => (int)$company_id,
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'company_id' => (int)$company_id,
+            'id' => (int)$id,
+        );
 
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $ppsf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $ppsf->getTable() . ' as b
 					where	b.id = a.pay_period_schedule_id
 						AND b.company_id = ?
 						AND a.pay_period_schedule_id = ?
-						AND a.user_id in ( '. $this->getListSQL( $user_id, $ph, 'int' ) .' )
+						AND a.user_id in ( ' . $this->getListSQL($user_id, $ph, 'int') . ' )
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPayPeriodScheduleId($id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
+    public function getByPayPeriodScheduleIdAndUserID($id, $user_id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
 
-		if ( $order == NULL ) {
-			$order = array( 'a.user_id' => 'asc' );
-			$strict = FALSE;
-		} else {
-			$strict = TRUE;
-		}
+        if ($user_id == '') {
+            return false;
+        }
 
-		$ppsf = new PayPeriodScheduleFactory();
+        $ppsf = new PayPeriodScheduleFactory();
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        $ph = array(
+            'id' => (int)$id,
+            'user_id' => (int)$user_id,
+        );
 
-
-		$query = '
+        $query = '
 					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $ppsf->getTable() .' as b
-					where	b.id = a.pay_period_schedule_id
-						AND pay_period_schedule_id = ?
-					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order, $strict );
-
-		$this->ExecuteSQL( $query, $ph );
-
-		return $this;
-	}
-
-	function getByPayPeriodScheduleIdAndUserID($id, $user_id, $where = NULL, $order = NULL) {
-		if ( $id == '') {
-			return FALSE;
-		}
-
-		if ( $user_id == '') {
-			return FALSE;
-		}
-
-		$ppsf = new PayPeriodScheduleFactory();
-
-		$ph = array(
-					'id' => (int)$id,
-					'user_id' => (int)$user_id,
-					);
-
-		$query = '
-					select	a.*
-					from	'. $this->getTable() .' as a,
-							'. $ppsf->getTable() .' as b
+					from	' . $this->getTable() . ' as a,
+							' . $ppsf->getTable() . ' as b
 					where	b.id = a.pay_period_schedule_id
 						AND pay_period_schedule_id = ?
 						AND user_id = ?
 					';
-		$query .= $this->getWhereSQL( $where );
-		$query .= $this->getSortSQL( $order );
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order);
 
-		$this->ExecuteSQL( $query, $ph );
+        $this->ExecuteSQL($query, $ph);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	function getByPayPeriodScheduleIdArray($id) {
-		$ppsulf = new PayPeriodScheduleUserListFactory();
+    public function getByPayPeriodScheduleIdArray($id)
+    {
+        $ppsulf = new PayPeriodScheduleUserListFactory();
 
-		$ppsulf->getByPayPeriodScheduleId($id);
+        $ppsulf->getByPayPeriodScheduleId($id);
 
-		$user_list = array();
-		foreach ($ppsulf as $user) {
-			$user_list[$user->getUser()] = NULL;
-		}
+        $user_list = array();
+        foreach ($ppsulf as $user) {
+            $user_list[$user->getUser()] = null;
+        }
 
-		if ( empty($user_list) == FALSE ) {
-			return $user_list;
-		}
+        if (empty($user_list) == false) {
+            return $user_list;
+        }
 
-		return array();
-	}
+        return array();
+    }
+
+    public function getByPayPeriodScheduleId($id, $where = null, $order = null)
+    {
+        if ($id == '') {
+            return false;
+        }
+
+        if ($order == null) {
+            $order = array('a.user_id' => 'asc');
+            $strict = false;
+        } else {
+            $strict = true;
+        }
+
+        $ppsf = new PayPeriodScheduleFactory();
+
+        $ph = array(
+            'id' => (int)$id,
+        );
+
+
+        $query = '
+					select	a.*
+					from	' . $this->getTable() . ' as a,
+							' . $ppsf->getTable() . ' as b
+					where	b.id = a.pay_period_schedule_id
+						AND pay_period_schedule_id = ?
+					';
+        $query .= $this->getWhereSQL($where);
+        $query .= $this->getSortSQL($order, $strict);
+
+        $this->ExecuteSQL($query, $ph);
+
+        return $this;
+    }
 }
-?>

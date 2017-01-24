@@ -23,7 +23,7 @@ require_once("HTML/QuickForm/input.php");
 
 /**
  * HTML class for a text field
- * 
+ *
  * @author       Adam Daniel <adaniel1@eesus.jnj.com>
  * @author       Bertrand Mansion <bmansion@mamasam.com>
  * @version      1.0
@@ -32,42 +32,42 @@ require_once("HTML/QuickForm/input.php");
  */
 class HTML_QuickForm_text extends HTML_QuickForm_input
 {
-                
+
     // {{{ constructor
 
     /**
      * Class constructor
-     * 
-     * @param     string    $elementName    (optional)Input field name attribute
-     * @param     string    $elementLabel   (optional)Input field label
-     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string 
+     *
+     * @param     string $elementName (optional)Input field name attribute
+     * @param     string $elementLabel (optional)Input field label
+     * @param     mixed $attributes (optional)Either a typical HTML attribute string
      *                                      or an associative array
      * @since     1.0
      * @access    public
      * @return    void
      */
-    function HTML_QuickForm_text($elementName=null, $elementLabel=null, $attributes=null)
+    public function HTML_QuickForm_text($elementName = null, $elementLabel = null, $attributes = null)
     {
         //HTML_QuickForm_input::HTML_QuickForm_input($elementName, $elementLabel, $attributes);
         new HTML_QuickForm_input($elementName, $elementLabel, $attributes);
         self::$_persistantFreeze = true;
         self::setType('text');
     } //end constructor
-        
+
     // }}}
     // {{{ setSize()
 
     /**
      * Sets size of text field
-     * 
-     * @param     string    $size  Size of text field
+     *
+     * @param     string $size Size of text field
      * @since     1.3
      * @access    public
      * @return    void
      */
-    static function setSize($size)
+    public static function setSize($size)
     {
-        self::updateAttributes(array('size'=>$size));
+        self::updateAttributes(array('size' => $size));
     } //end func setSize
 
     // }}}
@@ -75,18 +75,16 @@ class HTML_QuickForm_text extends HTML_QuickForm_input
 
     /**
      * Sets maxlength of text field
-     * 
-     * @param     string    $maxlength  Maximum length of text field
+     *
+     * @param     string $maxlength Maximum length of text field
      * @since     1.3
      * @access    public
      * @return    void
      */
-    static function setMaxlength($maxlength)
+    public static function setMaxlength($maxlength)
     {
-        self::updateAttributes(array('maxlength'=>$maxlength));
+        self::updateAttributes(array('maxlength' => $maxlength));
     } //end func setMaxlength
 
     // }}}
-    
-} //end class HTML_QuickForm_text
-?>
+} //end class HTML_QuickForm_text;

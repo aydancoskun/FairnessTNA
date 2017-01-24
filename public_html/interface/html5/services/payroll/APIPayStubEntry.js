@@ -1,48 +1,48 @@
-var APIPayStubEntry = ServiceCaller.extend( {
+var APIPayStubEntry = ServiceCaller.extend({
 
-	key_name: 'PayStubEntry',
-	className: 'APIPayStubEntry',
+    key_name: 'PayStubEntry',
+    className: 'APIPayStubEntry',
 
 
-	getPayStubEntry: function() {
+    getPayStubEntry: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubEntry', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubEntry', arguments);
 
-	},
+    },
 
-	getPayStubEntryDefaultData: function() {
+    getPayStubEntryDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getPayStubEntryDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getPayStubEntryDefaultData', arguments);
 
-	},
+    },
 
-	getCommonPayStubEntryData: function() {
+    getCommonPayStubEntryData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonPayStubEntryData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonPayStubEntryData', arguments);
 
-	},
+    },
 
-	validatePayStubEntry: function() {
+    validatePayStubEntry: function () {
 
-		return this.argumentsHandler( this.className, 'validatePayStubEntry', arguments );
+        return this.argumentsHandler(this.className, 'validatePayStubEntry', arguments);
 
-	},
+    },
 
-	setPayStubEntry: function() {
+    setPayStubEntry: function () {
 
-		return this.argumentsHandler( this.className, 'setPayStubEntry', arguments );
+        return this.argumentsHandler(this.className, 'setPayStubEntry', arguments);
 
-	},
+    },
 
-	deletePayStubEntry: function() {
+    deletePayStubEntry: function () {
 
-		return this.argumentsHandler( this.className, 'deletePayStubEntry', arguments );
+        return this.argumentsHandler(this.className, 'deletePayStubEntry', arguments);
 
-	},
+    },
 
-	copyPayStubEntry: function() {
+    copyPayStubEntry: function () {
 
-		return this.argumentsHandler( this.className, 'copyPayStubEntry', arguments );
+        return this.argumentsHandler(this.className, 'copyPayStubEntry', arguments);
 
-	}
-} );
+    }
+});

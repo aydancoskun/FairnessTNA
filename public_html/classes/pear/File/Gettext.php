@@ -3,7 +3,7 @@
 
 /**
  * File::Gettext
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.0 of the PHP license
@@ -26,11 +26,11 @@
  */
 ini_set('track_errors', true);
 
-/** 
+/**
  * File_Gettext
- * 
+ *
  * GNU gettext file reader and writer.
- * 
+ *
  * #################################################################
  * # All protected members of this class are public in its childs. #
  * #################################################################
@@ -43,44 +43,44 @@ class File_Gettext
 {
     /**
      * strings
-     * 
+     *
      * associative array with all [msgid => msgstr] entries
-     * 
+     *
      * @access  protected
      * @var     array
-    */
-    var $strings = array();
+     */
+    public $strings = array();
 
     /**
      * meta
-     * 
-     * associative array containing meta 
+     *
+     * associative array containing meta
      * information like project name or content type
-     * 
+     *
      * @access  protected
      * @var     array
      */
-    var $meta = array();
-    
+    public $meta = array();
+
     /**
      * file path
-     * 
+     *
      * @access  protected
      * @var     string
      */
-    var $file = '';
-    
+    public $file = '';
+
     /**
      * Factory
      *
      * @static
      * @access  public
-     * @return  object  Returns File_Gettext_PO or File_Gettext_MO on success 
+     * @return  object  Returns File_Gettext_PO or File_Gettext_MO on success
      *                  or PEAR_Error on failure.
-     * @param   string  $format MO or PO
-     * @param   string  $file   path to GNU gettext file
+     * @param   string $format MO or PO
+     * @param   string $file path to GNU gettext file
      */
-    static function &factory($format, $file = '')
+    public static function &factory($format, $file = '')
     {
         $format = strToUpper($format);
         if (!@include_once 'File/Gettext/' . $format . '.php') {
@@ -92,70 +92,85 @@ class File_Gettext
     }
 
     /**
+     * Raise PEAR error
+     *
+     * @static
+     * @access  protected
+     * @return  object
+     * @param   string $error
+     * @param   int $code
+     */
+    public static function raiseError($error = null, $code = null)
+    {
+        include_once 'PEAR.php';
+        return PEAR::raiseError($error, $code);
+    }
+
+    /**
      * poFile2moFile
      *
      * That's a simple fake of the 'msgfmt' console command.  It reads the
      * contents of a GNU PO file and saves them to a GNU MO file.
-     * 
+     *
      * @static
      * @access  public
      * @return  mixed   Returns true on success or PEAR_Error on failure.
-     * @param   string  $pofile path to GNU PO file
-     * @param   string  $mofile path to GNU MO file
+     * @param   string $pofile path to GNU PO file
+     * @param   string $mofile path to GNU MO file
      */
-    function poFile2moFile($pofile, $mofile)
+    public function poFile2moFile($pofile, $mofile)
     {
         if (!is_file($pofile)) {
             return File_Gettext::raiseError("File $pofile doesn't exist.");
         }
-        
+
         include_once 'File/Gettext/PO.php';
-        
+
         $PO = new File_Gettext_PO($pofile);
         if (true !== ($e = $PO->load())) {
             return $e;
         }
-        
+
         $MO = &$PO->toMO();
         if (true !== ($e = $MO->save($mofile))) {
             return $e;
         }
         unset($PO, $MO);
-        
+
         return true;
     }
-    
+
     /**
      * prepare
      *
      * @static
      * @access  protected
      * @return  string
-     * @param   string  $string
-     * @param   bool    $reverse
+     * @param   string $string
+     * @param   bool $reverse
      */
-    function prepare($string, $reverse = false)
+    public function prepare($string, $reverse = false)
     {
         if ($reverse) {
             $smap = array('"', "\n", "\t", "\r");
             $rmap = array('\\"', '\\n"' . "\n" . '"', '\\t', '\\r');
-            return (string) str_replace($smap, $rmap, $string);
+            return (string)str_replace($smap, $rmap, $string);
         } else {
             $smap = array('/"\s+"/', '/\\\\n/', '/\\\\r/', '/\\\\t/', '/\\\\"/');
             $rmap = array('', "\n", "\r", "\t", '"');
-            return (string) preg_replace($smap, $rmap, $string);
+            return (string)preg_replace($smap, $rmap, $string);
         }
     }
-    
+
     /**
      * meta2array
      *
      * @static
      * @access  public
      * @return  array
-     * @param   string  $meta
+     * @param   string $meta
      */
-    function meta2array($meta)
+    public function meta2array($meta)
     {
         $array = array();
         foreach (explode("\n", $meta) as $info) {
@@ -168,37 +183,8 @@ class File_Gettext
     }
 
     /**
-     * toArray
-     * 
-     * Returns meta info and strings as an array of a structure like that:
-     * <code>
-     *   array(
-     *       'meta' => array(
-     *           'Content-Type'      => 'text/plain; charset=iso-8859-1',
-     *           'Last-Translator'   => 'Michael Wallner <mike@iworks.at>',
-     *           'PO-Revision-Date'  => '2004-07-21 17:03+0200',
-     *           'Language-Team'     => 'German <mail@example.com>',
-     *       ),
-     *       'strings' => array(
-     *           'All rights reserved'   => 'Alle Rechte vorbehalten',
-     *           'Welcome'               => 'Willkommen',
-     *           // ...
-     *       )
-     *   )
-     * </code>
-     * 
-     * @see     fromArray()
-     * @access  protected
-     * @return  array
-     */
-    function toArray()
-    {
-    	return array('meta' => $this->meta, 'strings' => $this->strings);
-    }
-    
-    /**
      * fromArray
-     * 
+     *
      * Assigns meta info and strings from an array of a structure like that:
      * <code>
      *   array(
@@ -215,68 +201,81 @@ class File_Gettext
      *       )
      *   )
      * </code>
-     * 
+     *
      * @see     toArray()
      * @access  protected
      * @return  bool
-     * @param   array       $array
+     * @param   array $array
      */
-    function fromArray($array)
+    public function fromArray($array)
     {
-    	if (!array_key_exists('strings', $array)) {
-    	    if (count($array) != 2) {
+        if (!array_key_exists('strings', $array)) {
+            if (count($array) != 2) {
                 return false;
-    	    } else {
-    	        list($this->meta, $this->strings) = $array;
+            } else {
+                list($this->meta, $this->strings) = $array;
             }
-    	} else {
+        } else {
             $this->meta = @$array['meta'];
             $this->strings = @$array['strings'];
         }
         return true;
     }
-    
+
     /**
      * toMO
      *
      * @access  protected
      * @return  object  File_Gettext_MO
      */
-    function &toMO()
+    public function &toMO()
     {
         include_once 'File/Gettext/MO.php';
         $MO = new File_Gettext_MO;
         $MO->fromArray($this->toArray());
         return $MO;
     }
-    
+
+    /**
+     * toArray
+     *
+     * Returns meta info and strings as an array of a structure like that:
+     * <code>
+     *   array(
+     *       'meta' => array(
+     *           'Content-Type'      => 'text/plain; charset=iso-8859-1',
+     *           'Last-Translator'   => 'Michael Wallner <mike@iworks.at>',
+     *           'PO-Revision-Date'  => '2004-07-21 17:03+0200',
+     *           'Language-Team'     => 'German <mail@example.com>',
+     *       ),
+     *       'strings' => array(
+     *           'All rights reserved'   => 'Alle Rechte vorbehalten',
+     *           'Welcome'               => 'Willkommen',
+     *           // ...
+     *       )
+     *   )
+     * </code>
+     *
+     * @see     fromArray()
+     * @access  protected
+     * @return  array
+     */
+    public function toArray()
+    {
+        return array('meta' => $this->meta, 'strings' => $this->strings);
+    }
+
     /**
      * toPO
      *
      * @access  protected
      * @return  object      File_Gettext_PO
      */
-    function &toPO()
+    public function &toPO()
     {
         include_once 'File/Gettext/PO.php';
         $PO = new File_Gettext_PO;
         $PO->fromArray($this->toArray());
         return $PO;
     }
-    
-    /**
-     * Raise PEAR error
-     *
-     * @static
-     * @access  protected
-     * @return  object
-     * @param   string  $error
-     * @param   int     $code
-     */
-    static function raiseError($error = null, $code = null)
-    {
-        include_once 'PEAR.php';
-        return PEAR::raiseError($error, $code);
-    }
 }
-?>

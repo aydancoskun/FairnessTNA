@@ -1,68 +1,67 @@
-var APITimeSheet = ServiceCaller.extend( {
+var APITimeSheet = ServiceCaller.extend({
 
-	key_name: 'TimeSheet',
-	className: 'APITimeSheet',
+    key_name: 'TimeSheet',
+    className: 'APITimeSheet',
 
-	reCalculateTimeSheet: function() {
+    reCalculateTimeSheet: function () {
 
-		return this.argumentsHandler( this.className, 'reCalculateTimeSheet', arguments );
+        return this.argumentsHandler(this.className, 'reCalculateTimeSheet', arguments);
 
-	},
+    },
 
-	verifyTimeSheet: function() {
+    verifyTimeSheet: function () {
 
-		return this.argumentsHandler( this.className, 'verifyTimeSheet', arguments );
+        return this.argumentsHandler(this.className, 'verifyTimeSheet', arguments);
 
-	},
+    },
 
-	getTimeSheetTotalData: function() {
+    getTimeSheetTotalData: function () {
 
-		return this.argumentsHandler( this.className, 'getTimeSheetTotalData', arguments );
+        return this.argumentsHandler(this.className, 'getTimeSheetTotalData', arguments);
 
-	},
+    },
 
-	getTimeSheetData: function() {
+    getTimeSheetData: function () {
 
-		return this.argumentsHandler( this.className, 'getTimeSheetData', arguments );
+        return this.argumentsHandler(this.className, 'getTimeSheetData', arguments);
 
-	},
+    },
 
-	getCommonTimeSheetData: function() {
+    getCommonTimeSheetData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonTimeSheetData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonTimeSheetData', arguments);
 
-	},
+    },
 
-	getTimeSheet: function() {
+    getTimeSheet: function () {
 
-		return this.argumentsHandler( this.className, 'getTimeSheet', arguments );
+        return this.argumentsHandler(this.className, 'getTimeSheet', arguments);
 
-	},
+    },
 
-	setTimeSheet: function() {
+    setTimeSheet: function () {
 
-		return this.argumentsHandler( this.className, 'setTimeSheet', arguments );
+        return this.argumentsHandler(this.className, 'setTimeSheet', arguments);
 
-	},
+    },
 
-	getTimeSheetDefaultData: function() {
+    getTimeSheetDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getTimeSheetDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getTimeSheetDefaultData', arguments);
 
-	},
+    },
 
-	deleteTimeSheet: function() {
+    deleteTimeSheet: function () {
 
-		return this.argumentsHandler( this.className, 'deleteTimeSheet', arguments );
+        return this.argumentsHandler(this.className, 'deleteTimeSheet', arguments);
 
-	},
+    },
 
-	validateTimeSheet: function() {
+    validateTimeSheet: function () {
 
-		return this.argumentsHandler( this.className, 'validateTimeSheet', arguments );
+        return this.argumentsHandler(this.className, 'validateTimeSheet', arguments);
 
-	}
+    }
 
 
-
-} );
+});

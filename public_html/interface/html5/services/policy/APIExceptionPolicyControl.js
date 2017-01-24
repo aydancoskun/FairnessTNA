@@ -1,51 +1,51 @@
-var APIExceptionPolicyControl = ServiceCaller.extend( {
+var APIExceptionPolicyControl = ServiceCaller.extend({
 
-	key_name: 'ExceptionPolicyControl',
-	className: 'APIExceptionPolicyControl',
+    key_name: 'ExceptionPolicyControl',
+    className: 'APIExceptionPolicyControl',
 
-	getExceptionPolicyControlDefaultData: function() {
+    getExceptionPolicyControlDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getExceptionPolicyControlDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getExceptionPolicyControlDefaultData', arguments);
 
-	},
+    },
 
-	getExceptionPolicyControl: function() {
+    getExceptionPolicyControl: function () {
 
-		return this.argumentsHandler( this.className, 'getExceptionPolicyControl', arguments );
+        return this.argumentsHandler(this.className, 'getExceptionPolicyControl', arguments);
 
-	},
+    },
 
-	getCommonExceptionPolicyControlData: function() {
+    getCommonExceptionPolicyControlData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonExceptionPolicyControlData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonExceptionPolicyControlData', arguments);
 
-	},
+    },
 
-	validateExceptionPolicyControl: function() {
+    validateExceptionPolicyControl: function () {
 
-		return this.argumentsHandler( this.className, 'validateExceptionPolicyControl', arguments );
+        return this.argumentsHandler(this.className, 'validateExceptionPolicyControl', arguments);
 
-	},
+    },
 
-	setExceptionPolicyControl: function() {
+    setExceptionPolicyControl: function () {
 
-		return this.argumentsHandler( this.className, 'setExceptionPolicyControl', arguments );
+        return this.argumentsHandler(this.className, 'setExceptionPolicyControl', arguments);
 
-	},
+    },
 
-	deleteExceptionPolicyControl: function() {
+    deleteExceptionPolicyControl: function () {
 
-		return this.argumentsHandler( this.className, 'deleteExceptionPolicyControl', arguments );
+        return this.argumentsHandler(this.className, 'deleteExceptionPolicyControl', arguments);
 
-	},
+    },
 
-	copyExceptionPolicyControl: function() {
+    copyExceptionPolicyControl: function () {
 
-		return this.argumentsHandler( this.className, 'copyExceptionPolicyControl', arguments );
+        return this.argumentsHandler(this.className, 'copyExceptionPolicyControl', arguments);
 
-	},
+    },
 
-	exportExceptionPolicyControl: function() {
-		return this.argumentsHandler( this.className, 'exportExceptionPolicyControl', arguments );
-	}
-} );
+    exportExceptionPolicyControl: function () {
+        return this.argumentsHandler(this.className, 'exportExceptionPolicyControl', arguments);
+    }
+});

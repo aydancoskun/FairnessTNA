@@ -50,6 +50,53 @@
 class Validate_Finance_CreditCard
 {
     /**
+     * Validates a credit card number
+     *
+     * If a type is passed, the card will be checked against it.
+     * This method only checks the number locally. No banks or payment
+     * gateways are involved.
+     * This method doesn't guarantee that the card is legitimate. It merely
+     * checks the card number passes a mathematical algorithm.
+     *
+     * @param string $creditCard number (spaces and dashes tolerated)
+     * @param string $cardType type/brand of card (case insensitive)
+     *               "MasterCard", "Visa", "AMEX", "AmericanExpress",
+     *               "American Express", "Diners", "DinersClub", "Diners Club",
+     *               "CarteBlanche", "Carte Blanche", "Discover", "JCB",
+     *               "EnRoute", "Eurocard", "Eurocard/MasterCard".
+     * @return bool   TRUE if number is valid, FALSE otherwise
+     * @access public
+     * @static
+     * @see Luhn()
+     */
+    public static function number($creditCard, $cardType = null)
+    {
+        $cc = str_replace(array('-', ' '), '', $creditCard);
+        if (($len = strlen($cc)) < 13
+            || strspn($cc, '0123456789') != $len
+        ) {
+            return false;
+        }
+
+        // Only apply the Luhn algorithm for cards other than enRoute
+        // So check if we have a enRoute card now
+        if (strlen($cc) != 15
+            || (substr($cc, 0, 4) != '2014'
+                && substr($cc, 0, 4) != '2149')
+        ) {
+            if (!Validate_Finance_CreditCard::Luhn($cc)) {
+                return false;
+            }
+        }
+
+        if (is_string($cardType)) {
+            return Validate_Finance_CreditCard::type($cc, $cardType);
+        }
+
+        return true;
+    }
+
+    /**
      * Validates a number according to Luhn check algorithm
      *
      * This function checks given number according Luhn check
@@ -60,13 +107,13 @@ class Validate_Finance_CreditCard
      * @link http://hysteria.sk/prielom/prielom-12.html#3 (Slovak language)
      * @link http://www.speech.cs.cmu.edu/~sburke/pub/luhn_lib.html (Perl lib)
      *
-     * @param  string  $number to check
+     * @param  string $number to check
      * @return bool    TRUE if number is valid, FALSE otherwise
      * @access public
      * @static
      * @author Ondrej Jombik <nepto@pobox.sk>
      */
-    static function Luhn($number)
+    public static function Luhn($number)
     {
         $len_number = strlen($number);
         $sum = 0;
@@ -83,55 +130,6 @@ class Validate_Finance_CreditCard
         return ($sum % 10) ? false : true;
     }
 
-
-    /**
-     * Validates a credit card number
-     *
-     * If a type is passed, the card will be checked against it.
-     * This method only checks the number locally. No banks or payment
-     * gateways are involved.
-     * This method doesn't guarantee that the card is legitimate. It merely
-     * checks the card number passes a mathematical algorithm.
-     *
-     * @param string  $creditCard number (spaces and dashes tolerated)
-     * @param string  $cardType type/brand of card (case insensitive)
-     *               "MasterCard", "Visa", "AMEX", "AmericanExpress",
-     *               "American Express", "Diners", "DinersClub", "Diners Club",
-     *               "CarteBlanche", "Carte Blanche", "Discover", "JCB",
-     *               "EnRoute", "Eurocard", "Eurocard/MasterCard".
-     * @return bool   TRUE if number is valid, FALSE otherwise
-     * @access public
-     * @static
-     * @see Luhn()
-     */
-    static function number($creditCard, $cardType = null)
-    {
-        $cc = str_replace(array('-', ' '), '', $creditCard);
-        if (($len = strlen($cc)) < 13
-            || strspn($cc, '0123456789') != $len) {
-
-            return false;
-        }
-
-        // Only apply the Luhn algorithm for cards other than enRoute
-        // So check if we have a enRoute card now
-        if (strlen($cc) != 15
-            || (substr($cc, 0, 4) != '2014'
-                && substr($cc, 0, 4) != '2149')) {
-
-            if (!Validate_Finance_CreditCard::Luhn($cc)) {
-                return false;
-            }
-        }
-
-        if (is_string($cardType)) {
-            return Validate_Finance_CreditCard::type($cc, $cardType);
-        }
-
-        return true;
-    }
-
-
     /**
      * Validates the credit card number against a type
      *
@@ -143,8 +141,8 @@ class Validate_Finance_CreditCard
      * For instance, if a $card is a MasterCard, type($card, 'EuroCard')
      * will also return true.
      *
-     * @param string  $creditCard number (spaces and dashes tolerated)
-     * @param string  $cardType type/brand of card (case insensitive)
+     * @param string $creditCard number (spaces and dashes tolerated)
+     * @param string $cardType type/brand of card (case insensitive)
      *               "MasterCard", "Visa", "AMEX", "AmericanExpress",
      *               "American Express", "Diners", "DinersClub", "Diners Club",
      *               "CarteBlanche", "Carte Blanche", "Discover", "JCB",
@@ -154,7 +152,7 @@ class Validate_Finance_CreditCard
      * @static
      * @link http://www.beachnet.com/~hstiles/cardtype.html
      */
-    static function type($creditCard, $cardType)
+    public static function type($creditCard, $cardType)
     {
         switch (strtoupper($cardType)) {
             case 'MASTERCARD':
@@ -217,8 +215,8 @@ class Validate_Finance_CreditCard
      *
      * This method returns FALSE for card types that don't support CVV.
      *
-     * @param string  $cvv value to verify
-     * @param string  $cardType type/brand of card (case insensitive)
+     * @param string $cvv value to verify
+     * @param string $cardType type/brand of card (case insensitive)
      *               "MasterCard", "Visa", "AMEX", "AmericanExpress",
      *               "American Express", "Discover", "Eurocard/MasterCard",
      *               "Eurocard"
@@ -226,7 +224,7 @@ class Validate_Finance_CreditCard
      * @access public
      * @static
      */
-    static function cvv($cvv, $cardType)
+    public static function cvv($cvv, $cardType)
     {
         switch (strtoupper($cardType)) {
             case 'MASTERCARD':
@@ -246,12 +244,11 @@ class Validate_Finance_CreditCard
         }
 
         if (strlen($cvv) == $digits
-            && strspn($cvv, '0123456789') == $digits) {
+            && strspn($cvv, '0123456789') == $digits
+        ) {
             return true;
         }
 
         return false;
     }
 }
-
-?>

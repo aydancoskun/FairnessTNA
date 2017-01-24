@@ -30,10 +30,10 @@ require_once 'Net/Curl.php';
  * Defines global variables
  */
 $GLOBALS['_Payment_Process_BeanstreamEFT'] = array(
-    PAYMENT_PROCESS_ACTION_NORMAL   => 'D',
-    PAYMENT_PROCESS_ACTION_AUTHONLY => NULL,
-    PAYMENT_PROCESS_ACTION_POSTAUTH  => NULL,
-    PAYMENT_PROCESS_ACTION_VOID     => 'VD'
+    PAYMENT_PROCESS_ACTION_NORMAL => 'D',
+    PAYMENT_PROCESS_ACTION_AUTHONLY => null,
+    PAYMENT_PROCESS_ACTION_POSTAUTH => null,
+    PAYMENT_PROCESS_ACTION_VOID => 'VD'
 );
 
 /**
@@ -58,17 +58,17 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      * @see _prepare()
      * @access private
      */
-    var $_fieldMap = array(
+    public $_fieldMap = array(
         // Required
-        'customerId'    => 'loginCompany',
+        'customerId' => 'loginCompany',
         //'login'         => 'loginUser',
         //'password'      => 'loginPass',
-		'password'      => 'passCode',
-        'action'        => 'trnType',
+        'password' => 'passCode',
+        'action' => 'trnType',
         'invoiceNumber' => 'trnOrderNumber',
-        'amount'        => 'trnAmount',
-        'processDate'   => 'processDate',
-        'batchFile'     => 'batchFile',
+        'amount' => 'trnAmount',
+        'processDate' => 'processDate',
+        'batchFile' => 'batchFile',
         //'name'          => 'name',
         //'address'       => '',
         //'city'          => '',
@@ -87,19 +87,19 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      * @author Joe Stump <joe@joestump.net>
      * @access protected
      */
-    var $_typeFieldMap = array(
-            'ACH' => array(
-                'routingCode' => 'routingNumber',
-                'accountNumber' => 'accountNumber',
-                'accountCode' => 'accountCode',
-                'name' => 'ordName'
-            ),
-            'EFT' => array(
-                'institutionCode' => 'institutionId',
-                'routingCode' => 'transitNumber',
-                'accountNumber' => 'accountNumber',
-                'name' => 'ordName'
-            ),
+    public $_typeFieldMap = array(
+        'ACH' => array(
+            'routingCode' => 'routingNumber',
+            'accountNumber' => 'accountNumber',
+            'accountCode' => 'accountCode',
+            'name' => 'ordName'
+        ),
+        'EFT' => array(
+            'institutionCode' => 'institutionId',
+            'routingCode' => 'transitNumber',
+            'accountNumber' => 'accountNumber',
+            'name' => 'ordName'
+        ),
     );
 
     /**
@@ -108,11 +108,11 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      * @see Payment_Process::setOptions()
      * @access private
      */
-    var $_defaultOptions = array(
-         'authorizeUri' => 'https://www.beanstream.com/scripts/batch_upload.asp',
-         //'requestType' => 'BACKEND',
-         //'cavEnabled' => 0,
-         'ServiceVersion' => '1.1',
+    public $_defaultOptions = array(
+        'authorizeUri' => 'https://www.beanstream.com/scripts/batch_upload.asp',
+        //'requestType' => 'BACKEND',
+        //'cavEnabled' => 0,
+        'ServiceVersion' => '1.1',
     );
 
     /**
@@ -121,7 +121,7 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      * @var string
      * @access private
      */
-    var $_encapChars = '|~#$^*_=+-`{}![]:";<>?/&';
+    public $_encapChars = '|~#$^*_=+-`{}![]:";<>?/&';
 
     /**
      * Has the transaction been processed?
@@ -129,76 +129,33 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      * @type boolean
      * @access private
      */
-    var $_processed = false;
+    public $_processed = false;
 
     /**
      * The response body sent back from the gateway.
      *
      * @access private
      */
-    var $_responseBody = '';
+    public $_responseBody = '';
 
-    /**
-     * Constructor.
-     *
-     * @param  array  $options  Class options to set.
-     * @see Payment_Process::setOptions()
-     * @return void
-     */
-    function __construct($options = false)
-    {
-        parent::__construct($options);
-        $this->_driver = 'BeanstreamEFT';
-        //$this->_makeRequired('customerId','login', 'password', 'action', 'invoiceNumber');
-		$this->_makeRequired('customerId','password', 'action', 'invoiceNumber');
-    }
-
-    function Payment_Process_BeanstreamEFT($options = false)
+    public function Payment_Process_BeanstreamEFT($options = false)
     {
         $this->__construct($options);
     }
 
     /**
-     * Prepare the batch data.
+     * Constructor.
      *
-     * This function handles the 'testTransaction' option, which is specific to
-     * this processor.
+     * @param  array $options Class options to set.
+     * @see Payment_Process::setOptions()
+     * @return void
      */
-    function _prepare()
+    public function __construct($options = false)
     {
-        $result = parent::_prepare();
-        if ( $result !== TRUE ) {
-            return $result;
-        }
-
-        //Build batch file for each type of transaction type.
-        if ($this->_payment->getType() == 'EFT') {
-            $batch_fields = array('trnType', 'institutionId', 'transitNumber', 'accountNumber', 'trnAmount', 'trnOrderNumber', 'ordName' );
-            if ( is_array($batch_fields) ) {
-                $batch_data[] = substr( $this->_payment->getType(), 0, 1);
-                foreach( $batch_fields as $batch_field ) {
-                    $batch_data[] = $this->_data[$batch_field];
-                }
-            }
-        } elseif ($this->_payment->getType() == 'ACH') {
-            $batch_fields = array('trnType', 'routingNumber', 'accountNumber', 'accountCode', 'trnAmount', 'trnOrderNumber', 'ordName' );
-            if ( is_array($batch_fields) ) {
-                $batch_data[] = substr( $this->_payment->getType(), 0, 1);
-                foreach( $batch_fields as $batch_field ) {
-                    if ( $batch_field == 'accountCode' ) {
-                        $batch_data[] = 'CC';
-                    } else {
-                        $batch_data[] = $this->_data[$batch_field];
-                    }
-                }
-            }
-        }
-
-        if ( is_array($batch_data) ) {
-            $this->batchFile = implode(',', $batch_data);
-        }
-
-        return TRUE;
+        parent::__construct($options);
+        $this->_driver = 'BeanstreamEFT';
+        //$this->_makeRequired('customerId','login', 'password', 'action', 'invoiceNumber');
+        $this->_makeRequired('customerId', 'password', 'action', 'invoiceNumber');
     }
 
     /**
@@ -210,7 +167,7 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      * @return mixed Payment_Process_Result on success, PEAR_Error on failure
      * @access public
      */
-    function &process()
+    public function &process()
     {
         // Sanity check
         $result = $this->validate();
@@ -233,7 +190,7 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
         PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
 
         //Must use GET for login information.
-        $curl = new Net_Curl($this->_options['authorizeUri'].'?'.$fields);
+        $curl = new Net_Curl($this->_options['authorizeUri'] . '?' . $fields);
         $curl->timeout = 300;
         if (PEAR::isError($curl)) {
             PEAR::popErrorHandling();
@@ -241,16 +198,16 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
         }
 
         $temp_file_prefix = 'eft_';
-        if ( isset($this->_data['trnOrderNumber']) AND preg_match( '/^[A-Z0-9_\-]+$/i', $this->_data['trnOrderNumber'] ) ) {
-            $temp_file_prefix .= $this->_data['trnOrderNumber'].'_';
+        if (isset($this->_data['trnOrderNumber']) and preg_match('/^[A-Z0-9_\-]+$/i', $this->_data['trnOrderNumber'])) {
+            $temp_file_prefix .= $this->_data['trnOrderNumber'] . '_';
         }
-        $temp_file = tempnam( sys_get_temp_dir(), $temp_file_prefix ).'.csv';
-        file_put_contents( $temp_file, $this->batchFile);
+        $temp_file = tempnam(sys_get_temp_dir(), $temp_file_prefix) . '.csv';
+        file_put_contents($temp_file, $this->batchFile);
 
-        if ( class_exists('\CURLFile') ) {
-            $curl->fields = array('batchFile' => new \CURLFile( $temp_file ) ); //PHP v5.5+ method.
+        if (class_exists('\CURLFile')) {
+            $curl->fields = array('batchFile' => new \CURLFile($temp_file)); //PHP v5.5+ method.
         } else {
-            $curl->fields = array('batchFile' => '@'.$temp_file); //Pre PHP v5.5 method.
+            $curl->fields = array('batchFile' => '@' . $temp_file); //Pre PHP v5.5 method.
         }
 
         $curl->userAgent = 'PEAR Payment_Process_Beanstream 0.1';
@@ -274,8 +231,8 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
         PEAR::popErrorHandling();
 
         $response = Payment_Process_Result::factory($this->_driver,
-                                                     $this->_responseBody,
-                                                     $this);
+            $this->_responseBody,
+            $this);
 
         if (!PEAR::isError($response)) {
             $response->parse();
@@ -286,6 +243,77 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
     }
 
     /**
+     * Prepare the batch data.
+     *
+     * This function handles the 'testTransaction' option, which is specific to
+     * this processor.
+     */
+    public function _prepare()
+    {
+        $result = parent::_prepare();
+        if ($result !== true) {
+            return $result;
+        }
+
+        //Build batch file for each type of transaction type.
+        if ($this->_payment->getType() == 'EFT') {
+            $batch_fields = array('trnType', 'institutionId', 'transitNumber', 'accountNumber', 'trnAmount', 'trnOrderNumber', 'ordName');
+            if (is_array($batch_fields)) {
+                $batch_data[] = substr($this->_payment->getType(), 0, 1);
+                foreach ($batch_fields as $batch_field) {
+                    $batch_data[] = $this->_data[$batch_field];
+                }
+            }
+        } elseif ($this->_payment->getType() == 'ACH') {
+            $batch_fields = array('trnType', 'routingNumber', 'accountNumber', 'accountCode', 'trnAmount', 'trnOrderNumber', 'ordName');
+            if (is_array($batch_fields)) {
+                $batch_data[] = substr($this->_payment->getType(), 0, 1);
+                foreach ($batch_fields as $batch_field) {
+                    if ($batch_field == 'accountCode') {
+                        $batch_data[] = 'CC';
+                    } else {
+                        $batch_data[] = $this->_data[$batch_field];
+                    }
+                }
+            }
+        }
+
+        if (is_array($batch_data)) {
+            $this->batchFile = implode(',', $batch_data);
+        }
+
+        return true;
+    }
+
+    /**
+     * Prepare the POST query string.
+     *
+     * You will need PHP_Compat::str_split() if you run this processor
+     * under PHP 4.
+     *
+     * @access private
+     * @return string The query string
+     */
+    public function _prepareQueryString()
+    {
+        //$url_fields = array('ServiceVersion', 'loginCompany', 'loginUser', 'loginPass', 'processDate' );
+        $url_fields = array('ServiceVersion', 'loginCompany', 'passCode', 'processDate');
+
+        $data = array_merge($this->_options, $this->_data);
+
+        foreach ($data as $key => $val) {
+            if (in_array($key, $url_fields) and strlen($val) > 0) {
+                //if ( strlen($val) > 0 ) {
+                $return[] = $key . '=' . urlencode($val);
+            }
+        }
+
+        $retval = implode('&', $return);
+
+        return $retval;
+    }
+
+    /**
      * Processes a callback from payment gateway
      *
      * Success here doesn't mean the transaction was approved. It means
@@ -293,13 +321,13 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      *
      * @return mixed Payment_Process_Result on success, PEAR_Error on failure
      */
-    function &processCallback()
+    public function &processCallback()
     {
         $this->_responseBody = $_POST;
         $this->_processed = true;
 
         $response = &Payment_Process_Result::factory($this->_driver,
-                            $this->_responseBody);
+            $this->_responseBody);
         if (!PEAR::isError($response)) {
             $response->_request = $this;
             $response->parseCallback();
@@ -307,7 +335,6 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
             $r = $response->isLegitimate();
             if (PEAR::isError($r)) {
                 return $r;
-
             } elseif ($r === false) {
                 return PEAR::raiseError('Illegitimate callback from gateway.');
             }
@@ -321,40 +348,12 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      *
      * @return string Two-digit status returned from gateway.
      */
-    function getStatus()
+    public function getStatus()
     {
         return false;
     }
 
     /**
-     * Prepare the POST query string.
-     *
-     * You will need PHP_Compat::str_split() if you run this processor
-     * under PHP 4.
-     *
-     * @access private
-     * @return string The query string
-     */
-    function _prepareQueryString()
-    {
-        //$url_fields = array('ServiceVersion', 'loginCompany', 'loginUser', 'loginPass', 'processDate' );
-		$url_fields = array('ServiceVersion', 'loginCompany', 'passCode', 'processDate' );
-
-        $data = array_merge($this->_options, $this->_data);
-
-        foreach ($data as $key => $val) {
-            if ( in_array($key, $url_fields) AND strlen($val) > 0 ) {
-            //if ( strlen($val) > 0 ) {
-                $return[] = $key.'='.urlencode($val);
-            }
-        }
-
-        $retval = implode('&', $return);
-
-        return $retval;
-    }
-
-   /**
      * Validates the charge amount.
      *
      * Charge amount must be 8 characters long, double-precision.
@@ -363,7 +362,7 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      *
      * @return boolean true on success, false otherwise
      */
-    function _validateAmount()
+    public function _validateAmount()
     {
         return Validate::number($this->amount, array(
             'decimal' => '.',
@@ -380,9 +379,9 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      *
      * @access private
      */
-    function _handleAmount()
+    public function _handleAmount()
     {
-        $this->_data['trnAmount'] = $this->amount = $this->amount*100;
+        $this->_data['trnAmount'] = $this->amount = $this->amount * 100;
     }
 
     /**
@@ -392,50 +391,50 @@ class Payment_Process_BeanstreamEFT extends Payment_Process_Common
      *
      * @access private
      */
-    function _handleProcessDate()
+    public function _handleProcessDate()
     {
-        if ( isset($this->processDate) ) {
+        if (isset($this->processDate)) {
             $epoch = (int)$this->processDate;
         } else {
-            $this->processDate = FALSE;
+            $this->processDate = false;
             $epoch = time();
         }
 
-        if ( $epoch < time() ) {
+        if ($epoch < time()) {
             $epoch = time();
         }
 
-        $cutoff_hour = date('G', $epoch );
-        if ( $cutoff_hour > 10 ) { // 11AM
+        $cutoff_hour = date('G', $epoch);
+        if ($cutoff_hour > 10) { // 11AM
             //Process date is next day
             $epoch += 86400;
         } else {
             //Process date can be today.
         }
 
-        $this->processDate = $this->_data['processDate'] = date('Ymd', $epoch );
+        $this->processDate = $this->_data['processDate'] = date('Ymd', $epoch);
     }
 }
 
 
-class Payment_Process_Result_BeanstreamEFT extends Payment_Process_Result {
+class Payment_Process_Result_BeanstreamEFT extends Payment_Process_Result
+{
+    public $_statusCodeMap = array('1' => PAYMENT_PROCESS_RESULT_APPROVED,
+        '2' => PAYMENT_PROCESS_RESULT_OTHER,
+        '3' => PAYMENT_PROCESS_RESULT_OTHER,
+        '4' => PAYMENT_PROCESS_RESULT_REVIEW,
+        '5' => PAYMENT_PROCESS_RESULT_REVIEW,
+        '6' => PAYMENT_PROCESS_RESULT_REVIEW,
+        '7' => PAYMENT_PROCESS_RESULT_DECLINED,
+        '8' => PAYMENT_PROCESS_RESULT_REVIEW,
+        '9' => PAYMENT_PROCESS_RESULT_REVIEW,
+        '10' => PAYMENT_PROCESS_RESULT_REVIEW,
+        '11' => PAYMENT_PROCESS_RESULT_REVIEW,
+        '12' => PAYMENT_PROCESS_RESULT_REVIEW,
+        '13' => PAYMENT_PROCESS_RESULT_REVIEW,
+    );
 
-    var $_statusCodeMap = array('1' => PAYMENT_PROCESS_RESULT_APPROVED,
-                                '2' => PAYMENT_PROCESS_RESULT_OTHER,
-                                '3' => PAYMENT_PROCESS_RESULT_OTHER,
-                                '4' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                '5' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                '6' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                '7' => PAYMENT_PROCESS_RESULT_DECLINED,
-                                '8' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                '9' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                '10' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                '11' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                '12' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                '13' => PAYMENT_PROCESS_RESULT_REVIEW,
-                                );
-
-    var $_statusCodeMessages = array(
+    public $_statusCodeMessages = array(
         '1' => 'File successfully received',
         '2' => 'Secure connection required',
         '3' => 'Service version not supported',
@@ -451,21 +450,21 @@ class Payment_Process_Result_BeanstreamEFT extends Payment_Process_Result {
         '13' => 'Upload rejected. File name is limited to 32 characters in length, including file type extension',
     );
 
-    var $_fieldMap = array('0'  => 'code',
-                           '2'  => 'messageCode',
-                           '3'  => 'message',
-                           '4'  => 'approvalCode',
-                           '5'  => 'avsCode',
-                           '6'  => 'transactionId',
-                           '7'  => 'invoiceNumber',
-                           '8'  => 'description',
-                           '9'  => 'amount',
-                           '12' => 'customerId',
-                           '37' => 'md5Hash',
-                           '38' => 'cvvCode'
+    public $_fieldMap = array('0' => 'code',
+        '2' => 'messageCode',
+        '3' => 'message',
+        '4' => 'approvalCode',
+        '5' => 'avsCode',
+        '6' => 'transactionId',
+        '7' => 'invoiceNumber',
+        '8' => 'description',
+        '9' => 'amount',
+        '12' => 'customerId',
+        '37' => 'md5Hash',
+        '38' => 'cvvCode'
     );
 
-    function Payment_Process_Response_BeanstreamEFT($rawResponse)
+    public function Payment_Process_Response_BeanstreamEFT($rawResponse)
     {
         $this->Payment_Process_Response($rawResponse);
     }
@@ -475,29 +474,28 @@ class Payment_Process_Result_BeanstreamEFT extends Payment_Process_Result {
      *
      * @access public
      */
-    function parse()
+    public function parse()
     {
-        if ( preg_match('/<code>([\d]+)<\/code>/i', $this->_rawResponse, $code_match ) ) {
-            if ( isset($code_match[1]) ) {
+        if (preg_match('/<code>([\d]+)<\/code>/i', $this->_rawResponse, $code_match)) {
+            if (isset($code_match[1])) {
                 $code = (int)$code_match[1];
 
-                $this->code          = $code;
-                $this->messageCode   = $code;
+                $this->code = $code;
+                $this->messageCode = $code;
 
-                if ( $code == 1 ) {
+                if ($code == 1) {
                     $this->_returnCode = PAYMENT_PROCESS_RESULT_APPROVED;
 
-                    if ( preg_match('/<batch_id>(.*)<\/batch_id>/i', $this->_rawResponse, $batch_id_match ) ) {
+                    if (preg_match('/<batch_id>(.*)<\/batch_id>/i', $this->_rawResponse, $batch_id_match)) {
                         $this->approvalCode = $this->transactionId = $batch_id_match[1];
                     }
                 } else {
                     $this->_returnCode = PAYMENT_PROCESS_RESULT_DECLINED;
                 }
 
-                if ( preg_match('/<message>(.*)<\/message>/i', $this->_rawResponse, $message_match ) ) {
-                    $this->message = $message_match[1] .' (Code: '. $code .')';
+                if (preg_match('/<message>(.*)<\/message>/i', $this->_rawResponse, $message_match)) {
+                    $this->message = $message_match[1] . ' (Code: ' . $code . ')';
                 }
-
             } else {
                 $this->_returnCode = PAYMENT_PROCESS_RESULT_OTHER;
                 $this->message = 'Error parsing response.';
@@ -508,4 +506,3 @@ class Payment_Process_Result_BeanstreamEFT extends Payment_Process_Result {
         }
     }
 }
-?>

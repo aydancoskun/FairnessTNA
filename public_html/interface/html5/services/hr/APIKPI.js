@@ -1,60 +1,59 @@
-var APIKPI = ServiceCaller.extend( {
+var APIKPI = ServiceCaller.extend({
 
-	key_name: 'KPI',
-	className: 'APIKPI',
+    key_name: 'KPI',
+    className: 'APIKPI',
 
-	getCommonKPIData: function() {
+    getCommonKPIData: function () {
 
-		return this.argumentsHandler( this.className, 'getCommonKPIData', arguments );
+        return this.argumentsHandler(this.className, 'getCommonKPIData', arguments);
 
-	},
+    },
 
-	getKPI: function() {
+    getKPI: function () {
 
-		return this.argumentsHandler( this.className, 'getKPI', arguments );
+        return this.argumentsHandler(this.className, 'getKPI', arguments);
 
-	},
+    },
 
-	setKPI: function() {
+    setKPI: function () {
 
-		return this.argumentsHandler( this.className, 'setKPI', arguments );
+        return this.argumentsHandler(this.className, 'setKPI', arguments);
 
-	},
+    },
 
-	getKPIDefaultData: function() {
+    getKPIDefaultData: function () {
 
-		return this.argumentsHandler( this.className, 'getKPIDefaultData', arguments );
+        return this.argumentsHandler(this.className, 'getKPIDefaultData', arguments);
 
-	},
+    },
 
-	deleteKPI: function() {
+    deleteKPI: function () {
 
-		return this.argumentsHandler( this.className, 'deleteKPI', arguments );
+        return this.argumentsHandler(this.className, 'deleteKPI', arguments);
 
-	},
+    },
 
-	validateKPI: function() {
+    validateKPI: function () {
 
-		return this.argumentsHandler( this.className, 'validateKPI', arguments );
+        return this.argumentsHandler(this.className, 'validateKPI', arguments);
 
-	},
+    },
 
-	copyKPI: function() {
+    copyKPI: function () {
 
-		return this.argumentsHandler( this.className, 'copyKPI', arguments );
+        return this.argumentsHandler(this.className, 'copyKPI', arguments);
 
-	},
+    },
 
-	exportKPI: function() {
-		return this.argumentsHandler( this.className, 'exportKPI', arguments );
-	},
+    exportKPI: function () {
+        return this.argumentsHandler(this.className, 'exportKPI', arguments);
+    },
 
-	generateInvoices: function() {
+    generateInvoices: function () {
 
-		return this.argumentsHandler( this.className, 'generateInvoices', arguments );
+        return this.argumentsHandler(this.className, 'generateInvoices', arguments);
 
-	}
+    }
 
 
-
-} );
+});

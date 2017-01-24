@@ -1,41 +1,39 @@
-(function( $ ) {
+(function ($) {
 
-	$.fn.RibbonSubMenuNavWidget = function( options ) {
-		var opts = $.extend( {}, $.fn.RibbonSubMenuNavWidget.defaults, options );
+    $.fn.RibbonSubMenuNavWidget = function (options) {
+        var opts = $.extend({}, $.fn.RibbonSubMenuNavWidget.defaults, options);
 
-		var $this = this;
+        var $this = this;
 
-		var is_mouse_over = false;
+        var is_mouse_over = false;
 
-		this.close = function() {
-			this.remove();
-			LocalCacheData.openRibbonNaviMenu = null;
-		};
+        this.close = function () {
+            this.remove();
+            LocalCacheData.openRibbonNaviMenu = null;
+        };
 
-		this.getIsMouseOver = function() {
-			return is_mouse_over;
-		}
+        this.getIsMouseOver = function () {
+            return is_mouse_over;
+        }
 
-		this.each( function() {
+        this.each(function () {
 
-			var o = $.meta ? $.extend( {}, opts, $( this ).data() ) : opts;
+            var o = $.meta ? $.extend({}, opts, $(this).data()) : opts;
 
-			$( this ).mouseenter( function() {
-				is_mouse_over = true;
-			} );
+            $(this).mouseenter(function () {
+                is_mouse_over = true;
+            });
 
-			$( this ).mouseleave( function() {
-				is_mouse_over = false;
-			} );
+            $(this).mouseleave(function () {
+                is_mouse_over = false;
+            });
 
-		} );
+        });
 
-		return this;
+        return this;
 
-	};
+    };
 
-	$.fn.RibbonSubMenuNavWidget.defaults = {
+    $.fn.RibbonSubMenuNavWidget.defaults = {};
 
-	};
-
-})( jQuery );
+})(jQuery);

@@ -19,29 +19,28 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
-require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'global.inc.php');
-require_once( dirname(__FILE__) . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'includes'. DIRECTORY_SEPARATOR .'CLI.inc.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'global.inc.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'CLI.inc.php');
 
-if ( isset($argv[1]) AND in_array($argv[1], array('--help', '-help', '-h', '-?') ) ) {
-	$help_output = "Usage: fix_mysql.php\n";
-	echo $help_output;
+if (isset($argv[1]) and in_array($argv[1], array('--help', '-help', '-h', '-?'))) {
+    $help_output = "Usage: fix_mysql.php\n";
+    echo $help_output;
 } else {
-	//Handle command line arguments
-	$last_arg = count($argv)-1;
+    //Handle command line arguments
+    $last_arg = count($argv) - 1;
 
-	if ( isset($db) AND is_object($db) AND strncmp($db->databaseType,'mysql',5) != 0 ) {
-		echo "This script must be run on MySQL only!\n";
-		exit;
-	}
+    if (isset($db) and is_object($db) and strncmp($db->databaseType, 'mysql', 5) != 0) {
+        echo "This script must be run on MySQL only!\n";
+        exit;
+    }
 
-	$install_obj = new Install();
-	$install_obj->setDatabaseConnection( $db );
-	$install_obj->initializeSequences();
-	echo "Done.\n";
+    $install_obj = new Install();
+    $install_obj->setDatabaseConnection($db);
+    $install_obj->initializeSequences();
+    echo "Done.\n";
 }
 
 Debug::writeToLog();
-//Debug::Display();
-?>
+//Debug::Display();;

@@ -19,159 +19,193 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Policy
  */
-class PolicyGroupUserFactory extends Factory {
-	protected $table = 'policy_group_user';
-	protected $pk_sequence_name = 'policy_group_user_id_seq'; //PK Sequence name
+class PolicyGroupUserFactory extends Factory
+{
+    public $user_obj = null;
+        protected $table = 'policy_group_user'; //PK Sequence name
+protected $pk_sequence_name = 'policy_group_user_id_seq';
 
-	var $user_obj = NULL;
+    public function setPolicyGroup($id)
+    {
+        $id = trim($id);
 
-	function getPolicyGroup() {
-		if ( isset($this->data['policy_group_id']) ) {
-			return (int)$this->data['policy_group_id'];
-		}
+        $pglf = TTnew('PolicyGroupListFactory');
 
-		return FALSE;
-	}
-	function setPolicyGroup($id) {
-		$id = trim($id);
+        if ($id != 0
+            or $this->Validator->isResultSetWithRows('policy_group',
+                $pglf->getByID($id),
+                TTi18n::gettext('Policy Group is invalid')
+            )
+        ) {
+            $this->data['policy_group_id'] = $id;
 
-		$pglf = TTnew( 'PolicyGroupListFactory' );
+            return true;
+        }
 
-		if ( $id != 0
-				OR $this->Validator->isResultSetWithRows(	'policy_group',
-															$pglf->getByID($id),
-															TTi18n::gettext('Policy Group is invalid')
-															) ) {
-			$this->data['policy_group_id'] = $id;
+        return false;
+    }
 
-			return TRUE;
-		}
+    public function setUser($id)
+    {
+        $id = trim($id);
 
-		return FALSE;
-	}
+        $ulf = TTnew('UserListFactory');
 
-	function getUserObject() {
-		if ( is_object($this->user_obj) ) {
-			return $this->user_obj;
-		} else {
-			$ulf = TTnew( 'UserListFactory' );
-			$ulf->getById( $this->getUser() );
-			if ( $ulf->getRecordCount() == 1 ) {
-				$this->user_obj = $ulf->getCurrent();
-				return $this->user_obj;
-			}
+        if ($id != 0
+            and $this->Validator->isResultSetWithRows('user',
+                $ulf->getByID($id),
+                TTi18n::gettext('Selected Employee is invalid')
+            )
+            and $this->Validator->isTrue('user',
+                $this->isUniqueUser($id),
+                TTi18n::gettext('Selected Employee is already assigned to another Policy Group')
+            )
+        ) {
+            $this->data['user_id'] = $id;
 
-			return FALSE;
-		}
-	}
-	function isUniqueUser($id) {
-		$pglf = TTnew( 'PolicyGroupListFactory' );
+            return true;
+        }
 
-		$ph = array(
-					'id' => (int)$id,
-					);
+        return false;
+    }
 
+    public function isUniqueUser($id)
+    {
+        $pglf = TTnew('PolicyGroupListFactory');
 
-		$query = 'select a.id from '. $this->getTable() .' as a, '. $pglf->getTable() .' as b where a.policy_group_id = b.id AND a.user_id = ? AND b.deleted=0';
-		$user_id = $this->db->GetOne($query, $ph);
-		//Debug::Arr($user_id, 'Unique User ID: '. $user_id, __FILE__, __LINE__, __METHOD__, 10);
-
-		if ( $user_id === FALSE ) {
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-	function getUser() {
-		if ( isset($this->data['user_id']) ) {
-			return (int)$this->data['user_id'];
-		}
-	}
-	function setUser($id) {
-		$id = trim($id);
-
-		$ulf = TTnew( 'UserListFactory' );
-
-		if ( $id != 0
-				AND $this->Validator->isResultSetWithRows(	'user',
-															$ulf->getByID($id),
-															TTi18n::gettext('Selected Employee is invalid')
-															)
-				AND	$this->Validator->isTrue(		'user',
-													$this->isUniqueUser($id),
-													TTi18n::gettext('Selected Employee is already assigned to another Policy Group')
-													)
-			) {
-
-			$this->data['user_id'] = $id;
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
-
-	function getCreatedDate() {
-		return FALSE;
-	}
-	function setCreatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
-
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
+        $ph = array(
+            'id' => (int)$id,
+        );
 
 
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
+        $query = 'select a.id from ' . $this->getTable() . ' as a, ' . $pglf->getTable() . ' as b where a.policy_group_id = b.id AND a.user_id = ? AND b.deleted=0';
+        $user_id = $this->db->GetOne($query, $ph);
+        //Debug::Arr($user_id, 'Unique User ID: '. $user_id, __FILE__, __LINE__, __METHOD__, 10);
 
-	function addLog( $log_action ) {
-		$u_obj = $this->getUserObject();
-		if ( is_object($u_obj) ) {
-			return TTLog::addEntry( $this->getPolicyGroup(), $log_action, TTi18n::getText('Employee').': '. $u_obj->getFullName( FALSE, TRUE ), NULL, $this->getTable() );
-		}
+        if ($user_id === false) {
+            return true;
+        }
 
-		return FALSE;
-	}
+        return false;
+    }
+
+    public function getDeleted()
+    {
+        return false;
+    }
+
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedDate()
+    {
+        return false;
+    }
+
+    //This table doesn't have any of these columns, so overload the functions.
+
+    public function setCreatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getDeletedDate()
+    {
+        return false;
+    }
+
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getDeletedBy()
+    {
+        return false;
+    }
+
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
+
+    public function addLog($log_action)
+    {
+        $u_obj = $this->getUserObject();
+        if (is_object($u_obj)) {
+            return TTLog::addEntry($this->getPolicyGroup(), $log_action, TTi18n::getText('Employee') . ': ' . $u_obj->getFullName(false, true), null, $this->getTable());
+        }
+
+        return false;
+    }
+
+    public function getUserObject()
+    {
+        if (is_object($this->user_obj)) {
+            return $this->user_obj;
+        } else {
+            $ulf = TTnew('UserListFactory');
+            $ulf->getById($this->getUser());
+            if ($ulf->getRecordCount() == 1) {
+                $this->user_obj = $ulf->getCurrent();
+                return $this->user_obj;
+            }
+
+            return false;
+        }
+    }
+
+    public function getUser()
+    {
+        if (isset($this->data['user_id'])) {
+            return (int)$this->data['user_id'];
+        }
+    }
+
+    public function getPolicyGroup()
+    {
+        if (isset($this->data['policy_group_id'])) {
+            return (int)$this->data['policy_group_id'];
+        }
+
+        return false;
+    }
 }
-?>

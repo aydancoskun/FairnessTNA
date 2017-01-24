@@ -22,18 +22,18 @@ require_once 'HTML/QuickForm/Action.php';
 
 /**
  * This action handles the output of the form.
- * 
+ *
  * If you want to customize the form display, subclass this class and
  * override the _renderForm() method, you don't need to change the perform()
  * method itself.
- * 
+ *
  * @author  Alexey Borzov <avb@php.net>
  * @package HTML_QuickForm_Controller
  * @version $Revision: 1.4 $
  */
 class HTML_QuickForm_Action_Display extends HTML_QuickForm_Action
 {
-    function perform(&$page, $actionName)
+    public function perform(&$page, $actionName)
     {
         $pageName = $page->getAttribute('id');
         // If the original action was 'display' and we have values in container then we load them
@@ -63,18 +63,17 @@ class HTML_QuickForm_Action_Display extends HTML_QuickForm_Action
     }
 
 
-   /**
-    * Actually outputs the form.
-    * 
-    * If you want to customize the form's appearance (you most certainly will),
-    * then you should override this method. There is no need to override perform()
-    * 
-    * @access public
-    * @param  object HTML_QuickForm_Page  the page being processed
-    */
-    function _renderForm(&$page)
+    /**
+     * Actually outputs the form.
+     *
+     * If you want to customize the form's appearance (you most certainly will),
+     * then you should override this method. There is no need to override perform()
+     *
+     * @access public
+     * @param  object HTML_QuickForm_Page  the page being processed
+     */
+    public function _renderForm(&$page)
     {
         $page->display();
     }
 }
-?>

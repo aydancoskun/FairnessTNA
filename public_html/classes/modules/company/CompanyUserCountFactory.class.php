@@ -19,184 +19,218 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
-  ********************************************************************************/
+ ********************************************************************************/
 
 
 /**
  * @package Modules\Company
  */
-class CompanyUserCountFactory extends Factory {
-	protected $table = 'company_user_count';
-	protected $pk_sequence_name = 'company_user_count_id_seq'; //PK Sequence name
-	function getCompany() {
-		return (int)$this->data['company_id'];
-	}
-	function setCompany($id) {
-		$id = trim($id);
+class CompanyUserCountFactory extends Factory
+{
+    protected $table = 'company_user_count';
+    protected $pk_sequence_name = 'company_user_count_id_seq'; //PK Sequence name
 
-		$clf = TTnew( 'CompanyListFactory' );
+    public function getCompany()
+    {
+        return (int)$this->data['company_id'];
+    }
 
-		if ( $id == 0
-				OR $this->Validator->isResultSetWithRows(	'company',
-															$clf->getByID($id),
-															TTi18n::gettext('Company is invalid')
-															) ) {
-			$this->data['company_id'] = $id;
+    public function setCompany($id)
+    {
+        $id = trim($id);
 
-			return TRUE;
-		}
+        $clf = TTnew('CompanyListFactory');
 
-		return FALSE;
-	}
+        if ($id == 0
+            or $this->Validator->isResultSetWithRows('company',
+                $clf->getByID($id),
+                TTi18n::gettext('Company is invalid')
+            )
+        ) {
+            $this->data['company_id'] = $id;
 
-	function getDateStamp( $raw = FALSE ) {
-		if ( isset($this->data['date_stamp']) ) {
-			if ( $raw === TRUE ) {
-				return $this->data['date_stamp'];
-			} else {
-				return TTDate::strtotime( $this->data['date_stamp'] );
-			}
-		}
+            return true;
+        }
 
-		return FALSE;
-	}
-	function setDateStamp($epoch) {
-		$epoch = ( !is_int($epoch) ) ? trim($epoch) : $epoch; //Dont trim integer values, as it changes them to strings.
+        return false;
+    }
 
-		if	(	$this->Validator->isDate(		'date_stamp',
-												$epoch,
-												TTi18n::gettext('Incorrect date'))
-			) {
+    public function getDateStamp($raw = false)
+    {
+        if (isset($this->data['date_stamp'])) {
+            if ($raw === true) {
+                return $this->data['date_stamp'];
+            } else {
+                return TTDate::strtotime($this->data['date_stamp']);
+            }
+        }
 
-			if	(	$epoch > 0 ) {
-				$this->data['date_stamp'] = $epoch;
+        return false;
+    }
 
-				return TRUE;
-			} else {
-				$this->Validator->isTRUE(		'date_stamp',
-												FALSE,
-												TTi18n::gettext('Incorrect date'));
-			}
+    public function setDateStamp($epoch)
+    {
+        $epoch = (!is_int($epoch)) ? trim($epoch) : $epoch; //Dont trim integer values, as it changes them to strings.
+
+        if ($this->Validator->isDate('date_stamp',
+            $epoch,
+            TTi18n::gettext('Incorrect date'))
+        ) {
+            if ($epoch > 0) {
+                $this->data['date_stamp'] = $epoch;
+
+                return true;
+            } else {
+                $this->Validator->isTRUE('date_stamp',
+                    false,
+                    TTi18n::gettext('Incorrect date'));
+            }
+        }
+
+        return false;
+    }
+
+    public function getActiveUsers()
+    {
+        if (isset($this->data['active_users'])) {
+            return $this->data['active_users'];
+        }
+
+        return false;
+    }
+
+    public function setActiveUsers($value)
+    {
+        $value = (int)trim($value);
+
+        if ($this->Validator->isNumeric('active_users',
+            $value,
+            TTi18n::gettext('Incorrect value'))
+        ) {
+            $this->data['active_users'] = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getInActiveUsers()
+    {
+        if (isset($this->data['inactive_users'])) {
+            return $this->data['inactive_users'];
+        }
+
+        return false;
+    }
+
+    public function setInActiveUsers($value)
+    {
+        $value = (int)trim($value);
+
+        if ($this->Validator->isNumeric('inactive_users',
+            $value,
+            TTi18n::gettext('Incorrect value'))
+        ) {
+            $this->data['inactive_users'] = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getDeletedUsers()
+    {
+        if (isset($this->data['deleted_users'])) {
+            return $this->data['deleted_users'];
+        }
+
+        return false;
+    }
+
+    public function setDeletedUsers($value)
+    {
+        $value = (int)trim($value);
+
+        if ($this->Validator->isNumeric('deleted_users',
+            $value,
+            TTi18n::gettext('Incorrect value'))
+        ) {
+            $this->data['deleted_users'] = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function postSave()
+    {
+        //$this->removeCache( $this->getId() );
+
+        return true;
+    }
+
+    //This table doesn't have any of these columns, so overload the functions.
+    public function getDeleted()
+    {
+        return false;
+    }
+
+    public function setDeleted($bool)
+    {
+        return false;
+    }
+
+    public function getCreatedBy()
+    {
+        return false;
+    }
+
+    public function setCreatedBy($id = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedDate()
+    {
+        return false;
+    }
+
+    public function setUpdatedDate($epoch = null)
+    {
+        return false;
+    }
+
+    public function getUpdatedBy()
+    {
+        return false;
+    }
+
+    public function setUpdatedBy($id = null)
+    {
+        return false;
+    }
 
 
-		}
+    public function getDeletedDate()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
+    public function setDeletedDate($epoch = null)
+    {
+        return false;
+    }
 
-	function getActiveUsers() {
-		if ( isset($this->data['active_users']) ) {
-			return $this->data['active_users'];
-		}
+    public function getDeletedBy()
+    {
+        return false;
+    }
 
-		return FALSE;
-	}
-	function setActiveUsers($value) {
-		$value = (int)trim($value);
-
-		if	(	$this->Validator->isNumeric(	'active_users',
-												$value,
-												TTi18n::gettext('Incorrect value')) ) {
-
-			$this->data['active_users'] = $value;
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function getInActiveUsers() {
-		if ( isset($this->data['inactive_users']) ) {
-			return $this->data['inactive_users'];
-		}
-
-		return FALSE;
-	}
-	function setInActiveUsers($value) {
-		$value = (int)trim($value);
-
-		if	(	$this->Validator->isNumeric(	'inactive_users',
-												$value,
-												TTi18n::gettext('Incorrect value')) ) {
-
-			$this->data['inactive_users'] = $value;
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function getDeletedUsers() {
-		if ( isset($this->data['deleted_users']) ) {
-			return $this->data['deleted_users'];
-		}
-
-		return FALSE;
-	}
-	function setDeletedUsers($value) {
-		$value = (int)trim($value);
-
-		if	(	$this->Validator->isNumeric(	'deleted_users',
-												$value,
-												TTi18n::gettext('Incorrect value')) ) {
-
-			$this->data['deleted_users'] = $value;
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	function postSave() {
-		//$this->removeCache( $this->getId() );
-
-		return TRUE;
-	}
-
-	//This table doesn't have any of these columns, so overload the functions.
-	function getDeleted() {
-		return FALSE;
-	}
-	function setDeleted($bool) {
-		return FALSE;
-	}
-
-	function getCreatedBy() {
-		return FALSE;
-	}
-	function setCreatedBy($id = NULL) {
-		return FALSE;
-	}
-
-	function getUpdatedDate() {
-		return FALSE;
-	}
-	function setUpdatedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getUpdatedBy() {
-		return FALSE;
-	}
-	function setUpdatedBy($id = NULL) {
-		return FALSE;
-	}
-
-
-	function getDeletedDate() {
-		return FALSE;
-	}
-	function setDeletedDate($epoch = NULL) {
-		return FALSE;
-	}
-	function getDeletedBy() {
-		return FALSE;
-	}
-	function setDeletedBy($id = NULL) {
-		return FALSE;
-	}
-
+    public function setDeletedBy($id = null)
+    {
+        return false;
+    }
 }
-?>

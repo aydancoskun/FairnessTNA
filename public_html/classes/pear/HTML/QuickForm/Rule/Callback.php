@@ -21,9 +21,9 @@
 require_once('HTML/QuickForm/Rule.php');
 
 /**
-* Validates values using callback functions or methods
-* @version     1.0
-*/
+ * Validates values using callback functions or methods
+ * @version     1.0
+ */
 class HTML_QuickForm_Rule_Callback extends HTML_QuickForm_Rule
 {
     /**
@@ -36,29 +36,29 @@ class HTML_QuickForm_Rule_Callback extends HTML_QuickForm_Rule
      * @var     array
      * @access  private
      */
-    var $_data = array();
+    public $_data = array();
 
-   /**
-    * Whether to use BC mode for specific rules
-    * 
-    * Previous versions of QF passed element's name as a first parameter
-    * to validation functions, but not to validation methods. This behaviour
-    * is emulated if you are using 'function' as rule type when registering.
-    * 
-    * @var array
-    * @access private
-    */
-    var $_BCMode = array();
+    /**
+     * Whether to use BC mode for specific rules
+     *
+     * Previous versions of QF passed element's name as a first parameter
+     * to validation functions, but not to validation methods. This behaviour
+     * is emulated if you are using 'function' as rule type when registering.
+     *
+     * @var array
+     * @access private
+     */
+    public $_BCMode = array();
 
     /**
      * Validates a value using a callback
      *
-     * @param     string    $value      Value to be checked
-     * @param     mixed     $options    Options for callback
+     * @param     string $value Value to be checked
+     * @param     mixed $options Options for callback
      * @access    public
      * @return    boolean   true if value is valid
      */
-    function validate($value, $options = null)
+    public function validate($value, $options = null)
     {
         if (isset($this->_data[$this->name])) {
             $callback = $this->_data[$this->name];
@@ -79,13 +79,13 @@ class HTML_QuickForm_Rule_Callback extends HTML_QuickForm_Rule
     /**
      * Adds new callbacks to the callbacks list
      *
-     * @param     string    $name       Name of rule
-     * @param     string    $callback   Name of function or method
-     * @param     string    $class      Name of class containing the method
-     * @param     bool      $BCMode     Backwards compatibility mode 
+     * @param     string $name Name of rule
+     * @param     string $callback Name of function or method
+     * @param     string $class Name of class containing the method
+     * @param     bool $BCMode Backwards compatibility mode
      * @access    public
      */
-    function addData($name, $callback, $class = null, $BCMode = false)
+    public function addData($name, $callback, $class = null, $BCMode = false)
     {
         if (!empty($class)) {
             $this->_data[$name] = array($callback, $class);
@@ -96,18 +96,16 @@ class HTML_QuickForm_Rule_Callback extends HTML_QuickForm_Rule
     } // end func addData
 
 
-    function getValidationScript($options = null)
+    public function getValidationScript($options = null)
     {
         if (isset($this->_data[$this->name])) {
             $callback = $this->_data[$this->name][0];
-            $params   = ($this->_BCMode[$this->name]? "'', {jsVar}": '{jsVar}') .
-                        (isset($options)? ", '{$options}'": '');
+            $params = ($this->_BCMode[$this->name] ? "'', {jsVar}" : '{jsVar}') .
+                (isset($options) ? ", '{$options}'" : '');
         } else {
-            $callback = is_array($options)? $options[1]: $options;
-            $params   = '{jsVar}';
+            $callback = is_array($options) ? $options[1] : $options;
+            $params = '{jsVar}';
         }
         return array('', "{jsVar} != '' && !{$callback}({$params})");
     } // end func getValidationScript
-
-} // end class HTML_QuickForm_Rule_Callback
-?>
+} // end class HTML_QuickForm_Rule_Callback;
