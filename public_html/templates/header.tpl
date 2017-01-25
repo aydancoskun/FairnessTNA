@@ -170,7 +170,7 @@
                 version.Please
                 re - run
                 the
-                Fairness
+                FairnessTNA
                 installer
                 to
                 complete

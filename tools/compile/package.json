@@ -1,5 +1,5 @@
 {
-  "name": "Fairness",
+  "name": "FairnessTNA",
   "version": "0.1.0",
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -13,6 +13,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Fairness",
+  "author": "FairnessTNA",
   "license": "ISC"
 }

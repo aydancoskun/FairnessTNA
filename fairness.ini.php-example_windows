@@ -1,7 +1,7 @@
 ;<?php die('Access denied...');?>
 ;
 ;
-; Fairness Configuration File
+; FairnessTNA Configuration File
 ; *Windows Example*
 ;
 ;
@@ -10,7 +10,7 @@
 ; System paths. NO TRAILING SLASHES!
 ;
 [path]
-;URL to Fairness web root directory. ie: http://your.domain.com/<*BASE_URL*>
+;URL to FairnessTNA web root directory. ie: http://your.domain.com/<*BASE_URL*>
 ;DO NOT INCLUDE http://your.domain.com, just the directory AFTER your domain
 base_url = /fairness/interface
 
@@ -48,7 +48,7 @@ password = "ENTER_PASSWORD_HERE"
 ; Email delivery settings.
 ;
 [mail]
-;Least setup, deliver email through Fairness's email relay via SOAP (HTTP port 80)
+;Least setup, deliver email through FairnessTNA's email relay via SOAP (HTTP port 80)
 delivery_method = soap 
 
 ;Deliver email through local sendmail command specified in php.ini

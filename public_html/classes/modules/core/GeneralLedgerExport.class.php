@@ -5,7 +5,7 @@
 How this needs to work
 ----------------------
 
-Abstraction layer. Store all data in a "Fairness" format, then use
+Abstraction layer. Store all data in a "FairnessTNA" format, then use
 different classes to export that data to each EFT foramt.
 
 Add:

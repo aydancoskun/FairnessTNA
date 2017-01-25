@@ -1,10 +1,10 @@
-Fairness Time & Attendance
+FairnessTNA Time & Attendance
 ==========================
 
-Fairness is Time and Attendance software derived from sources freely provided to the public by a prominent Canadian software company. It is licensed under the AGPL as is its upstream counterpart. See LICENSE file for the full license text and COPYRIGHT file for attribution and notes.
+FairnessTNA is Time and Attendance software derived from sources freely provided to the public by a prominent Canadian software company. It is licensed under the AGPL as is its upstream counterpart. See LICENSE file for the full license text and COPYRIGHT file for attribution and notes.
 
 
-To install fairness follow INSTALL.txt. It should run on any linux as well as other proprietary OSs as long as the system requirements are met.
+To install FairnessTNA follow INSTALL.txt. It should run on any linux as well as other proprietary OSs as long as the system requirements are met.
 
 
 So far we streamlined some of the original code base.

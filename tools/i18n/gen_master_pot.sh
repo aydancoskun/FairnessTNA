@@ -39,7 +39,7 @@ echo "Parsing JS Files..."
 find $DEPTH/ -name "*.js" | egrep -v "\.git|/tools/compile" | xargs cat | xgettext --from-code=UTF-8 --no-wrap --keyword=_ --join-existing --language=Javascript --no-location -s --output-dir=$LOCALE_ROOT -o $POT_FILENAME -
 
 #---- Extract strings from DB Tables with static strings ----
-###  Not necessary for Fairness at this time ###
+###  Not necessary for FairnessTNA at this time ###
 
 
 #---- Done ----

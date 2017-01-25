@@ -1,16 +1,15 @@
 <?php
-/*********************************************************************************
- * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright of T i m e T r e x Software Inc.
- * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
+/**********************************************************************************
+ * This file is part of "FairnessTNA", a Payroll and Time Management program.
+ * FairnessTNA is copyright 2013-2017 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
+ * others. For full attribution and copyrights details see the COPYRIGHT file.
  *
- * Fairness is free software; you can redistribute it and/or modify it under the
+ * FairnessTNA is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation, either version 3 of the License, or (at you option )
  * any later version.
  *
- * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FairnessTNA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
@@ -19,7 +18,7 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- ********************************************************************************/
+ *********************************************************************************/
 
 //PHP v5.1.0 introduced $_SERVER['REQUEST_TIME'], but it doesn't include microseconds until v5.4.0.
 if (!isset($_SERVER['REQUEST_TIME_FLOAT']) or version_compare(PHP_VERSION, '5.4.0', '<') == true) {
@@ -100,12 +99,12 @@ if (isset($config_vars['debug']['production']) and $config_vars['debug']['produc
 if (isset($config_vars['branding']['application_name']) and $config_vars['branding']['application_name'] != '') {
     define('APPLICATION_NAME', $config_vars['branding']['application_name']);
 } else {
-    define('APPLICATION_NAME', (PRODUCTION == false) ? 'Fairness-Debug' : 'Fairness');
+    define('APPLICATION_NAME', (PRODUCTION == false) ? 'FairnessTNA-Debug' : 'FairnessTNA');
 }
 if (isset($config_vars['branding']['organization_name']) and $config_vars['branding']['organization_name'] != '') {
     define('ORGANIZATION_NAME', $config_vars['branding']['organization_name']);
 } else {
-    define('ORGANIZATION_NAME', 'Fairness');
+    define('ORGANIZATION_NAME', 'FairnessTNA');
 }
 if (isset($config_vars['branding']['organization_url']) and $config_vars['branding']['organization_url'] != '') {
     define('ORGANIZATION_URL', $config_vars['branding']['organization_url']);
@@ -373,7 +372,7 @@ set_include_path(
     Environment::getBasePath() . 'classes' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'core' .
     PATH_SEPARATOR . Environment::getBasePath() . 'classes' .
     PATH_SEPARATOR . Environment::getBasePath() . 'classes' . DIRECTORY_SEPARATOR . 'plugins' .
-    //PATH_SEPARATOR . get_include_path() . //Don't include system include path, as it can cause conflicts with other packages bundled with Fairness. However the bundled PEAR.php must check for class_exists('PEAR') to prevent conflicts with PHPUnit.
+    //PATH_SEPARATOR . get_include_path() . //Don't include system include path, as it can cause conflicts with other packages bundled with FairnessTNA. However the bundled PEAR.php must check for class_exists('PEAR') to prevent conflicts with PHPUnit.
     PATH_SEPARATOR . Environment::getBasePath() . 'classes' . DIRECTORY_SEPARATOR . 'pear'); //Put PEAR path at the end so system installed PEAR is used first, this prevents require_once() from including PEAR from two directories, which causes a fatal error.
 
 require_once(Environment::getBasePath() . 'classes' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'Exception.class.php');

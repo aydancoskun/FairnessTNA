@@ -24,7 +24,7 @@ msgstr ""
 msgid " and "
 msgstr ""
 
-msgid " or contact a Fairness support expert for "
+msgid " or contact a FairnessTNA support expert for "
 msgstr ""
 
 msgid " requires a modern HTML5 standards compatible web browser, click here for more information."
@@ -517,7 +517,7 @@ msgstr ""
 msgid "A"
 msgstr ""
 
-msgid "A Newer Version of Fairness is Available."
+msgid "A Newer Version of FairnessTNA is Available."
 msgstr ""
 
 msgid "A password reset has been requested for"
@@ -2080,8 +2080,8 @@ msgstr ""
 msgid "Automatically Show Context Menu"
 msgstr ""
 
-msgid "Automatically created by Fairness"
-msgstr "由 Fairness 自动创建"
+msgid "Automatically created by FairnessTNA"
+msgstr "由 FairnessTNA 自动创建"
 
 msgid "Availability"
 msgstr ""
@@ -7033,7 +7033,7 @@ msgstr "Gibraltar"
 msgid "Gift"
 msgstr "礼物"
 
-msgid "Glad to hear that you are happy with your Fairness experience! But we don't want to rest on our laurels, so let us know what we are doing right, or what we can do to make further improvements, we will listen, promise."
+msgid "Glad to hear that you are happy with your FairnessTNA experience! But we don't want to rest on our laurels, so let us know what we are doing right, or what we can do to make further improvements, we will listen, promise."
 msgstr ""
 
 msgid "Glasgow"
@@ -8818,8 +8818,8 @@ msgstr ""
 msgid "Install Wizard"
 msgstr ""
 
-msgid "Installing/Upgrading the Fairness database may take up to 10 minutes. Please do not stop the process in any way, including pressing STOP or BACK in your web browser, doing so may leave your database in an unusable state."
-msgstr "安装/升级 Fairness 数据库可能需要10分钟。请不要中途中止过程，包括按你的浏览器上的’停止‘或’后退‘按钮，这么做可能导致你的数据库处于不稳定状态。"
+msgid "Installing/Upgrading the FairnessTNA database may take up to 10 minutes. Please do not stop the process in any way, including pressing STOP or BACK in your web browser, doing so may leave your database in an unusable state."
+msgstr "安装/升级 FairnessTNA 数据库可能需要10分钟。请不要中途中止过程，包括按你的浏览器上的’停止‘或’后退‘按钮，这么做可能导致你的数据库处于不稳定状态。"
 
 msgid "Institute"
 msgstr ""
@@ -12310,7 +12310,7 @@ msgstr ""
 msgid "Ogliastra"
 msgstr ""
 
-msgid "Oh no! Sorry to hear that you are unhappy with your Fairness experience, please let us know how we can improve, we will listen, promise."
+msgid "Oh no! Sorry to hear that you are unhappy with your FairnessTNA experience, please let us know how we can improve, we will listen, promise."
 msgstr ""
 
 msgid "Ohio"
@@ -16189,7 +16189,7 @@ msgstr "Sonora"
 msgid "Sonsonate"
 msgstr "松索纳特"
 
-msgid "Sorry to hear that you are not satisfied with your Fairness experience, please let us know how we can improve, we will listen, promise."
+msgid "Sorry to hear that you are not satisfied with your FairnessTNA experience, please let us know how we can improve, we will listen, promise."
 msgstr ""
 
 msgid "Sorry, your company's account has been CANCELLED, please contact customer support if you believe this is an error"
@@ -17458,10 +17458,10 @@ msgstr ""
 msgid "TimeSheet<br>Reports"
 msgstr ""
 
-msgid "Fairness Version"
+msgid "FairnessTNA Version"
 msgstr ""
 
-msgid "Fairness support"
+msgid "FairnessTNA support"
 msgstr ""
 
 msgid "TimeZone"
@@ -18773,8 +18773,8 @@ msgstr ""
 msgid "WARNING: %1 application version does not match database version. Please re-run the %1 installer to complete the upgrade process."
 msgstr ""
 
-msgid "WARNING: %1 application version does not match database version. Please re-run the Fairness installer to complete the upgrade process."
-msgstr "警告：%1 应用程序版本不兼容数据版本。请再运行 Fairness 安装程序方可完成升级程序。"
+msgid "WARNING: %1 application version does not match database version. Please re-run the FairnessTNA installer to complete the upgrade process."
+msgstr "警告：%1 应用程序版本不兼容数据版本。请再运行 FairnessTNA 安装程序方可完成升级程序。"
 
 msgid "WARNING: %1 automatic upgrade has failed due to a system error! Please contact your %1 administrator immediately to re-run the %1 installer to correct the issue."
 msgstr ""
@@ -21557,8 +21557,8 @@ msgstr ""
 #~ msgid "Folder:"
 #~ msgstr "文件夹："
 
-#~ msgid "For installation support, please join our community %1forums%2 or contact a Fairness support expert for %3Implementation Support Services%4."
-#~ msgstr "若需要安装支持，请加入我们的社区 %1论坛%2 或联系 Fairness 支持服务专家 %3购买应用支持服务%4。"
+#~ msgid "For installation support, please join our community %1forums%2 or contact a FairnessTNA support expert for %3Implementation Support Services%4."
+#~ msgstr "若需要安装支持，请加入我们的社区 %1论坛%2 或联系 FairnessTNA 支持服务专家 %3购买应用支持服务%4。"
 
 #~ msgid "Force Time Zone:"
 #~ msgstr "强用时区："
@@ -23379,14 +23379,14 @@ msgstr ""
 #~ msgid "Time Units:"
 #~ msgstr "时间单位："
 
-#~ msgid "Fairness"
-#~ msgstr "Fairness"
+#~ msgid "FairnessTNA"
+#~ msgstr "FairnessTNA"
 
-#~ msgid "Fairness Login"
-#~ msgstr "Fairness 登录"
+#~ msgid "FairnessTNA Login"
+#~ msgstr "FairnessTNA 登录"
 
-#~ msgid "Fairness Version:"
-#~ msgstr "Fairness 版本："
+#~ msgid "FairnessTNA Version:"
+#~ msgstr "FairnessTNA 版本："
 
 #~ msgid "Title:"
 #~ msgstr "标题："

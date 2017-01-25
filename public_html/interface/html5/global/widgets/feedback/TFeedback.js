@@ -60,11 +60,11 @@
             feedback_rating = $this.attr('data-feedback');
 
             if ($(this).attr('alt') == 'happy') {
-                $(message_container.find('.title')).text($.i18n._('Glad to hear that you are happy with your Fairness experience! But we don\'t want to rest on our laurels, so let us know what we are doing right, or what we can do to make further improvements, we will listen, promise.'))
+                $(message_container.find('.title')).text($.i18n._('Glad to hear that you are happy with your FairnessTNA experience! But we don\'t want to rest on our laurels, so let us know what we are doing right, or what we can do to make further improvements, we will listen, promise.'))
             } else if ($(this).attr('alt') == 'neutral') {
-                $(message_container.find('.title')).text($.i18n._('Sorry to hear that you are not satisfied with your Fairness experience, please let us know how we can improve, we will listen, promise.'))
+                $(message_container.find('.title')).text($.i18n._('Sorry to hear that you are not satisfied with your FairnessTNA experience, please let us know how we can improve, we will listen, promise.'))
             } else if ($(this).attr('alt') == 'sad') {
-                $(message_container.find('.title')).text($.i18n._('Oh no! Sorry to hear that you are unhappy with your Fairness experience, please let us know how we can improve, we will listen, promise.'))
+                $(message_container.find('.title')).text($.i18n._('Oh no! Sorry to hear that you are unhappy with your FairnessTNA experience, please let us know how we can improve, we will listen, promise.'))
             }
 
             message_container.find('.sendButton').html($.i18n._('Send'));

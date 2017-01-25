@@ -1,16 +1,15 @@
 <?php
-/*********************************************************************************
- * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright of T i m e T r e x Software Inc.
- * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
+/**********************************************************************************
+ * This file is part of "FairnessTNA", a Payroll and Time Management program.
+ * FairnessTNA is copyright 2013-2017 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
+ * others. For full attribution and copyrights details see the COPYRIGHT file.
  *
- * Fairness is free software; you can redistribute it and/or modify it under the
+ * FairnessTNA is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation, either version 3 of the License, or (at you option )
  * any later version.
  *
- * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FairnessTNA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
@@ -19,7 +18,7 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- ********************************************************************************/
+ *********************************************************************************/
 
 
 /**
@@ -199,7 +198,7 @@ class InstallSchema_1031A extends InstallSchema_Base
                                         Debug::Text('Hierarchy Control ID: ' . $hcf->getID() . ' Name: ' . $name, __FILE__, __LINE__, __METHOD__, 10);
 
                                         $hcf->setName(substr($name, 0, 249));
-                                        $hcf->setDescription(TTi18n::getText('Automatically created by Fairness'));
+                                        $hcf->setDescription(TTi18n::getText('Automatically created by FairnessTNA'));
 
                                         Debug::Text('zHierarchy Control ID: ' . $hcf->getID(), __FILE__, __LINE__, __METHOD__, 10);
                                         $hcf->setUser($decoded_path['children']);
@@ -279,7 +278,7 @@ class InstallSchema_1031A extends InstallSchema_Base
             }
         }
 
-        //This used to be handled in 1016T postInstall function, but when upgrading really old versions (ie: 2.2.22) of Fairness to newer
+        //This used to be handled in 1016T postInstall function, but when upgrading really old versions (ie: 2.2.22) of FairnessTNA to newer
         //ones (ie: 3.3.2) it would fail because new columns have been added to the company_deduction table in schema 1031A.
         //Migrate to completely separate Tax / Deductions for social security, as the employee and employer rates are different now.
         $clf = TTnew('CompanyListFactory');

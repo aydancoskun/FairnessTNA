@@ -13,14 +13,14 @@ fi
 $crontab_binary -u $web_server_user -l | grep -i $cron_file > /dev/null
 if [ $? == 1 ] ; then
 	if [ -e $cron_file ] ; then
-	        echo "Fairness Maintenance Jobs NOT in cron, adding..."
+	        echo "FairnessTNA Maintenance Jobs NOT in cron, adding..."
 		echo "* * * * * php ${cron_file} > /dev/null 2>&1" | $crontab_binary -u $web_server_user - 
 	else 
-		echo "ERROR: Fairness maintenance job file does not exist: ${cron_file}";
+		echo "ERROR: FairnessTNA maintenance job file does not exist: ${cron_file}";
 		exit 1;
 	fi
 else
-        echo "Fairness Maintenance Jobs already in cron, not adding again..."
+        echo "FairnessTNA Maintenance Jobs already in cron, not adding again..."
 fi;
 exit 0;
 

@@ -1,16 +1,15 @@
 <?php
-/*********************************************************************************
- * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright of T i m e T r e x Software Inc.
- * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
+/**********************************************************************************
+ * This file is part of "FairnessTNA", a Payroll and Time Management program.
+ * FairnessTNA is copyright 2013-2017 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
+ * others. For full attribution and copyrights details see the COPYRIGHT file.
  *
- * Fairness is free software; you can redistribute it and/or modify it under the
+ * FairnessTNA is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation, either version 3 of the License, or (at you option )
  * any later version.
  *
- * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FairnessTNA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
@@ -19,7 +18,7 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- ********************************************************************************/
+ *********************************************************************************/
 
 
 /**
@@ -2914,7 +2913,7 @@ private $prev_user_date_total_end_time_stamp = null;
                     if ($bp_obj->getIncludeMultipleBreaks() == true) {
                         //If only one break policy is defined (say 30min auto-add after 0hrs w/include punch time)
                         //and the employee punches out for two breaks, one for 10mins and one for 15mins, only the first break will be added back in.
-                        //Because Fairness tries to match each break to a specific break policy.
+                        //Because FairnessTNA tries to match each break to a specific break policy.
                         //getIncludeMultipleBreaks(): is the flag that ignores how many breaks there are in total,
                         //and just combines any breaks together that fall within the active after time.
                         //So it doesn't matter if the employee takes 1 break or 30, they are all combined into one after the active_after time.

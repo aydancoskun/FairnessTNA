@@ -1,16 +1,15 @@
 <?php
-/*********************************************************************************
- * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright of T i m e T r e x Software Inc.
- * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
+/**********************************************************************************
+ * This file is part of "FairnessTNA", a Payroll and Time Management program.
+ * FairnessTNA is copyright 2013-2017 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
+ * others. For full attribution and copyrights details see the COPYRIGHT file.
  *
- * Fairness is free software; you can redistribute it and/or modify it under the
+ * FairnessTNA is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation, either version 3 of the License, or (at you option )
  * any later version.
  *
- * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FairnessTNA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
@@ -19,7 +18,7 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- ********************************************************************************/
+ *********************************************************************************/
 
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'global.inc.php');
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'CLI.inc.php');
@@ -33,7 +32,7 @@ require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATO
 
  Proceedure to Convert MySQL to PostgreSQL:
 
- 1. Upgrade to latest version of Fairness still using MySQL.
+ 1. Upgrade to latest version of FairnessTNA still using MySQL.
 
  2. Run: convert_mysql_to_postgresql.php sequence > update_sequences.sql
  3. Run: convert_mysql_to_postgresql.php truncate > delete_all_data.sql
@@ -41,7 +40,7 @@ require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATO
  4. Dump MySQL database with the following command:
     mysqldump -t --skip-add-locks --compatible=postgresql --complete-insert <Fairness_Database_Name> > fairness_mysql.sql
 
- 5. Install a fresh copy of Fairness on PostgreSQL, make sure its the latest version of Fairness and it matches the version
+ 5. Install a fresh copy of FairnessTNA on PostgreSQL, make sure its the latest version of FairnessTNA and it matches the version
     currently installed and running on MySQL.
 
  6. Run: psql <Fairness_Database_Name> < delete_all_data.sql
@@ -94,6 +93,6 @@ if ($argc < 2 or in_array($argv[1], array('--help', '-help', '-h', '-?'))) {
     }
 }
 
-//echo "WARNING: Clear Fairness cache after running this.\n";
+//echo "WARNING: Clear FairnessTNA cache after running this.\n";
 
 //Debug::Display();;

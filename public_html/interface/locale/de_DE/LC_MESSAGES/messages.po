@@ -24,7 +24,7 @@ msgstr " "
 msgid " and "
 msgstr " und "
 
-msgid " or contact a Fairness support expert for "
+msgid " or contact a FairnessTNA support expert for "
 msgstr ""
 
 msgid " requires a modern HTML5 standards compatible web browser, click here for more information."
@@ -517,7 +517,7 @@ msgstr ""
 msgid "A"
 msgstr "A"
 
-msgid "A Newer Version of Fairness is Available."
+msgid "A Newer Version of FairnessTNA is Available."
 msgstr ""
 
 msgid "A password reset has been requested for"
@@ -2080,8 +2080,8 @@ msgstr "Automatische Stempeluhr-Einstellungen"
 msgid "Automatically Show Context Menu"
 msgstr "Kontextmenü automatisch einblenden"
 
-msgid "Automatically created by Fairness"
-msgstr "Automatisch durch Fairness angelegt"
+msgid "Automatically created by FairnessTNA"
+msgstr "Automatisch durch FairnessTNA angelegt"
 
 msgid "Availability"
 msgstr "Verfügbarkeit"
@@ -7033,7 +7033,7 @@ msgstr "Gibraltar"
 msgid "Gift"
 msgstr "Geschenk"
 
-msgid "Glad to hear that you are happy with your Fairness experience! But we don't want to rest on our laurels, so let us know what we are doing right, or what we can do to make further improvements, we will listen, promise."
+msgid "Glad to hear that you are happy with your FairnessTNA experience! But we don't want to rest on our laurels, so let us know what we are doing right, or what we can do to make further improvements, we will listen, promise."
 msgstr ""
 
 msgid "Glasgow"
@@ -8818,8 +8818,8 @@ msgstr ""
 msgid "Install Wizard"
 msgstr ""
 
-msgid "Installing/Upgrading the Fairness database may take up to 10 minutes. Please do not stop the process in any way, including pressing STOP or BACK in your web browser, doing so may leave your database in an unusable state."
-msgstr "Installation/Aktualisierung der Fairness-Datenbank kann bis zu 10 Minuten dauern. Bitte den Prozess auf keinen Fall stoppen, auch nicht, in dem Sie STOPP oder ZURÜCK an Ihrem Browser betätigen; es zu tun ließe Ihre Datenbank in einem nicht mehr benutzbaren Zustand."
+msgid "Installing/Upgrading the FairnessTNA database may take up to 10 minutes. Please do not stop the process in any way, including pressing STOP or BACK in your web browser, doing so may leave your database in an unusable state."
+msgstr "Installation/Aktualisierung der FairnessTNA-Datenbank kann bis zu 10 Minuten dauern. Bitte den Prozess auf keinen Fall stoppen, auch nicht, in dem Sie STOPP oder ZURÜCK an Ihrem Browser betätigen; es zu tun ließe Ihre Datenbank in einem nicht mehr benutzbaren Zustand."
 
 msgid "Institute"
 msgstr "Institut"
@@ -12310,7 +12310,7 @@ msgstr ""
 msgid "Ogliastra"
 msgstr "Ogliastra"
 
-msgid "Oh no! Sorry to hear that you are unhappy with your Fairness experience, please let us know how we can improve, we will listen, promise."
+msgid "Oh no! Sorry to hear that you are unhappy with your FairnessTNA experience, please let us know how we can improve, we will listen, promise."
 msgstr ""
 
 msgid "Ohio"
@@ -16189,7 +16189,7 @@ msgstr "Sonora"
 msgid "Sonsonate"
 msgstr "Sonsonate"
 
-msgid "Sorry to hear that you are not satisfied with your Fairness experience, please let us know how we can improve, we will listen, promise."
+msgid "Sorry to hear that you are not satisfied with your FairnessTNA experience, please let us know how we can improve, we will listen, promise."
 msgstr ""
 
 msgid "Sorry, your company's account has been CANCELLED, please contact customer support if you believe this is an error"
@@ -17458,10 +17458,10 @@ msgstr ""
 msgid "TimeSheet<br>Reports"
 msgstr ""
 
-msgid "Fairness Version"
+msgid "FairnessTNA Version"
 msgstr ""
 
-msgid "Fairness support"
+msgid "FairnessTNA support"
 msgstr ""
 
 msgid "TimeZone"
@@ -18773,8 +18773,8 @@ msgstr "WARNUNG: %1"
 msgid "WARNING: %1 application version does not match database version. Please re-run the %1 installer to complete the upgrade process."
 msgstr ""
 
-msgid "WARNING: %1 application version does not match database version. Please re-run the Fairness installer to complete the upgrade process."
-msgstr "WARNUNG: %1 Anwendungsversion stimmt nicht mit der Datenbankversion überein. Bitte lassen Sie, um den Upgrade-Prozess zu komplettieren, Fairness Installer erneut laufen."
+msgid "WARNING: %1 application version does not match database version. Please re-run the FairnessTNA installer to complete the upgrade process."
+msgstr "WARNUNG: %1 Anwendungsversion stimmt nicht mit der Datenbankversion überein. Bitte lassen Sie, um den Upgrade-Prozess zu komplettieren, FairnessTNA Installer erneut laufen."
 
 msgid "WARNING: %1 automatic upgrade has failed due to a system error! Please contact your %1 administrator immediately to re-run the %1 installer to correct the issue."
 msgstr ""
@@ -20186,8 +20186,8 @@ msgstr "Jahre"
 #~ msgid "First Name:"
 #~ msgstr "Vorname:"
 
-#~ msgid "For installation support, please join our community %1forums%2 or contact a Fairness support expert for %3Implementation Support Services%4."
-#~ msgstr "Um Installation-Support zu erhalten, treten Sie bitter unserer Community %1 -Foren%2 bei- oder nehmen Sie mit einem Fairness-Supportexperten für %3-Implementation Support-Services%4 Kontakt auf."
+#~ msgid "For installation support, please join our community %1forums%2 or contact a FairnessTNA support expert for %3Implementation Support Services%4."
+#~ msgstr "Um Installation-Support zu erhalten, treten Sie bitter unserer Community %1 -Foren%2 bei- oder nehmen Sie mit einem FairnessTNA-Supportexperten für %3-Implementation Support-Services%4 Kontakt auf."
 
 #~ msgid "Force closing pay period"
 #~ msgstr "Periodenabschluss erzwingen"
@@ -20340,8 +20340,8 @@ msgstr "Jahre"
 #~ msgid "This accrual policy is in use"
 #~ msgstr "Diese Abgrenzungsregel wird verwendet"
 
-#~ msgid "Fairness Version:"
-#~ msgstr "Fairness Version:"
+#~ msgid "FairnessTNA Version:"
+#~ msgstr "FairnessTNA Version:"
 
 #~ msgid "Total:"
 #~ msgstr "Gesamtmenge:"

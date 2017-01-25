@@ -309,7 +309,7 @@ InstallWizardController = BaseWizardController.extend({
                     license_html = license_html + $.i18n._('After this change has been made, you can click the "Re-Check" button below to begin your installation.');
                     license_html = license_html + '<br>';
                     license_html = license_html + '<br>';
-                    license_html = license_html + $.i18n._('For help, please visit') + ' <a href="https://github.com/aydancoskun/fairness">Fairness</a> ';
+                    license_html = license_html + $.i18n._('For help, please visit') + ' <a href="https://github.com/aydancoskun/fairness">FairnessTNA</a> ';
                     license.append(license_html);
 
                     var ribbon_button_box = this.getRibbonButtonBox();
@@ -1124,7 +1124,7 @@ InstallWizardController = BaseWizardController.extend({
                 }
 
                 if (this.onTestDatabaseConnectionClick(this, false)) {
-                    TAlertManager.showConfirmAlert($.i18n._('Installing/Upgrading the Fairness database may take up to 10 minutes. Please do not stop the process in any way, including pressing STOP or BACK in your web browser, doing so may leave your database in an unusable state.'), null, function (result) {
+                    TAlertManager.showConfirmAlert($.i18n._('Installing/Upgrading the FairnessTNA database may take up to 10 minutes. Please do not stop the process in any way, including pressing STOP or BACK in your web browser, doing so may leave your database in an unusable state.'), null, function (result) {
                         if (result) {
                             $this.api.createDatabase($data, {
                                 onResult: function (res) {

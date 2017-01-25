@@ -1,8 +1,8 @@
-Fairness Time & Attendance
+FairnessTNA Time & Attendance
 ==========================
 
-Fairness is copyright (C) 2013 Aydan Coskun with parts of the code being copyright (C) 2003 - 2013 TimeTrex Software Inc.
-This is because Fairness is a Fork of the "TimeTrex Workforce Management" software by Mike Benoit which is kindly licensed under the
+FairnessTNA is copyright (C) 2013 Aydan Coskun with parts of the code being copyright (C) 2003 - 2013 TimeTrex Software Inc.
+This is because FairnessTNA is a Fork of the "TimeTrex Workforce Management" software by Mike Benoit which is kindly licensed under the
 GNU AFFERO GENERAL PUBLIC LICENSE VERSION 3. See LICENSE file for the full license text.
 
 We had to take a good look at the way the license for Timetrex is implemented and what it actually means because it has a few gotchas. This is probably the reason no one else has ever forked TimeTrex. Below is a list of what was found. Just to be clear upfront: This is in no way a slight against Timetrex and especially Mike, in any way. We believe that part of the licensing choices that were made are either a clear oversight, misunderstanding or have their roots in the history of the Timetrex licensing model.
@@ -87,7 +87,7 @@ There are "Additional permissions" which you can remove. Quote: "When you convey
 Type 2:
 Then there are "further restrictions". Quote: "All other non-permissive additional terms are considered "further restrictions" within the meaning of section 10. If the Program as you received it, or any part of it, contains a notice stating that it is governed by this License along with a term that is a further restriction, you may remove that term."
 
-From a legal standpoint we are forking this software and it is now called "Fairness Time & Attendance". Obviously putting "Powered by Timetrex" onto every page is nonsense for an open source product. But there is the point of attribution.
+From a legal standpoint we are forking this software and it is now called "FairnessTNA Time & Attendance". Obviously putting "Powered by Timetrex" onto every page is nonsense for an open source product. But there is the point of attribution.
 
 There are two quotes relevant to this:
 
@@ -139,7 +139,7 @@ Section 3 of the GNU AFFERO GENERAL PUBLIC LICENSE Version 3 states:
 
 One last point is that timetrex software phones home without telling the user. It does that a lot. It uses several ways to do so. A soap interface, plain "fopen" calls during every step of the install process. (understood why, but please let people know or ask if its OK.) and Google Analytics for every page load including host names and "licensing information", number of users etc.
 
-All that has been removed in Fairness.
+All that has been removed in FairnessTNA.
 
 List of removals:
 ----------------

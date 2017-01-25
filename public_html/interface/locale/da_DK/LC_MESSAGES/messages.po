@@ -24,7 +24,7 @@ msgstr ""
 msgid " and "
 msgstr ""
 
-msgid " or contact a Fairness support expert for "
+msgid " or contact a FairnessTNA support expert for "
 msgstr ""
 
 msgid " requires a modern HTML5 standards compatible web browser, click here for more information."
@@ -517,7 +517,7 @@ msgstr ""
 msgid "A"
 msgstr ""
 
-msgid "A Newer Version of Fairness is Available."
+msgid "A Newer Version of FairnessTNA is Available."
 msgstr ""
 
 msgid "A password reset has been requested for"
@@ -2080,7 +2080,7 @@ msgstr ""
 msgid "Automatically Show Context Menu"
 msgstr ""
 
-msgid "Automatically created by Fairness"
+msgid "Automatically created by FairnessTNA"
 msgstr ""
 
 msgid "Availability"
@@ -7033,7 +7033,7 @@ msgstr "Gibraltar"
 msgid "Gift"
 msgstr "Gave"
 
-msgid "Glad to hear that you are happy with your Fairness experience! But we don't want to rest on our laurels, so let us know what we are doing right, or what we can do to make further improvements, we will listen, promise."
+msgid "Glad to hear that you are happy with your FairnessTNA experience! But we don't want to rest on our laurels, so let us know what we are doing right, or what we can do to make further improvements, we will listen, promise."
 msgstr ""
 
 msgid "Glasgow"
@@ -8818,8 +8818,8 @@ msgstr ""
 msgid "Install Wizard"
 msgstr ""
 
-msgid "Installing/Upgrading the Fairness database may take up to 10 minutes. Please do not stop the process in any way, including pressing STOP or BACK in your web browser, doing so may leave your database in an unusable state."
-msgstr "Installation/opdatering af Fairness databasen kan tage op til 10 minutter. Afbryd venligst ikke processen på nogen måde, heller ikke ved at trykke STOP eller TILBAGE i din web browser, hvis du gør dette kan det efterlade din database i en ikke funktionsdygtig tilstand."
+msgid "Installing/Upgrading the FairnessTNA database may take up to 10 minutes. Please do not stop the process in any way, including pressing STOP or BACK in your web browser, doing so may leave your database in an unusable state."
+msgstr "Installation/opdatering af FairnessTNA databasen kan tage op til 10 minutter. Afbryd venligst ikke processen på nogen måde, heller ikke ved at trykke STOP eller TILBAGE i din web browser, hvis du gør dette kan det efterlade din database i en ikke funktionsdygtig tilstand."
 
 msgid "Institute"
 msgstr ""
@@ -12310,7 +12310,7 @@ msgstr ""
 msgid "Ogliastra"
 msgstr ""
 
-msgid "Oh no! Sorry to hear that you are unhappy with your Fairness experience, please let us know how we can improve, we will listen, promise."
+msgid "Oh no! Sorry to hear that you are unhappy with your FairnessTNA experience, please let us know how we can improve, we will listen, promise."
 msgstr ""
 
 msgid "Ohio"
@@ -16189,7 +16189,7 @@ msgstr ""
 msgid "Sonsonate"
 msgstr ""
 
-msgid "Sorry to hear that you are not satisfied with your Fairness experience, please let us know how we can improve, we will listen, promise."
+msgid "Sorry to hear that you are not satisfied with your FairnessTNA experience, please let us know how we can improve, we will listen, promise."
 msgstr ""
 
 msgid "Sorry, your company's account has been CANCELLED, please contact customer support if you believe this is an error"
@@ -17458,10 +17458,10 @@ msgstr ""
 msgid "TimeSheet<br>Reports"
 msgstr ""
 
-msgid "Fairness Version"
+msgid "FairnessTNA Version"
 msgstr ""
 
-msgid "Fairness support"
+msgid "FairnessTNA support"
 msgstr ""
 
 msgid "TimeZone"
@@ -18773,8 +18773,8 @@ msgstr ""
 msgid "WARNING: %1 application version does not match database version. Please re-run the %1 installer to complete the upgrade process."
 msgstr ""
 
-msgid "WARNING: %1 application version does not match database version. Please re-run the Fairness installer to complete the upgrade process."
-msgstr "ADVARSEL: %1 apllikationsversion matcher ikke databaseversionen. Kør venligst Fairness installeren igen for at færdiggøre opgraderingsprocessen."
+msgid "WARNING: %1 application version does not match database version. Please re-run the FairnessTNA installer to complete the upgrade process."
+msgstr "ADVARSEL: %1 apllikationsversion matcher ikke databaseversionen. Kør venligst FairnessTNA installeren igen for at færdiggøre opgraderingsprocessen."
 
 msgid "WARNING: %1 automatic upgrade has failed due to a system error! Please contact your %1 administrator immediately to re-run the %1 installer to correct the issue."
 msgstr ""
@@ -21548,8 +21548,8 @@ msgstr ""
 #~ msgid "Folder:"
 #~ msgstr "Mappe:"
 
-#~ msgid "For installation support, please join our community %1forums%2 or contact a Fairness support expert for %3Implementation Support Services%4."
-#~ msgstr "For installationssupport, så meld dig venligst ind i vores fællesskabs%1fora%2 eller kontakt en Fairness support ekspert for %3implementations support servicer%4."
+#~ msgid "For installation support, please join our community %1forums%2 or contact a FairnessTNA support expert for %3Implementation Support Services%4."
+#~ msgstr "For installationssupport, så meld dig venligst ind i vores fællesskabs%1fora%2 eller kontakt en FairnessTNA support ekspert for %3implementations support servicer%4."
 
 #~ msgid "Force Time Zone:"
 #~ msgstr "Tving tidszone:"
@@ -23275,14 +23275,14 @@ msgstr ""
 #~ msgid "Time Zone:"
 #~ msgstr "Tidszone:"
 
-#~ msgid "Fairness"
-#~ msgstr "Fairness"
+#~ msgid "FairnessTNA"
+#~ msgstr "FairnessTNA"
 
-#~ msgid "Fairness Login"
-#~ msgstr "Fairness log på"
+#~ msgid "FairnessTNA Login"
+#~ msgstr "FairnessTNA log på"
 
-#~ msgid "Fairness Version:"
-#~ msgstr "Fairness version:"
+#~ msgid "FairnessTNA Version:"
+#~ msgstr "FairnessTNA version:"
 
 #~ msgid "Title:"
 #~ msgstr "Titel:"
@@ -23549,7 +23549,7 @@ msgstr ""
 #~ msgstr "Jomfruøerne, U.s."
 
 #~ msgid "WARNING! With LDAP Only authentication if a connection is not able to be established with your LDAP server you will be locked out of the system completely. Please test the LDAP settings using Enabled w/Local Fallback mode prior to choosing this option."
-#~ msgstr "ADVARSEL! Med LDAP kan der kun ske en godkendelse af brugeren hvis forbindelsen til din LDAP-server er korrekt konfigureret og installeret. Hvis Fairness ikke er i stand til at være etablere kontakt med din LDAP-server vil du blive lukket fuldstændigt ude af systemet. Test derfor LDAP indstillingerne på din server ved hjælp af menupunktet 'Aktiveret med lokal bruger godkendelse' før du vælger denne mulighed."
+#~ msgstr "ADVARSEL! Med LDAP kan der kun ske en godkendelse af brugeren hvis forbindelsen til din LDAP-server er korrekt konfigureret og installeret. Hvis FairnessTNA ikke er i stand til at være etablere kontakt med din LDAP-server vil du blive lukket fuldstændigt ude af systemet. Test derfor LDAP indstillingerne på din server ved hjælp af menupunktet 'Aktiveret med lokal bruger godkendelse' før du vælger denne mulighed."
 
 #~ msgid "WARNING:"
 #~ msgstr "ADVARSEL:"

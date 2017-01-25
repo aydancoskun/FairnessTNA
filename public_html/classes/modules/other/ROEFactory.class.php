@@ -1,16 +1,15 @@
 <?php
-/*********************************************************************************
- * This file is part of "Fairness", a Payroll and Time Management program.
- * Fairness is Copyright 2013 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * Portions of this software are Copyright of T i m e T r e x Software Inc.
- * Fairness is a fork of "T i m e T r e x Workforce Management" Software.
+/**********************************************************************************
+ * This file is part of "FairnessTNA", a Payroll and Time Management program.
+ * FairnessTNA is copyright 2013-2017 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
+ * others. For full attribution and copyrights details see the COPYRIGHT file.
  *
- * Fairness is free software; you can redistribute it and/or modify it under the
+ * FairnessTNA is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation, either version 3 of the License, or (at you option )
  * any later version.
  *
- * Fairness is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FairnessTNA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
@@ -19,7 +18,7 @@
  * with this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- ********************************************************************************/
+ *********************************************************************************/
 
 
 /**
@@ -536,7 +535,7 @@ protected $pk_sequence_name = 'roe_id_seq';
 
     public function getSetupData()
     {
-        //FIXME: Alert the user if they don't have enough information in Fairness to get accurate values.
+        //FIXME: Alert the user if they don't have enough information in FairnessTNA to get accurate values.
         //Get insurable hours, earnings, and vacation pay now that the final pay stub is generated
         $ugdlf = TTnew('UserGenericDataListFactory');
         $ugdlf->getByCompanyIdAndScriptAndDefault($this->getUserObject()->getCompany(), $this->getTable());
@@ -592,7 +591,7 @@ protected $pk_sequence_name = 'roe_id_seq';
         $pay_periods_with_earnings = 0;
 
         //Don't include YTD adjustments in ROE totals,
-        //As the proper way is to generate ROEs from their old system and ROEs from Fairness, and issue both to the employee.
+        //As the proper way is to generate ROEs from their old system and ROEs from FairnessTNA, and issue both to the employee.
         //Since its unlikely that they will be importing hours and earnings worked in each pay period in order to properly account for them.
         $pself = TTnew('PayStubEntryListFactory');
         $pself->getPayPeriodReportByUserIdAndEntryNameIdAndStartDateAndEndDate($this->getUser(), $setup_data['insurable_earnings_psea_ids'], $insurable_earnings_start_date, $this->getFinalPayStubEndDate(), 0, true, null, array('x.start_date' => 'desc'));
@@ -994,7 +993,7 @@ protected $pk_sequence_name = 'roe_id_seq';
             UserGenericStatusFactory::queueGenericStatus($this->getUserObject()->getFullName(true), 20, TTi18n::gettext('Not generating final pay stub!'), null);
         }
 
-        //FIXME: Alert the user if they don't have enough information in Fairness to get accurate values.
+        //FIXME: Alert the user if they don't have enough information in FairnessTNA to get accurate values.
         //Get insurable hours, earnings, and vacation pay now that the final pay stub is generated
         $setup_data = $this->getSetupData();
         $absence_policy_ids = $setup_data['absence_policy_ids'];

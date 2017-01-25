@@ -1677,7 +1677,7 @@ if (!class_exists('FPDF')) {
             }
         }
 
-//Additional Functions for Fairness
+//Additional Functions for FairnessTNA
         public function rotate($angle, $x = -1, $y = -1)
         {
             if ($x == -1) {

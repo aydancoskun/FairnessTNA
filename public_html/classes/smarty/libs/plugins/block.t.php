@@ -92,7 +92,7 @@ function smarty_block_t($params, $text, &$smarty)
         }
     }
 
-    // *** Start Fairness Mod - Calls TT specific gettext function if defined.
+    // *** Start FairnessTNA Mod - Calls TT specific gettext function if defined.
     if (class_exists('TTi18n')) {
         $text = TTi18n::gettext($text);
     } else {
