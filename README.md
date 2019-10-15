@@ -1,7 +1,18 @@
 FairnessTNA Time & Attendance
 ==========================
 
-FairnessTNA is Time and Attendance software derived from sources freely provided to the public by a prominent Canadian software company. It is licensed under the AGPL as is its upstream counterpart. See LICENSE file for the full license text and COPYRIGHT file for attribution and notes.
+Introduction
+
+FairnessTNA is a third-party fork of the TimeTrex Workforce Management Software. FairnessTNA attempts to add functionality to TimeTrex with a goal of making things even simpler and faster. We are very grateful to the TimeTrex team for providing the base that we built FairnessTNA on. Since this is a fork we'll pull in changes from the original TimeTrex regularly as they are released.
+
+
+Some of the documentation in this readme was taken from the TimeTrex website and provided here for convenience, so that you can read this document and know about all features provided. The original documentation can be found here: https://help.timetrex.com/latest/enterprise/Introduction/Administrator-Guide-Use.htm.
+
+
+Since FairnessTNA is intended to replace TimeTrex, it still uses most of the same database structure. Generaly speaking FairnessTNA should be a drop in replacement for the TimeTrex Community Edition, but we are a small team. Please back up your TimeTrex install carefully before attempting a migrations.
+
+
+FairnessTNA is licensed under the AGPL as is its upstream counterpart. See LICENSE file for the full license text and COPYRIGHT file for attribution and notes.
 
 
 To install FairnessTNA follow INSTALL.txt. It should run on any linux as well as other proprietary OSs as long as the system requirements are met.
