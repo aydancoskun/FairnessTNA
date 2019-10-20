@@ -1,29 +1,34 @@
 #!/usr/bin/php
 <?php
-/**********************************************************************************
- * This file is part of "FairnessTNA", a Payroll and Time Management program.
- * FairnessTNA is copyright 2013-2017 Aydan Coskun (aydan.ayfer.coskun@gmail.com)
- * others. For full attribution and copyrights details see the COPYRIGHT file.
+/*********************************************************************************
+ * FairnessTNA is a Workforce Management program forked from TimeTrex in 2013,
+ * copyright Aydan Coskun. Original code base is copyright TimeTrex Software Inc.
  *
- * FairnessTNA is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Affero General Public License version 3 as published by the
- * Free Software Foundation, either version 3 of the License, or (at you option )
- * any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * FairnessTNA is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along
- * with this program; if not, see http://www.gnu.org/licenses or write to the Free
- * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
- * 02110-1301 USA.
- *********************************************************************************/
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * You can contact Aydan Coskun via issue tracker on github.com/aydancoskun
+ ********************************************************************************/
 /*
  * File Contributed By: Open Source Consulting, S.A.   San Jose, Costa Rica.
  * http://osc.co.cr
  */
+
+if ( PHP_SAPI != 'cli' ) {
+	echo "This script can only be called from the Command Line.\n";
+	exit;
+}
+
 
 // creates the locale directories for use with gettext
 // and also initializes each with a messages.po file.
@@ -36,7 +41,7 @@ $locales = array(
 
 //	'af_ZA',
 //	'am_ET',
-    'ar_EG',
+	'ar_EG',
 //	'as_IN',
 //	'az_AZ',
 //	'be_BY',
@@ -50,30 +55,30 @@ $locales = array(
 //	'co_FR',
 //	'cs_CZ',
 //	'cy_GB',
-    'da_DK',
-    'de_DE',
+	'da_DK',
+	'de_DE',
 //	'dz_BT',
 //	'el_GR',
-    'en_US',
-    'es_ES',
+	'en_US',
+	'es_ES',
 //	'et_EE',
 //	'fa_IR',
 //	'fi_FI',
 //	'fj_FJ',
 //	'fo_FO',
-    'fr_FR',
-    'fr_CA',
+	'fr_FR',
+	'fr_CA',
 //	'ga_IE',
 //	'gd_GB',
 //	'gu_IN',
 //	'he_IL',
 //	'hi_IN',
 //	'hr_HR',
-//	'hu_HU',
+	'hu_HU',
 //	'hy_AM',
-    'id_ID',
+	'id_ID',
 // 'is_IS',
-    'it_IT',
+	'it_IT',
 //	'ja_JP',
 //	'jv_ID',
 //	'ka_GE',
@@ -106,8 +111,8 @@ $locales = array(
 //	'pa_IN',
 //	'pl_PL',
 //	'ps_AF',
-    'pt_PT',
-    'pt_BR',
+	'pt_PT',
+	'pt_BR',
 //	'rm_CH',
 //	'rn_BI',
 //	'ro_RO',
@@ -136,17 +141,17 @@ $locales = array(
 //	'wa_BE',
 //	'wen_DE',
 //	'lp_SG',
-    'zh_ZH',
-    'yi_US',
+	'zh_ZH',
+	'yi_US',
 );
 
 $dir = $depth . '/interface/locale';
-chdir($dir);
+chdir( $dir );
 
-foreach ($locales as $locale) {
-    if (!is_dir('./' . $locale)) {
-        $cmd = "mkdir $locale && mkdir $locale/LC_MESSAGES && msginit --no-translator -l $locale -o $locale/LC_MESSAGES/messages.po -i messages.pot";
-        shell_exec($cmd);
-    }
+foreach( $locales as $locale ) {
+	if ( !is_dir( './' . $locale ) ) {
+		$cmd = "mkdir $locale && mkdir $locale/LC_MESSAGES && msginit --no-translator -l $locale -o $locale/LC_MESSAGES/messages.po -i messages.pot";
+		shell_exec( $cmd );
+	}
 }
 ?>

@@ -1,0 +1,51 @@
+
+The following third party softwares are used in FairnessTNA:
+
+FairnessTNA v11.6.1 is powered by TimeTrex Community Edition v11.6.1
+https://www.timetrex.com/onsite-community?step=download or 
+https://github.com/aydancoskun/timetrex-community-edition/releases
+autolinker 1.6.2 MIT https://github.com/gregjacobs/Autolinker.js
+backbone 1.3.3 MIT backbonejs.org
+json2.js 10-25-17 backbonejs.org
+underscore 1.9.1 MIT http://underscorejs.org/
+bootstrap 4.1.3 MIT http://getbootstrap.com
+bootstrap-select 1.13.2 MIT https://silviomoreto.github.io/bootstrap-select/
+bootstrap-toolkit 2.6.3 MIT https://github.com/maciej-gurban/responsive-bootstrap-toolkit
+leaflet 1.3.4 BSD 	http://leafletjs.com/download.html
+leaflet-draw 1.0.3 MIT https://github.com/Leaflet/Leaflet.draw
+leaflet-providers1.4.0 BSD https://github.com/leaflet-extras/leaflet-providers
+leaflet-routing-machine 3.2.11 ISC http://www.liedman.net/leaflet-routing-machine/
+leaflet-markercluster 1.4.1 MIT https://github.com/Leaflet/Leaflet.markercluster
+pdfjs 1.9.426 Apache https://mozilla.github.io/pdf.js/getting_started/#download
+qunit 2.6.0 MIT https://qunitjs.com/
+rightclickmenu 2.7.1 MIT http://swisnl.github.io/jQuery-contextMenu/index.html
+tinymce 4.8.1 LGPL https://www.tinymce.com/download/
+html2canvas.js 1.00-alpha.12 MIT https://github.com/niklasvh/html2canvas/releases
+html5shiv 3.7.3 MIT https://github.com/aFarkas/html5shiv
+interact.min.js 1.3.4 ASIS interactjs.io
+masonry 4.2.2 MIT http://masonry.desandro.com
+measurement 0.1 unknown https://github.com/Philzen/measurement.js
+moment 2.22.2 MIT https://momentjs.com/
+nanobar 0.4.2 MIT https://github.com/jacoborus/nanobar
+r 2.3.6 BSD https://github.com/requirejs/r.js
+require 2.3.6 BSD https://raw.githubusercontent.com/requirejs/r.js/master/require.js
+require_async_plugin 0.1.2 MIT https://github.com/millermedeiros/requirejs-plugins/tree/master/src
+respond 1.4.2 ASIS https://github.com/scottjehl/Respond
+sonic 0.3 MIT https://github.com/padolsey/sonic.js
+color-picker 1.1.1 MIT https://github.com/PitPik/tinyColorPicker/blob/master/jqColorPicker.min.js
+datepicker 1.6.3 MIT https://github.com/trentrichardson/jQuery-Timepicker-Addon
+free-jqgrid 4.15.5 MIT https://github.com/free-jqgrid/jqGrid/releases
+jquery.jqgrid.winmultiselect 30-Oct-2017 MIT https://github.com/OlegKi/jqGrid-plugins
+grid.locale-en.js unknown unknown
+jquery 3.3.1 ASIS https://github.com/jquery/jquery
+jqueryui 1.12.1 MIT http://jqueryui.com/download/
+jquery.qtip 3.0.3 MIT https://github.com/Craga89/qTip1,http://qtip2.com/
+jquery-tagsinput.js 1.3.3 MIT http://xoxco.com/clickable/jquery-tags-input [SITE IS GONE]
+jquery.stickytableheaders 0.1.24 ASIS https://github.com/jmosbech/StickyTableHeaders [unused]
+jquery-ba-resize 1.1 MIT https://github.com/cowboy/jquery-resize
+jquery.bridget 2.0.1 MIT https://github.com/desandro/jquery-bridget
+jquery.i18n 1.1.2 AS IS	https://github.com/recurser/jquery-i18n
+jquery.imageareaselect 0.9.10 MIT http://odyniec.net/projects/imgareaselect/
+jquery.json 2.6.0 MIT https://github.com/Krinkle/jquery-json
+jquery.tablednd 1.0.3 MIT https://github.com/isocra/TableDnD
+decimal 10.0.2 MIT https://github.com/MikeMcl/decimal.js/

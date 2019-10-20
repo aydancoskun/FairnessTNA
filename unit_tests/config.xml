@@ -1,62 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
-         backupStaticAttributes="true"
-         bootstrap="BootStrap.php"
-         cacheTokens="true"
-         colors="false"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         forceCoversAnnotation="false"
-         mapTestClassNameToCoveredClassName="false"
-         printerClass="PHPUnit_TextUI_ResultPrinter"
-         processIsolation="false"
-         stopOnError="true"
-         stopOnFailure="true"
-         stopOnIncomplete="false"
-         stopOnSkipped="false"
-         testSuiteLoaderClass="PHPUnit_Runner_StandardTestSuiteLoader"
-         strict="false"
-         verbose="false">
-
+<phpunit    backupGlobals="false"
+            backupStaticAttributes="true"
+            bootstrap="BootStrap.php"
+            cacheResult="true"
+            cacheResultFile="./cacheResultFile"
+            cacheTokens="true"
+            colors="true"
+            columns="max"
+            convertDeprecationsToExceptions="true"
+            convertErrorsToExceptions="true"
+            convertNoticesToExceptions="true"
+            convertWarningsToExceptions="true"
+            disableCodeCoverageIgnore="false"
+            forceCoversAnnotation="false"
+            printerClass="PHPUnit\TextUI\ResultPrinter"
+            processIsolation="false"
+            stopOnError="true"
+            stopOnFailure="true"
+            stopOnIncomplete="false"
+            stopOnRisky="false"
+            stopOnSkipped="false"
+            stopOnWarning="false"
+            stopOnDefect="false"
+            failOnRisky="false"
+            failOnWarning="false"
+            beStrictAboutChangesToGlobalState="false"
+            beStrictAboutOutputDuringTests="false"
+            beStrictAboutResourceUsageDuringSmallTests="false"
+            beStrictAboutTestsThatDoNotTestAnything="true"
+            beStrictAboutTodoAnnotatedTests="false"
+            beStrictAboutCoversAnnotation="false"
+            ignoreDeprecatedCodeUnitsFromCodeCoverage="false"
+            enforceTimeLimit="false"
+            defaultTimeLimit="0"
+            timeoutForSmallTests="1"
+            timeoutForMediumTests="10"
+            timeoutForLargeTests="60"        
+            testSuiteLoaderClass="PHPUnit\Runner\StandardTestSuiteLoader"
+            verbose="false"
+            resolveDependencies="true">
     <testsuites>
 
         <testsuite name="Other">
-            <directory suffix=".php">testcases/other/</directory>
+          <directory suffix=".php">testcases/other/</directory>
         </testsuite>
 
         <testsuite name="Payroll Deduction">
-            <directory suffix=".php">testcases/payroll_deduction/</directory>
+          <directory suffix=".php">testcases/payroll_deduction/</directory>
         </testsuite>
 
         <testsuite name="Paystub">
-            <directory suffix=".php">testcases/paystub/</directory>
+          <directory suffix=".php">testcases/paystub/</directory>
         </testsuite>
 
         <testsuite name="Policy">
-            <directory suffix=".php">testcases/policy/</directory>
+          <directory suffix=".php">testcases/policy/</directory>
         </testsuite>
 
         <testsuite name="Expense">
-            <directory suffix=".php">testcases/expense/</directory>
+          <directory suffix=".php">testcases/expense/</directory>
         </testsuite>
 
         <testsuite name="User Review">
-            <directory suffix=".php">testcases/kpi/</directory>
+          <directory suffix=".php">testcases/kpi/</directory>
         </testsuite>
 
         <testsuite name="Job Application">
-            <directory suffix=".php">testcases/recruitment/</directory>
+          <directory suffix=".php">testcases/recruitment/</directory>
         </testsuite>
 
         <testsuite name="i18n">
             <directory suffix=".php">testcases/i18n/</directory>
         </testsuite>
-        <!--
-                <testsuite name="Selenium">
-                    <directory suffix=".php">testcases/selenium/</directory>
-                </testsuite>
-        -->
-    </testsuites>
 
+        <testsuite name="Reports">
+            <directory suffix=".php">testcases/report/</directory>
+        </testsuite>
+
+    </testsuites>
 </phpunit>

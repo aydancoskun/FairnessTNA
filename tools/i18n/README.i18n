@@ -95,7 +95,7 @@ call adds some performance overhead.
 
 The locale directory exists at
 
- fairness/interface/locale
+ /interface/locale
  
 This directory contains:
  - the messages.pot master string dictionary with all english strings.
