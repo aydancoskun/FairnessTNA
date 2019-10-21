@@ -84,7 +84,8 @@ default_interface = html5
 ; Force all clients to use SSL.
 force_ssl = FALSE
 installer_enabled = FALSE
-
+: you want to keep disable_feedback=TRUE as its anyway not sending anything in the moment
+disable_feedback = TRUE
 ; Specify the URL hostname to be used to access FairnessTNA.
 ; The BASE_URL specified above will be appended on to this automatically.
 ; This should be a fully qualified domain name only, do not include http:// or any trailing directories.

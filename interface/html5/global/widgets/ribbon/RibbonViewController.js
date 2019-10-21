@@ -215,7 +215,7 @@ RibbonViewController = Backbone.View.extend( {
 
 		this.setSelectSubMenu( TopMenuManager.selected_sub_menu_id );
 
-		$( '#leftLogo' ).attr( 'src', Global.getRealImagePath( 'css/global/widgets/ribbon/images/logo.png' ) );
+		$( '#leftLogo' ).attr( 'src', Global.getRealImagePath( 'css/global/widgets/ribbon/images/fairness-corner-logo.png' ) );
 		$( '#rightLogo' ).attr( 'src', ServiceCaller.companyLogo + '&t=' + new Date().getTime() );
 
 		if ( LocalCacheData.getLoginUserPreference() ) {

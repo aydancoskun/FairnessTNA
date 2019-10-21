@@ -18,9 +18,7 @@ However, evem though limited this is open source software licensed under the GNU
 GENERAL PUBLIC LICENSE Version 3. So when you dive into the source code to find out
 what is going on and you attempt to change any part of the software to allow more users or
 to add further functionality, you have to wade through, as we have done, a host of 
-obfuscated source code and other attempted "effective technological measures" with direct
-statements in the source code that attempt to forbid you to circumvent their technological
-measures.
+obfuscated source code and other attempts of, what the AGPL calls, "effective technological measures" with direct statements in the source code that attempt to forbid you to circumvent their "technological measures".
 
 TimeTrex have made the choice to license their work under the AGPL however reading through
 the source code there is all sorts of additional restrictions imposed that are simply not
